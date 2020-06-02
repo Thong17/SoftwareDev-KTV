@@ -213,9 +213,10 @@ section .menu li a {
   color: #000;
 }
 
-.canvas {
+#c {
+  display: block;
+  width: 100%;
+  height: 100vh;
   position: fixed;
-  background-color: #202020;
-  z-index: -1;
 }
 /*# sourceMappingURL=style.css.map */
