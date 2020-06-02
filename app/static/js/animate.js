@@ -82,13 +82,13 @@ animate()
 var tl = gsap.timeline()
 
 tl.from('.hero h3', {
-    x: -100
+    x: 100
 }).from('.hero p', {
-    x: 1000,
+    x: 1500,
     duration: 1.5,
     ease: "power3.out"
 }).from('.logo', {
-    y: -50,
+    y: -100,
     ease: 'elastic.out',
     duration: 1
 }, '-=0.5')

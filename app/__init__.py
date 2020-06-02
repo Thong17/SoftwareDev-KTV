@@ -9,10 +9,10 @@ from flask_login import UserMixin, LoginManager
 import os
 from datetime import datetime
 
-connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
+connection = 'mysql+pymysql://root@localhost/phone_shop'
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = '098c75537d0816443c'
 app.config['SQLALCHEMY_DATABASE_URI'] = connection
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
