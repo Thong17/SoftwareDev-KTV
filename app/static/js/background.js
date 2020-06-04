@@ -1,156 +1,138 @@
-var N_FLOWERS = 16, 
-		PALETTE = [
-			'#85a29e', '#f0d442', 
-			'#f59330', '#b22148'], 
-		p = ['M', 'C', ' '], 
-		c, ξ, w, h, flowers = [], 
-		m = null;
+const gui = new dat.GUI()
 
-var rand = function(max, min, is_int) {
-	var max = ((max - 1) || 0) + 1, 
-			min = min || 0, 
-			gen = min + (max - min)*Math.random()
-	
-	return is_int ? (~~gen) : gen;
-};
+const canvas = document.querySelector('#canvas')
 
-var Flower = function() {
-	var shape, fill, k, α, φ, f, ts, 
-			x, y, vx, vy, a, ax, ay, θ, ω;
-	
-	this.init = function(t, ψ) {
-		var dtxt = '', cx, cy, cr, γ, x0, y0, 
-				n = rand(10, 5, 1), 
-				β = 2*Math.PI/n, 
-				ri = rand(20, 5), 
-				ro = rand(80, 50);
-		
-		x = rand(w, 0, 1);
-		y = rand(h, 0, 1);
-		θ = rand(2*Math.PI);
-		ω = rand(.02*Math.PI, .005*Math.PI);
-		vx = vy = 0;
-		
-		fill = PALETTE[rand(4, 0, 1)];
-		ts = t || 0;
-		φ = (ψ || ψ === 0) ? ψ : rand(Math.PI);
-		f = rand(.01, .001);
-		α = Math.sin(φ);
-		
-		for(var i = 0; i < n; i++) {
-			for(var j = 0; j < 4; j++) {
-				if(j > 0 || i + j === 0) {
-					if(i === n - 1 && j === 3) {
-					cx = x0;
-					cy = y0;
-				}
-				else {
-					k = j%3;
-					γ = (i + ~~(j/2) + rand(.2, -.2))*β;
-					cr = (k?ro:ri) + rand(10, -5);
-					cx = ~~(cr*Math.cos(γ));
-					cy = ~~(cr*Math.sin(γ));	
-				}
-				
-				if(i + j === 0) {
-					x0 = cx;
-					y0 = cy;
-				}
-				
-					dtxt += p[Math.min(j, 2)] + cx + ' ' + cy;
-				}
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+const context = canvas.getContext('2d')
+
+const wave = {
+	y: canvas.height / 2,
+	length: 0.01,
+	amplitude: 43,
+	frequency: 0.03
+}
+
+var y = gui.add(wave, 'y', 0, canvas.height)
+gui.add(wave, 'length', -0.01, 0.01)
+gui.add(wave, 'amplitude', -300, 300)
+gui.add(wave, 'frequency', -0.1, 0.1)
+
+let increment = wave.frequency
+
+y.onChange(function () {
+	var createColor = function () {
+
+		// The available hex options
+		var hex = ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+		var shuffle = function () {
+
+			var currentIndex = hex.length;
+			var temporaryValue, randomIndex;
+
+			// While there remain elements to shuffle...
+			while (0 !== currentIndex) {
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentIndex);
+				currentIndex -= 1;
+
+				// And swap it with the current element.
+				temporaryValue = hex[currentIndex];
+				hex[currentIndex] = hex[randomIndex];
+				hex[randomIndex] = temporaryValue;
 			}
+
+		};
+
+		/**
+		 * Create a six-digit hex color
+		 */
+		var hexColor = function () {
+
+			var color = '#';
+
+			for (var i = 0; i < 6; i++) {
+
+				// Shuffle the hex values
+				shuffle(hex);
+
+				// Append first hex value to the string
+				color += hex[0];
+
+			}
+
+			return color;
+
+		};
+
+		// Return the color string
+		return hexColor();
+
+	};
+
+	/*!
+	 * Get the contrasting color for any hex color
+	 * (c) 2019 Chris Ferdinandi, MIT License, https://gomakethings.com
+	 * Derived from work by Brian Suda, https://24ways.org/2010/calculating-color-contrast/
+	 * @param  {String} A hexcolor value
+	 * @return {String} The contrasting color (black or white)
+	 */
+	var getContrast = function (hexcolor) {
+
+		// If a leading # is provided, remove it
+		if (hexcolor.slice(0, 1) === '#') {
+			hexcolor = hexcolor.slice(1);
 		}
-		
-		shape = new Path2D(dtxt);
-	};
-	
-	this.update = function(t, ξ) {
-		var δ, dx, dy, d;
-		
-		θ += ω;
-		
-		α = Math.sin(φ + f*(t - ts));
-		
-		if(m) {
-			dx = m.x - x;
-			dy = m.y - y;
-			
-			d = Math.hypot(dx, dy);
-			δ = Math.atan2(dy, dx);
-			
-			a = .0001*d;
-			ax = a*Math.cos(δ);
-			ay = a*Math.sin(δ);
-			
-			vx += ax;
-			vy += ay;
-			
-			x += vx;
-			y += vy;
+
+		// If a three-character hexcode, make six-character
+		if (hexcolor.length === 3) {
+			hexcolor = hexcolor.split('').map(function (hex) {
+				return hex + hex;
+			}).join('');
 		}
-		
-		if(α <= 0) { this.init(t, 0); }
-		
-		this.draw(ξ);
+
+		// Convert to RGB value
+		var r = parseInt(hexcolor.substr(0, 2), 16);
+		var g = parseInt(hexcolor.substr(2, 2), 16);
+		var b = parseInt(hexcolor.substr(4, 2), 16);
+
+		// Get YIQ ratio
+		var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+		// Check contrast
+		return (yiq >= 128) ? 'black' : 'white';
+
 	};
-	
-	this.draw = function(ξ) {
-		ξ.fillStyle = fill;
-		ξ.globalAlpha = α;
-		
-		ξ.save();
-		ξ.translate(~~x, ~~y);
-		ξ.rotate(θ);
-				
-		ξ.fill(shape);
-		ξ.stroke(shape);
-		
-		ξ.restore();
-	};
-	
-	this.init();
-};
 
-var size = function() {
-	var s = getComputedStyle(c);
-	c.width = w = ~~s.width.split('px')[0];
-	c.height = h = ~~s.height.split('px')[0];
-};
+	// Set the color/BG color
+	var apps = document.querySelectorAll('.menu li');
+	var bgColor = createColor();
+	apps.forEach(app => {
+		app.textContent = bgColor;
+		app.style.backgroundColor = bgColor;
+		app.style.color = getContrast(bgColor);
+	});
 
-var ani = function(t) {
-	ξ.clearRect(0, 0, w, h);
-	
-	for(var i = 0; i < N_FLOWERS; i++) {
-		flowers[i].update(t, ξ);
+})
+
+function animate() {
+
+	requestAnimationFrame(animate)
+
+	context.clearRect(0, 0, canvas.width, canvas.height)
+	context.beginPath()
+	context.moveTo(0, canvas.height)
+	for (let index = 0; index <= canvas.width; index++) {
+		context.lineTo(index, wave.y + Math.sin(index * wave.length + increment) * wave.amplitude)
 	}
-	
-	requestAnimationFrame(ani.bind(this, ++t));
-};
 
-(function init() {
-	c = document.getElementById('c');
-	ξ = c.getContext('2d');
-	
-	size();
-	
-	for(var i = 0; i < N_FLOWERS; i++) {
-		flowers.push(new Flower);
-	}
-	
-	ξ.strokeStyle = ξ.shadowColor = 
-		'#ffebbf';
-	ξ.shadowBlur = 3;
-	
-	ani(0);
-})();
+	context.lineTo(canvas.width, canvas.height)
+	context.stroke()
+	context.fillStyle = '#000'
+	context.fill()
+	increment += wave.frequency
+}
 
-addEventListener('resize', size, false);
-
-addEventListener('mousemove', function(e) {
-	m = { 'x': e.clientX, 'y': e.clientY };
-}, false);
-
-addEventListener('mouseout', function(e) {
-	m = null;
-}, false);
+animate()

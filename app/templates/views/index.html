@@ -17,7 +17,7 @@
         </div>
     </nav>
     <section>
-        <canvas id='c'></canvas>
+        <canvas id='canvas'></canvas>
         <ul class="menu">
             <li>
                 <a href="">Inventory</a>
@@ -36,10 +36,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
+    <script src="{{url_for('static', filename='js/dat.gui.js')}}"></script>
     <script src="{{url_for('static', filename='js/background.js')}}"></script>
 </body>
 
 </html>
-{% block body %}
-<h1>Index</h1>
-{% endblock %}

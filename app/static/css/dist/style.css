@@ -173,7 +173,7 @@ section .menu {
 section .menu li {
   height: 130px;
   width: 130px;
-  background-color: #555;
+  background-color: #000;
   list-style-type: none;
   margin: 0 30px;
   border-radius: 10px;
@@ -213,10 +213,7 @@ section .menu li a {
   color: #000;
 }
 
-#c {
-  display: block;
-  width: 100%;
-  height: 100vh;
+#canvas {
   position: fixed;
 }
 /*# sourceMappingURL=style.css.map */
