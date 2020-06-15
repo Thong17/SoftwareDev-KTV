@@ -30,17 +30,21 @@ def login():
         if form.validate_on_submit():
             username = request.form['username']
             password = request.form['password']
-            user = tblUser.query.filter_by(username=username).first()
-            while user is not None:
-                isMatch = bcrypt.check_password_hash(user.password, password)
-                if isMatch is True:
-                    login_user(user)
-                    msg['redirect'] = '/'
+            try:
+                user = tblUser.query.filter_by(username=username).first()
+                while user is not None:
+                    isMatch = bcrypt.check_password_hash(user.password, password)
+                    if isMatch is True:
+                        login_user(user)
+                        msg['redirect'] = '/'
+                        return jsonify(msg)
+                    msg['password'].append('Password does not match')
                     return jsonify(msg)
-                msg['password'].append('Password does not match')
+                msg['username'].append('Username does not exist')
                 return jsonify(msg)
-            msg['username'].append('Username does not exist')
-            return jsonify(msg)
+            except:
+                msg['username'].append('Connection is not available')
+                return jsonify(msg)
         for fieldName, errorMessages in form.errors.items():
             for err in errorMessages:
                 msg[fieldName].append(err)
@@ -83,3 +87,9 @@ def register():
                 db.session.rollback()
                 return 'Register failed'
     return render_template('views/register.html', form=form)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    logout_user()
+    return redirect('/login')
+
