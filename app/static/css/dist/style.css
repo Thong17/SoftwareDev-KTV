@@ -68,6 +68,7 @@ html, body {
           align-items: center;
   min-height: 100%;
   padding-bottom: 50px;
+  margin: 0;
 }
 
 .container-right footer {
@@ -200,7 +201,7 @@ span {
 .side-nav {
   height: 100vh;
   width: 78px;
-  background-color: #35363a;
+  background-color: #dddddd;
   position: fixed;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -213,8 +214,9 @@ span {
       -ms-flex-pack: space-evenly;
           justify-content: space-evenly;
   padding: 0 30px;
-  -webkit-transition: 0.3s ease-in-out;
-  transition: 0.3s ease-in-out;
+  -webkit-transition: 0.5s ease-in-out;
+  transition: 0.5s ease-in-out;
+  z-index: 1;
 }
 
 .side-nav li {
@@ -222,7 +224,7 @@ span {
 }
 
 .side-nav li a {
-  color: #f2f2f2;
+  color: #111;
   font-size: 18px;
 }
 
