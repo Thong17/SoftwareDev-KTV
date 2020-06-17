@@ -21,12 +21,12 @@
             </button>
         </li>
         <li>
-            <a href="">
+            <a href="/">
                 <i class="fa fa-home" aria-hidden="true"></i>
             </a>
         </li>
         <li>
-            <a href="">
+            <a href="/custome">
                 <i class="fa fa-tasks" aria-hidden="true"></i>
             </a>
         </li>
@@ -36,7 +36,7 @@
             </a>
         </li>
         <li>
-            <a href="">
+            <a href="/setting">
                 <i class="fa fa-cog" aria-hidden="true"></i>
             </a>
         </li>
@@ -44,12 +44,14 @@
     <header>
         <nav class="menu-nav">
             <div class="nav-logo">
-                <i class="fa fa-bolt" aria-hidden="true"></i>
+                <i class="fa fa-terminal" aria-hidden="true"></i>
             </div>
+            {% block navbar %}{% endblock %}
             <div class="dropdown">
-                <button type="button" class="btn" data-toggle="dropdown">
+                <button type="button" class="btn btn-user" data-toggle="dropdown">
                     {{current_user.username}}
                 </button>
+
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Link 1</a>
                     <a class="dropdown-item" href="#">Link 2</a>
@@ -68,13 +70,34 @@
     <footer>
         Developed by thong
     </footer>
-    
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
+    <script>
+        var theme = ''
+        if (document.cookie.length != 0) {
+            theme = document.cookie.split('=')[1]
+            $('html').attr('data-theme', theme)
+            $.each($('#select-theme option'), function () {
+                if ($(this).val() == theme) {
+                    $(this).attr('selected', 'selected')
+                }
+            })
+        }
+
+        $('#side-btn').on('click', function () {
+            $('.side-nav').toggleClass('nav-on')
+        })
+        $('#select-theme').on('change', function () {
+            theme = $(this).children('option:selected').val()
+            document.cookie = 'color=' + theme
+            $('html').attr('data-theme', theme)
+        })
+    </script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 from app import app, bcrypt, db, login_manager
-from app import tblUser
+from app import tblUser, tblBrand, tblCategory
 from app import LoginForm, RegisterForm
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
@@ -92,4 +92,12 @@ def register():
 def logout():
     logout_user()
     return redirect('/login')
+
+@app.route('/setting')
+def setting():
+    return render_template('views/setting.html')
+
+@app.route('/custome')
+def custome():
+    return render_template('views/custome.html')
 
