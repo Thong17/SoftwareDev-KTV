@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -48,10 +48,9 @@
             </div>
             {% block navbar %}{% endblock %}
             <div class="dropdown">
-                <button type="button" class="btn btn-user" data-toggle="dropdown">
+                <button type="button" class="btn color-font" data-toggle="dropdown">
                     {{current_user.username}}
                 </button>
-
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Link 1</a>
                     <a class="dropdown-item" href="#">Link 2</a>
@@ -70,7 +69,6 @@
     <footer>
         Developed by thong
     </footer>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>

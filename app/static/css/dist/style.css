@@ -140,11 +140,6 @@ input:valid + label {
           transform: translate(0, -50%);
 }
 
-.btn-user {
-  color: var(--color-logo);
-  font-weight: 300;
-}
-
 .nav-logo {
   color: var(--color-logo);
 }
@@ -314,6 +309,10 @@ footer {
 .color-font {
   color: var(--color-font);
   font-weight: 300;
+}
+
+.color-font:hover {
+  color: var(--color-font);
 }
 
 .wrap-container {

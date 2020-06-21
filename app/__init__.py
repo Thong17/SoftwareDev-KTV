@@ -66,25 +66,25 @@ category_brand = db.Table('category_brand',
 class tblCategory(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     category = db.Column(db.String(20), nullable=False)
-    description = db.Column(db.Text(), nullable=False)
+    description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 class tblProperty(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     property = db.Column(db.String(20), nullable=False)
-    description = db.Column(db.Text(), nullable=False)
+    description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
 
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    value = db.Column(db.String(20), nullable=False)
+    value = db.Column(db.String(255), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     propertyId = db.Column(db.String(36), db.ForeignKey('tbl_property.id'), nullable=False)
-
+    categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
 
 class tblBrand(db.Model):
     id = db.Column(db.String(36), primary_key=True)

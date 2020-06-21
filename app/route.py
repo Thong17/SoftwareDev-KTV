@@ -101,3 +101,7 @@ def setting():
 def custome():
     return render_template('views/custome.html')
 
+@app.route('/category')
+def category():
+    return render_template('views/category.html')
+
