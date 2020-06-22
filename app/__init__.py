@@ -53,7 +53,7 @@ class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
     firstname = db.Column(db.String(20), nullable=False)
     lastname = db.Column(db.String(20), nullable=False)
-    username = db.Column(db.String(20), nullable=False)
+    username = db.Column(db.String(20), nullable=False, unique=True)
     gender = db.Column(db.String(1), nullable=False)
     birthdate = db.Column(db.Date, nullable=True)
     email = db.Column(db.String(100), nullable=False)
@@ -70,14 +70,15 @@ category_brand = db.Table('category_brand',
 
 class tblCategory(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    category = db.Column(db.String(20), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 class tblProperty(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    property = db.Column(db.String(20), nullable=False)
+    property = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
@@ -85,18 +86,37 @@ class tblProperty(db.Model):
 
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    value = db.Column(db.String(255), nullable=True, default='')
+    product = db.Column(db.String(50), nullable=False)
+    photo = db.Column(db.String(255), nullable=True, default='default.png')
+    description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    propertyId = db.Column(db.String(36), db.ForeignKey('tbl_property.id'), nullable=False)
+    brandId = db.Column(db.String(36), db.ForeignKey('tbl_brand.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
+
+class tblValue(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    value = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text(), nullable=True, default='')
+    productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+    propertyId = db.Column(db.String(36), db.ForeignKey('tbl_property.id'), nullable=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 class tblBrand(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     brand = db.Column(db.String(20), nullable=False)
+    description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     brands = db.relationship('tblCategory', secondary=category_brand, backref='brands', lazy='dynamic')
+
+class tblColor(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    color = db.Column(db.String(20), nullable=False)
+    hex = db.Column(db.String(100), nullable=True, default= '')
+    price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    product = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=True)
 
 
 from app import route

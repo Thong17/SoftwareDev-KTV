@@ -103,7 +103,17 @@ def custome():
 @app.route('/category', methods=['POST', 'GET'])
 def category():
     form = CategoryForm()
+    categories = tblCategory.query.all()
     if request.method == 'POST':
-        return 
-    return render_template('views/category.html', form=form)
+        category = request.form['category']
+        description = request.form['description']
+        Model = tblCategory(id=str(uuid4()), category=category, description=description, createdBy=current_user.id)
+        try:
+            db.session.add(Model)
+            db.session.commit()
+            return redirect('/category')
+        except:
+            return 'Failed'
+        
+    return render_template('views/category.html', form=form, categories=categories)
 

@@ -63,12 +63,12 @@
 {% endblock %}
 {% block script %}
 <script>
-    var pie = document.querySelector('#pie')
+    var pie = $('#pie')
 
     var canvase = document.getElementById("pieChart")
 
-    canvase.width = pie.clientWidth
-    canvase.height = pie.clientHeight
+    canvase.width = pie.width()
+    canvase.height = pie.height()
 
     $(window).on('resize', function () {
         canvase.width = pie.clientWidth

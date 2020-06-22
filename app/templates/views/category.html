@@ -7,7 +7,7 @@
     
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 100%;">
-            <table class="table">
+            <table class="table color-font">
                 <thead>
                     <tr>
                         <th>List categories</th>
@@ -15,10 +15,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Laptop</td>
-                        <td>Description</td>
-                    </tr>
+                    {% if categories %}
+                        {% for category in categories %}
+                            <tr>
+                                <td>{{ category.category }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <p>No category created</p>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
