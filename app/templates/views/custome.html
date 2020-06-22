@@ -26,5 +26,70 @@
 {% endblock %}
 
 {% block content %}
+<div class="wrap-container grid-container">
+    <div class="grid-item">
+        <div class="item-header">
+            Category
+        </div>
+        <div class="item-body" id="pie">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Brand
+        </div>
+        <div class="item-body">
 
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Product
+        </div>
+        <div class="item-body">
+
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Advertise
+        </div>
+        <div class="item-body">
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    var pie = document.querySelector('#pie')
+    
+    var canvase = document.getElementById("pieChart")
+    
+    canvase.width = pie.clientWidth
+    canvase.height = pie.clientHeight
+
+    $(window).on('resize', function() {
+        canvase.width = pie.clientWidth
+        canvase.height = pie.clientHeight
+    })
+    
+    
+    var ctxP = canvase.getContext('2d');
+    var myPieChart = new Chart(ctxP, {
+        type: 'pie',
+        data: {
+            labels: ["Red", "Green", "Yellow", "Grey", "Dark Grey"],
+            datasets: [{
+                data: [300, 50, 100, 40, 120],
+                backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360"],
+                hoverBackgroundColor: ["#FF5A5E", "#5AD3D1", "#FFC870", "#A8B3C5", "#616774"]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
 {% endblock %}

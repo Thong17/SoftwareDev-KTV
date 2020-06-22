@@ -72,6 +72,7 @@ html, body {
     min-height: 100%;
     padding-bottom: 50px;
     margin: 0;
+    overflow-x: hidden;
 }
 
 .container-right footer {
@@ -158,12 +159,14 @@ input:valid+label {
     height: 100vh;
     width: 78px;
     background-color: var(--color-menu);
+    width: 58px;
     position: fixed;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    padding: 0 30px;
+    padding: 0 20px;
     transition: 0.5s ease-in-out;
+    transition: 0.3s ease-in-out;
     z-index: 1;
 }
 
@@ -201,6 +204,7 @@ header {
     min-height: 100%;
     padding-bottom: 70px;
     margin-left: 78px;
+    margin-right: 18px;
 }
 
 .menu-nav {
@@ -269,4 +273,30 @@ footer {
     font-weight: 300;
     font-size: 13px;
     outline: none;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    padding: 50px;
+    grid-gap: 30px;
+}
+.grid-item {
+    background-color: var(--color-menu);
+    color: var(--color-font);
+    height: 330px;
+    border-radius: 5px;
+    position: relative;
+}
+.item-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+.item-body {
+    overflow: hidden;
+    position: relative;
+    height: 250px;
 }
