@@ -4,7 +4,43 @@
 
 {% block content %}
 <div class="wrap-container">
-    <button class="btn border color-font">Create Category</button>
+    
+    <div class="row-wrapper">
+        <div class="column-wrapper" style="width: 100%;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>List categories</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Laptop</td>
+                        <td>Description</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="border-right"></div>
+        <div class="column-wrapper">
+            <h3 class="color-font title">Category</h3>
+            <form action="/category" method="post">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.category.label(class='color-font') }}
+                    {{ form.category(class='form-control input-color') }}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label(class='color-font') }}
+                    {{ form.description(class='form-control input-color') }}
+                </div>
+                <div class="form-group flex-end">
+                    {{form.submit(class='btn border color-font')}}
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
 

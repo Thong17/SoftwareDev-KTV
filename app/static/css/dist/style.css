@@ -148,6 +148,7 @@ input:valid + label {
 .title {
   margin-bottom: 30px;
   text-align: center;
+  text-transform: uppercase;
 }
 
 .flex-end {
@@ -185,9 +186,8 @@ input:valid + label {
 
 .side-nav {
   height: 100vh;
-  width: 78px;
-  background-color: var(--color-menu);
   width: 58px;
+  background-color: var(--color-menu);
   position: fixed;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -200,8 +200,6 @@ input:valid + label {
       -ms-flex-pack: space-evenly;
           justify-content: space-evenly;
   padding: 0 20px;
-  -webkit-transition: 0.5s ease-in-out;
-  transition: 0.5s ease-in-out;
   -webkit-transition: 0.3s ease-in-out;
   transition: 0.3s ease-in-out;
   z-index: 1;
@@ -253,8 +251,7 @@ header {
   position: relative;
   min-height: 100%;
   padding-bottom: 70px;
-  margin-left: 78px;
-  margin-right: 18px;
+  margin-left: 58px;
 }
 
 .menu-nav {
@@ -268,9 +265,12 @@ header {
       -ms-flex-align: center;
           align-items: center;
   position: fixed;
-  width: 100%;
-  position: relative;
+  width: calc(100% - 58px);
   padding: 20px 50px;
+  z-index: 100;
+  background-color: var(--color-bg);
+  -webkit-transition: 0.3s ease-in-out;
+  transition: 0.3s ease-in-out;
 }
 
 footer {
@@ -311,6 +311,10 @@ footer {
   font-weight: 300;
 }
 
+main {
+  padding-top: 50px;
+}
+
 .color-font {
   color: var(--color-font);
   font-weight: 300;
@@ -322,6 +326,25 @@ footer {
 
 .wrap-container {
   padding: 50px;
+  position: relative;
+}
+
+.border-right {
+  margin: 0 30px;
+}
+
+.row-wrapper {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.column-wrapper {
+  padding: 0 30px;
 }
 
 .right {
@@ -355,8 +378,8 @@ footer {
 .grid-container {
   display: -ms-grid;
   display: grid;
-  -ms-grid-columns: 50% 50%;
-      grid-template-columns: 50% 50%;
+  -ms-grid-columns: 50% auto;
+      grid-template-columns: 50% auto;
   padding: 50px;
   grid-gap: 30px;
 }
@@ -388,5 +411,10 @@ footer {
   overflow: hidden;
   position: relative;
   height: 250px;
+}
+
+.input-color, .input-color:focus {
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 /*# sourceMappingURL=style.css.map */

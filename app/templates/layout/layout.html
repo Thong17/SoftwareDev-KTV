@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="{{theme}}">
 
 <head>
     <meta charset="UTF-8">
@@ -8,8 +8,17 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
         integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/css/mdb.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{url_for('static', filename='css/dist/style.css')}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var theme = ''
+
+        if (document.cookie.length != 0) {
+            theme = document.cookie.split('=')[1]
+            $('html').attr('data-theme', theme)
+
+        }
+    </script>
 </head>
 
 <body>
@@ -38,7 +47,7 @@
         </li>
         <li>
             <a href="/setting">
-                <i class="fa fa-cog" aria-hidden="true"></i>
+                <i class="fa fa-sliders" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -68,28 +77,23 @@
         </main>
     </header>
     <footer>
-        Developed by thong
+        <p class="color-font">Developed by thong</p>
+        
     </footer>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/js/mdb.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/js/mdb.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
     {% block script %}{% endblock %}
     <script>
-        var theme = ''
-        if (document.cookie.length != 0) {
-            theme = document.cookie.split('=')[1]
-            $('html').attr('data-theme', theme)
-            $.each($('#select-theme option'), function () {
-                if ($(this).val() == theme) {
-                    $(this).attr('selected', 'selected')
-                }
-            })
-        }
-
+        $.each($('#select-theme option'), function () {
+            if ($(this).val() == theme) {
+                $(this).attr('selected', 'selected')
+            }
+        })
         $('#side-btn').on('click', function () {
             $('.side-nav').toggleClass('nav-on')
         })

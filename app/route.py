@@ -1,6 +1,6 @@
 from app import app, bcrypt, db, login_manager
 from app import tblUser, tblBrand, tblCategory
-from app import LoginForm, RegisterForm
+from app import LoginForm, RegisterForm, CategoryForm
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -10,7 +10,6 @@ import json
 @login_manager.user_loader
 def load_user(id):
     return tblUser.query.get(id)
-
 
 @app.route('/')
 @login_required
@@ -101,7 +100,10 @@ def setting():
 def custome():
     return render_template('views/custome.html')
 
-@app.route('/category')
+@app.route('/category', methods=['POST', 'GET'])
 def category():
-    return render_template('views/category.html')
+    form = CategoryForm()
+    if request.method == 'POST':
+        return 
+    return render_template('views/category.html', form=form)
 

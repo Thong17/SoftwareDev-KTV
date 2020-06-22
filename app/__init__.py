@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, Email, EqualTo
 from wtforms.fields.html5 import DateField, DateTimeLocalField
 from flask_login import UserMixin, LoginManager
@@ -41,6 +41,11 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=20)])
     confirm = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
+
+class CategoryForm(FlaskForm):
+    category = StringField('Category', validators=[DataRequired(), Length(max=20)])
+    description = TextAreaField('Description')
+    submit = SubmitField('Save')
 
 
 #Table
