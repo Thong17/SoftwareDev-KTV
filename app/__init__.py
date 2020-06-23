@@ -2,11 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
+from flask_marshmallow import Marshmallow
+from marshmallow_sqlalchemy import ModelSchema
 from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, Email, EqualTo
 from wtforms.fields.html5 import DateField, DateTimeLocalField
 from flask_login import UserMixin, LoginManager
 import os
+from marshmallow import fields
 from datetime import datetime
 
 connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
@@ -19,6 +22,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 bcrypt = Bcrypt(app)
+
+ma = Marshmallow(app)
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -74,6 +79,7 @@ class tblCategory(db.Model):
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    properties = db.relationship('tblProperty', backref='properties', lazy=True)
 
 class tblProperty(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -98,7 +104,7 @@ class tblValue(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     value = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text(), nullable=True, default='')
-    productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+    products = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
     propertyId = db.Column(db.String(36), db.ForeignKey('tbl_property.id'), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
@@ -116,7 +122,18 @@ class tblColor(db.Model):
     color = db.Column(db.String(20), nullable=False)
     hex = db.Column(db.String(100), nullable=True, default= '')
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    product = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=True)
+    productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=True)
+
+
+class BrandSchema(ModelSchema):
+    class Meta:
+        model = tblBrand
+
+class CategorySchema(ModelSchema):
+    class Meta:
+        model = tblCategory
+
+        brands = fields.Nested(BrandSchema, many=True)
 
 
 from app import route

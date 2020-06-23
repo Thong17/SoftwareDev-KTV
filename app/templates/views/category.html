@@ -4,48 +4,115 @@
 
 {% block content %}
 <div class="wrap-container">
-    
+
     <div class="row-wrapper">
+        <div class="column-wrapper" style="width: 350px">
+            <div class="column-header">
+                <div class="box today">
+                    <div class="box-icon">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        <p>Today</p>
+                    </div>
+                    <div class="box-result">
+                        0
+                    </div>
+                </div>
+                <div class="box total">
+                    <div class="box-icon">
+                        <i class="fa fa-inbox" aria-hidden="true"></i>
+                        <p>Total</p>
+                    </div>
+                    <div class="box-result">
+                        0
+                    </div>
+
+                </div>
+                <div class="box activity">
+                    <div class="box-icon">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        <p>Activity</p>
+                    </div>
+                    <div class="box-result">
+                        0
+                    </div>
+
+                </div>
+            </div>
+            <br>
+            <div class="flex-between">
+                <h5 class="color-font">Categories</h5>
+                <button class="btn border color-font" id="add-category">+</button>
+            </div>
+            <hr>
+            <div class="item-container">
+                {% if categories %}
+                {% for category in categories %}
+                <div class="flex-between item color-font" id="{{ category.id }}">
+                    <p>{{ category.category }}</p>
+                    <p class="clear-icon">+</p>
+                </div>
+                {% endfor %}
+                {% endif %}
+                <form action="/category" method="post" class="form">
+                    <hr>
+                    {{ form.csrf_token }}
+                    <div class="form-group margin-0">
+                        {{ form.category(class='form-control input-color', placeholder='Category', autocomplete='off') }}
+                    </div>
+                    <div class="form-group margin-0">
+                        {{ form.description(class='form-control input-color') }}
+                    </div>
+                    <div class="form-group flex-end margin-0">
+                        {{form.submit(class='btn border color-font', placeholder='Description')}}
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <div class="border-right"></div>
         <div class="column-wrapper" style="width: 100%;">
-            <table class="table color-font">
+            <div class="flex-between" id="property">
+                <h3 class="color-font">Category</h3>
+            </div>
+            <br>
+            <table class="table">
                 <thead>
                     <tr>
-                        <th>List categories</th>
-                        <th></th>
+                        <td>Column</td>
+                        <td>Type</td>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if categories %}
-                        {% for category in categories %}
-                            <tr>
-                                <td>{{ category.category }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <p>No category created</p>
-                    {% endif %}
                 </tbody>
             </table>
-        </div>
-        <div class="border-right"></div>
-        <div class="column-wrapper">
-            <h3 class="color-font title">Category</h3>
-            <form action="/category" method="post">
-                {{ form.csrf_token }}
-                <div class="form-group">
-                    {{ form.category.label(class='color-font') }}
-                    {{ form.category(class='form-control input-color') }}
-                </div>
-                <div class="form-group">
-                    {{ form.description.label(class='color-font') }}
-                    {{ form.description(class='form-control input-color') }}
-                </div>
-                <div class="form-group flex-end">
-                    {{form.submit(class='btn border color-font')}}
-                </div>
-            </form>
         </div>
     </div>
 </div>
 {% endblock %}
 
+{% block script %}
+<script>
+    $('#add-category').on('click', function () {
+        var form = $('.form').toggleClass('display')
+        document.querySelector('#submit').scrollIntoView({
+            behavior: 'smooth'
+        })
+        
+        gsap.from('.form', {
+            y: -50,
+            opacity: 0
+        })
+    })
+    $('.item').on('click', function() {
+        var id = $(this).attr('id')
+        $.ajax({
+            url: '/category/'+id,
+            type: 'post',
+            data: {data: id},
+            success: function(data) {
+                $('#property').html('<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">'+ data.category +'</h5></div><button class="btn border color-font" id="'+data.id+'">+</button>')
+            }   
+        })
+    })
+</script>
+{% endblock %}
