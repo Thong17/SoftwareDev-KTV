@@ -14,7 +14,7 @@
                         <p>Today</p>
                     </div>
                     <div class="box-result">
-                        0
+                        {{today}}
                     </div>
                 </div>
                 <div class="box total">
@@ -23,7 +23,7 @@
                         <p>Total</p>
                     </div>
                     <div class="box-result">
-                        0
+                        {{total}}
                     </div>
 
                 </div>
@@ -39,9 +39,11 @@
                 </div>
             </div>
             <br>
-            <div class="flex-between">
+            <div class="flex-center">
                 <h5 class="color-font">Categories</h5>
-                <button class="btn border color-font" id="add-category">+</button>
+                <button class="btn border color-font" id="add-category">
+                    <p class="plus">+</p>
+                </button>
             </div>
             <hr>
             <div class="item-container">
@@ -49,20 +51,20 @@
                 {% for category in categories %}
                 <div class="flex-between item color-font" id="{{ category.id }}">
                     <p>{{ category.category }}</p>
-                    <p class="clear-icon">+</p>
+                    <p class="clear">+</p>
                 </div>
                 {% endfor %}
                 {% endif %}
                 <form action="/category" method="post" class="form">
                     <hr>
                     {{ form.csrf_token }}
-                    <div class="form-group margin-0">
+                    <div class="form-group m-0" id="cgr">
                         {{ form.category(class='form-control input-color', placeholder='Category', autocomplete='off') }}
                     </div>
-                    <div class="form-group margin-0">
+                    <div class="form-group m-0">
                         {{ form.description(class='form-control input-color') }}
                     </div>
-                    <div class="form-group flex-end margin-0">
+                    <div class="form-group flex-end m-0">
                         {{form.submit(class='btn border color-font', placeholder='Description')}}
                     </div>
                 </form>
@@ -71,20 +73,25 @@
         </div>
         <div class="border-right"></div>
         <div class="column-wrapper" style="width: 100%;">
-            <div class="flex-between" id="property">
-                <h3 class="color-font">Category</h3>
+            <div class="content-header">
+                <div class="flex-between" id="prop-header">
+                    <h3 class="color-font">Category</h3>
+                </div>
             </div>
-            <br>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <td>Column</td>
-                        <td>Type</td>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div class="content-body">
+                <table class="table color-font">
+                    <thead>
+                        <tr>
+                            <td style="width: 30%; font-weight: 500;">Column</td>
+                            <td style="width: 20%; font-weight: 500;">Type</td>
+                            <td style="width: 50%; font-weight: 500;">Description</td>
+                        </tr>
+                    </thead>
+                    <tbody id="list-properties">
+
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -92,27 +99,160 @@
 
 {% block script %}
 <script>
+
+    function convertUTCDateToLocalDate(date) {
+        var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+
+        var offset = date.getTimezoneOffset() / 60;
+        var hours = date.getHours();
+
+        newDate.setHours(hours - offset);
+
+        return newDate;
+    }
     $('#add-category').on('click', function () {
         var form = $('.form').toggleClass('display')
+        if (form.hasClass('display')) {
+            $('#add-category p').addClass('clear')
+        } else {
+            $('#add-category p').removeClass('clear')
+        }
         document.querySelector('#submit').scrollIntoView({
             behavior: 'smooth'
         })
-        
+
         gsap.from('.form', {
             y: -50,
             opacity: 0
         })
     })
-    $('.item').on('click', function() {
+    $('.item').on('click', function (e) {
         var id = $(this).attr('id')
         $.ajax({
-            url: '/category/'+id,
-            type: 'post',
-            data: {data: id},
-            success: function(data) {
-                $('#property').html('<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">'+ data.category +'</h5></div><button class="btn border color-font" id="'+data.id+'">+</button>')
-            }   
+            url: '/category/' + id,
+            method: 'POST',
+            data: { data: id },
+            success: function (data) {
+                if ($('.property-form').hasClass('display-row')) {
+                    $('.property-form').removeClass('display-row')
+                }
+                $('#prop-header').html('<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">' + data.category + '</h5></div><button class="btn border color-font add-prop" id="' + data.id + '"><p class="plus">+</p></button>')
+                var element = ''
+                if (data.properties.length > 0) {
+                    data.properties.forEach(prop => {
+
+                        var date = convertUTCDateToLocalDate(new Date(prop.createdOn))
+
+                        element += '<tr><td>' + prop.property + '</td><td>' + prop.type + '</td><td class="flex-between-center"><p>' + prop.description + '</p><div class="flex-between-center action-btn"><p class="clear" id="'+prop.id+'">+</p><i class="fa fa-pencil-square-o" id="'+prop.id+'" aria-hidden="true"></i></div></td></tr>'
+                    });
+                }
+                element += `<tr class="property-form">
+                            <td class="pl-0"><input type="text" name="property" class="form-control input-color" id="property"
+                                    placeholder="Property"></td>
+                            <td><select name="type" id="type" class="form-control input-color">
+                                    <option value="Text">Text</option>
+                                    <option value="Currency">Currency</option>
+                                    <option value="Number">Number</option>
+                                    <option value="Boolean">Boolean</option>
+                                </select></td>
+                            <td style="display: flex; justify-content: space-between;" class="pr-0"><input type="text"
+                                    name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
+                                    class="btn border color-font ml-3" id="add-property">+</button></td>
+                        </tr>`
+                $('#list-properties').html(element)
+
+            }
+        })
+
+        var containers = $('.item-container').children()
+
+        Array.from(containers).forEach(item => {
+            $(item).removeClass('is-selected')
+        });
+        $(this).addClass('is-selected')
+
+
+    })
+    $('html').on('click', '.add-prop', function () {
+        var form = $('.property-form').toggleClass('display-row')
+        if (form.hasClass('display-row')) {
+            $('.add-prop p').addClass('clear')
+        } else {
+            $('.add-prop p').removeClass('clear')
+        }
+        gsap.from('.property-form', {
+            opacity: 0
         })
     })
+    $('html').on('click', '#add-property', function () {
+        var categoryId = $('.add-prop').attr('id')
+        var property = $('#property')
+        var type = $('#type')
+        var description = $('#detail')
+
+        var data = {}
+        data.categoryId = categoryId
+        data.property = property.val()
+        data.type = type.val()
+        data.description = description.val()
+
+        $.ajax({
+            url: '/category/property',
+            method: 'POST',
+            data: data,
+            success: function (data) {
+                if (data['msg'] == '') {
+                    $('#list-properties').prepend(`
+                        <tr>
+                            <td>`+ data['property'] + `</td>
+                            <td>`+ data['type'] + `</td>
+                            <td>`+ data['description'] + `</td>
+                        </tr>
+                    `)
+                }
+            }
+        })
+
+        property.val('')
+        type.val('')
+        description.val('')
+    })
+    $(document).on('submit', 'form', function () {
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            dataType: 'json',
+            data: $(this).serialize(),
+            success: function (data) {
+                if (data['redirect'] == '/category') {
+                    window.location.href = data['redirect']
+                }
+                if (data['category'].length > 0) {
+                    for (let index = 0; index < data['category'].length; index++) {
+                        const element = data['category'][index];
+                        $('#category').addClass('invalid')
+                        $('#cgr').append('<div title="' + element + '" class="errors-msg" id="err-cgr"><i class="fa fa-exclamation" aria-hidden="true"></i></div>')
+                    }
+                    gsap.from('#err-cgr', {
+                        opacity: 0,
+                        scale: 0.5,
+                        duration: 1,
+                        ease: 'elastic.out'
+                    })
+                } else {
+                    $('#category').removeClass('invalid')
+                    $('#err-cgr').remove()
+                }
+            }
+        });
+        return false;
+    })
+    $('#list-properties').on('click', '.action-btn p', function() {
+        console.log(this)
+    })
+    $('#list-properties').on('click', '.action-btn i', function() {
+        console.log(this)
+    })
+
 </script>
 {% endblock %}

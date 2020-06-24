@@ -1,11 +1,13 @@
 from app import app, bcrypt, db, login_manager
-from app import tblUser, tblBrand, tblCategory
+from app import tblUser, tblBrand, tblCategory, tblProperty
 from app import LoginForm, RegisterForm, CategoryForm
 from app import CategorySchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
 import json
+from datetime import datetime, timedelta, date
+from sqlalchemy import func
 
 
 @login_manager.user_loader
@@ -106,7 +108,8 @@ def setting():
 @app.route('/custome')
 @login_required
 def custome():
-    return render_template('views/custome.html')
+    categories = tblCategory.query.all()
+    return render_template('views/custome.html', categories=categories)
 
 
 @app.route('/category', methods=['POST', 'GET'])
@@ -114,18 +117,30 @@ def custome():
 def categories():
     form = CategoryForm()
     categories = tblCategory.query.all()
+    today = len(tblCategory.query.filter(tblCategory.createdOn > datetime.utcnow() - timedelta(days=1)).all())
+    total = len(categories)
     if request.method == 'POST':
-        category = request.form['category']
-        description = request.form['description']
-        Model = tblCategory(id=str(uuid4()), category=category, description=description, createdBy=current_user.id)
-        try:
-            db.session.add(Model)
-            db.session.commit()
-            return redirect('/category')
-        except:
-            return 'Failed'
-
-    return render_template('views/category.html', form=form, categories=categories)
+        msg = {
+            'category': [],
+            'redirect': ''
+        }
+        if form.validate_on_submit():
+            category = request.form['category']
+            description = request.form['description']
+            Modal = tblCategory(id=str(uuid4()), category=category,
+                                description=description, createdBy=current_user.id)
+            try:
+                db.session.add(Modal)
+                db.session.commit()
+                msg['redirect'] = '/category'
+                return jsonify(msg)
+            except:
+                return 'Failed'
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                msg[fieldName].append(err)
+        return jsonify(msg)
+    return render_template('views/category.html', form=form, categories=categories, today=today, total=total)
 
 
 @app.route('/category/<id>', methods=['POST'])
@@ -141,4 +156,15 @@ def category(id):
 @app.route('/category/property', methods=['POST'])
 @login_required
 def add_property():
-    return ''
+    categoryId = request.form['categoryId']
+    _property = request.form['property']
+    _type = request.form['type']
+    description = request.form['description']
+    id = str(uuid4())
+
+    Modal = tblProperty(id=id, property=_property, type=_type,
+                        description=description, categoryId=categoryId, createdBy=current_user.id)
+
+    db.session.add(Modal)
+    db.session.commit()
+    return jsonify({'id': id, 'property': _property, 'type': _type, 'description': description, 'msg': ''})

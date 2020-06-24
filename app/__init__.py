@@ -129,11 +129,20 @@ class BrandSchema(ModelSchema):
     class Meta:
         model = tblBrand
 
+class PropertySchema(ModelSchema):
+    class Meta:
+        model = tblProperty
+
 class CategorySchema(ModelSchema):
+    brands = fields.Nested(BrandSchema, many=True)
+    properties = fields.Nested(PropertySchema(many=True), many=True)
     class Meta:
         model = tblCategory
 
-        brands = fields.Nested(BrandSchema, many=True)
+        
+
+
+
 
 
 from app import route
