@@ -117,8 +117,12 @@ def custome():
 def categories():
     form = CategoryForm()
     categories = tblCategory.query.all()
-    today = len(tblCategory.query.filter(tblCategory.createdOn > datetime.utcnow() - timedelta(days=1)).all())
     total = len(categories)
+    today = []
+
+    for item in categories:
+        if datetime.now().date() == item.createdOn.date():
+            today.append(item)
     if request.method == 'POST':
         msg = {
             'category': [],

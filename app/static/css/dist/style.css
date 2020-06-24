@@ -572,7 +572,7 @@ main {
 }
 
 .item-container {
-  height: 340px;
+  height: 50vh;
   overflow-y: auto;
 }
 
