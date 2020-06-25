@@ -79,7 +79,7 @@
                 </div>
             </div>
             <div class="content-body">
-                <table class="table color-font" id="tbl-property">
+                <table class="table color-font">
                     <thead>
                         <tr>
                             <td style="width: 30%; font-weight: 500;">Column</td>
@@ -98,21 +98,8 @@
 {% endblock %}
 
 {% block script %}
-<script src="{{ url_for('static', filename='js/bootstable.js') }}"></script>
 <script>
-    var prp_form = `<tr class="property-form">
-                        <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
-                                placeholder="Property"></div></td>
-                        <td><select name="type" id="type" class="form-control input-color">
-                                <option value="Text">Text</option>
-                                <option value="Currency">Currency</option>
-                                <option value="Number">Number</option>
-                                <option value="Boolean">Boolean</option>
-                            </select></td>
-                        <td style="display: flex; justify-content: space-between;" class="pr-0"><input type="text"
-                                name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
-                                class="btn border color-font ml-3" id="add-property">+</button></td>
-                    </tr>`
+
     function convertUTCDateToLocalDate(date) {
         var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
 
@@ -159,7 +146,19 @@
                         element += '<tr id="prp-'+prop.id+'"><td>' + prop.property + '</td><td>' + prop.type + '</td><td class="flex-between-center"><p>' + prop.description + '</p><div class="flex-between-center action-btn"><p class="clear color-font" id="' + prop.id + '">+</p><i class="fa fa-pencil-square-o" id="' + prop.id + '" aria-hidden="true"></i></div></td></tr>'
                     });
                 }
-                element += prp_form
+                element += `<tr class="property-form">
+                            <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
+                                    placeholder="Property"></div></td>
+                            <td><select name="type" id="type" class="form-control input-color">
+                                    <option value="Text">Text</option>
+                                    <option value="Currency">Currency</option>
+                                    <option value="Number">Number</option>
+                                    <option value="checkbox">Checkbox</option>
+                                </select></td>
+                            <td style="display: flex; justify-content: space-between;" class="pr-0"><input type="text"
+                                    name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
+                                    class="btn border color-font ml-3" id="add-property">+</button></td>
+                        </tr>`
                 $('#list-properties').html(element)
 
             }
@@ -279,19 +278,22 @@
     })
     $('#list-properties').on('click', '.action-btn i', function () {
         var id = $(this).attr('id')
-        var tds = document.querySelectorAll('#prp-'+id+' > td')
-        var forms = []
-        var form = {}
+        var tds = document.querySelectorAll('#prp-'+id+' td')
         Array.from(tds).forEach(function(td, i) {
             var value = $(td).text()
-            if (i == 2) {
+            console.log($(tds[i]))
+            if (i == 0) {
+                $(tds[i]).html('<input type="text" value="'+value+'" class="input-color form-control">')
+            } else if (i == 1){
+                $(tds[i]).html('<select class="form-control"><option value="text">Text</option><option value="currency">Text</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select>')
+            } else {
                 value = value.slice(0, -1)
+                $(tds[i]).html('<input type="text" value="'+value+'" class="input-color form-control" style="width: 80%"><div class="flex-between-center"><p class="clear">+</p><i class="fa fa-pencil-square-o" aria-hidden="true"></i></div>')
             }
-            form.value = value
-            forms.push(form)
+            
         })
         console.log(forms)
-        
+
     })
 
 </script>

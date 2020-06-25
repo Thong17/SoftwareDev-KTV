@@ -10,7 +10,7 @@ html[data-theme='light'] {
   --color-font: #111;
   --color-logo: #111;
   --color-text: #333;
-  --color-hr: rgba(0, 0, 0, .1);
+  --color-hr: rgba(0, 0, 0, 0.1);
 }
 
 html[data-theme='dark'] {
@@ -43,7 +43,7 @@ html, body {
 }
 
 .container-right {
-  width: 70vh;
+  width: 700px;
   height: 100%;
 }
 
