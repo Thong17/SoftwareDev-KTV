@@ -143,11 +143,11 @@
 
                         var date = convertUTCDateToLocalDate(new Date(prop.createdOn))
 
-                        element += '<tr id="prp-'+prop.id+'"><td>' + prop.property + '</td><td>' + prop.type + '</td><td class="flex-between-center"><p>' + prop.description + '</p><div class="flex-between-center action-btn"><p class="clear color-font" id="' + prop.id + '">+</p><i class="fa fa-pencil-square-o" id="' + prop.id + '" aria-hidden="true"></i></div></td></tr>'
+                        element += '<tr id="prp-'+prop.id+'"><td><span>' + prop.property + '</span><input type="text" value="' + prop.property + '" class="input-color form-control hide"></td><td><span>' + prop.type + '</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Text</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td><td class="flex-between-center"><span>' + prop.description + '</span><input type="text" value="'+ prop.description +'" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-trash-o" aria-hidden="true" id="'+ prop.id +'"></i><i class="fa fa-pencil-square-o" id="' + prop.id + '" aria-hidden="true"></i></div></td></tr>'
                     });
                 }
                 element += `<tr class="property-form">
-                            <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
+                            <td><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
                                     placeholder="Property"></div></td>
                             <td><select name="type" id="type" class="form-control input-color">
                                     <option value="Text">Text</option>
@@ -155,7 +155,7 @@
                                     <option value="Number">Number</option>
                                     <option value="checkbox">Checkbox</option>
                                 </select></td>
-                            <td style="display: flex; justify-content: space-between;" class="pr-0"><input type="text"
+                            <td style="display: flex; justify-content: space-between;"><input type="text"
                                     name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
                                     class="btn border color-font ml-3" id="add-property">+</button></td>
                         </tr>`
@@ -207,9 +207,9 @@
                         $('#err-prp').remove()
                         $('#list-properties').prepend(`
                             <tr id="prp-`+ data['id'] +`">
-                                <td>`+ data['property'] + `</td>
-                                <td>`+ data['type'] + `</td>
-                                <td class="flex-between-center"><p>`+ data['description'] +`</p><div class="flex-between-center action-btn"><p class="clear color-font" id="`+ data['id'] +`">+</p><i class="fa fa-pencil-square-o" id="`+ data['id'] +`" aria-hidden="true"></i></div></td>
+                                <td><span>`+ data['property'] + `<span><input type="text" value="`+ data['property'] +`" class="input-color form-control hide"></td>
+                                <td><span>`+ data['type'] +`</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Text</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
+                                <td class="flex-between-center><span>`+ data['description'] +`</span><input type="text" value="'+value+'" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-trash-o" aria-hidden="true" id="`+ data['id'] +`"></i><i class="fa fa-pencil-square-o" id="`+ data['id'] +`" aria-hidden="true"></i></div></td>
                             </tr>
                         `)
                     }
@@ -260,7 +260,7 @@
         });
         return false;
     })
-    $('#list-properties').on('click', '.action-btn p', function () {
+    $('#list-properties').on('click', '.action-btn .fa-trash-o', function () {
         if (confirm('Are you sure you want to delete?')) {
             var id = $(this).attr('id')
             $.ajax({
@@ -276,25 +276,55 @@
         }
 
     })
-    $('#list-properties').on('click', '.action-btn i', function () {
+    $('#list-properties').on('click', '.action-btn .fa-pencil-square-o', function () {
         var id = $(this).attr('id')
         var tds = document.querySelectorAll('#prp-'+id+' td')
         Array.from(tds).forEach(function(td, i) {
             var value = $(td).text()
-            console.log($(tds[i]))
             if (i == 0) {
-                $(tds[i]).html('<input type="text" value="'+value+'" class="input-color form-control">')
-            } else if (i == 1){
-                $(tds[i]).html('<select class="form-control"><option value="text">Text</option><option value="currency">Text</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select>')
-            } else {
-                value = value.slice(0, -1)
-                $(tds[i]).html('<input type="text" value="'+value+'" class="input-color form-control" style="width: 80%"><div class="flex-between-center"><p class="clear">+</p><i class="fa fa-pencil-square-o" aria-hidden="true"></i></div>')
+                $(tds[i]).find('span').addClass('hide')
+                $(tds[i]).find('input').removeClass('hide')
+            } else if (i == 1) {
+                $(tds[i]).find('span').addClass('hide')
+                $(tds[i]).find('select').removeClass('hide')
+            }else {
+                $(tds[i]).find('span').addClass('hide')
+                $(tds[i]).find('input').removeClass('hide')
+                $(tds[i]).find('.action-btn').html('<span id="'+ id +'" class="btn-cancel pointer" onclick="return cancel(this)"><ion-icon name="close-outline"></ion-icon></span><span class="pointer" id="'+ id +'" onclick="return submit(this)"><ion-icon name="checkmark-outline"></ion-icon></span>')
             }
             
         })
-        console.log(forms)
 
     })
+
+    $(document).on('click', '.btn-clear', function(){
+        var tr = $(this).parents().eq(2)
+        $(tr).html()
+    })
+
+    function cancel(arg) {
+        var tr = $(arg).parents().eq(2)
+        var tds = $(tr).children()
+        Array.from(tds).forEach(function(td, i) {
+            if (i == 0) {
+                $(tds[i]).find('span').removeClass('hide')
+                $(tds[i]).find('input').addClass('hide')
+            } else if (i == 1) {
+                $(tds[i]).find('span').removeClass('hide')
+                $(tds[i]).find('select').addClass('hide')
+            }else {
+                var id = $(tds[i]).find('.btn-cancel').attr('id')
+                $(tds[i]).find('span').removeClass('hide')
+                $(tds[i]).find('input').addClass('hide')
+                $(tds[i]).find('.action-btn').html('<i class="fa fa-trash-o" aria-hidden="true" id="'+ id +'"></i><i class="fa fa-pencil-square-o" id="'+ id +'" aria-hidden="true"></i>')
+            }
+            
+        })
+    }
+
+    function submit(arg) {
+        console.log(arg)
+    }
 
 </script>
 {% endblock %}
