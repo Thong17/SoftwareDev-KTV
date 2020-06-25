@@ -79,7 +79,7 @@
                 </div>
             </div>
             <div class="content-body">
-                <table class="table color-font">
+                <table class="table color-font" id="tbl-property">
                     <thead>
                         <tr>
                             <td style="width: 30%; font-weight: 500;">Column</td>
@@ -98,8 +98,21 @@
 {% endblock %}
 
 {% block script %}
+<script src="{{ url_for('static', filename='js/bootstable.js') }}"></script>
 <script>
-
+    var prp_form = `<tr class="property-form">
+                        <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
+                                placeholder="Property"></div></td>
+                        <td><select name="type" id="type" class="form-control input-color">
+                                <option value="Text">Text</option>
+                                <option value="Currency">Currency</option>
+                                <option value="Number">Number</option>
+                                <option value="Boolean">Boolean</option>
+                            </select></td>
+                        <td style="display: flex; justify-content: space-between;" class="pr-0"><input type="text"
+                                name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
+                                class="btn border color-font ml-3" id="add-property">+</button></td>
+                    </tr>`
     function convertUTCDateToLocalDate(date) {
         var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
 
@@ -143,22 +156,10 @@
 
                         var date = convertUTCDateToLocalDate(new Date(prop.createdOn))
 
-                        element += '<tr><td>' + prop.property + '</td><td>' + prop.type + '</td><td class="flex-between-center"><p>' + prop.description + '</p><div class="flex-between-center action-btn"><p class="clear" id="'+prop.id+'">+</p><i class="fa fa-pencil-square-o" id="'+prop.id+'" aria-hidden="true"></i></div></td></tr>'
+                        element += '<tr id="prp-'+prop.id+'"><td>' + prop.property + '</td><td>' + prop.type + '</td><td class="flex-between-center"><p>' + prop.description + '</p><div class="flex-between-center action-btn"><p class="clear color-font" id="' + prop.id + '">+</p><i class="fa fa-pencil-square-o" id="' + prop.id + '" aria-hidden="true"></i></div></td></tr>'
                     });
                 }
-                element += `<tr class="property-form">
-                            <td class="pl-0"><input type="text" name="property" class="form-control input-color" id="property"
-                                    placeholder="Property"></td>
-                            <td><select name="type" id="type" class="form-control input-color">
-                                    <option value="Text">Text</option>
-                                    <option value="Currency">Currency</option>
-                                    <option value="Number">Number</option>
-                                    <option value="Boolean">Boolean</option>
-                                </select></td>
-                            <td style="display: flex; justify-content: space-between;" class="pr-0"><input type="text"
-                                    name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
-                                    class="btn border color-font ml-3" id="add-property">+</button></td>
-                        </tr>`
+                element += prp_form
                 $('#list-properties').html(element)
 
             }
@@ -190,32 +191,45 @@
         var type = $('#type')
         var description = $('#detail')
 
-        var data = {}
-        data.categoryId = categoryId
-        data.property = property.val()
-        data.type = type.val()
-        data.description = description.val()
+        if (property.val() != '') {
+            var data = {}
+            data.categoryId = categoryId
+            data.property = property.val()
+            data.type = type.val()
+            data.description = description.val()
 
-        $.ajax({
-            url: '/category/property',
-            method: 'POST',
-            data: data,
-            success: function (data) {
-                if (data['msg'] == '') {
-                    $('#list-properties').prepend(`
-                        <tr>
-                            <td>`+ data['property'] + `</td>
-                            <td>`+ data['type'] + `</td>
-                            <td>`+ data['description'] + `</td>
-                        </tr>
-                    `)
+            $.ajax({
+                url: '/category/property',
+                method: 'POST',
+                data: data,
+                success: function (data) {
+                    if (data['msg'] == '') {
+                        property.removeClass('invalid')
+                        $('#err-prp').remove()
+                        $('#list-properties').prepend(`
+                            <tr id="prp-`+ data['id'] +`">
+                                <td>`+ data['property'] + `</td>
+                                <td>`+ data['type'] + `</td>
+                                <td class="flex-between-center"><p>`+ data['description'] +`</p><div class="flex-between-center action-btn"><p class="clear color-font" id="`+ data['id'] +`">+</p><i class="fa fa-pencil-square-o" id="`+ data['id'] +`" aria-hidden="true"></i></div></td>
+                            </tr>
+                        `)
+                    }
                 }
-            }
-        })
+            })
 
-        property.val('')
-        type.val('')
-        description.val('')
+            property.val('')
+            description.val('')
+        } else {
+            property.addClass('invalid')
+            if ($('#prp').find('#err-prp').length !== 0) {
+                return
+            } else {
+                $('#prp').append('<div title="Property field cannot be empty" class="errors-msg" id="err-prp" style="top: 10px"><i class="fa fa-exclamation" aria-hidden="true"></i></div>')
+            }
+            property.focus()
+        }
+
+
     })
     $(document).on('submit', 'form', function () {
         $.ajax({
@@ -247,11 +261,37 @@
         });
         return false;
     })
-    $('#list-properties').on('click', '.action-btn p', function() {
-        console.log(this)
+    $('#list-properties').on('click', '.action-btn p', function () {
+        if (confirm('Are you sure you want to delete?')) {
+            var id = $(this).attr('id')
+            $.ajax({
+                url: '/property/remove/' + id,
+                method: 'POST',
+                data: { data: id },
+                success: function (data) {
+                    $('#prp-'+id).remove()
+                }
+            })
+        } else {
+            return false
+        }
+
     })
-    $('#list-properties').on('click', '.action-btn i', function() {
-        console.log(this)
+    $('#list-properties').on('click', '.action-btn i', function () {
+        var id = $(this).attr('id')
+        var tds = document.querySelectorAll('#prp-'+id+' > td')
+        var forms = []
+        var form = {}
+        Array.from(tds).forEach(function(td, i) {
+            var value = $(td).text()
+            if (i == 2) {
+                value = value.slice(0, -1)
+            }
+            form.value = value
+            forms.push(form)
+        })
+        console.log(forms)
+        
     })
 
 </script>

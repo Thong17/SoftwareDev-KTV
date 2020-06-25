@@ -172,3 +172,16 @@ def add_property():
     db.session.add(Modal)
     db.session.commit()
     return jsonify({'id': id, 'property': _property, 'type': _type, 'description': description, 'msg': ''})
+
+@app.route('/property/remove/<id>', methods=['POST'])
+@login_required
+def remove_property(id):
+    if request.form['data']:
+        id = request.form['data']
+        try:
+            _property = tblProperty.query.get(id)
+            db.session.delete(_property)
+            db.session.commit()
+            return jsonify({'msg': 'Property deleted'})
+        except:
+            return 'Failded'
