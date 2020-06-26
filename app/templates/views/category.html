@@ -91,6 +91,9 @@
 
                     </tbody>
                 </table>
+                <div class="loader hide">
+                    <div class="loading"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -99,6 +102,30 @@
 
 {% block script %}
 <script>
+    function toggleEdit(show, hide) {
+        this.show = show
+        this.hide = hide
+
+        this.show.removeClass('hide')
+        this.hide.addClass('hide')
+    }
+
+    function addProperty(id, property, type, description) {
+        this.id = id
+        this.property = property
+        this.type = type
+        this.description = description
+
+        return `<tr id="prp-` + this.id + `">
+                    <td><span>` + this.property + `</span><input type="text" value="` + this.property + `" class="input-color form-control hide"></td>
+                    <td><span>` + this.type + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
+                    <td class="flex-between-center"><span>` + this.description + `</span><input type="text" value="` +
+            this.description +
+            `" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" id="` +
+            this.id + `" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="` + this.id + `"></i></div></td>
+                </tr>`
+
+    }
 
     function convertUTCDateToLocalDate(date) {
         var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
@@ -128,21 +155,39 @@
     })
     $('.item').on('click', function (e) {
         var id = $(this).attr('id')
+        var header = $(this).children()[0]
+        $('#prop-header').html(
+                    '<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">' +
+                        $(header).text() +
+                    '</h5></div><button class="btn border color-font add-prop btn-slim" id="' +
+                    id + '"><p class="plus">+</p></button>')
         $.ajax({
             url: '/category/' + id,
             method: 'POST',
-            data: { data: id },
+            data: {
+                data: id
+            },
+            beforeSend: function () {
+                $('.content-body table').addClass('hide')
+                $('.content-body .loader').removeClass('hide')
+            },
             success: function (data) {
+                setTimeout(function () {
+                    $('.content-body table').removeClass('hide')
+                    $('.content-body .loader').addClass('hide')
+                }, 500)
+                
                 if ($('.property-form').hasClass('display-row')) {
                     $('.property-form').removeClass('display-row')
                 }
-                $('#prop-header').html('<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">' + data.category + '</h5></div><button class="btn border color-font add-prop btn-slim" id="' + data.id + '"><p class="plus">+</p></button>')
+                
                 var element = ''
                 if (data.properties.length > 0) {
                     data.properties.forEach(prop => {
                         var date = convertUTCDateToLocalDate(new Date(prop.createdOn))
 
-                        element += '<tr id="prp-' + prop.id + '"><td><span>' + prop.property + '</span><input type="text" value="' + prop.property + '" class="input-color form-control hide"></td><td><span>' + prop.type + '</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td><td class="flex-between-center"><span>' + prop.description + '</span><input type="text" value="' + prop.description + '" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" id="' + prop.id + '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' + prop.id + '"></i></div></td></tr>'
+                        element += addProperty(prop.id, prop.property, prop.type, prop
+                            .description)
                     });
                 }
                 element += `<tr class="property-form">
@@ -204,13 +249,8 @@
                     if (data['msg'] == '') {
                         property.removeClass('invalid')
                         $('#err-prp').remove()
-                        $('#list-properties').prepend(`
-                            <tr id="prp-`+ data['id'] + `">
-                                <td><span>`+ data['property'] + `</span><input type="text" value="` + data['property'] + `" class="input-color form-control hide"></td>
-                                <td><span>`+ data['type'] + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
-                                <td class="flex-between-center"><span>`+ data['description'] + `</span><input type="text" value="` + data['description'] + `" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" id="` + data['id'] + `" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="` + data['id'] + `"></i></div></td>
-                            </tr>
-                        `)
+                        $('#list-properties').prepend(addProperty(data['id'], data['property'],
+                            data['type'], data['description']))
 
                     }
                 }
@@ -223,7 +263,9 @@
             if ($('#prp').find('#err-prp').length !== 0) {
                 return
             } else {
-                $('#prp').append('<div title="Property field cannot be empty" class="errors-msg" id="err-prp" style="top: 10px"><i class="fa fa-exclamation" aria-hidden="true"></i></div>')
+                $('#prp').append(
+                    '<div title="Property field cannot be empty" class="errors-msg" id="err-prp" style="top: 10px"><i class="fa fa-exclamation" aria-hidden="true"></i></div>'
+                )
             }
             property.focus()
         }
@@ -244,7 +286,9 @@
                     for (let index = 0; index < data['category'].length; index++) {
                         const element = data['category'][index];
                         $('#category').addClass('invalid')
-                        $('#cgr').append('<div title="' + element + '" class="errors-msg" id="err-cgr"><i class="fa fa-exclamation" aria-hidden="true"></i></div>')
+                        $('#cgr').append('<div title="' + element +
+                            '" class="errors-msg" id="err-cgr"><i class="fa fa-exclamation" aria-hidden="true"></i></div>'
+                        )
                     }
                     gsap.from('#err-cgr', {
                         opacity: 0,
@@ -266,7 +310,9 @@
             $.ajax({
                 url: '/property/remove/' + id,
                 method: 'POST',
-                data: { data: id },
+                data: {
+                    data: id
+                },
                 success: function (data) {
                     $('#prp-' + id).remove()
                 }
@@ -282,12 +328,10 @@
         Array.from(tds).forEach(function (td, i) {
             var value = $(td).text()
             if (i == 0) {
-                $(tds[i]).find('span').addClass('hide')
-                $(tds[i]).find('input').removeClass('hide')
+                toggleEdit($(tds[i]).find('input'), $(tds[i]).find('span'))
                 $(tds[i]).addClass('pl-0')
             } else if (i == 1) {
-                $(tds[i]).find('span').addClass('hide')
-                $(tds[i]).find('select').removeClass('hide')
+                toggleEdit($(tds[i]).find('select'), $(tds[i]).find('span'))
                 var options = $('#prp-' + id).find('select').children()
                 var type = $('#prp-' + id).find('span')[1]
 
@@ -298,9 +342,12 @@
                 })
 
             } else {
-                $(tds[i]).find('span').addClass('hide')
-                $(tds[i]).find('input').removeClass('hide')
-                $(tds[i]).find('.action-btn').html('<span id="' + id + '" class="btn-cancel pointer" onclick="return cancel(this)"><ion-icon name="close-outline"></ion-icon></span><span class="pointer" id="' + id + '" onclick="return submit(this)"><ion-icon name="checkmark-outline"></ion-icon></span>')
+                toggleEdit($(tds[i]).find('input'), $(tds[i]).find('span'))
+                $(tds[i]).find('.action-btn').html('<span id="' + id +
+                    '" class="btn-cancel pointer" onclick="return cancel(this)"><ion-icon name="close-outline"></ion-icon></span><span class="pointer" id="' +
+                    id +
+                    '" onclick="return submit(this)"><ion-icon name="checkmark-outline"></ion-icon></span>'
+                )
             }
 
         })
@@ -317,17 +364,16 @@
         var tds = $(tr).children()
         Array.from(tds).forEach(function (td, i) {
             if (i == 0) {
-                $(tds[i]).find('span').removeClass('hide')
-                $(tds[i]).find('input').addClass('hide')
+                toggleEdit($(tds[i]).find('span'), $(tds[i]).find('input'))
                 $(tds[i]).removeClass('pl-0')
             } else if (i == 1) {
-                $(tds[i]).find('span').removeClass('hide')
-                $(tds[i]).find('select').addClass('hide')
+                toggleEdit($(tds[i]).find('span'), $(tds[i]).find('select'))
             } else {
                 var id = $(tds[i]).find('.btn-cancel').attr('id')
-                $(tds[i]).find('span').removeClass('hide')
-                $(tds[i]).find('input').addClass('hide')
-                $(tds[i]).find('.action-btn').html('<i class="fa fa-pencil-square-o" id="' + id + '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' + id + '"></i>')
+                toggleEdit($(tds[i]).find('span'), $(tds[i]).find('input'))
+                $(tds[i]).find('.action-btn').html('<i class="fa fa-pencil-square-o" id="' + id +
+                    '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' + id +
+                    '"></i>')
             }
         })
     }
@@ -354,32 +400,35 @@
         $.ajax({
             url: '/property/update/' + id,
             method: 'POST',
-            data: { type: data.type, property: data.property, description: data.description },
+            data: {
+                type: data.type,
+                property: data.property,
+                description: data.description
+            },
             success: function (data) {
                 console.log(data)
 
                 Array.from(tds).forEach(function (td, i) {
                     if (i == 0) {
                         $(tds[i]).find('span').text(data.property)
-                        $(tds[i]).find('span').removeClass('hide')
-                        $(tds[i]).find('input').addClass('hide')
+                        toggleEdit($(tds[i]).find('span'), $(tds[i]).find('input'))
                         $(tds[i]).removeClass('pl-0')
                     } else if (i == 1) {
                         $(tds[i]).find('span').text(data.type)
-                        $(tds[i]).find('span').removeClass('hide')
-                        $(tds[i]).find('select').addClass('hide')
+                        toggleEdit($(tds[i]).find('span'), $(tds[i]).find('select'))
                     } else {
                         var id = $(tds[i]).find('.btn-cancel').attr('id')
                         $(tds[i]).find('span').text(data.description)
-                        $(tds[i]).find('span').removeClass('hide')
-                        $(tds[i]).find('input').addClass('hide')
-                        $(tds[i]).find('.action-btn').html('<i class="fa fa-pencil-square-o" id="' + id + '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' + id + '"></i>')
+                        toggleEdit($(tds[i]).find('span'), $(tds[i]).find('input'))
+                        $(tds[i]).find('.action-btn').html('<i class="fa fa-pencil-square-o" id="' +
+                            id +
+                            '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' +
+                            id + '"></i>')
                     }
                 })
 
             }
         })
     }
-
 </script>
 {% endblock %}
