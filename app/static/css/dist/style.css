@@ -16,8 +16,8 @@ input[type=number]:focus,
 [type=email].form-control:focus,
 [type=tel].form-control:focus,
 [contenteditable].form-control:focus {
-  -webkit-box-shadow: inset 0 -1px 0 #ddd;
-          box-shadow: inset 0 -1px 0 #ddd;
+  -webkit-box-shadow: inset 0 -1px 0 var(--color-hr);
+          box-shadow: inset 0 -1px 0 var(--color-hr);
 }
 
 html[data-theme='light'] {
@@ -177,6 +177,22 @@ input:valid + label {
           justify-content: flex-end;
 }
 
+.flex-between-end {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+
+.flex-between-end h5 {
+  margin: 0;
+}
+
 .errors-msg {
   height: 13px;
   width: 13px;
@@ -189,7 +205,7 @@ input:valid + label {
 }
 
 .invalid {
-  border-color: #d9534f;
+  border-color: #d9534f !important;
 }
 
 .profile a {
@@ -434,6 +450,7 @@ main {
 .input-color, .input-color:focus {
   background-color: var(--color-bg);
   color: var(--color-text);
+  border-color: var(--color-hr);
 }
 
 .table-data {
@@ -562,9 +579,9 @@ main {
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .flex-center {
@@ -697,7 +714,7 @@ table.table > tbody > tr > td {
 
 .action-btn {
   width: 40px;
-  margin-left: 10px;
+  margin-left: 20px;
 }
 
 .scale-up {
@@ -725,5 +742,10 @@ table.table > tbody > tr > td {
 
 .pointer {
   cursor: pointer;
+}
+
+.btn-slim {
+  padding: 1px 20px;
+  border-radius: 30px;
 }
 /*# sourceMappingURL=style.css.map */

@@ -105,11 +105,15 @@ def setting():
     return render_template('views/setting.html')
 
 
-@app.route('/custome')
+@app.route('/custome', methods=['POST', 'GET'])
 @login_required
 def custome():
-    categories = tblCategory.query.all()
-    return render_template('views/custome.html', categories=categories)
+    if request.method == 'POST':
+        categories = tblCategory.query.all()
+        json = CategorySchema()
+        result = json.dump(categories, many=True)
+        return jsonify(result)
+    return render_template('views/custome.html')
 
 
 @app.route('/category', methods=['POST', 'GET'])
@@ -185,3 +189,21 @@ def remove_property(id):
             return jsonify({'msg': 'Property deleted'})
         except:
             return 'Failded'
+
+@app.route('/property/update/<id>', methods=['POST'])
+def update_property(id):
+    _property = tblProperty.query.get(id)
+
+    new_property = request.form['property']
+    new_type = request.form['type']
+    new_description = request.form['description']
+
+    _property.property = new_property
+    _property.type = new_type
+    _property.description = new_description
+
+    try:
+        db.session.commit()
+        return jsonify({'id': id, 'property': new_property, 'type': new_type, 'description': new_description})
+    except:
+        return jsonify({'msg': 'Failed'})

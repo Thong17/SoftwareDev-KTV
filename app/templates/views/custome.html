@@ -63,49 +63,92 @@
 {% endblock %}
 {% block script %}
 <script>
-    var pie = $('#pie')
+    function _PieChart(div, canvas, type, data) {
+        this.div = div
+        this.canvas = canvas
+        this.type = type
+        this.data = data
 
-    var canvase = document.getElementById("pieChart")
+        var canvas = this.canvas
 
-    canvase.width = pie.width()
-    canvase.height = pie.height()
+        canvas.width = this.div.offsetWidth
+        canvas.height = this.div.offsetHeight
 
-    $(window).on('resize', function () {
-        canvase.width = pie.clientWidth
-        canvase.height = pie.clientHeight
-    })
-    var bgColor = $('body').css('background-color')
-    var fontColor = $('.color-font').css('color')
+        $(window).on('resize', function () {
+            canvas.width = this.div.offsetWidth
+            canvas.height = this.div.offsetHeight
+        })
+        var bgColor = $('.grid-item').css('background-color')
+        var fontColor = $('.color-font').css('color')
 
-    console.log(fontColor)
-
-    var ctxP = canvase.getContext('2d');
-    var myPieChart = new Chart(ctxP, {
-        type: 'pie',
-        data: {
-            labels: ["Laptop", "Phone", "Watch", "Keyboard", "Mouse", "Headset", "Mousepad"],
-            datasets: [{
-                data: [30, 50, 100, 40, 120, 40, 70],
-                backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360", "#ff22ff", "#994499"]
-            }]
-        },
-        options: {
-            responsive: true,
-            elements: {
-                arc: {
-                    borderColor: bgColor
-                }
+        var ctxP = canvas.getContext('2d');
+        var myPieChart = new Chart(ctxP, {
+            type: this.type,
+            data: {
+                labels: this.data.labels,
+                datasets: [{
+                    data: this.data.quantities,
+                    backgroundColor: this.data.colors
+                }]
             },
-            legend: {
-                display: true,
-                labels: {
-                    fontColor: fontColor,
-                    padding: 30
+            options: {
+                responsive: true,
+                elements: {
+                    arc: {
+                        borderColor: bgColor
+                    }
                 },
-                position: 'left'
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: fontColor,
+                        padding: 30
+                    },
+                    position: 'left'
+                }
             }
+        });
+    }
+    function generateColor() {
+        var letters = '456789AB';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 8)];
         }
-    });
+        return color;
+    }
+    $(document).ready(function () {
+        $.ajax({
+            url: '/custome',
+            method: 'POST',
+            success: function (data) {
+                var labels = [];
+                var quantities = [];
+                var colors = [];
+                
+
+                data.forEach(category => {
+                    labels.push(category.category)
+                    quantities.push(category.properties.length)
+                    colors.push(generateColor())
+
+                });
+                var pieObj = {}
+                pieObj.labels = labels
+                pieObj.quantities = quantities
+                pieObj.colors = colors
+
+                var pie = document.getElementById('pie')
+
+                console.log(colors)
+
+                var canvas = document.getElementById('pieChart')
+
+                _PieChart(pie, canvas, 'pie', pieObj)
+            }
+        })
+    })
+
 
 </script>
 {% endblock %}

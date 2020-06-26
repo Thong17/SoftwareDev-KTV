@@ -39,9 +39,9 @@
                 </div>
             </div>
             <br>
-            <div class="flex-center">
+            <div class="flex-between-end">
                 <h5 class="color-font">Categories</h5>
-                <button class="btn border color-font" id="add-category">
+                <button class="btn border color-font btn-slim" id="add-category">
                     <p class="plus">+</p>
                 </button>
             </div>
@@ -136,29 +136,28 @@
                 if ($('.property-form').hasClass('display-row')) {
                     $('.property-form').removeClass('display-row')
                 }
-                $('#prop-header').html('<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">' + data.category + '</h5></div><button class="btn border color-font add-prop" id="' + data.id + '"><p class="plus">+</p></button>')
+                $('#prop-header').html('<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">' + data.category + '</h5></div><button class="btn border color-font add-prop btn-slim" id="' + data.id + '"><p class="plus">+</p></button>')
                 var element = ''
                 if (data.properties.length > 0) {
                     data.properties.forEach(prop => {
-
                         var date = convertUTCDateToLocalDate(new Date(prop.createdOn))
 
-                        element += '<tr id="prp-'+prop.id+'"><td><span>' + prop.property + '</span><input type="text" value="' + prop.property + '" class="input-color form-control hide"></td><td><span>' + prop.type + '</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Text</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td><td class="flex-between-center"><span>' + prop.description + '</span><input type="text" value="'+ prop.description +'" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-trash-o" aria-hidden="true" id="'+ prop.id +'"></i><i class="fa fa-pencil-square-o" id="' + prop.id + '" aria-hidden="true"></i></div></td></tr>'
+                        element += '<tr id="prp-' + prop.id + '"><td><span>' + prop.property + '</span><input type="text" value="' + prop.property + '" class="input-color form-control hide"></td><td><span>' + prop.type + '</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td><td class="flex-between-center"><span>' + prop.description + '</span><input type="text" value="' + prop.description + '" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" id="' + prop.id + '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' + prop.id + '"></i></div></td></tr>'
                     });
                 }
                 element += `<tr class="property-form">
-                            <td><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
+                            <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
                                     placeholder="Property"></div></td>
                             <td><select name="type" id="type" class="form-control input-color">
-                                    <option value="Text">Text</option>
-                                    <option value="Currency">Currency</option>
-                                    <option value="Number">Number</option>
+                                    <option value="text">Text</option>
+                                    <option value="currency">Currency</option>
+                                    <option value="number">Number</option>
                                     <option value="checkbox">Checkbox</option>
                                 </select></td>
-                            <td style="display: flex; justify-content: space-between;"><input type="text"
+                            <td class="flex-between-center"><input type="text"
                                     name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
                                     class="btn border color-font ml-3" id="add-property">+</button></td>
-                        </tr>`
+                            </tr>`
                 $('#list-properties').html(element)
 
             }
@@ -206,12 +205,13 @@
                         property.removeClass('invalid')
                         $('#err-prp').remove()
                         $('#list-properties').prepend(`
-                            <tr id="prp-`+ data['id'] +`">
-                                <td><span>`+ data['property'] + `<span><input type="text" value="`+ data['property'] +`" class="input-color form-control hide"></td>
-                                <td><span>`+ data['type'] +`</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Text</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
-                                <td class="flex-between-center><span>`+ data['description'] +`</span><input type="text" value="'+value+'" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-trash-o" aria-hidden="true" id="`+ data['id'] +`"></i><i class="fa fa-pencil-square-o" id="`+ data['id'] +`" aria-hidden="true"></i></div></td>
+                            <tr id="prp-`+ data['id'] + `">
+                                <td><span>`+ data['property'] + `</span><input type="text" value="` + data['property'] + `" class="input-color form-control hide"></td>
+                                <td><span>`+ data['type'] + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
+                                <td class="flex-between-center"><span>`+ data['description'] + `</span><input type="text" value="` + data['description'] + `" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" id="` + data['id'] + `" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="` + data['id'] + `"></i></div></td>
                             </tr>
                         `)
+
                     }
                 }
             })
@@ -268,7 +268,7 @@
                 method: 'POST',
                 data: { data: id },
                 success: function (data) {
-                    $('#prp-'+id).remove()
+                    $('#prp-' + id).remove()
                 }
             })
         } else {
@@ -278,26 +278,36 @@
     })
     $('#list-properties').on('click', '.action-btn .fa-pencil-square-o', function () {
         var id = $(this).attr('id')
-        var tds = document.querySelectorAll('#prp-'+id+' td')
-        Array.from(tds).forEach(function(td, i) {
+        var tds = document.querySelectorAll('#prp-' + id + ' td')
+        Array.from(tds).forEach(function (td, i) {
             var value = $(td).text()
             if (i == 0) {
                 $(tds[i]).find('span').addClass('hide')
                 $(tds[i]).find('input').removeClass('hide')
+                $(tds[i]).addClass('pl-0')
             } else if (i == 1) {
                 $(tds[i]).find('span').addClass('hide')
                 $(tds[i]).find('select').removeClass('hide')
-            }else {
+                var options = $('#prp-' + id).find('select').children()
+                var type = $('#prp-' + id).find('span')[1]
+
+                Array.from(options).forEach((option, i) => {
+                    if ($(option).val() == $(type).text()) {
+                        $(option).attr('selected', 'selected')
+                    }
+                })
+
+            } else {
                 $(tds[i]).find('span').addClass('hide')
                 $(tds[i]).find('input').removeClass('hide')
-                $(tds[i]).find('.action-btn').html('<span id="'+ id +'" class="btn-cancel pointer" onclick="return cancel(this)"><ion-icon name="close-outline"></ion-icon></span><span class="pointer" id="'+ id +'" onclick="return submit(this)"><ion-icon name="checkmark-outline"></ion-icon></span>')
+                $(tds[i]).find('.action-btn').html('<span id="' + id + '" class="btn-cancel pointer" onclick="return cancel(this)"><ion-icon name="close-outline"></ion-icon></span><span class="pointer" id="' + id + '" onclick="return submit(this)"><ion-icon name="checkmark-outline"></ion-icon></span>')
             }
-            
+
         })
 
     })
 
-    $(document).on('click', '.btn-clear', function(){
+    $(document).on('click', '.btn-clear', function () {
         var tr = $(this).parents().eq(2)
         $(tr).html()
     })
@@ -305,25 +315,70 @@
     function cancel(arg) {
         var tr = $(arg).parents().eq(2)
         var tds = $(tr).children()
-        Array.from(tds).forEach(function(td, i) {
+        Array.from(tds).forEach(function (td, i) {
             if (i == 0) {
                 $(tds[i]).find('span').removeClass('hide')
                 $(tds[i]).find('input').addClass('hide')
+                $(tds[i]).removeClass('pl-0')
             } else if (i == 1) {
                 $(tds[i]).find('span').removeClass('hide')
                 $(tds[i]).find('select').addClass('hide')
-            }else {
+            } else {
                 var id = $(tds[i]).find('.btn-cancel').attr('id')
                 $(tds[i]).find('span').removeClass('hide')
                 $(tds[i]).find('input').addClass('hide')
-                $(tds[i]).find('.action-btn').html('<i class="fa fa-trash-o" aria-hidden="true" id="'+ id +'"></i><i class="fa fa-pencil-square-o" id="'+ id +'" aria-hidden="true"></i>')
+                $(tds[i]).find('.action-btn').html('<i class="fa fa-pencil-square-o" id="' + id + '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' + id + '"></i>')
             }
-            
         })
     }
 
     function submit(arg) {
-        console.log(arg)
+        var tds = $(arg).parents().eq(2).children()
+        var id = $(arg).parents().eq(2).attr('id')
+
+        var data = new FormData()
+
+        Array.from(tds).forEach((td, i) => {
+            if (i == 1) {
+                data.type = $(td).find('select').val()
+            } else if (i == 0) {
+                data.property = $(td).find('input').val()
+            } else {
+                data.description = $(td).find('input').val()
+            }
+        })
+
+        id = id.split('prp-')[1]
+
+
+        $.ajax({
+            url: '/property/update/' + id,
+            method: 'POST',
+            data: { type: data.type, property: data.property, description: data.description },
+            success: function (data) {
+                console.log(data)
+
+                Array.from(tds).forEach(function (td, i) {
+                    if (i == 0) {
+                        $(tds[i]).find('span').text(data.property)
+                        $(tds[i]).find('span').removeClass('hide')
+                        $(tds[i]).find('input').addClass('hide')
+                        $(tds[i]).removeClass('pl-0')
+                    } else if (i == 1) {
+                        $(tds[i]).find('span').text(data.type)
+                        $(tds[i]).find('span').removeClass('hide')
+                        $(tds[i]).find('select').addClass('hide')
+                    } else {
+                        var id = $(tds[i]).find('.btn-cancel').attr('id')
+                        $(tds[i]).find('span').text(data.description)
+                        $(tds[i]).find('span').removeClass('hide')
+                        $(tds[i]).find('input').addClass('hide')
+                        $(tds[i]).find('.action-btn').html('<i class="fa fa-pencil-square-o" id="' + id + '" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true" id="' + id + '"></i>')
+                    }
+                })
+
+            }
+        })
     }
 
 </script>
