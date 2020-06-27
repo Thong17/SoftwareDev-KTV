@@ -76,12 +76,13 @@ category_brand = db.Table('category_brand',
 class tblCategory(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     category = db.Column(db.String(50), nullable=False)
+    photo = db.Column(db.String(255), nullable=True, default='default.png')
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    properties = db.relationship('tblProperty', backref='properties', lazy=True)
-    products = db.relationship('tblProduct', backref='products', lazy=True)
-    brands = db.relationship('tblBrand', secondary=category_brand, backref='brands', lazy='dynamic')
+    properties = db.relationship('tblProperty', backref='properties', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    products = db.relationship('tblProduct', backref='products', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    brands = db.relationship('tblBrand', secondary=category_brand, backref='brands', lazy='dynamic', cascade="all, delete-orphan", single_parent=True)
 
 class tblProperty(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -91,7 +92,6 @@ class tblProperty(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
-    values = db.relationship('tblValue', backref='values', lazy=True)
 
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -103,8 +103,8 @@ class tblProduct(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     brandId = db.Column(db.String(36), db.ForeignKey('tbl_brand.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
+    values = db.relationship('tblValue', backref='values', lazy=True, cascade="all, delete-orphan", single_parent=True)
     
-
 class tblValue(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     value = db.Column(db.String(50), nullable=False)
@@ -120,7 +120,7 @@ class tblBrand(db.Model):
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    categories = db.relationship('tblCategory', secondary=category_brand, backref='categories', lazy='dynamic')
+    categories = db.relationship('tblCategory', secondary=category_brand, backref='categories', lazy='dynamic', cascade="all, delete-orphan", single_parent=True)
 
 class tblColor(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -131,15 +131,21 @@ class tblColor(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
 
-
 class tblPhoto(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    source = db.Column(db.String(255), nullable=True, default='default.png')
+    src = db.Column(db.String(255), nullable=True, default='default.png')
     alt = db.Column(db.String(50), nullable=True)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
     colorId = db.Column(db.String(36), db.ForeignKey('tbl_color.id'), nullable=False)
+
+class tblActivity(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    activity = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 
 class BrandSchema(ModelSchema):

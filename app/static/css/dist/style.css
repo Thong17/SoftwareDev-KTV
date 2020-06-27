@@ -27,6 +27,7 @@ html[data-theme='light'] {
   --color-logo: #111;
   --color-text: #333;
   --color-hr: rgba(0, 0, 0, 0.1);
+  --color-hover: rgba(0, 0, 0, 0.3);
 }
 
 html[data-theme='dark'] {
@@ -36,6 +37,7 @@ html[data-theme='dark'] {
   --color-logo: #fff;
   --color-text: #c5c5c5;
   --color-hr: rgba(255, 255, 255, .1);
+  --color-hover: rgba(255, 255, 255, 0.3);
 }
 
 html,
@@ -350,12 +352,12 @@ main {
 }
 
 .color-font {
-  color: var(--color-font);
+  color: var(--color-text) !important;
   font-weight: 300;
 }
 
 .color-font:hover {
-  color: var(--color-font);
+  color: var(--color-text) !important;
 }
 
 .wrap-container {
@@ -656,6 +658,29 @@ hr {
   cursor: pointer;
 }
 
+.btn-clear {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.btn-clear:hover {
+  color: var(--color-hover);
+}
+
 .add-prop,
 #add-category {
   position: relative;
@@ -783,7 +808,22 @@ table.table > tbody > tr > td {
           animation: spin 2s linear infinite;
 }
 
-/* Safari */
+table {
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0 5px;
+}
+
+thead tr th {
+  border-collapse: separate;
+  border-spacing: 5px 5px;
+}
+
+tbody tr#first td {
+  border-collapse: separate;
+  border-spacing: 5px 5px;
+}
+
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);

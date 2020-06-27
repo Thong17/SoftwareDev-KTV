@@ -207,3 +207,22 @@ def update_property(id):
         return jsonify({'id': id, 'property': new_property, 'type': new_type, 'description': new_description})
     except:
         return jsonify({'msg': 'Failed'})
+
+@app.route('/category/remove/<id>', methods=['POST'])
+def remove_category(id):
+    category = tblCategory.query.get(id)
+    
+
+    
+
+    try: 
+        db.session.delete(category)
+        db.session.commit()
+        categories = tblCategory.query.all()
+        today = []
+        for item in categories:
+            if datetime.now().date() == item.createdOn.date():
+                today.append(item)
+        return jsonify({'msg': 'Success', 'today': len(today), 'total': len(categories)})
+    except:
+        return jsonify({'msg': 'Failed'})
