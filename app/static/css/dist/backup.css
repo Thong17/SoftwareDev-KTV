@@ -27,7 +27,6 @@ html[data-theme='light'] {
   --color-logo: #111;
   --color-text: #333;
   --color-hr: rgba(0, 0, 0, 0.1);
-  --color-hover: rgba(0, 0, 0, 0.3);
 }
 
 html[data-theme='dark'] {
@@ -37,7 +36,6 @@ html[data-theme='dark'] {
   --color-logo: #fff;
   --color-text: #c5c5c5;
   --color-hr: rgba(255, 255, 255, .1);
-  --color-hover: rgba(255, 255, 255, 0.3);
 }
 
 html,
@@ -356,8 +354,8 @@ main {
   font-weight: 300;
 }
 
-.hover:hover {
-  color: var(--color-font) !important;
+.color-font:hover {
+  color: var(--color-font);
 }
 
 .wrap-container {
@@ -658,29 +656,6 @@ hr {
   cursor: pointer;
 }
 
-.btn-clear {
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-transform: rotate(45deg);
-          transform: rotate(45deg);
-  cursor: pointer;
-  z-index: 1;
-}
-
-.btn-clear:hover {
-  color: var(--color-hover);
-}
-
 .add-prop,
 #add-category {
   position: relative;
@@ -718,20 +693,14 @@ hr {
 }
 
 table.table > thead > tr > td {
-  border-collapse: separate;
   border-color: var(--color-hr) !important;
-  font-size: 15px;
-}
-
-table.table > tbody > tr > td {
-  border-collapse: separate;
-  border-color: var(--color-hr) !important;
+  border-collapse: collapse;
   font-size: 13px;
 }
 
-table {
-  border-collapse: separate;
-  border-spacing: 0 5px;
+table.table > tbody > tr > td {
+  border-color: var(--color-hr) !important;
+  font-size: 13px;
 }
 
 .flex-between-center {
@@ -814,15 +783,6 @@ table {
           animation: spin 2s linear infinite;
 }
 
-.btn:hover, .btn:focus {
-  -webkit-box-shadow: none;
-          box-shadow: none;
-  outline: none;
-  -webkit-box-shadow: inset 0 -1px 0 var(--color-hr);
-          box-shadow: inset 0 -1px 0 var(--color-hr);
-  color: var(--color-font);
-}
-
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);
@@ -844,4 +804,4 @@ table {
             transform: rotate(360deg);
   }
 }
-/*# sourceMappingURL=style.css.map */
+/*# sourceMappingURL=backup.css.map */

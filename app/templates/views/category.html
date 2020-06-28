@@ -65,7 +65,7 @@
                         {{ form.description(class='form-control input-color') }}
                     </div>
                     <div class="form-group flex-end m-0">
-                        {{form.submit(class='btn border color-font', placeholder='Description')}}
+                        {{form.submit(class='btn border color-font')}}
                     </div>
                 </form>
             </div>
@@ -79,9 +79,9 @@
                 </div>
             </div>
             <div class="content-body">
-                <table class="table color-font">
+                <table class="table">
                     <thead>
-                        <tr>
+                        <tr class="color-font">
                             <td style="width: 30%; font-weight: 500;">Column</td>
                             <td style="width: 20%; font-weight: 500;">Type</td>
                             <td style="width: 50%; font-weight: 500;">Description</td>
@@ -116,7 +116,7 @@
         this.type = type
         this.description = description
 
-        return `<tr id="prp-` + this.id + `">
+        return `<tr id="prp-` + this.id + `" class="color-font hover">
                     <td><span>` + this.property + `</span><input type="text" value="` + this.property + `" class="input-color form-control hide"></td>
                     <td><span>` + this.type + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
                     <td class="flex-between-center"><span>` + this.description + `</span><input type="text" value="` +
@@ -452,16 +452,19 @@
                             stagger: {
                                 each: 0.1,
                                 from: 'end'
+                            },
+                            onComplete: function() {
+                                $('#' + id).fadeOut('slow', function () {
+                                    $(this).remove()
+                                    $('#list-properties').empty()
+                                })
                             }
                         })
 
                         $('.today .box-result p').text(data['today'])
                         $('.total .box-result p').text(data['total'])
 
-                        $('#' + id).fadeOut('slow', function () {
-                            $(this).remove()
-                            $('#list-properties').empty()
-                        })
+                        
                     }
                 }
             })
