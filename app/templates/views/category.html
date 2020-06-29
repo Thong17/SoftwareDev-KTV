@@ -50,8 +50,9 @@
                 {% if categories %}
                 {% for category in categories %}
                 <div class="flex-between item color-font" id="{{ category.id }}">
-                    <p>{{ category.category }}</p>
+                    <p class="edit-content" contenteditable="true">{{ category.category }}</p>
                     <p class="btn-clear" onclick="return removeCategory(this)">+</p>
+                    <p class="checkmark hide">L</p>
                 </div>
                 {% endfor %}
                 {% endif %}
@@ -65,7 +66,7 @@
                         {{ form.description(class='form-control input-color') }}
                     </div>
                     <div class="form-group flex-end m-0">
-                        {{form.submit(class='btn border color-font')}}
+                        {{form.submit(class='btn border btn-shadow color-font')}}
                     </div>
                 </form>
             </div>
@@ -156,7 +157,7 @@
 
     var tl = gsap.timeline()
 
-    $('.item').on('click', function (e) {
+    $('.item-container').on('click', '.item', function (e) {
         var id = $(this).attr('id')
         var header = $(this).children()[0]
         $('#prop-header').html(
@@ -197,6 +198,8 @@
 
                         element += addProperty(prop.id, prop.property, prop.type, prop.description)
                     });
+                } else {
+                    element += '<p class="no-result">No property created</p>'
                 }
                 element += `<tr class="property-form">
                             <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
@@ -254,9 +257,12 @@
                 data: data,
                 success: function (data) {
                     if (data['msg'] == '') {
+                        if ($('#list-properties').has('.no-result')) {
+                            $('.no-result').empty()
+                        }
                         property.removeClass('invalid')
                         $('#err-prp').remove()
-                        $('#list-properties').prepend(addProperty(data['id'], data['property'], data['type'], data['description']))
+                        $('#list-properties tr:last-child').before(addProperty(data['id'], data['property'], data['type'], data['description']))
                         $('#property').focus()
                     }
                 }
@@ -286,7 +292,14 @@
             data: $(this).serialize(),
             success: function (data) {
                 if (data['redirect'] == '/category') {
-                    window.location.href = data['redirect']
+                    var element = `<div class="flex-between item color-font" id="`+data['id']+`">
+                        <p class="edit-content" contenteditable="true">`+data['name']+`</p>
+                        <p class="btn-clear" onclick="return removeCategory(this)">+</p>
+                        <p class="checkmark hide">L</p>
+                    </div>`
+                    $('.item-container .form').before(element)
+                    $('#category').val('')
+                    $('#description').val('')
                 }
                 if (data['category'].length > 0) {
                     for (let index = 0; index < data['category'].length; index++) {
@@ -453,7 +466,7 @@
                                 each: 0.1,
                                 from: 'end'
                             },
-                            onComplete: function() {
+                            onComplete: function () {
                                 $('#' + id).fadeOut('slow', function () {
                                     $(this).remove()
                                     $('#list-properties').empty()
@@ -464,15 +477,53 @@
                         $('.today .box-result p').text(data['today'])
                         $('.total .box-result p').text(data['total'])
 
-                        
+
                     }
                 }
             })
         } else {
             return
         }
-
-
     }
+    $(document).on('click', '.edit-content', function () {
+        event.stopPropagation()
+        var id = $(this).parent().attr('id')
+
+        var old_content = $(this).parent().find('.edit-content').text()
+
+        clear = $('#' + id).find('.btn-clear')
+        check = $('#' + id).find('.checkmark')
+
+        toggleEdit($(check), $(clear))
+
+        var isContented = false
+
+        $(check).on('mousedown', function () {
+            var new_content = $(this).parent().find('.edit-content').text()
+            isContented = true
+            $.ajax({
+                url: '/category/update/' + id,
+                method: 'POST',
+                data: { data: new_content },
+                success: function (data) {
+                    $('#' + id).find('.edit-content').text(new_content)
+                    toggleEdit($(clear), $(check))
+                }
+            })
+        })
+
+        $(this).on('focusout', function () {
+            if (!isContented) {
+                $('#' + id).find('.edit-content').text(old_content)
+            }
+            toggleEdit($(clear), $(check))
+            
+        })
+        
+    })
+
+
+
+
 </script>
 {% endblock %}

@@ -16,8 +16,8 @@ input[type=number]:focus,
 [type=email].form-control:focus,
 [type=tel].form-control:focus,
 [contenteditable].form-control:focus {
-  -webkit-box-shadow: inset 0 -1px 0 var(--color-hr);
-          box-shadow: inset 0 -1px 0 var(--color-hr);
+  -webkit-box-shadow: inset 0 -2px 0 var(--color-hr);
+          box-shadow: inset 0 -2px 0 var(--color-hr);
 }
 
 html[data-theme='light'] {
@@ -734,6 +734,10 @@ table {
   border-spacing: 0 5px;
 }
 
+table tbody tr {
+  cursor: pointer;
+}
+
 .flex-between-center {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -814,13 +818,63 @@ table {
           animation: spin 2s linear infinite;
 }
 
-.btn:hover, .btn:focus {
-  -webkit-box-shadow: none;
-          box-shadow: none;
+.btn:hover,
+.btn:focus {
   outline: none;
+  color: var(--color-font);
+}
+
+.btn-shadow:hover,
+.btn-shadow:focus {
   -webkit-box-shadow: inset 0 -1px 0 var(--color-hr);
           box-shadow: inset 0 -1px 0 var(--color-hr);
   color: var(--color-font);
+}
+
+[contenteditable="true"]:active,
+[contenteditable="true"]:focus {
+  border: none;
+  outline: none;
+  -webkit-transform: scale(1.2);
+          transform: scale(1.2);
+}
+
+.edit-content {
+  cursor: text;
+  -webkit-transition: 0.3s ease-in-out;
+  transition: 0.3s ease-in-out;
+}
+
+.checkmark {
+  -webkit-transform: scaleX(-1) rotate(-35deg);
+          transform: scaleX(-1) rotate(-35deg);
+  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.checkmark:hover {
+  color: var(--color-hover);
+}
+
+.no-result {
+  color: var(--color-text);
+  margin: 0;
+  font-size: 13px;
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
 }
 
 @-webkit-keyframes spin {

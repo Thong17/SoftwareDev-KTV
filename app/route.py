@@ -130,13 +130,18 @@ def categories():
     if request.method == 'POST':
         msg = {
             'category': [],
-            'redirect': ''
+            'redirect': '',
+            'name': '',
+            'id': ''
         }
         if form.validate_on_submit():
             category = request.form['category']
             description = request.form['description']
-            Modal = tblCategory(id=str(uuid4()), category=category,
+            id = str(uuid4())
+            Modal = tblCategory(id=id, category=category,
                                 description=description, createdBy=current_user.id)
+            msg['name'] = category
+            msg['id'] = id
             try:
                 db.session.add(Modal)
                 db.session.commit()
@@ -211,10 +216,6 @@ def update_property(id):
 @app.route('/category/remove/<id>', methods=['POST'])
 def remove_category(id):
     category = tblCategory.query.get(id)
-    
-
-    
-
     try: 
         db.session.delete(category)
         db.session.commit()
@@ -225,4 +226,15 @@ def remove_category(id):
                 today.append(item)
         return jsonify({'msg': 'Success', 'today': len(today), 'total': len(categories)})
     except:
+        return jsonify({'msg': 'Failed'})
+
+@app.route('/category/update/<id>', methods=['POST'])
+def udpate_category(id):
+    category = tblCategory.query.get(id)
+    
+    try:
+        category.category = request.form['data']
+        db.session.commit()
+        return jsonify({'category': request.form['data'], 'msg': 'Success'})
+    except: 
         return jsonify({'msg': 'Failed'})
