@@ -8,7 +8,7 @@
         </a>
     </li>
     <li>
-        <a href="">
+        <a href="/brand">
             Brand
         </a>
     </li>
@@ -39,16 +39,16 @@
         <div class="item-header">
             Brand
         </div>
-        <div class="item-body">
-
+        <div class="item-body" id="doughnut">
+            <canvas id="doughnutChart"></canvas>
         </div>
     </div>
     <div class="grid-item">
         <div class="item-header">
             Product
         </div>
-        <div class="item-body">
-
+        <div class="item-body" id="line">
+            <canvas id="lineChart"></canvas>
         </div>
     </div>
     <div class="grid-item">
@@ -63,7 +63,7 @@
 {% endblock %}
 {% block script %}
 <script>
-    function _PieChart(div, canvas, type, data) {
+    function _Chart(div, canvas, type, data) {
         this.div = div
         this.canvas = canvas
         this.type = type
@@ -105,7 +105,7 @@
                         padding: 30
                     },
                     position: 'left'
-                }
+                },
             }
         });
     }
@@ -139,12 +139,14 @@
                 pieObj.colors = colors
 
                 var pie = document.getElementById('pie')
+                var pieCanvas = document.getElementById('pieChart')
 
-                console.log(colors)
+                var doughnut = document.getElementById('doughnut')
+                var doughnutCanvas = document.getElementById('doughnutChart')
 
-                var canvas = document.getElementById('pieChart')
 
-                _PieChart(pie, canvas, 'pie', pieObj)
+                _Chart(pie, pieCanvas, 'pie', pieObj)
+                _Chart(doughnut, doughnutCanvas, 'doughnut', pieObj)
             }
         })
     })

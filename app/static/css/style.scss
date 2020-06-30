@@ -20,6 +20,10 @@ input[type=number]:focus,
     box-shadow: inset 0 -2px 0 var(--color-hr);
 }
 
+h3, h5 {
+    color: var(--color-font);
+}
+
 html[data-theme='light'] {
     --color-bg: #fff;
     --color-menu: #f2f2f2;

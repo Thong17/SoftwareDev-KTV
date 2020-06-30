@@ -11,6 +11,7 @@ from flask_login import UserMixin, LoginManager
 import os
 from marshmallow import fields
 from datetime import datetime
+from http import cookies
 
 connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
 
@@ -24,6 +25,8 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
 ma = Marshmallow(app)
+
+c = cookies.SimpleCookie()
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -63,6 +66,8 @@ class tblUser(db.Model, UserMixin):
     birthdate = db.Column(db.Date, nullable=True)
     email = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    theme = db.Column(db.String(20), nullable=True, default='light')
+    language = db.Column(db.String(20), nullable=True, default='english')
     publicId = db.Column(db.String(50), nullable=False)
     isAdmin = db.Column(db.Boolean, default=False)
     isConfirm = db.Column(db.Boolean, default=False)

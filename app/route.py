@@ -1,4 +1,4 @@
-from app import app, bcrypt, db, login_manager
+from app import app, bcrypt, db, login_manager, c
 from app import tblUser, tblBrand, tblCategory, tblProperty
 from app import LoginForm, RegisterForm, CategoryForm
 from app import CategorySchema
@@ -18,6 +18,7 @@ def load_user(id):
 @app.route('/')
 @login_required
 def index():
+    c['data-lan'] = current_user.language
     return render_template('views/index.html')
 
 
@@ -238,3 +239,8 @@ def udpate_category(id):
         return jsonify({'category': request.form['data'], 'msg': 'Success'})
     except: 
         return jsonify({'msg': 'Failed'})
+
+@app.route('/brand')
+def brands():
+    return render_template('views/brand.html')
+
