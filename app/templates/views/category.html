@@ -301,6 +301,8 @@
                     $('.item-container .form').before(element)
                     $('#category').val('')
                     $('#description').val('')
+                    $('.today .box-result p').text(data['today'])
+                    $('.total .box-result p').text(data['total'])
                 }
                 if (data['category'].length > 0) {
                     for (let index = 0; index < data['category'].length; index++) {

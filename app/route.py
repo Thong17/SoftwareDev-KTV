@@ -18,7 +18,6 @@ def load_user(id):
 @app.route('/')
 @login_required
 def index():
-    c['data-lan'] = current_user.language
     return render_template('views/index.html')
 
 
@@ -133,7 +132,9 @@ def categories():
             'category': [],
             'redirect': '',
             'name': '',
-            'id': ''
+            'id': '',
+            'total': 0,
+            'today': 0
         }
         if form.validate_on_submit():
             category = request.form['category']
@@ -146,7 +147,11 @@ def categories():
             try:
                 db.session.add(Modal)
                 db.session.commit()
+                total += 1
+                today = len(today) + 1
                 msg['redirect'] = '/category'
+                msg['total'] = total
+                msg['today'] = today
                 return jsonify(msg)
             except:
                 return 'Failed'
@@ -244,3 +249,10 @@ def udpate_category(id):
 def brands():
     return render_template('views/brand.html')
 
+@app.route('/theme/change', methods=['POST'])
+def theme():
+    theme = request.form['data']
+    user = tblUser.query.get(current_user.id)
+    user.theme = theme
+    db.session.commit()
+    return jsonify({'theme': theme})
