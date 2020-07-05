@@ -20,6 +20,10 @@ input[type=number]:focus,
     box-shadow: inset 0 -2px 0 var(--color-hr);
 }
 
+.selector select {
+    box-shadow: none !important; 
+}
+
 h3, h5, p, a {
     color: var(--color-font);
 }
@@ -483,6 +487,8 @@ main {
 .item-container {
     height: 43vh;
     overflow-y: auto;
+    user-select: none;
+    overflow: hidden;
 }
 
 .item {
@@ -520,6 +526,10 @@ hr {
 .clear {
     transform: rotate(45deg);
     cursor: pointer;
+}
+
+.plus {
+    margin: 0;
 }
 
 .btn-clear {

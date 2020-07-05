@@ -55,6 +55,11 @@ class CategoryForm(FlaskForm):
     description = TextAreaField('Description')
     submit = SubmitField('Save')
 
+class BrandForm(FlaskForm):
+    brand = StringField('Brand', validators=[DataRequired(), Length(max=20)])
+    description = TextAreaField('Description')
+    submit = SubmitField('Save')
+
 
 #Table
 class tblUser(db.Model, UserMixin):

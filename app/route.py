@@ -1,6 +1,6 @@
 from app import app, bcrypt, db, login_manager, c
 from app import tblUser, tblBrand, tblCategory, tblProperty
-from app import LoginForm, RegisterForm, CategoryForm
+from app import LoginForm, RegisterForm, CategoryForm, BrandForm
 from app import CategorySchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
@@ -245,9 +245,40 @@ def udpate_category(id):
     except: 
         return jsonify({'msg': 'Failed'})
 
-@app.route('/brand')
-def brands():
-    return render_template('views/brand.html')
+@app.route('/brand', methods=['POST', 'GET'])
+def products():
+    brands = tblBrand.query.all()
+    categories = tblCategory.query.with_entities(tblCategory.id, tblCategory.category).all()
+    form = BrandForm()
+    if request.method == 'POST':
+        msg = {
+            'brand': [],
+            'redirect': '',
+            'name': '',
+            'id': ''
+        }
+        if form.validate_on_submit():
+            brand = request.form['brand']
+            category = tblCategory.query.get(request.form['category'])
+            description = request.form['description']
+            print(category)
+            id = str(uuid4())
+            Modal = tblBrand(id=id, brand=brand, description=description, createdBy=current_user.id)
+            msg['name'] = brand
+            msg['id'] = id
+            try:
+                Modal.categories.append(category)
+                db.session.add(Modal)
+                db.session.commit()
+                msg['redirect'] = '/brand'
+                return jsonify(msg)
+            except:
+                return 'Failed'
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                msg[fieldName].append(err)
+        return jsonify(msg)
+    return render_template('views/product.html', brands=brands, form=form, categories=categories)
 
 @app.route('/theme/change', methods=['POST'])
 def theme():

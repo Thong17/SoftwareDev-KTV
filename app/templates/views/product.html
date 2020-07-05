@@ -1,0 +1,135 @@
+{% extends 'views/custome.html' %}
+
+{% block content %}
+    <div class="wrap-container">
+        <div class="row-wrapper">
+            <div class="column-wrapper" style="width: 350px;">
+                <div class="flex-between-end">
+                    <h5 class="color-font">Brands</h5>
+                    <button class="btn border color-font btn-slim" id="add-brand">
+                        <p class="plus">+</p>
+                    </button>
+                </div>
+                <hr>
+                <div class="item-container">
+                    {% if brands %}
+                    {% for brand in brands %}
+                    <div class="flex-between item color-font" id="{{ brand.id }}">
+                        <p class="edit-content" contenteditable="true">{{ brand.brand }}</p>
+                        <p class="btn-clear" onclick="return removeBrand(this)">+</p>
+                        <p class="checkmark hide">L</p>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    <form action="/brand" method="post" class="form">
+                        <hr>
+                        {{ form.csrf_token }}
+                        <div class="form-group m-0" id="brd">
+                            <div class="row">
+                                <div class="col">
+                                    {{ form.brand(class='form-control input-color', placeholder='Brand', autocomplete='off') }}
+                                </div>
+                                <div class="col selector">
+                                    <select name="category" id="category" class="form-control input-color">
+                                        {% if categories %}
+                                        {% for category in categories %}
+                                            <option value="{{category.id}}">{{category.category}}</option>
+                                        {% endfor %}
+                                        {% else %}
+                                            <option value="">No category</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                        <div class="form-group m-0">
+                            {{ form.description(class='form-control input-color') }}
+                        </div>
+                        <div class="form-group flex-end m-0">
+                            {{form.submit(class='btn border btn-shadow color-font')}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="border-right"></div>
+            <div class="column-wrapper" style="width: 100%;">
+                <h5 class="color-font">Products</h5>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $('#add-brand').on('click', function () {
+        var form = $('.form').toggleClass('display')
+        if (form.hasClass('display')) {
+            $('#add-brand p').addClass('clear')
+        } else {
+            $('#add-brand p').removeClass('clear')
+        }
+        $('#brand').focus()
+        document.querySelector('#submit').scrollIntoView({
+            behavior: 'smooth'
+        })
+
+        gsap.from('.form', {
+            y: -50,
+            opacity: 0
+        })
+    })
+    $(document).on('submit', 'form', function () {
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            dataType: 'json',
+            data: $(this).serialize(),
+            success: function (data) {
+                if (data['redirect'] == '/brand') {
+                    var element = `<div class="flex-between item color-font" id="`+data['id']+`">
+                        <p class="edit-content" contenteditable="true">`+data['name']+`</p>
+                        <p class="btn-clear" onclick="return removeBrand(this)">+</p>
+                        <p class="checkmark hide">L</p>
+                    </div>`
+                    $('.item-container .form').before(element)
+                    $('#brand').val('')
+                    $('#description').val('')
+                }
+                if (data['brand'].length > 0) {
+                    for (let index = 0; index < data['brand'].length; index++) {
+                        const element = data['brand'][index];
+                        $('#brand').addClass('invalid')
+                        $('#brd').append('<div title="' + element +
+                            '" class="errors-msg" id="err-brd"><i class="fa fa-exclamation" aria-hidden="true"></i></div>'
+                        )
+                    }
+                    gsap.from('#err-brd', {
+                        opacity: 0,
+                        scale: 0.5,
+                        duration: 1,
+                        ease: 'elastic.out'
+                    })
+                } else {
+                    $('#brand').removeClass('invalid')
+                    $('#err-brd').remove()
+                }
+            }
+        });
+        return false;
+    })
+    $('.item-container').on('click', '.item', function (e) {
+        var id = $(this).attr('id')
+    
+        var containers = $('.item-container').children()
+
+        Array.from(containers).forEach(item => {
+            $(item).removeClass('is-selected')
+        });
+        $(this).addClass('is-selected')
+
+
+    })
+</script>
+{% endblock %}
