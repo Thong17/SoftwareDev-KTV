@@ -131,5 +131,61 @@
 
 
     })
+    $(document).on('click', '.edit-content', function () {
+        event.stopPropagation()
+        var id = $(this).parent().attr('id')
+
+        var old_content = $(this).parent().find('.edit-content').text()
+
+        clear = $('#' + id).find('.btn-clear')
+        check = $('#' + id).find('.checkmark')
+
+        toggleEdit($(check), $(clear))
+
+        var isContented = false
+
+        $(check).on('mousedown', function () {
+            var new_content = $(this).parent().find('.edit-content').text()
+            isContented = true
+            $.ajax({
+                url: '/brand/update/' + id,
+                method: 'POST',
+                data: { data: new_content },
+                success: function (data) {
+                    console.log(data)
+                    $('#' + id).find('.edit-content').text(new_content)
+                    toggleEdit($(clear), $(check))
+                }
+            })
+        })
+
+        $(this).on('focusout', function () {
+            if (!isContented) {
+                $('#' + id).find('.edit-content').text(old_content)
+            }
+            toggleEdit($(clear), $(check))
+            
+        })
+        
+    })
+
+    function removeBrand(arg) {
+        event.stopPropagation()
+        var id = $(arg).parent().attr('id')
+        if (confirm('Brand may contain many products and properties! Are you sure you want to delete it?')) {
+            $.ajax({
+                url: '/brand/remove/' + id,
+                method: 'POST',
+                success: function (data) {
+                    if (data['msg'] == 'Success') {
+                        console.log('done')
+
+                    }
+                }
+            })
+        } else {
+            return
+        }
+    }
 </script>
 {% endblock %}

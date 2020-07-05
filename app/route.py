@@ -280,6 +280,27 @@ def products():
         return jsonify(msg)
     return render_template('views/product.html', brands=brands, form=form, categories=categories)
 
+@app.route('/brand/remove/<id>', methods=['POST'])
+def remove_brand(id):
+    brand = tblBrand.query.get(id)
+    try: 
+        db.session.delete(brand)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Failed'})
+
+@app.route('/brand/update/<id>', methods=['POST'])
+def udpate_brand(id):
+    brand = tblBrand.query.get(id)
+    
+    try:
+        brand.brand = request.form['data']
+        db.session.commit()
+        return jsonify({'brand': request.form['data'], 'msg': 'Success'})
+    except: 
+        return jsonify({'msg': 'Failed'})
+
 @app.route('/theme/change', methods=['POST'])
 def theme():
     theme = request.form['data']
