@@ -21,28 +21,10 @@
                     </div>
                     {% endfor %}
                     {% endif %}
-                    <form action="/brand" method="post" class="form">
-                        <hr>
+                    <form action="/brand" method="post" class="form" id="brand-form">
                         {{ form.csrf_token }}
                         <div class="form-group m-0" id="brd">
-                            <div class="row">
-                                <div class="col">
-                                    {{ form.brand(class='form-control input-color', placeholder='Brand', autocomplete='off') }}
-                                </div>
-                                <div class="col selector">
-                                    <select name="category" id="category" class="form-control input-color">
-                                        {% if categories %}
-                                        {% for category in categories %}
-                                            <option value="{{category.id}}">{{category.category}}</option>
-                                        {% endfor %}
-                                        {% else %}
-                                            <option value="">No category</option>
-                                        {% endif %}
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            
+                            {{ form.brand(class='form-control input-color', placeholder='Brand', autocomplete='off') }}
                         </div>
                         <div class="form-group m-0">
                             {{ form.description(class='form-control input-color') }}
@@ -55,7 +37,44 @@
             </div>
             <div class="border-right"></div>
             <div class="column-wrapper" style="width: 100%;">
-                <h5 class="color-font">Products</h5>
+                <div class="content-header">
+                    
+                </div>
+                <div class="content-body flex-between">
+                    <div class="list-product" style="width: 100%; height: 100%;">
+
+                    </div>
+                    <div class="slide-form" style="width: 400px; height: 100%;">
+                        <form action="/product/add" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="photo" class="upload-label">
+                                    <input type="file" name="photo" id="photo" class="upload-input">
+                                    <i class="fa fa-camera" aria-hidden="true" class="upload-icon"></i>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control input-color" name="product" id="product" placeholder="Product">
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control input-color" name="price" id="price" placeholder="Price">
+                                    </div>
+                                    <div class="col-md-4 selector">
+                                        <select name="currency" id="currency" class="form-control input-color">
+                                            <option value="dollar"><span>&#36;</span></option>
+                                            <option value="riel"><span>&#6107;</span></option>
+                                        </select>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="description" id="produc-description" class="form-control input-color"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -80,7 +99,7 @@
             opacity: 0
         })
     })
-    $(document).on('submit', 'form', function () {
+    $(document).on('submit', '#brand-form', function () {
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
@@ -180,6 +199,8 @@
                     if (data['msg'] == 'Success') {
                         console.log('done')
 
+                    } else {
+                        console.log('failed')
                     }
                 }
             })
@@ -187,5 +208,15 @@
             return
         }
     }
+    $('.item-container').on('click', '.item', function() {
+        var id = $(this).attr('id')
+        var head = $(this).find('.edit-content').text()
+        console.log(id, head)
+        $('.content-header').html('<div class="flex-between"><h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>'+head+'</h5><button class="btn border color-font add-category btn-slim" id="' +
+            id + '"><p class="plus">+</p></button></div>')
+    })
+    $('.content-header').on('click', '.add-category', function() {
+        console.log(this)
+    })
 </script>
 {% endblock %}

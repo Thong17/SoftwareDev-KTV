@@ -488,7 +488,7 @@ main {
     height: 43vh;
     overflow-y: auto;
     user-select: none;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .item {
@@ -717,6 +717,7 @@ table tbody tr {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
 
 @keyframes spin {
     0% {

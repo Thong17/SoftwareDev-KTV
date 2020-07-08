@@ -259,15 +259,12 @@ def products():
         }
         if form.validate_on_submit():
             brand = request.form['brand']
-            category = tblCategory.query.get(request.form['category'])
             description = request.form['description']
-            print(category)
             id = str(uuid4())
             Modal = tblBrand(id=id, brand=brand, description=description, createdBy=current_user.id)
             msg['name'] = brand
             msg['id'] = id
             try:
-                Modal.categories.append(category)
                 db.session.add(Modal)
                 db.session.commit()
                 msg['redirect'] = '/brand'

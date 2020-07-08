@@ -84,13 +84,8 @@
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
     {% block script %}{% endblock %}
     <script>
-        var theme = ''
+        var theme = $('html').attr('data-theme')
 
-        if (document.cookie.length != 0) {
-            theme = document.cookie.split('=')[1]
-            $('html').attr('data-theme', theme)
-
-        }
         $.each($('#select-theme option'), function () {
             if ($(this).val() == theme) {
                 $(this).attr('selected', 'selected')
@@ -107,7 +102,6 @@
                 data: { data: theme },
                 success: function (data) {
                     console.log(data)
-                    document.cookie = 'color=' + data['theme']
                     $('html').attr('data-theme', data['theme'])
                 }
             })

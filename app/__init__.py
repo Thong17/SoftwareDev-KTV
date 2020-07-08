@@ -1,24 +1,28 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
 from flask_marshmallow import Marshmallow
 from marshmallow_sqlalchemy import ModelSchema
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, TextAreaField, FileField, DecimalField
 from wtforms.validators import DataRequired, Length, Optional, Email, EqualTo
 from wtforms.fields.html5 import DateField, DateTimeLocalField
 from flask_login import UserMixin, LoginManager
-import os
+from flask_uploads import UploadSet, configure_uploads, patch_request_class, IMAGES
 from marshmallow import fields
 from datetime import datetime
 from http import cookies
 
 connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '098c75537d0816443c'
 app.config['SQLALCHEMY_DATABASE_URI'] = connection
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static/uploads')
 
 db = SQLAlchemy(app)
 
@@ -30,6 +34,10 @@ c = cookies.SimpleCookie()
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+upload = UploadSet('photos', IMAGES)
+configure_uploads(app, upload)
+patch_request_class(app)
 
 
 
@@ -85,14 +93,14 @@ category_brand = db.Table('category_brand',
 
 class tblCategory(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    category = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False, unique=True)
     photo = db.Column(db.String(255), nullable=True, default='default.png')
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     properties = db.relationship('tblProperty', backref='properties', lazy=True, cascade="all, delete-orphan", single_parent=True)
     products = db.relationship('tblProduct', backref='products', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    brands = db.relationship('tblBrand', secondary=category_brand, backref='brands', lazy='dynamic', cascade="all, delete-orphan", single_parent=True)
+    brands = db.relationship('tblBrand', secondary=category_brand, backref='brands', lazy='dynamic')
 
 class tblProperty(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -107,6 +115,7 @@ class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     product = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    currency = db.Column(db.String(20), nullable=False)
     photo = db.Column(db.String(255), nullable=True, default='default.png')
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
@@ -126,11 +135,11 @@ class tblValue(db.Model):
 
 class tblBrand(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    brand = db.Column(db.String(20), nullable=False)
+    brand = db.Column(db.String(20), nullable=False, unique=True)
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    categories = db.relationship('tblCategory', secondary=category_brand, backref='categories', lazy='dynamic', cascade="all, delete-orphan", single_parent=True)
+    categories = db.relationship('tblCategory', secondary=category_brand, backref='categories', lazy='dynamic')
 
 class tblColor(db.Model):
     id = db.Column(db.String(36), primary_key=True)
