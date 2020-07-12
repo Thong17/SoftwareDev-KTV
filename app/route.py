@@ -246,7 +246,7 @@ def udpate_category(id):
         return jsonify({'msg': 'Failed'})
 
 @app.route('/brand', methods=['POST', 'GET'])
-def products():
+def brands():
     brands = tblBrand.query.all()
     categories = tblCategory.query.with_entities(tblCategory.id, tblCategory.category).all()
     form = BrandForm()
@@ -290,7 +290,6 @@ def remove_brand(id):
 @app.route('/brand/update/<id>', methods=['POST'])
 def udpate_brand(id):
     brand = tblBrand.query.get(id)
-    
     try:
         brand.brand = request.form['data']
         db.session.commit()

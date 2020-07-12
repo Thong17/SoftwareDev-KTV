@@ -1,9 +1,10 @@
 {% extends 'views/custome.html' %}
 
 {% block content %}
-    <div class="wrap-container">
-        <div class="row-wrapper">
-            <div class="column-wrapper" style="width: 350px;">
+<div class="wrap-container">
+    <div class="row-wrapper">
+        <div class="column-wrapper" style="width: 350px;">
+            <div id="brand-nav">
                 <div class="flex-between-end">
                     <h5 class="color-font">Brands</h5>
                     <button class="btn border color-font btn-slim" id="add-brand">
@@ -11,7 +12,7 @@
                     </button>
                 </div>
                 <hr>
-                <div class="item-container">
+                <div class="item-container" style="height: 72vh;">
                     {% if brands %}
                     {% for brand in brands %}
                     <div class="flex-between item color-font" id="{{ brand.id }}">
@@ -35,53 +36,120 @@
                     </form>
                 </div>
             </div>
-            <div class="border-right"></div>
-            <div class="column-wrapper" style="width: 100%;">
-                <div class="content-header">
-                    
-                </div>
-                <div class="content-body flex-between">
-                    <div class="list-product" style="width: 100%; height: 100%;">
-
-                    </div>
-                    <div class="slide-form" style="width: 400px; height: 100%;">
-                        <form action="/product/add" method="post" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <label for="photo" class="upload-label">
-                                    <input type="file" name="photo" id="photo" class="upload-input">
-                                    <i class="fa fa-camera" aria-hidden="true" class="upload-icon"></i>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control input-color" name="product" id="product" placeholder="Product">
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control input-color" name="price" id="price" placeholder="Price">
-                                    </div>
-                                    <div class="col-md-4 selector">
-                                        <select name="currency" id="currency" class="form-control input-color">
-                                            <option value="dollar"><span>&#36;</span></option>
-                                            <option value="riel"><span>&#6107;</span></option>
-                                        </select>
-                                    </div>
-                                    
+            <div id="product-nav" class="hide">
+                <h5 class="color-font m-0">Product</h5>
+                <div class="slide-form" style="width: 100%;">
+                    <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
+                        id="product-form">
+                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Category</h5>
+                        <div class="form-group selector">
+                            <p class="detail-content">Select category for product. Note: each category has different property</p>
+                            <select name="category" id="category" class="form-control input-color">
+                                {% if categories %}
+                                {% for category in categories %}
+                                <option value="{{category.id}}">{{category.category}}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option value="">No category</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
+                        <div class="form-group">
+                            <input type="text" class="form-control input-color" name="product" id="product" required>
+                            <label for="product" class="label product color-font">Product</label>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input type="number" class="form-control input-color" name="price" id="price"
+                                        required>
+                                    <label for="price" class="label price color-font">Price</label>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <textarea name="description" id="produc-description" class="form-control input-color"></textarea>
+                            <div class="col-md-4 selector">
+                                <div class="form-group">
+                                    <select name="currency" id="currency" class="form-control input-color">
+                                        <option value="dollar"><span>&#36;</span></option>
+                                        <option value="riel"><span>&#6107;</span></option>
+                                    </select>
+                                </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="description" id="produc-description"
+                                class="form-control input-color textarea" minlength="50"></textarea>
+                            <label for="description" class="label description color-font">Description</label>
+                        </div>
+                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
+                        <div class="form-group">
+                            <p class="detail-content">Select product photo. This photo will be show in the product</p>
+                            <div class="upload-container">
+                                <label for="photo" class="upload-label">
+                                    <input type="file" name="photo" id="photo" class="upload-input">
+                                    <span><i class="fa fa-camera" aria-hidden="true"></i></span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
                 </div>
+                <button class="btn btn-block border color-font submit-product">Save</button>
+            </div>
+        </div>
+        <div class="border-right"></div>
+        <div class="column-wrapper" style="width: 100%;">
+            <div class="content-header">
+
+            </div>
+            <div class="content-body flex-between">
+                <div class="list-product" style="width: 100%; height: 100%;">
+
+                </div>
+
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 
 {% block script %}
 <script>
+    $('.content-header').on('click', '.add-product', function () {
+        var id = $(this).attr('id')
+        var product = $('#product-nav')
+        var brand = $('#brand-nav')
+        if (product.hasClass('hide')) {
+            $('.add-product p').addClass('clear')
+            gsap.to('#brand-nav', {
+                opacity: 0,
+                x: -10,
+                onComplete: function () {
+                    toggleEdit(product, brand)
+                    $('.submit-product').attr('id', id)
+                    gsap.to('#product-nav', {
+                        opacity: 1,
+                        x: 0
+                    })
+                }
+            })
+            
+        } else {
+            $('.add-product p').removeClass('clear')
+            gsap.to('#product-nav', {
+                opacity: 0,
+                x: -10,
+                onComplete: function () {
+                    toggleEdit(brand, product)
+                    gsap.to('#brand-nav', {
+                        opacity: 1,
+                        x: 0
+                    })
+                }
+            })
+        }
+    })
+
     $('#add-brand').on('click', function () {
         var form = $('.form').toggleClass('display')
         if (form.hasClass('display')) {
@@ -107,8 +175,8 @@
             data: $(this).serialize(),
             success: function (data) {
                 if (data['redirect'] == '/brand') {
-                    var element = `<div class="flex-between item color-font" id="`+data['id']+`">
-                        <p class="edit-content" contenteditable="true">`+data['name']+`</p>
+                    var element = `<div class="flex-between item color-font" id="` + data['id'] + `">
+                        <p class="edit-content" contenteditable="true">` + data['name'] + `</p>
                         <p class="btn-clear" onclick="return removeBrand(this)">+</p>
                         <p class="checkmark hide">L</p>
                     </div>`
@@ -140,7 +208,7 @@
     })
     $('.item-container').on('click', '.item', function (e) {
         var id = $(this).attr('id')
-    
+
         var containers = $('.item-container').children()
 
         Array.from(containers).forEach(item => {
@@ -169,7 +237,9 @@
             $.ajax({
                 url: '/brand/update/' + id,
                 method: 'POST',
-                data: { data: new_content },
+                data: {
+                    data: new_content
+                },
                 success: function (data) {
                     console.log(data)
                     $('#' + id).find('.edit-content').text(new_content)
@@ -183,9 +253,9 @@
                 $('#' + id).find('.edit-content').text(old_content)
             }
             toggleEdit($(clear), $(check))
-            
+
         })
-        
+
     })
 
     function removeBrand(arg) {
@@ -208,15 +278,14 @@
             return
         }
     }
-    $('.item-container').on('click', '.item', function() {
+    $('.item-container').on('click', '.item', function () {
         var id = $(this).attr('id')
         var head = $(this).find('.edit-content').text()
         console.log(id, head)
-        $('.content-header').html('<div class="flex-between"><h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>'+head+'</h5><button class="btn border color-font add-category btn-slim" id="' +
+        $('.content-header').html(
+            '<div class="flex-between"><h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>' +
+            head + '</h5><button class="btn border color-font add-product btn-slim" id="' +
             id + '"><p class="plus">+</p></button></div>')
-    })
-    $('.content-header').on('click', '.add-category', function() {
-        console.log(this)
     })
 </script>
 {% endblock %}

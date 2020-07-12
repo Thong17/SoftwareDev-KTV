@@ -18,6 +18,15 @@ input[type=number]:focus,
 [contenteditable].form-control:focus {
   -webkit-box-shadow: inset 0 -2px 0 var(--color-hr);
           box-shadow: inset 0 -2px 0 var(--color-hr);
+  border: 1px solid var(--color-hover);
+}
+
+select:hover, input:hover, textarea:hover {
+  border: 1px solid var(--color-hover);
+}
+
+.input:hover, .input:focus, .input:valid {
+  border: 1px solid #777 !important;
 }
 
 .selector select {
@@ -143,6 +152,7 @@ form {
 .form-group {
   position: relative;
   padding-top: 23px;
+  margin: 0;
 }
 
 .label {
@@ -159,7 +169,22 @@ input:valid + label {
   top: 0;
   left: 0;
   font-size: 13px;
+  color: var(--color-font);
+}
+
+.input:focus + label,
+.input:valid + label {
+  top: 0;
+  left: 0;
+  font-size: 13px;
   color: #111;
+}
+
+textarea:focus + label, textarea:invalid + label {
+  top: 0;
+  left: 0;
+  font-size: 13px;
+  color: var(--color-font);
 }
 
 .hero {
@@ -370,7 +395,7 @@ main {
 }
 
 .wrap-container {
-  padding: 50px;
+  padding: 50px 50px 0 50px;
   position: relative;
 }
 
@@ -617,13 +642,17 @@ main {
 }
 
 .item-container {
-  height: 43vh;
+  height: 54vh;
   overflow-y: auto;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   overflow-x: hidden;
+}
+
+.item-container::-webkit-scrollbar {
+  display: none;
 }
 
 .item {
@@ -891,6 +920,93 @@ table tbody tr {
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
+}
+
+.upload-container {
+  height: 150px;
+  border-radius: 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border: 1px solid var(--color-hr);
+}
+
+.upload-label {
+  position: relative;
+  cursor: pointer;
+  width: 50%;
+}
+
+.upload-input {
+  visibility: hidden;
+  width: 100%;
+}
+
+.upload-label span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.upload-label span i {
+  color: var(--color-text);
+  font-size: 18px;
+}
+
+.textarea {
+  min-height: 130px;
+}
+
+#brand-nav {
+  display: block;
+}
+
+#product-nav {
+  opacity: 0;
+  -webkit-transform: translateX(-10px);
+          transform: translateX(-10px);
+  height: 79vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.slide-form {
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-top: 1px solid var(--color-hr);
+  height: 83%;
+}
+
+.slide-form::-webkit-scrollbar {
+  display: none;
+}
+
+.sub-content {
+  font-size: 15px;
+  margin: 23px 0 0 0;
+}
+
+.detail-content {
+  font-size: 13px;
+  margin: 0 0 5px 0;
+  color: var(--color-text);
+  font-weight: 300;
 }
 
 @-webkit-keyframes spin {
