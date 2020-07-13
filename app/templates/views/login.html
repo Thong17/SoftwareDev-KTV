@@ -32,7 +32,7 @@
                 <form action="/login" method="post">
                     <h3 class="title">Login</h3>
                     {{ form.csrf_token }}
-                    <div class="form-group" id="usr">
+                    <div class="form-group mb-3" id="usr">
                         {{form.username(class='form-control input', autocomplete='off')}}
                         {{form.username.label(class='username label')}}
                     </div>

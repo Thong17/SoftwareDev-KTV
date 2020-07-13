@@ -43,7 +43,7 @@
                         id="product-form">
                         <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Category</h5>
                         <div class="form-group selector">
-                            <p class="detail-content">Select category for product. Note: each category has different property</p>
+                            <p class="detail-content">Note: each category has different property</p>
                             <select name="category" id="category" class="form-control input-color">
                                 {% if categories %}
                                 {% for category in categories %}
@@ -115,6 +115,7 @@
 
 {% block script %}
 <script>
+
     $('.content-header').on('click', '.add-product', function () {
         var id = $(this).attr('id')
         var product = $('#product-nav')

@@ -208,7 +208,7 @@ textarea:focus+label, textarea:invalid+label {
     cursor: pointer;
 }
 
-.invalid {
+.form-group .invalid {
     border-color: #d9534f !important;
 }
 
