@@ -40,7 +40,7 @@
                 <h5 class="color-font m-0">Product</h5>
                 <div class="slide-form" style="width: 100%;">
                     <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
-                        id="product-form" novalidate>
+                        id="product-form">
                         <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Select Category</h5>
                         <div class="form-group selector">
                             <select name="category" id="category" class="form-control input-color">
@@ -78,7 +78,7 @@
                         </div>
                         <div class="form-group">
                             <textarea name="description" id="product-description"
-                                class="form-control input-color textarea" minlength="50" maxlength="50"></textarea>
+                                class="form-control input-color textarea" required></textarea>
                             <label for="description" class="label description color-font">Description (Optional)</label>
                         </div>
                         <div class="product-image hide">
@@ -106,10 +106,14 @@
             </div>
             <div class="content-body flex-between">
                 <div class="list-product" style="width: 100%; height: 100%;">
-
+                    <div class="product-sample">
+                        <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
+                    </div>
                 </div>
-
-            </div>
+                <div class="loader hide">
+                    <div class="loading"></div>
+                </div>
+            </div>  
         </div>
     </div>
 </div>
@@ -133,13 +137,18 @@
         var id = $(this).attr('id')
         var product = $('#product-nav')
         var brand = $('#brand-nav')
+        var loader = $('.loader')
+        var list = $('.list-product')
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
+            toggleEdit(loader, list)
             gsap.to('#brand-nav', {
                 opacity: 0,
                 x: -10,
                 onComplete: function () {
                     toggleEdit(product, brand)
+                    toggleEdit(list, loader)
+                    $('.product-sample').addClass('sample')
                     $('.submit-product').attr('id', id)
                     gsap.to('#product-nav', {
                         opacity: 1,
@@ -150,11 +159,14 @@
             
         } else {
             $('.add-product p').removeClass('clear')
+            toggleEdit(loader, list)
             gsap.to('#product-nav', {
                 opacity: 0,
                 x: -10,
                 onComplete: function () {
                     toggleEdit(brand, product)
+                    toggleEdit(list, loader)
+                    $('.product-sample').removeClass('sample')
                     gsap.to('#brand-nav', {
                         opacity: 1,
                         x: 0
