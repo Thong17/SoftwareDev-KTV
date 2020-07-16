@@ -26,8 +26,10 @@ select:hover, input:hover, textarea:hover {
 }
 
 .input:hover, .input:focus, .input:valid {
-    border: 1px solid #999 !important;
+    border: 1px solid #777 !important;
 }
+
+
 
 .selector select {
     box-shadow: none !important;
@@ -129,7 +131,7 @@ form {
 .form-group {
     position: relative;
     padding-top: 23px;
-    margin: 5px 0 0 0;
+    margin: 5px;
 }
 
 .label {
@@ -510,7 +512,7 @@ main {
 }
 
 .item-container {
-    height: 54vh;
+    height: 52vh;
     overflow-y: auto;
     user-select: none;
     overflow-x: hidden;
@@ -790,7 +792,7 @@ table tbody tr {
 #product-nav {
     opacity: 0;
     transform: translateX(-10px);
-    height: 79vh;
+    height: 77vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -809,7 +811,7 @@ table tbody tr {
 
 .sub-content {
     font-size: 15px;
-    margin: 23px 0 0 0;
+    margin: 20px 0 0 0;
 }
 
 .detail-content {

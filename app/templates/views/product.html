@@ -12,7 +12,7 @@
                     </button>
                 </div>
                 <hr>
-                <div class="item-container" style="height: 72vh;">
+                <div class="item-container" style="height: 70vh;">
                     {% if brands %}
                     {% for brand in brands %}
                     <div class="flex-between item color-font" id="{{ brand.id }}">
@@ -40,10 +40,9 @@
                 <h5 class="color-font m-0">Product</h5>
                 <div class="slide-form" style="width: 100%;">
                     <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
-                        id="product-form">
-                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Category</h5>
+                        id="product-form" novalidate>
+                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Select Category</h5>
                         <div class="form-group selector">
-                            <p class="detail-content">Note: each category has different property</p>
                             <select name="category" id="category" class="form-control input-color">
                                 {% if categories %}
                                 {% for category in categories %}
@@ -54,7 +53,7 @@
                                 {% endif %}
                             </select>
                         </div>
-                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
+                        <h5 class="color-font sub-content mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
                         <div class="form-group">
                             <input type="text" class="form-control input-color" name="product" id="product" required>
                             <label for="product" class="label product color-font">Product</label>
@@ -78,23 +77,26 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <textarea name="description" id="produc-description"
-                                class="form-control input-color textarea" minlength="50"></textarea>
-                            <label for="description" class="label description color-font">Description</label>
+                            <textarea name="description" id="product-description"
+                                class="form-control input-color textarea" minlength="50" maxlength="50"></textarea>
+                            <label for="description" class="label description color-font">Description (Optional)</label>
                         </div>
-                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
-                        <div class="form-group">
-                            <p class="detail-content">Select product photo. This photo will be show in the product</p>
-                            <div class="upload-container">
-                                <label for="photo" class="upload-label">
-                                    <input type="file" name="photo" id="photo" class="upload-input">
-                                    <span><i class="fa fa-camera" aria-hidden="true"></i></span>
-                                </label>
+                        <div class="product-image hide">
+                            <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
+                            <div class="form-group">
+                                <p class="detail-content">Select product photo. This photo will be show in the product</p>
+                                <div class="upload-container">
+                                    <label for="photo" class="upload-label">
+                                        <input type="file" name="photo" id="photo" class="upload-input">
+                                        <span><i class="fa fa-camera" aria-hidden="true"></i></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
+                        <input type="submit" value="Save" class="submit-btn hide">
                     </form>
                 </div>
-                <button class="btn btn-block border color-font submit-product">Save</button>
+                <button class="btn btn-block border color-font submit-product">Create</button>
             </div>
         </div>
         <div class="border-right"></div>
@@ -115,6 +117,17 @@
 
 {% block script %}
 <script>
+
+    $('.submit-product').on('click', function() {
+        $('.submit-btn').click()
+        var product = $('#product').val()
+        var price = $('#price').val()
+        var currency = $('#currency').val()
+        var description = $('#product-description').val()
+        var category = $('#category').val()
+
+        console.log(product, price, currency, description, category)
+    })
 
     $('.content-header').on('click', '.add-product', function () {
         var id = $(this).attr('id')

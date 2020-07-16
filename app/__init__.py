@@ -182,9 +182,4 @@ class CategorySchema(ModelSchema):
         model = tblCategory
 
         
-
-
-
-
-
 from app import route
