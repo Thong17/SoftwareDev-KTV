@@ -45,6 +45,7 @@
                         <div class="form-group selector">
                             <p class="detail-content">Use category for specific products</p>
                             <select name="category" id="category" class="form-control input-color">
+                                <option disabled selected="selected">Category</option>
                                 {% if categories %}
                                 {% for category in categories %}
                                 <option value="{{category.id}}">{{category.category}}</option>
@@ -57,7 +58,7 @@
                         <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
                         <div class="form-group">
                             <input type="text" class="form-control input-color" name="product" id="product" required>
-                            <label for="product" class="label product color-font">Product</label>
+                            <label for="product" class="label product">Product</label>
                         </div>
                         
                         <div class="row">
@@ -65,7 +66,7 @@
                                 <div class="form-group">
                                     <input type="number" class="form-control input-color" name="price" id="price"
                                         required>
-                                    <label for="price" class="label price color-font">Price</label>
+                                    <label for="price" class="label price">Price</label>
                                 </div>
                             </div>
                             <div class="col-md-4 selector pl-0">
@@ -80,7 +81,7 @@
                         <div class="form-group">
                             <textarea name="description" id="product-description"
                                 class="form-control input-color textarea" required></textarea>
-                            <label for="description" class="label description color-font">Description</label>
+                            <label for="description" class="label description">Description</label>
                         </div>
                         <div class="product-image hide">
                             <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
@@ -107,37 +108,7 @@
             </div>
             <div class="content-body flex-between">
                 <div class="list-product" style="width: 100%; height: 100%;">
-                    <div class="sample hide">
-                        <div class="sample-header">
-                            <div class="product-img">
-                                <img src="/static/uploads/mac.png" alt="Default">
-                            </div>
-                            <div class="product-info">
-                                <div class="product-title">
-                                    <h3 class="color-font">Product Name</h3>
-                                    <p class="paragraph">Category</p>
-                                </div>
-                                <div class="product-price">
-                                    <h3></h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sample-body">
-                            <div class="body-header">
-                                <div class="header-menu">
-                                    <p class="color-font">Specs</p>
-                                    <p class="color-font">Dimension</p>
-                                    <p class="color-font">Features</p>
-                                </div>
-                                <div class="header-btn">
-                                    <button class="btn-blank color-font"><i class="fa fa-search" aria-hidden="true"></i></button>
-                                </div>
-                            </div>
-                            <div class="body-content">
-                                
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="loader hide">
                     <div class="loading"></div>
@@ -178,7 +149,6 @@
                 onComplete: function () {
                     toggleEdit(product, brand)
                     toggleEdit(list, loader)
-                    $('.sample').removeClass('hide')
                     $('.submit-product').attr('id', id)
                     gsap.to('#product-nav', {
                         opacity: 1,
@@ -196,7 +166,6 @@
                 onComplete: function () {
                     toggleEdit(brand, product)
                     toggleEdit(list, loader)
-                    $('.sample').addClass('hide')
                     gsap.to('#brand-nav', {
                         opacity: 1,
                         x: 0
@@ -342,6 +311,11 @@
             '<div class="flex-between"><h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>' +
             head + '</h5><button class="btn border color-font add-product btn-slim" id="' +
             id + '"><p class="plus">+</p></button></div>')
+
+        $('.list-product').prepend(`
+                    <div class="product-item">
+                        <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
+                    </div>`)
         
     })
 </script>
