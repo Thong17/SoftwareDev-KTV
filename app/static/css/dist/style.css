@@ -43,7 +43,7 @@ html[data-theme='light'] {
   --color-menu: #e0e0e0;
   --color-font: #111;
   --color-logo: #111;
-  --color-text: #333;
+  --color-text: #222;
   --color-hr: rgba(0, 0, 0, 0.1);
   --color-hover: rgba(0, 0, 0, 0.3);
 }
