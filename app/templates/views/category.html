@@ -62,7 +62,7 @@
                         {{ form.category(class='form-control input-color', placeholder='Category', autocomplete='off') }}
                     </div>
                     <div class="form-group m-0">
-                        {{ form.description(class='form-control input-color') }}
+                        {{ form.description(class='form-control input-color', placeholder='Description') }}
                     </div>
                     <div class="form-group flex-end m-0">
                         {{form.submit(class='btn border btn-shadow color-font')}}
@@ -112,7 +112,7 @@
 
         return `<tr id="prp-` + this.id + `" class="color-font hover">
                     <td><span>` + this.property + `</span><input type="text" value="` + this.property + `" class="input-color form-control hide"></td>
-                    <td><span>` + this.type + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
+                    <td class="selector"><span>` + this.type + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
                     <td class="flex-between-center"><span>` + this.description + `</span><input type="text" value="` +
             this.description +
             `" class="input-color form-control hide" style="width: 90%"><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" id="` +

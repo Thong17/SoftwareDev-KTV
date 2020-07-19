@@ -28,7 +28,7 @@
                             {{ form.brand(class='form-control input-color', placeholder='Brand', autocomplete='off') }}
                         </div>
                         <div class="form-group m-0">
-                            {{ form.description(class='form-control input-color') }}
+                            {{ form.description(class='form-control input-color', placeholder='Description') }}
                         </div>
                         <div class="form-group flex-end m-0">
                             {{form.submit(class='btn border btn-shadow color-font')}}
@@ -43,6 +43,7 @@
                         id="product-form">
                         <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Select Category</h5>
                         <div class="form-group selector">
+                            <p class="detail-content">Use category for specific products</p>
                             <select name="category" id="category" class="form-control input-color">
                                 {% if categories %}
                                 {% for category in categories %}
@@ -53,7 +54,7 @@
                                 {% endif %}
                             </select>
                         </div>
-                        <h5 class="color-font sub-content mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
+                        <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
                         <div class="form-group">
                             <input type="text" class="form-control input-color" name="product" id="product" required>
                             <label for="product" class="label product color-font">Product</label>
@@ -67,7 +68,7 @@
                                     <label for="price" class="label price color-font">Price</label>
                                 </div>
                             </div>
-                            <div class="col-md-4 selector">
+                            <div class="col-md-4 selector pl-0">
                                 <div class="form-group">
                                     <select name="currency" id="currency" class="form-control input-color">
                                         <option value="dollar"><span>&#36;</span></option>
@@ -79,7 +80,7 @@
                         <div class="form-group">
                             <textarea name="description" id="product-description"
                                 class="form-control input-color textarea" required></textarea>
-                            <label for="description" class="label description color-font">Description (Optional)</label>
+                            <label for="description" class="label description color-font">Description</label>
                         </div>
                         <div class="product-image hide">
                             <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
@@ -106,8 +107,36 @@
             </div>
             <div class="content-body flex-between">
                 <div class="list-product" style="width: 100%; height: 100%;">
-                    <div class="product-sample">
-                        <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
+                    <div class="sample hide">
+                        <div class="sample-header">
+                            <div class="product-img">
+                                <img src="/static/uploads/mac.png" alt="Default">
+                            </div>
+                            <div class="product-info">
+                                <div class="product-title">
+                                    <h3 class="color-font">Product Name</h3>
+                                    <p class="paragraph">Category</p>
+                                </div>
+                                <div class="product-price">
+                                    <h3></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sample-body">
+                            <div class="body-header">
+                                <div class="header-menu">
+                                    <p class="color-font">Specs</p>
+                                    <p class="color-font">Dimension</p>
+                                    <p class="color-font">Features</p>
+                                </div>
+                                <div class="header-btn">
+                                    <button class="btn-blank color-font"><i class="fa fa-search" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                            <div class="body-content">
+                                
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="loader hide">
@@ -139,6 +168,7 @@
         var brand = $('#brand-nav')
         var loader = $('.loader')
         var list = $('.list-product')
+
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
             toggleEdit(loader, list)
@@ -148,7 +178,7 @@
                 onComplete: function () {
                     toggleEdit(product, brand)
                     toggleEdit(list, loader)
-                    $('.product-sample').addClass('sample')
+                    $('.sample').removeClass('hide')
                     $('.submit-product').attr('id', id)
                     gsap.to('#product-nav', {
                         opacity: 1,
@@ -166,7 +196,7 @@
                 onComplete: function () {
                     toggleEdit(brand, product)
                     toggleEdit(list, loader)
-                    $('.product-sample').removeClass('sample')
+                    $('.sample').addClass('hide')
                     gsap.to('#brand-nav', {
                         opacity: 1,
                         x: 0
@@ -312,6 +342,7 @@
             '<div class="flex-between"><h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>' +
             head + '</h5><button class="btn border color-font add-product btn-slim" id="' +
             id + '"><p class="plus">+</p></button></div>')
+        
     })
 </script>
 {% endblock %}
