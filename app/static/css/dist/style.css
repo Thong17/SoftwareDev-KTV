@@ -742,7 +742,8 @@ hr {
 .content-body {
   position: relative;
   height: 72vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .content-header {
@@ -792,6 +793,18 @@ table tbody tr {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+}
+
+.flex-between-start {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
 }
 
 .flex-between-center p {
@@ -1009,6 +1022,7 @@ table tbody tr {
 }
 
 .list-product {
+  width: 100%;
   position: relative;
   display: -ms-grid;
   display: grid;
@@ -1016,7 +1030,10 @@ table tbody tr {
   -ms-grid-columns: (minmax(130px, 1fr))[auto-fill];
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   overflow-y: auto;
-  height: 100%;
+}
+
+.content-body::-webkit-scrollbar {
+  display: none;
 }
 
 .product-item {
