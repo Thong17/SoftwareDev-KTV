@@ -40,7 +40,6 @@ configure_uploads(app, upload)
 patch_request_class(app)
 
 
-
 # Flask Form
 class LoginForm(FlaskForm, UserMixin):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
@@ -99,7 +98,7 @@ class tblCategory(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     properties = db.relationship('tblProperty', backref='properties', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    products = db.relationship('tblProduct', backref='products', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    products = db.relationship('tblProduct', backref='productOfCategory', lazy=True, cascade="all, delete-orphan", single_parent=True)
     brands = db.relationship('tblBrand', secondary=category_brand, backref='brands', lazy='dynamic')
 
 class tblProperty(db.Model):
@@ -139,6 +138,7 @@ class tblBrand(db.Model):
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    products = db.relationship('tblProduct', backref='productOfBrand', lazy=True, cascade="all, delete-orphan", single_parent=True)
     categories = db.relationship('tblCategory', secondary=category_brand, backref='categories', lazy='dynamic')
 
 class tblColor(db.Model):

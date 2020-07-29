@@ -3,7 +3,7 @@
 {% block content %}
 <div class="wrap-container">
     <div class="row-wrapper">
-        <div class="column-wrapper" style="width: 350px;">
+        <div class="column-wrapper" style="width: 350px; box-sizing: border-box; overflow: hidden;">
             <div id="brand-nav">
                 <div class="flex-between-end">
                     <h5 class="color-font">Brands</h5>
@@ -37,83 +37,22 @@
                 </div>
             </div>
             <div id="product-nav" class="hide">
-                <h5 class="color-font m-0">Product</h5>
-                <div class="slide-form" style="width: 100%;">
-                    <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
-                        id="product-form">
-                        <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Select Category</h5>
-                        <div class="form-group selector">
-                            <p class="detail-content">Use category for specific products</p>
-                            <select name="category" id="category" class="form-control input-color">
-                                <option disabled selected="selected">Category</option>
-                                {% if categories %}
-                                {% for category in categories %}
-                                <option value="{{category.id}}">{{category.category}}</option>
-                                {% endfor %}
-                                {% else %}
-                                <option value="">No category</option>
-                                {% endif %}
-                            </select>
-                        </div>
-                        <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
-                        <div class="form-group">
-                            <input type="text" class="form-control input-color" name="product" id="product" required>
-                            <label for="product" class="label product">Product</label>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <input type="number" class="form-control input-color" name="price" id="price"
-                                        required>
-                                    <label for="price" class="label price">Price</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4 selector pl-0">
-                                <div class="form-group">
-                                    <select name="currency" id="currency" class="form-control input-color">
-                                        <option value="dollar"><span>&#36;</span></option>
-                                        <option value="riel"><span>&#6107;</span></option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <textarea name="description" id="product-description"
-                                class="form-control input-color textarea" required></textarea>
-                            <label for="description" class="label description">Description</label>
-                        </div>
-                        <div class="product-image hide">
-                            <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
-                            <div class="form-group">
-                                <p class="detail-content">Select product photo. This photo will be show in the product</p>
-                                <div class="upload-container">
-                                    <label for="photo" class="upload-label">
-                                        <input type="file" name="photo" id="photo" class="upload-input">
-                                        <span><i class="fa fa-camera" aria-hidden="true"></i></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="submit" value="Save" class="submit-btn hide">
-                    </form>
-                </div>
-                <button class="btn btn-block border color-font submit-product">Create</button>
+
             </div>
         </div>
         <div class="border-right"></div>
-        <div class="column-wrapper" style="width: 100%;">
+        <div class="column-wrapper" style="width: 100%; box-sizing: border-box; overflow: hidden;">
             <div class="content-header">
 
             </div>
             <div class="content-body">
                 <div class="list-product">
-
+                    
                 </div>
                 <div class="loader hide">
                     <div class="loading"></div>
                 </div>
-            </div>  
+            </div>
         </div>
     </div>
 </div>
@@ -121,57 +60,132 @@
 
 {% block script %}
 <script>
+    $(document).on('submit', '#product-form', function () {
+        event.preventDefault();
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            dataType: 'json',
+            data: $(this).serialize(),
+            success: function (data) {
+                $('.product-image').removeClass('hide')
+                toggleEdit($('.save-product'), $('.submit-product'))
+                $('.save-product').attr('id', data['id'])
+            }
+        })
+    })
 
-    $('.submit-product').on('click', function() {
+    $(document).on('click', '.save-product', function() {
+        $('.add-product').click()
+        
+    })
+
+    $('#product-nav').on('input', '#product', function () {
+        var product = $(this).val()
+        if (product == '') {
+            $('#sample-title').text('Product Name')
+        } else {
+            $('#sample-title').text(product)
+        }
+
+    })
+
+    $('#product-nav').on('input', '#price', function () {
+        var price = $(this).val()
+        $('#sample-price').text(price)
+    })
+
+    $('#product-nav').on('change', '#category', function () {
+        var category = $('#category option:selected').text()
+        $('#sample-category').text(category)
+    })
+
+    $('#product-nav').on('change', '#currency', function () {
+        var currency = $('#currency').val()
+        var price = $('#details-price').text()
+        if (currency == 'riel') {
+            $('#sample-symbol').html('R')
+        } else {
+            $('#sample-symbol').html('$')
+        }
+
+        console.log(currency)
+    })
+
+    $('#product-nav').on('click', '.submit-product', function () {
         $('.submit-btn').click()
+        var id = $(this).attr('id')
         var product = $('#product').val()
         var price = $('#price').val()
         var currency = $('#currency').val()
-        var description = $('#product-description').val()
+        var description = $('#details').val()
         var category = $('#category').val()
 
         console.log(product, price, currency, description, category)
     })
 
+
     $('.content-header').on('click', '.add-product', function () {
+        $('.add-product').attr("disabled", true)
         var id = $(this).attr('id')
         var product = $('#product-nav')
         var brand = $('#brand-nav')
         var loader = $('.loader')
         var list = $('.list-product')
+        var sample = $('.sample')
+        var icon = $('#add-product')
 
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
-            toggleEdit(loader, list)
+            $('.content-body').prepend(productSample)
+            
             gsap.to('#brand-nav', {
-                opacity: 0,
-                x: -10,
+                x: '-100%',
+                duration: 0.2,
                 onComplete: function () {
+                    $('.add-product').attr("disabled", false)
                     toggleEdit(product, brand)
-                    toggleEdit(list, loader)
-                    $('.submit-product').attr('id', id)
+                    $('#product-nav').html(productForm)
+                    $('#brand-id').val(id)
                     gsap.to('#product-nav', {
-                        opacity: 1,
                         x: 0
+                    },)
+                }
+            })
+
+        } else {
+            $('.add-product p').removeClass('clear')
+            toggleLoader(loader)
+            $('.list-product').empty()
+            if ($('.content-body').has('.product-sample')) {
+                $('.product-sample').remove()
+            }
+            $.ajax({
+                url: '/product',
+                type: 'post',
+                data: {data: id},
+                success: function(results) {
+                    setTimeout(function() {
+                        toggleLoader(loader)
+                    }, 300)
+                    results.forEach(data => {
+                        showProduct($('.list-product'), data.id, data.product, data.photo, data.price)
+                    });
+
+                    gsap.to('#product-nav', {
+                        x: '100%',
+                        duration: 0.2,
+                        onComplete: function () {
+                            $('.add-product').attr("disabled", false)
+                            toggleEdit(brand, product)
+                            gsap.to('#brand-nav', {
+                                x: 0
+                            })
+                        }
                     })
                 }
             })
             
-        } else {
-            $('.add-product p').removeClass('clear')
-            toggleEdit(loader, list)
-            gsap.to('#product-nav', {
-                opacity: 0,
-                x: -10,
-                onComplete: function () {
-                    toggleEdit(brand, product)
-                    toggleEdit(list, loader)
-                    gsap.to('#brand-nav', {
-                        opacity: 1,
-                        x: 0
-                    })
-                }
-            })
         }
     })
 
@@ -306,17 +320,33 @@
     $('.item-container').on('click', '.item', function () {
         var id = $(this).attr('id')
         var head = $(this).find('.edit-content').text()
-        console.log(id, head)
+        toggleLoader($('.loader'))
+        $('.list-product').empty()
         $('.content-header').html(
             '<div class="flex-between"><h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>' +
             head + '</h5><button class="btn border color-font add-product btn-slim" id="' +
             id + '"><p class="plus">+</p></button></div>')
 
-        $('.list-product').prepend(`
-                    <div class="product-item">
-                        <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
-                    </div>`)
+        $.ajax({
+            url: '/product',
+            type: 'post',
+            data: {data: id},
+            success: function(results) {
+                results.forEach(data => {
+                    showProduct($('.list-product'), data.id, data.product, data.photo, data.price)
+                    
+                });
+
+                
+                
+                setTimeout(function() {
+                    toggleLoader($('.loader'))
+                }, 300)
+                
+            }
+        })
         
     })
+    
 </script>
 {% endblock %}

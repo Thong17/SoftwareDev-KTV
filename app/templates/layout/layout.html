@@ -115,6 +115,133 @@
             this.show.removeClass('hide')
             this.hide.addClass('hide')
         }
+
+        function toggleLoader(loader) {
+            this.loader = loader
+            if (this.loader.hasClass('hide')) {
+                this.loader.removeClass('hide')
+            } else {
+                this.loader.addClass('hide')
+            }
+            
+        }
+
+
+
+        function showProduct(element, id, product, photo, price) {
+            this.element = element
+            this.id = id
+            this.product = product
+            this.photo = photo
+            this.price = price
+            this.element.append(`<div class="product-item" id="`+this.id+`">
+                        <div class="item-wrapper">
+                            <div class="item-img">
+                                <img src="static/uploads/`+this.photo+`" alt="" srcset="">
+                                <div class="product-btn color-text">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                            <div class="item-details">
+                                <div class="details">
+                                    <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">`+this.product+`</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">category</p>
+                                </div>
+                                <div class="flex-between-end color-text" style="width: 100%;">
+                                    <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol">$</span><span class="price-tag">`+this.price+`</span></p>
+                                    <p style="font-size: 12px;">
+                                        <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`)
+        }
+
+        var productSample = `<div class="product-sample">
+                                    <div class="sample-wrapper">
+                                        <div class="sample-img">
+                                            <img src="static/svg/camera-light.svg" alt="" srcset="">
+                                        </div>
+                                        <div class="sample-details">
+                                            <div class="details">
+                                                <p class="color-font text-wrapper" id="sample-title" style="font-size: 14px;">Product Name</p>
+                                                <p class="color-text" id="sample-category" style="font-size: 12px;">category</p>
+                                            </div>
+                                            <div class="flex-between-end color-text" style="width: 100%;">
+                                                <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span id="sample-symbol">$</span><span id="sample-price"></span></p>
+                                                <p style="font-size: 12px;">
+                                                    <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`
+        var productForm = `<h5 class="color-font m-0">Product</h5>
+                    <div class="slide-form" style="width: 100%;">
+                        <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
+                            id="product-form">
+                            <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Select Category</h5>
+                            <input type="hidden" name="brand" id="brand-id">
+                            <div class="form-group selector">
+                                <p class="detail-content">Use category for specific products</p>
+                                <select name="category" id="category" class="form-control input-color" required>
+                                    <option disabled selected="selected" value="">Category</option>
+                                    {% if categories %}
+                                    {% for category in categories %}
+                                    <option value="{{category.id}}">{{category.category}}</option>
+                                    {% endfor %}
+                                    {% else %}
+                                    <option value="">No category</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
+                            <div class="form-group">
+                                <input type="text" class="form-control input-color" name="product" id="product" required>
+                                <label for="product" class="label product">Product</label>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <input type="number" class="form-control input-color" name="price" id="price"
+                                            required>
+                                        <label for="price" class="label price">Price</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 selector pl-0">
+                                    <div class="form-group">
+                                        <select name="currency" id="currency" class="form-control input-color">
+                                            <option value="dollar"><span>&#36;</span></option>
+                                            <option value="riel"><span>&#6107;</span></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="details" id="details"
+                                    class="form-control input-color textarea" required></textarea>
+                                <label for="details" class="label details">Description</label>
+                            </div>
+                            <div class="product-image hide">
+                                <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
+                                <div class="form-group">
+                                    <p class="detail-content">Select product photo. This photo will be show in the product</p>
+                                    <div class="upload-container">
+                                        <label for="photo" class="upload-label">
+                                            <input type="file" name="photo" id="photo" class="upload-input">
+                                            <span><i class="fa fa-camera" aria-hidden="true"></i></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="submit" value="Save" class="submit-btn hide">
+                        </form>
+                    </div>
+                    <button class="btn btn-block border color-font submit-product">Create</button>
+                    <button class="btn btn-block border color-font save-product hide">Save</button>`
     </script>
 </body>
 

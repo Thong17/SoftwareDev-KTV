@@ -166,13 +166,11 @@
                 data: id
             },
             beforeSend: function () {
-                $('#list-properties').addClass('hide')
-                $('.loader').removeClass('hide')
+                toggleEdit($('.loader'), $('#list-properties'))
             },
             success: function (data) {
                 setTimeout(function () {
-                    $('#list-properties').removeClass('hide')
-                    $('.loader').addClass('hide')
+                    toggleEdit($('#list-properties'), $('.loader'))
                     tl.from('#list-properties tr', {
                         opacity: 0,
                         x: -10,
@@ -279,6 +277,7 @@
 
     })
     $(document).on('submit', '.form', function () {
+        event.preventDefault()
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),

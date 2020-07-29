@@ -1,13 +1,14 @@
 from app import app, bcrypt, db, login_manager, c
-from app import tblUser, tblBrand, tblCategory, tblProperty
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm
 from app import CategorySchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
-import json
+import json, simplejson
 from datetime import datetime, timedelta, date
 from sqlalchemy import func
+from decimal import Decimal
 
 
 @login_manager.user_loader
@@ -246,6 +247,7 @@ def udpate_category(id):
         return jsonify({'msg': 'Failed'})
 
 @app.route('/brand', methods=['POST', 'GET'])
+@login_required
 def brands():
     brands = tblBrand.query.all()
     categories = tblCategory.query.with_entities(tblCategory.id, tblCategory.category).all()
@@ -304,3 +306,39 @@ def theme():
     user.theme = theme
     db.session.commit()
     return jsonify({'theme': theme})
+
+@app.route('/product/add', methods=['POST'])
+def add_product():
+    product = request.form['product']
+    price = request.form['price']
+    category = request.form['category']
+    currency = request.form['currency']
+    description = request.form['details']
+    brand = request.form['brand']
+
+    id = str(uuid4())
+
+    Model = tblProduct(id=id, product=product, price=price, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
+    
+    db.session.add(Model)
+    db.session.commit()
+
+    return jsonify({'data': 'Success', 'id': id})
+
+
+@app.route('/product', methods=['POST'])
+def products():
+    id = request.form['data']
+    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.price, tblProduct.photo).filter_by(brandId=id).all()
+    products = []
+    for Product in Products:
+        price = simplejson.dumps({"price": Product.price})
+        price = json.loads(price)
+        product = {
+            'id': Product.id,
+            'product': Product.product,
+            'photo': Product.photo
+        }
+        product.update(price)
+        products.append(product)
+    return jsonify(products)
