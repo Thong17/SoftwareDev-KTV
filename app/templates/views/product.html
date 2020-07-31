@@ -137,7 +137,8 @@
 
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
-            $('.content-body').prepend(productSample)
+            // $('.content-body').prepend(productSample)
+            $('.list-product').html(productSample)
             
             gsap.to('#brand-nav', {
                 x: '-100%',
