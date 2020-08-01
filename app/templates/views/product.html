@@ -42,10 +42,9 @@
         </div>
         <div class="border-right"></div>
         <div class="column-wrapper" style="width: 100%; box-sizing: border-box; overflow: hidden;">
-            <div class="content-header">
-
-            </div>
+            <div class="content-header"></div>
             <div class="content-body">
+                <div class="inset-shadow hide"></div>
                 <div class="list-product">
                     
                 </div>
@@ -75,6 +74,14 @@
         })
     })
 
+    $('.list-product').on('scroll', function () {
+        if ($('.list-product').scrollTop()) {
+            $('.inset-shadow').removeClass('hide');
+        } else {
+            $('.inset-shadow').addClass('hide');
+        }
+    })
+
     $(document).on('click', '.save-product', function() {
         $('.add-product').click()
         
@@ -87,12 +94,16 @@
         } else {
             $('#sample-title').text(product)
         }
-
     })
 
     $('#product-nav').on('input', '#price', function () {
         var price = $(this).val()
         $('#sample-price').text(price)
+    })
+
+    $('#product-nav').on('input', '#details', function () {
+        var description = $(this).val()
+        $('#sample-description').text(description)
     })
 
     $('#product-nav').on('change', '#category', function () {
@@ -146,7 +157,7 @@
                 onComplete: function () {
                     $('.add-product').attr("disabled", false)
                     toggleEdit(product, brand)
-                    $('#product-nav').html(productForm)
+                    $('#product-nav').html(showProductForm({category: "Select category", product: "", price: "", description: ""}))
                     $('#brand-id').val(id)
                     gsap.to('#product-nav', {
                         x: 0

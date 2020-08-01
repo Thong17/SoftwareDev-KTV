@@ -134,7 +134,8 @@
             this.product = product
             this.photo = photo
             this.price = price
-            this.element.append(`<div class="product-item" id="`+this.id+`">
+            this.element.append(`
+                    <div class="product-item" id="`+this.id+`">
                         <div class="item-wrapper">
                             <div class="item-img">
                                 <img src="static/uploads/`+this.photo+`" alt="" srcset="">
@@ -172,12 +173,20 @@
                                             <p class="color-text mt-2" id="sample-description" style="font-size: 12px;"><p>
                                         </div>
                                     </div>
-                                    <div class="border-right"></div>
                                     <div class="sample-right">
-                                        <div class="sample-price">$</div>
+                                        <div class="sample-header">
+                                            <div class="sample-price color-font">$</div>
+                                        </div>
+                                        
                                     </div>
                                 </div>`
-        var productForm = `<h5 class="color-font m-0">Product</h5>
+
+        function showProductForm(params) {
+            var category = params.category
+            var product = params.product
+            var price = params.price
+            var description = params.description
+            var productForm = `<h5 class="color-font m-0">Product</h5>
                     <div class="slide-form" style="width: 100%;">
                         <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
                             id="product-form">
@@ -186,7 +195,7 @@
                             <div class="form-group selector">
                                 <p class="detail-content">Use category for specific products</p>
                                 <select name="category" id="category" class="form-control input-color" required>
-                                    <option disabled selected="selected" value="">Category</option>
+                                    <option disabled selected="selected" value="">`+category+`</option>
                                     {% if categories %}
                                     {% for category in categories %}
                                     <option value="{{category.id}}">{{category.category}}</option>
@@ -198,14 +207,14 @@
                             </div>
                             <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
                             <div class="form-group">
-                                <input type="text" class="form-control input-color" name="product" id="product" required>
+                                <input type="text" class="form-control input-color" name="product" id="product" value="`+product+`" required>
                                 <label for="product" class="label product">Product</label>
                             </div>
                             
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="price" id="price"
+                                        <input type="number" class="form-control input-color" name="price" id="price" value="`+price+`"
                                             required>
                                         <label for="price" class="label price">Price</label>
                                     </div>
@@ -221,7 +230,7 @@
                             </div>
                             <div class="form-group">
                                 <textarea name="details" id="details"
-                                    class="form-control input-color textarea" required></textarea>
+                                    class="form-control input-color textarea" value="`+description+`" required></textarea>
                                 <label for="details" class="label details">Description</label>
                             </div>
                             <div class="product-image hide">
@@ -241,6 +250,8 @@
                     </div>
                     <button class="btn btn-block border color-font submit-product">Create</button>
                     <button class="btn btn-block border color-font save-product hide">Save</button>`
+            return productForm
+        }
     </script>
 </body>
 
