@@ -60,7 +60,8 @@
 {% block script %}
 <script>
     $(document).on('change', '#photo', function () {
-        uploadPhoto($(this).val())
+        var photos = document.querySelector('#photo').files
+        uploadPhoto(photos)
     })
 
     $(document).on('submit', '#product-form', function () {
@@ -87,7 +88,8 @@
     })
 
     $(document).on('click', '.save-product', function() {
-        $('.add-product').click()
+        var files = document.querySelector('#photo').files
+        console.log(files)
         
     })
 

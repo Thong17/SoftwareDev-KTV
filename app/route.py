@@ -345,3 +345,9 @@ def products():
         product.update(price)
         products.append(product)
     return jsonify(products)
+
+@app.route('/product/photo', methods=['POST'])
+def product_photo():
+    files = request.files['file']
+    print(files)
+    return jsonify()

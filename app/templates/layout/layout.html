@@ -239,8 +239,9 @@
                                 <div class="form-group">
                                     <p class="detail-content">Select product photo. This photo will be show in the product</p>
                                     <div class="upload-container">
+                                        <img src="/static/uploads/default.png" id="image-src">
                                         <label for="photo" class="upload-label">
-                                            <input type="file" name="photo" id="photo" class="upload-input">
+                                            <input type="file" name="photo" id="photo" class="upload-input" multiple>
                                             <span><i class="fa fa-camera" aria-hidden="true"></i></span>
                                         </label>
                                     </div>
@@ -253,10 +254,51 @@
                     <button class="btn btn-block border color-font save-product hide">Save</button>`
             return productForm
         }
+
+        function uuid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8)
+                return v.toString(16)
+            })
+        }
         
-        function uploadPhoto(photo) {
-            this.photo = photo
-            console.log(this.photo)
+        function uploadPhoto(files) {
+            const validtypes = ['image/gif', 'image/jpeg', 'image/png']
+            this.files = files
+            var form = new FormData()
+            if (this.files.length > 0) {
+                this.files.forEach(file => {
+                    if (jQuery.inArray(file.type, validtypes) == -1) {
+                        console.log('Invalide file!')
+                    } else {
+                        if (file.size > 2000000) {
+                        console.log('Image size too big ')
+                        } else {
+                            form.append('file', file)
+                            console.log(file)
+                        }
+                    }
+                })
+                $.ajax({
+                    url: '/product/photo',
+                    method: 'POST',
+                    data: form,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    beforeSend: function () {
+                        console.log('loading...')
+                    },
+                    success: function(data) {
+                        setTimeout(function() {
+                            console.log(data)
+                        }, 3000);
+                    }
+                })
+            } else {
+                console.log('No file selected')
+            }
+            
         }
     </script>
 </body>
