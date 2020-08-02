@@ -181,7 +181,7 @@
                         toggleLoader(loader)
                     }, 300)
                     results.forEach(data => {
-                        showProduct($('.list-product'), data.id, data.product, data.photo, data.price)
+                        showProduct($('.list-product'), data.id, data.product, data.category, data.photo, data.price)
                     });
 
                     gsap.to('#product-nav', {
@@ -345,7 +345,7 @@
             data: {data: id},
             success: function(results) {
                 results.forEach(data => {
-                    showProduct($('.list-product'), data.id, data.product, data.photo, data.price)
+                    showProduct($('.list-product'), data.id, data.product, data.category, data.photo, data.price)
                     
                 });
 

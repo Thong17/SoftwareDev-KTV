@@ -329,15 +329,19 @@ def add_product():
 @app.route('/product', methods=['POST'])
 def products():
     id = request.form['data']
-    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.price, tblProduct.photo).filter_by(brandId=id).all()
+    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.price, tblProduct.photo, tblProduct.categoryId).filter_by(brandId=id).all()
+    
     products = []
     for Product in Products:
         price = simplejson.dumps({"price": Product.price})
         price = json.loads(price)
+        Category = tblCategory.query.get(Product.categoryId)
+        print(Category)
         product = {
             'id': Product.id,
             'product': Product.product,
-            'photo': Product.photo
+            'photo': Product.photo,
+            'category': Category.category
         }
         product.update(price)
         products.append(product)

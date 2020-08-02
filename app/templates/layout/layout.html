@@ -128,12 +128,13 @@
 
 
 
-        function showProduct(element, id, product, photo, price) {
+        function showProduct(element, id, product, category, photo, price) {
             this.element = element
             this.id = id
             this.product = product
             this.photo = photo
             this.price = price
+            this.category = category
             this.element.append(`
                     <div class="product-item" id="`+this.id+`">
                         <div class="item-wrapper">
@@ -147,7 +148,7 @@
                             <div class="item-details">
                                 <div class="details">
                                     <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">`+this.product+`</p>
-                                    <p class="color-text" id="details-category" style="font-size: 12px;">category</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+this.category+`</p>
                                 </div>
                                 <div class="flex-between-end color-text" style="width: 100%;">
                                     <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol">$</span><span class="price-tag">`+this.price+`</span></p>

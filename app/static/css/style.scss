@@ -26,7 +26,8 @@ button {
     box-shadow: none !important;
 }
 
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
     appearance: none;
     margin: 0;
 }
@@ -57,7 +58,7 @@ a {
 
 select:invalid,
 select option[value=""] {
-  color: var(--color-hover);
+    color: var(--color-hover);
 }
 
 html[data-theme='light'] {
@@ -248,8 +249,8 @@ textarea:valid+label {
     position: fixed;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    padding: 0 20px;
+    justify-content: space-between;
+    padding: 30px 20px;
     transition: 0.3s ease-in-out;
     z-index: 101;
 }
@@ -402,7 +403,7 @@ main {
 .grid-container {
     display: grid;
     grid-template-columns: 50% auto;
-    padding: 50px;
+    padding: 50px 100px;
     grid-gap: 30px;
 }
 
@@ -860,21 +861,22 @@ table tbody tr {
 }
 
 .list-product {
+    position: relative;
     width: 100%;
-    height: 100%;
     display: grid;
     grid-column-gap: 30px;
     grid-row-gap: 50px;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(250px, 250px));
     padding: 15px 15px 0 15px;
-    overflow-y: scroll;
+    overflow-y: auto;
     transition: 0.3s ease;
     scroll-behavior: smooth;
 }
 
 .inset-shadow {
     display: block;
-    box-shadow: inset 0 7px 9px -7px var(--color-hover);
+    box-shadow: inset 0 7px 9px -7px #111;
     position: absolute;
     top: 0;
     left: -5px;
@@ -912,7 +914,8 @@ table tbody tr {
     height: 160px;
 }
 
-.item-img img, .sample-img img {
+.item-img img,
+.sample-img img {
     height: 100%;
     width: 100%;
     object-fit: cover;
@@ -928,7 +931,8 @@ table tbody tr {
     align-items: flex-start;
 }
 
-.item-details p, .sample-details p {
+.item-details p,
+.sample-details p {
     margin: 0;
     text-align: start;
 }
@@ -1024,7 +1028,26 @@ table tbody tr {
     align-items: center;
 }
 
+.list-product::-webkit-scrollbar-track
+{
+    box-shadow: inset 0 0 6px var(--color-hr);
+    border-radius: 5px;
+    background-color: var(--color-hr);
+}
 
+.list-product::-webkit-scrollbar
+{
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-bg);
+}
+
+.list-product::-webkit-scrollbar-thumb
+{
+    border-radius: 5px;
+    box-shadow: inset 0 0 6px var(--color-hr);
+    background-color: var(--color-hover);
+}
 
 @keyframes spin {
     0% {
