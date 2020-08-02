@@ -336,7 +336,6 @@ def products():
         price = simplejson.dumps({"price": Product.price})
         price = json.loads(price)
         Category = tblCategory.query.get(Product.categoryId)
-        print(Category)
         product = {
             'id': Product.id,
             'product': Product.product,

@@ -59,6 +59,10 @@
 
 {% block script %}
 <script>
+    $(document).on('change', '#photo', function () {
+        uploadPhoto($(this).val())
+    })
+
     $(document).on('submit', '#product-form', function () {
         event.preventDefault();
         $.ajax({
@@ -158,6 +162,7 @@
                     $('.add-product').attr("disabled", false)
                     toggleEdit(product, brand)
                     $('#product-nav').html(showProductForm({category: "Select category", product: "", price: "", description: ""}))
+                    
                     $('#brand-id').val(id)
                     gsap.to('#product-nav', {
                         x: 0
@@ -182,6 +187,7 @@
                     }, 300)
                     results.forEach(data => {
                         showProduct($('.list-product'), data.id, data.product, data.category, data.photo, data.price)
+                        
                     });
 
                     gsap.to('#product-nav', {
@@ -266,8 +272,6 @@
             $(item).removeClass('is-selected')
         });
         $(this).addClass('is-selected')
-
-
     })
     $(document).on('click', '.edit-content', function () {
         event.stopPropagation()
@@ -330,6 +334,7 @@
         }
     }
     $('.item-container').on('click', '.item', function () {
+        $('.item').bind('click', function(){ return false; });
         var id = $(this).attr('id')
         var head = $(this).find('.edit-content').text()
         toggleLoader($('.loader'))
@@ -348,10 +353,9 @@
                     showProduct($('.list-product'), data.id, data.product, data.category, data.photo, data.price)
                     
                 });
-
-                
                 
                 setTimeout(function() {
+                    $('.item').unbind('click')
                     toggleLoader($('.loader'))
                 }, 300)
                 
