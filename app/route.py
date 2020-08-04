@@ -1,5 +1,5 @@
-from app import app, bcrypt, db, login_manager, c
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct
+from app import app, bcrypt, db, login_manager, c, upload
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm
 from app import CategorySchema
 from flask import render_template, redirect, request, jsonify
@@ -346,8 +346,22 @@ def products():
         products.append(product)
     return jsonify(products)
 
-@app.route('/product/photo', methods=['POST'])
-def product_photo():
-    files = request.files['file']
-    print(files)
+@app.route('/upload/photo/<id>', methods=['POST'])
+def upload_photo(id):
+    for file in request.files:
+        extension = request.files[file].filename.split('.')[1]
+        request.files[file].filename = str(uuid4()) + '.' + extension
+        photo = upload.save(file)
+        print(name)
     return jsonify()
+
+@app.route('/upload/color/<id>', methods=['POST'])
+def upload_color(id):
+    hex = request.form['hex']
+    color = request.form['color']
+    cid = str(uuid4())
+    Color = tblColor(id=cid, color=color, hex=hex, createdBy=current_user.id, productId=id)
+    db.session.add(Color)
+    db.session.commit()
+
+    return jsonify({'id': cid, 'hex': hex, 'color': color})

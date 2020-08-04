@@ -10,7 +10,7 @@
         integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <!-- <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css"> -->
     <link rel="stylesheet" href="{{url_for('static', filename='css/dist/style.css')}}">
-    
+
     {% block style %}{% endblock %}
 </head>
 
@@ -123,7 +123,7 @@
             } else {
                 this.loader.addClass('hide')
             }
-            
+
         }
 
 
@@ -136,10 +136,10 @@
             this.price = price
             this.category = category
             this.element.append(`
-                    <div class="product-item" id="`+this.id+`">
+                    <div class="product-item" id="`+ this.id + `">
                         <div class="item-wrapper">
                             <div class="item-img">
-                                <img src="static/uploads/`+this.photo+`" alt="" srcset="">
+                                <img src="static/uploads/`+ this.photo + `" alt="" srcset="">
                                 <div class="product-btn color-text">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
@@ -147,11 +147,11 @@
                             </div>
                             <div class="item-details">
                                 <div class="details">
-                                    <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">`+this.product+`</p>
-                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+this.category+`</p>
+                                    <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">`+ this.product + `</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+ this.category + `</p>
                                 </div>
                                 <div class="flex-between-end color-text" style="width: 100%;">
-                                    <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol">$</span><span class="price-tag">`+this.price+`</span></p>
+                                    <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol">$</span><span class="price-tag">`+ this.price + `</span></p>
                                     <p style="font-size: 12px;">
                                         <i class="fa fa-heart-o" aria-hidden="true"></i>
                                     </p>
@@ -177,6 +177,7 @@
                                     <div class="sample-right">
                                         <div class="sample-header">
                                             <div class="sample-price color-font">$</div>
+                                            
                                         </div>
                                         
                                     </div>
@@ -196,7 +197,7 @@
                             <div class="form-group selector">
                                 <p class="detail-content">Use category for specific products</p>
                                 <select name="category" id="category" class="form-control input-color" required>
-                                    <option disabled selected="selected" value="">`+category+`</option>
+                                    <option disabled selected="selected" value="">`+ category + `</option>
                                     {% if categories %}
                                     {% for category in categories %}
                                     <option value="{{category.id}}">{{category.category}}</option>
@@ -208,14 +209,14 @@
                             </div>
                             <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
                             <div class="form-group">
-                                <input type="text" class="form-control input-color" name="product" id="product" value="`+product+`" required>
+                                <input type="text" class="form-control input-color" name="product" id="product" value="`+ product + `" required>
                                 <label for="product" class="label product">Product</label>
                             </div>
                             
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="price" id="price" value="`+price+`"
+                                        <input type="number" class="form-control input-color" name="price" id="price" value="`+ price + `"
                                             required>
                                         <label for="price" class="label price">Price</label>
                                     </div>
@@ -231,24 +232,39 @@
                             </div>
                             <div class="form-group">
                                 <textarea name="details" id="details"
-                                    class="form-control input-color textarea" value="`+description+`" required></textarea>
+                                    class="form-control input-color textarea" value="`+ description + `" required></textarea>
                                 <label for="details" class="label details">Description</label>
                             </div>
-                            <div class="product-image hide">
-                                <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Image</h5>
-                                <div class="form-group">
-                                    <p class="detail-content">Select product photo. This photo will be show in the product</p>
-                                    <div class="upload-container">
-                                        <img src="/static/uploads/default.png" id="image-src">
-                                        <label for="photo" class="upload-label">
-                                            <input type="file" name="photo" id="photo" class="upload-input" multiple>
-                                            <span><i class="fa fa-camera" aria-hidden="true"></i></span>
-                                        </label>
+                            
+                            <input type="submit" value="Save" class="submit-btn hide">
+                        </form>
+                        
+                        <div class="product-image hide">
+                            <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Appearance</h5>
+                            <div class="form-group selector">
+                                <p class="detail-content">Add color for product</p>
+                                <div class="row">
+                                    <div class="col-sm-9 pr-0 selector">
+                                        <select name="color" id="color" class="form-control input-color" required>
+                                            <option disabled selected="selected" value="">Select color</option>
+                                        </select>   
+                                    </div>
+                                    <div class="col-sm-3" style="width=100%">
+                                        <button class="btn pickr input-color" style="width: 100%">+</button>
                                     </div>
                                 </div>
                             </div>
-                            <input type="submit" value="Save" class="submit-btn hide">
-                        </form>
+                            <div class="form-group">
+                                <p class="detail-content">Select product photo for each color</p>
+                                <div class="upload-container">
+                                    <img src="/static/uploads/default.png" id="image-src">
+                                    <label for="photo" class="upload-label">
+                                        <input type="file" name="photo" id="photo" class="upload-input" multiple disabled>
+                                        <span><i class="fa fa-camera" aria-hidden="true"></i></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <button class="btn btn-block border color-font submit-product">Create</button>
                     <button class="btn btn-block border color-font save-product hide">Save</button>`
@@ -256,32 +272,37 @@
         }
 
         function uuid() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8)
                 return v.toString(16)
             })
         }
-        
+
         function uploadPhoto(files) {
             const validtypes = ['image/gif', 'image/jpeg', 'image/png']
+            var id = document.querySelector('.save-product').id
             this.files = files
             var form = new FormData()
             if (this.files.length > 0) {
-                this.files.forEach(file => {
+
+                this.files.forEach((file, index) => {
                     if (jQuery.inArray(file.type, validtypes) == -1) {
                         console.log('Invalide file!')
+                        return false
                     } else {
                         if (file.size > 2000000) {
-                        console.log('Image size too big ')
+                            console.log('Image size too big ')
+                            return false
                         } else {
-                            form.append('file', file)
-                            console.log(file)
+                            form.append(index, file)
+                            console.log(index)
                         }
                     }
                 })
+
                 $.ajax({
-                    url: '/product/photo',
-                    method: 'POST',
+                    url: '/upload/photo/' + id,
+                    type: 'post',
                     data: form,
                     contentType: false,
                     cache: false,
@@ -289,8 +310,8 @@
                     beforeSend: function () {
                         console.log('loading...')
                     },
-                    success: function(data) {
-                        setTimeout(function() {
+                    success: function (data) {
+                        setTimeout(function () {
                             console.log(data)
                         }, 3000);
                     }
@@ -298,7 +319,65 @@
             } else {
                 console.log('No file selected')
             }
+
+        }
+
+        function uploadColor(picker, input) {
+            if ($('.pcr-app').length) {
+                $('.pcr-app').remove()
+            } 
+            this.picker = picker
+            this.input = input
+            const pickr = Pickr.create({
+                el: this.picker,
+                theme: 'classic', // or 'monolith', or 'nano'
+                defaultRepresentation: 'HEX',
+                default: '#111111',
+                useAsButton: true,
+                components: {
+
+                    // Main components
+                    preview: true,
+                    opacity: true,
+                    hue: true,
+
+                    // Input / output Options
+                    interaction: {
+                        hex: false,
+                        rgba: false,
+                        hsla: false,
+                        hsva: false,
+                        cmyk: false,
+                        input: true,
+                        clear: false,
+                        save: true
+                    }
+                }
+            })
+
+            $('.pcr-interaction').prepend('<input type="text" class="pcr-name" id="'+this.input+'" placeholder="Name" style="width: 50%; text-align: left">')
             
+
+            pickr.on('save', (color, instance) => {
+                const hex = color.toHEXA().toString()
+                const name = $('#'+this.input).val()
+                const id = $(this.picker).attr('id')
+
+                $.ajax({
+                    url: '/upload/color/' + id,
+                    type: 'post',
+                    data: { 'hex': hex, 'color': name },
+                    beforeSend: function () {
+                        $('.pcr-save').attr('disabled', true)
+                    },
+                    success: function (data) {
+                        $('#color').append(`<option val="` + data.hex + `">` + data.color + `</option>`)
+                        $('.pcr-save').attr('disabled', false)
+                        pickr.hide()
+                    }
+                })
+
+            })
         }
     </script>
 </body>
