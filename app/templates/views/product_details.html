@@ -1,0 +1,43 @@
+{% extends 'layout/layout.html' %}
+
+{% block content %}
+<div class="wrap-container">
+    <h1 class="color-font product-title" id="{{ product.id }}">{{ product.product }}</h1>
+    <p>{{ product.price }}</p>
+    <p>{{ product.currency }}</p>
+
+    <div class="item-img">
+        <img src="/static/uploads/{{ product.photo }}">
+    </div>
+    {% if product.colors %}
+        <div class="details-colors">
+            {% for color in product.colors %}
+                <span style="background-color: {{ color.hex }}"></span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h3>Properties</h3>
+    <div class="list-properties">
+        {% for property in product.productOfCategory.properties %}
+        <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ property.property }}</h5>
+        <div class="property-values" id="{{ property.id }}">
+            <div class="add-value">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+    
+{% endblock %}
+
+{% block script %}
+    <script>
+        $('.add-value').on('click', function() {
+            var product = $('.product-title').attr('id')
+            var property = $(this).parents('.property-values').attr('id')
+            console.log(product, property)
+        })
+    </script>
+{% endblock %}

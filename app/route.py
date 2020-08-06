@@ -1,5 +1,5 @@
 from app import app, bcrypt, db, login_manager, c, upload
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm
 from app import CategorySchema
 from flask import render_template, redirect, request, jsonify
@@ -330,7 +330,7 @@ def add_product():
 def products():
     id = request.form['data']
     Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.price, tblProduct.photo, tblProduct.categoryId).filter_by(brandId=id).all()
-    
+    test = tblProduct.query.all()
     products = []
     for Product in Products:
         price = simplejson.dumps({"price": Product.price})
@@ -346,16 +346,28 @@ def products():
         products.append(product)
     return jsonify(products)
 
-@app.route('/upload/photo/<id>', methods=['POST'])
-def upload_photo(id):
+@app.route('/product/photo/<id>', methods=['POST'])
+def product_photo(id):
+    alt = request.form['name']
+    jsons = []
     for file in request.files:
-        extension = request.files[file].filename.split('.')[1]
-        request.files[file].filename = str(uuid4()) + '.' + extension
-        photo = upload.save(file)
-        print(name)
-    return jsonify()
+        photo = request.files[file]
+        extension = photo.filename.split('.')[1]
+        filename = str(uuid4()) + '.' + extension
+        photo.filename = filename
+        uploaded = upload.save(photo)
+        Product = tblProduct.query.get(id)
+        Product.photo = filename
+        db.session.commit()
+        json = {
+            'photoId': Product.id,
+            'photoSrc': filename,
+            'photoAlt': alt
+        }
+        jsons.append(json)
+    return jsonify(jsons)
 
-@app.route('/upload/color/<id>', methods=['POST'])
+@app.route('/product/color/<id>', methods=['POST'])
 def upload_color(id):
     hex = request.form['hex']
     color = request.form['color']
@@ -365,3 +377,32 @@ def upload_color(id):
     db.session.commit()
 
     return jsonify({'id': cid, 'hex': hex, 'color': color})
+
+@app.route('/color/photo/<id>', methods=['POST'])
+def color_photo(id):
+    cid = request.form['color']
+    alt = request.form['name']
+    jsons = []
+    for file in request.files:
+        photo = request.files[file]
+        extension = photo.filename.split('.')[1]
+        filename = str(uuid4()) + '.' + extension
+        photo.filename = filename
+        uploaded = upload.save(photo)
+        pid = str(uuid4())
+        Photo = tblPhoto(id=pid, src=filename, alt=alt, createdBy=current_user.id, colorId=cid, productId=id)
+        db.session.add(Photo)
+        db.session.commit()
+        json = {
+            'colorId': cid,
+            'photoId': pid,
+            'photoSrc': filename,
+            'photoAlt': alt
+        }
+        jsons.append(json)
+    return jsonify(jsons)
+
+@app.route('/product/<id>')
+def product(id):
+    product = tblProduct.query.get(id)
+    return render_template('views/product_details.html', product=product)

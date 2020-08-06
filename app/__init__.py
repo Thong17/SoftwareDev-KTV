@@ -122,10 +122,14 @@ class tblProduct(db.Model):
     brandId = db.Column(db.String(36), db.ForeignKey('tbl_brand.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
     values = db.relationship('tblValue', backref='values', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
     
 class tblValue(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     value = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    currency = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text(), nullable=True, default='')
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
     propertyId = db.Column(db.String(36), db.ForeignKey('tbl_property.id'), nullable=False)
@@ -149,6 +153,7 @@ class tblColor(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+    photos = db.relationship('tblPhoto', backref='photosOfColor', lazy=True, cascade="all, delete-orphan", single_parent=True)
 
 class tblPhoto(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -165,7 +170,6 @@ class tblActivity(db.Model):
     type = db.Column(db.String(50), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-
 
 class BrandSchema(ModelSchema):
     class Meta:

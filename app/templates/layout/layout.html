@@ -126,7 +126,9 @@
 
         }
 
+        function filterProducts(list, filter) {
 
+        }
 
         function showProduct(element, id, product, category, photo, price) {
             this.element = element
@@ -136,7 +138,7 @@
             this.price = price
             this.category = category
             this.element.append(`
-                    <div class="product-item" id="`+ this.id + `">
+                    <a class="product-item" id="`+ this.id + `" href="/product/` + this.id + `">
                         <div class="item-wrapper">
                             <div class="item-img">
                                 <img src="static/uploads/`+ this.photo + `" alt="" srcset="">
@@ -158,30 +160,37 @@
                                 </div>
                             </div>
                         </div>
-                    </div>`)
+                    </a>`)
         }
 
-        var productSample = `<div class="product-sample">
-                                    <div class="sample-left">
-                                        <div class="sample-img">
+        var productDetails = `<div class="product-details">
+                                    <div class="details-left">
+                                        <div class="details-img">
                                             <img src="static/svg/camera-light.svg" alt="" srcset="">
                                         </div>
-                                        <div class="sample-details">
-                                            <div class="details">
-                                                <p class="color-font text-wrapper" id="sample-title" style="font-size: 14px;">Product Name</p>
-                                                <p class="color-text" id="sample-category" style="font-size: 12px;">category</p>
-                                            </div>
-                                            <p class="color-text mt-2" id="sample-description" style="font-size: 12px;"><p>
-                                        </div>
-                                    </div>
-                                    <div class="sample-right">
-                                        <div class="sample-header">
-                                            <div class="sample-price color-font">$</div>
+                                        <div class="details-colors">
                                             
                                         </div>
-                                        
+                                        <div class="details-details">
+                                            <div class="details">
+                                                <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">Product Name</p>
+                                                <p class="color-text" id="details-category" style="font-size: 12px;">category</p>
+                                            </div>
+                                            <p class="color-text mt-2" id="details-description" style="font-size: 12px;"><p>
+                                        </div>
+                                    </div>
+                                    <div class="details-right">
+                                        <div class="details-header">
+                                            <span class="details-symbol color-font">$</span>
+                                            <span class="details-price color-font"></span>
+                                        </div>
+                                        <div class="details-property"></div>
                                     </div>
                                 </div>`
+        
+        function showProductDeails(params) {
+
+        }
 
         function showProductForm(params) {
             var category = params.category
@@ -241,6 +250,23 @@
                         
                         <div class="product-image hide">
                             <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Appearance</h5>
+                            <div class="form-group">
+                                <p class="detail-content">Select product photo</p>
+                                <div class="upload-container">
+                                    <div class="image-containers" id="product-img">
+                                        <div class="image-item">
+                                            <img src="/static/uploads/default.png" id="product-src">
+                                        </div>
+                                    </div>
+                                    <div class="bubbling hide">
+                                        <img src="/static/svg/bubbling-{{current_user.theme}}.svg">
+                                    </div>
+                                    <label for="product-photo" class="upload-label">
+                                        <input type="file" name="product-photo" id="product-photo" class="upload-input">
+                                        <span><i class="fa fa-camera" aria-hidden="true"></i></span>
+                                    </label>
+                                </div>
+                            </div>
                             <div class="form-group selector">
                                 <p class="detail-content">Add color for product</p>
                                 <div class="row">
@@ -255,10 +281,17 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <p class="detail-content">Select product photo for each color</p>
+                                <p class="detail-content">Select color photo: <span class="selected-color"></span></p>
                                 <div class="upload-container">
-                                    <img src="/static/uploads/default.png" id="image-src">
-                                    <label for="photo" class="upload-label">
+                                    <div class="image-containers" id="color-img">
+                                        <div class="image-item">
+                                            <img src="/static/uploads/default.png" id="image-src">
+                                        </div>
+                                    </div>
+                                    <div class="bubbling hide">
+                                        <img src="/static/svg/bubbling-{{current_user.theme}}.svg">
+                                    </div>
+                                    <label for="photo" class="upload-label disabled">
                                         <input type="file" name="photo" id="photo" class="upload-input" multiple disabled>
                                         <span><i class="fa fa-camera" aria-hidden="true"></i></span>
                                     </label>
@@ -267,7 +300,7 @@
                         </div>
                     </div>
                     <button class="btn btn-block border color-font submit-product">Create</button>
-                    <button class="btn btn-block border color-font save-product hide">Save</button>`
+                    <button class="btn btn-block border color-font save-product hide">Upload</button>`
             return productForm
         }
 
@@ -278,46 +311,70 @@
             })
         }
 
-        function uploadPhoto(files) {
+        function uploadPhoto(files, color, product, self, url) {
+            
             const validtypes = ['image/gif', 'image/jpeg', 'image/png']
-            var id = document.querySelector('.save-product').id
+            this.color = color
+            this.product = product
+            this.url = url
             this.files = files
-            var form = new FormData()
-            if (this.files.length > 0) {
+            this.self = self
+            
+            var imgtag = $(this.self).closest('.upload-container').find('.image-containers').attr('id')
+            var name = $(this.self).closest('.slide-form').find('#product').val()
+            var loader = $(this.self).closest('.upload-container').find('.bubbling')
 
+            
+            toggleLoader(loader)
+            var form = new FormData()
+            form.append('color', this.color)
+            form.append('name', name)
+
+            console.log(imgtag, loader, name)
+            if (this.files.length > 0) {
                 this.files.forEach((file, index) => {
                     if (jQuery.inArray(file.type, validtypes) == -1) {
                         console.log('Invalide file!')
+                        toggleLoader(loader)
                         return false
                     } else {
                         if (file.size > 2000000) {
                             console.log('Image size too big ')
+                            toggleLoader(loader)
                             return false
                         } else {
                             form.append(index, file)
-                            console.log(index)
                         }
                     }
                 })
 
                 $.ajax({
-                    url: '/upload/photo/' + id,
+                    url: this.url + '/' + this.product,
                     type: 'post',
                     data: form,
                     contentType: false,
                     cache: false,
                     processData: false,
                     beforeSend: function () {
-                        console.log('loading...')
+
                     },
                     success: function (data) {
+                        console.log(data)
+                        var element = ''
+                        data.forEach(photo => {
+                            element += `<div class="image-item">
+                                            <img src="/static/uploads/`+photo.photoSrc+`" alt="`+photo.photoAlt+`">
+                                        </div>`
+                        })
+                        $('#'+imgtag).html(element)
                         setTimeout(function () {
-                            console.log(data)
-                        }, 3000);
+                            toggleLoader(loader)
+                        }, 1000)
                     }
                 })
             } else {
                 console.log('No file selected')
+                toggleLoader(loader)
             }
 
         }
@@ -359,24 +416,31 @@
             
 
             pickr.on('save', (color, instance) => {
+                $('.pcr-save').attr('disabled', true)
                 const hex = color.toHEXA().toString()
                 const name = $('#'+this.input).val()
+                console.log(name)
                 const id = $(this.picker).attr('id')
+                if (name != '') {
+                    $.ajax({
+                        url: '/product/color/' + id,
+                        type: 'post',
+                        data: { 'hex': hex, 'color': name },
+                        beforeSend: function () {
 
-                $.ajax({
-                    url: '/upload/color/' + id,
-                    type: 'post',
-                    data: { 'hex': hex, 'color': name },
-                    beforeSend: function () {
-                        $('.pcr-save').attr('disabled', true)
-                    },
-                    success: function (data) {
-                        $('#color').append(`<option val="` + data.hex + `">` + data.color + `</option>`)
-                        $('.pcr-save').attr('disabled', false)
-                        pickr.hide()
-                    }
-                })
-
+                        },
+                        success: function (data) {
+                            $('#color').append(`<option value="` + data.id + `">` + data.color + `</option>`)
+                            $('.pcr-save').attr('disabled', false)
+                            $('.details-colors').append(`<span style="background-color: `+data.hex+`"></span>`)
+                            $('.pcr-name').val('')
+                            pickr.hide()
+                        }
+                    })
+                } else {
+                    $('#'+this.input).focus()
+                    $('.pcr-save').attr('disabled', false)
+                }
             })
         }
     </script>

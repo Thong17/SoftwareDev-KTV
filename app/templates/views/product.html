@@ -64,16 +64,47 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
+    $('.list-product').on('click', '.product-item', function() {
+        console.log(this)
+    })
+
+    $(document).on('change', '#color', function () {
+        $('#color-img').html(`<div class="image-item">
+                                        <img src="/static/uploads/default.png" id="image-src">
+                                    </div>`)
+        var color = $('#color option:selected').text()
+        if ($('#color').val() != '') {
+            $('#photo').attr('disabled', false)
+            $('.upload-label').removeClass('disabled')
+            $('.selected-color').html(color)
+        } else {
+            $('#photo').attr('disabled', true)
+            $('.upload-label').addClass('disabled')
+            $('.selected-color').html(color)
+        }
+    })
 
     $(document).on('change', '#photo', function () {
         var photos = document.querySelector('#photo').files
-        uploadPhoto(photos)
+        var color = $('#color').val()
+        var name = $('#product').val()
+        var product = document.querySelector('.save-product').id
+        uploadPhoto(photos, color, product, this, '/color/photo')
+        
+    })
+
+    $(document).on('change', '#product-photo', function() {
+        var photo = document.querySelector('#product-photo').files
+        var name = $('#product').val()
+        var product = document.querySelector('.save-product').id
+        uploadPhoto(photo, '', product, this, '/product/photo')
     })
 
     $(document).on('click', '.save-product', function () {
         var files = document.querySelector('#photo').files
-        console.log(files)
-
+        var color = $('#color').val()
+        var pid = $(this).attr('id')
+        console.log(files, color, pid)
     })
 
     $(document).on('submit', '#product-form', function () {
@@ -103,37 +134,34 @@
     $('#product-nav').on('input', '#product', function () {
         var product = $(this).val()
         if (product == '') {
-            $('#sample-title').text('Product Name')
+            $('#details-title').text('Product Name')
         } else {
-            $('#sample-title').text(product)
+            $('#details-title').text(product)
         }
     })
 
     $('#product-nav').on('input', '#price', function () {
         var price = $(this).val()
-        $('#sample-price').text(price)
+        $('.details-price').text(price)
     })
 
     $('#product-nav').on('input', '#details', function () {
         var description = $(this).val()
-        $('#sample-description').text(description)
+        $('#details-description').text(description)
     })
 
     $('#product-nav').on('change', '#category', function () {
         var category = $('#category option:selected').text()
-        $('#sample-category').text(category)
+        $('#details-category').text(category)
     })
 
     $('#product-nav').on('change', '#currency', function () {
         var currency = $('#currency').val()
-        var price = $('#sample-price').text()
         if (currency == 'riel') {
-            $('#sample-symbol').html('R')
+            $('.details-symbol').html('R')
         } else {
-            $('#sample-symbol').html('$')
+            $('.details-symbol').html('$')
         }
-
-        console.log(currency)
     })
 
     $('#product-nav').on('click', '.submit-product', function () {
@@ -148,7 +176,6 @@
         console.log(product, price, currency, description, category)
     })
 
-
     $('.content-header').on('click', '.add-product', function () {
         $('.add-product').attr("disabled", true)
         var id = $(this).attr('id')
@@ -156,13 +183,12 @@
         var brand = $('#brand-nav')
         var loader = $('.loader')
         var list = $('.list-product')
-        var sample = $('.sample')
+        var details = $('.details')
         var icon = $('#add-product')
 
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
-            // $('.content-body').prepend(productSample)
-            $('.list-product').html(productSample)
+            $('.list-product').html(productDetails)
 
             gsap.to('#brand-nav', {
                 x: '-100%',
@@ -186,8 +212,8 @@
             $('.add-product p').removeClass('clear')
             toggleLoader(loader)
             $('.list-product').empty()
-            if ($('.content-body').has('.product-sample')) {
-                $('.product-sample').remove()
+            if ($('.content-body').has('.product-details')) {
+                $('.product-details').remove()
             }
             $.ajax({
                 url: '/product',
@@ -210,6 +236,9 @@
                             toggleEdit(brand, product)
                             gsap.to('#brand-nav', {
                                 x: 0
+                            })
+                            gsap.from('.list-product', {
+                                opacity: 0
                             })
                         }
                     })
@@ -363,12 +392,15 @@
             success: function (results) {
                 results.forEach(data => {
                     showProduct($('.list-product'), data.id, data.product, data.category, data.photo, data.price)
-
+     
                 });
 
                 setTimeout(function () {
                     $('.item').unbind('click')
                     toggleLoader($('.loader'))
+                    gsap.from('.list-product', {
+                        opacity: 0
+                    })
                 }, 300)
 
             }

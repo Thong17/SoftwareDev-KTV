@@ -62,15 +62,16 @@ select option[value=""] {
 }
 
 html[data-theme='light'] {
-    --color-bg: #e9e9e9;
-    --color-menu: #e0e0e0;
+    --color-bg: #ffffff;
+    --color-menu: rgb(240, 240, 240);
     --color-font: #111;
     --color-logo: #111;
     --color-text: #555;
     --color-hr: rgba(0, 0, 0, 0.1);
     --color-hover: rgba(0, 0, 0, 0.3);
     --color-btn-hover: rgba(224, 224, 224, 0.5);
-    --color-shadow: rgba(1, 1, 1, 0.1)
+    --color-shadow: rgba(1, 1, 1, 0.1);
+    --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
 }
 
 html[data-theme='dark'] {
@@ -82,7 +83,8 @@ html[data-theme='dark'] {
     --color-hr: rgba(255, 255, 255, .1);
     --color-hover: rgba(255, 255, 255, 0.3);
     --color-btn-hover: rgba(37, 37, 37, 0.5);
-    --color-shadow: rgba(1, 1, 1, 0.5)
+    --color-shadow: rgba(1, 1, 1, 0.5);
+    --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
 }
 
 html,
@@ -722,7 +724,7 @@ table tbody tr {
     border-radius: 30px;
 }
 
-.loader {
+.loader, .bubbling {
     position: absolute;
     top: 0;
     left: 0;
@@ -732,7 +734,16 @@ table tbody tr {
     align-items: center;
     width: 100%;
     height: 100%;
+    z-index: 100;
 }
+
+.bubbling img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+    object-position: center;
+}
+
 
 .loading {
     border: 2px solid var(--color-hr);
@@ -793,7 +804,7 @@ table tbody tr {
 
 .upload-container {
     position: relative;
-    height: 150px;
+    height: 200px;
     border-radius: 5px;
     display: flex;
     justify-content: center;
@@ -801,10 +812,27 @@ table tbody tr {
     border: 1px solid var(--color-hr);
 }
 
-.upload-container img {
+.image-containers {
+    position: relative;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.image-item {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     z-index: -1;
 }
 
@@ -821,6 +849,11 @@ table tbody tr {
     width: 100%;
 }
 
+.upload-label.disabled {
+    background-color: var(--color-hr);
+    cursor: not-allowed;
+}
+
 .upload-label span {
     position: absolute;
     bottom: 10px;
@@ -829,14 +862,12 @@ table tbody tr {
 
 .upload-label span i {
     opacity: 0;
-    color: var(--color-text);
     font-size: 18px;
 }
 
 .upload-label:hover span i {
     opacity: 1;
-    color: var(--color-text);
-    font-size: 18px;
+    color: var(--color-hr);
 }
 
 .textarea {
@@ -888,8 +919,6 @@ table tbody tr {
     grid-template-rows: repeat(auto-fill, minmax(250px, 250px));
     padding: 15px 15px 0 15px;
     overflow-y: auto;
-    transition: 0.3s ease;
-    overscroll-behavior-y: contain;
 }
 
 .inset-shadow {
@@ -933,10 +962,10 @@ table tbody tr {
 }
 
 .item-img img,
-.sample-img img {
+.details-img img {
     height: 100%;
     width: 100%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
 }
 
@@ -950,7 +979,7 @@ table tbody tr {
 }
 
 .item-details p,
-.sample-details p {
+.details-details p {
     margin: 0;
     text-align: start;
 }
@@ -992,7 +1021,7 @@ table tbody tr {
     margin-right: 3px;
 }
 
-.product-sample {
+.product-details {
     position: absolute;
     top: 0;
     left: 0;
@@ -1011,19 +1040,18 @@ table tbody tr {
     cursor: pointer;
 }
 
-.sample-left {
+.details-left {
     width: 200px;
     height: 100%;
     position: relative;
 }
 
-.sample-img {
+.details-img {
     height: 200px;
     width: 200px;
 }
 
-.sample-details {
-    margin-top: 20px;
+.details-details {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1031,38 +1059,56 @@ table tbody tr {
     padding: 10px;
 }
 
-.sample-right {
+.details-right {
     width: 100%;
     height: 100%;
     position: relative;
     padding: 20px;
 }
 
-.sample-header {
+.details-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 }
 
-.list-product::-webkit-scrollbar-track
-{
-    box-shadow: inset 0 0 6px var(--color-hr);
-    border-radius: 5px;
-    background-color: var(--color-hr);
+.details-colors {
+    width: 100%;
+    height: 27px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.list-product::-webkit-scrollbar
+.details-colors span {
+    width: 27px;
+    height: 27px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background-color: var(--color-hr);
+    box-shadow: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
+}
+
+::-webkit-scrollbar-track
 {
-    width: 8px;
+    box-shadow: inset 0 0 6px var(--color-bg);
+    border-radius: 5px;
+    background-color: var(--color-bg);
+}
+
+::-webkit-scrollbar
+{
+    width: 5px;
     height: 8px;
     background-color: var(--color-bg);
 }
 
-.list-product::-webkit-scrollbar-thumb
+::-webkit-scrollbar-thumb
 {
     border-radius: 5px;
     box-shadow: inset 0 0 6px var(--color-hr);
-    background-color: var(--color-hover);
+    background-color: var(--color-bg);
 }
 
 
@@ -1077,6 +1123,31 @@ table tbody tr {
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
+}
+
+.list-properties {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.property-values {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.add-value {
+    width: 200px;
+    height: 130px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-menu);
+    cursor: pointer;
+    margin: 5px;
 }
 
 @keyframes spin {
