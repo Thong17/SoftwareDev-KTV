@@ -61,6 +61,10 @@ select option[value=""] {
     color: var(--color-hover) !important;
 }
 
+.modal {
+    z-index: 100000;
+}
+
 html[data-theme='light'] {
     --color-bg: #ffffff;
     --color-menu: rgb(240, 240, 240);
@@ -1148,6 +1152,8 @@ table tbody tr {
     background-color: var(--color-menu);
     cursor: pointer;
     margin: 5px;
+    border: none;
+    
 }
 
 @keyframes spin {
