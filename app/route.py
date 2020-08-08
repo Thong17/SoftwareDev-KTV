@@ -410,7 +410,7 @@ def product(id):
         result = json.dump(product)
         category = tblCategory.query.get(product.categoryId)
         c = CategorySchema()
-        result['properties'] = c.dump(category)
+        result['category'] = c.dump(category)
         return jsonify(result)
     return render_template('views/product_details.html', product=product)
 

@@ -64,18 +64,60 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
-    $('.list-product').on('click', '.product-item', function() {
+    $('.list-product').on('click', '.product-item', function () {
         console.log(this)
     })
 
-    $('.list-product').on('click', '.fa-pencil-square-o', function(e) {
+    $('.list-product').on('click', '.fa-pencil-square-o', function (e) {
         e.preventDefault()
+        
+        toggleEdit($('#product-nav'), $('#brand-nav'))
+        gsap.to('#product-nav', {
+            x: 0
+        })
+
+        $('.add-product').attr("disabled", true)
+        $('.add-product p').addClass('clear')
         var id = $(this).closest('.product-item').attr('id')
         $.ajax({
-            url: '/product/'+id,
+            url: '/product/' + id,
             method: 'POST',
-            success: function(data) {
+            success: function (data) {
                 console.log(data)
+                $('.list-product').html(showProductDetails({
+                    image: data.photo,
+                    colors: data.colors,
+                    product: data.product,
+                    category: data.category.category,
+                    description: data.description,
+                    currency: data.currency,
+                    price: data.price,
+                    properties: data.category.properties,
+                    values: data.values,
+                    id: data.id
+                }))
+
+                gsap.to('#brand-nav', {
+                    x: '-100%',
+                    duration: 0.2,
+                    onComplete: function () {
+                        $('.add-product').attr("disabled", false)
+
+                        $('#product-nav').html(showProductForm({
+                            category: data.category.category,
+                            product: data.product,
+                            price: data.price,
+                            description: data.description
+                        }))
+
+                        $('.product-image').removeClass('hide')
+
+                        uploadColor('.pickr', 'color-name')
+
+                        $('#brand-id').val(data.productOfBrand)
+                        
+                    }
+                })
             }
         })
         return false
@@ -103,10 +145,10 @@
         var name = $('#product').val()
         var product = document.querySelector('.save-product').id
         uploadPhoto(photos, color, product, this, '/color/photo')
-        
+
     })
 
-    $(document).on('change', '#product-photo', function() {
+    $(document).on('change', '#product-photo', function () {
         var photo = document.querySelector('#product-photo').files
         var name = $('#product').val()
         var product = document.querySelector('.save-product').id
@@ -201,7 +243,18 @@
 
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
-            $('.list-product').html(showProductDetails({image: 'camera-{{current_user.theme}}.svg', colors: "", product: "Product Name", category: "category", description: "description", currency: "$", price: "0.00", properties: "", value: "", id: ""}))
+            $('.list-product').html(showProductDetails({
+                image: 'camera-{{current_user.theme}}.svg',
+                colors: "",
+                product: "Product Name",
+                category: "category",
+                description: "description",
+                currency: "$",
+                price: "0.00",
+                properties: "",
+                values: "",
+                id: ""
+            }))
 
             gsap.to('#brand-nav', {
                 x: '-100%',
@@ -210,8 +263,13 @@
                     $('.add-product').attr("disabled", false)
                     toggleEdit(product, brand)
 
-                    $('#product-nav').html(showProductForm({ category: "Select category", product: "", price: "", description: "" }))
-                    
+                    $('#product-nav').html(showProductForm({
+                        category: "Select category",
+                        product: "",
+                        price: "",
+                        description: ""
+                    }))
+
                     uploadColor('.pickr', 'color-name')
 
                     $('#brand-id').val(id)
@@ -231,13 +289,16 @@
             $.ajax({
                 url: '/product',
                 type: 'post',
-                data: { data: id },
+                data: {
+                    data: id
+                },
                 success: function (results) {
                     setTimeout(function () {
                         toggleLoader(loader)
                     }, 300)
                     results.forEach(data => {
-                        showProduct($('.list-product'), data.id, data.product, data.category, data.photo, data.price)
+                        showProduct($('.list-product'), data.id, data.product, data
+                            .category, data.photo, data.price)
 
                     });
 
@@ -388,7 +449,9 @@
         }
     }
     $('.item-container').on('click', '.item', function () {
-        $('.item').bind('click', function () { return false; });
+        $('.item').bind('click', function () {
+            return false;
+        });
         var id = $(this).attr('id')
         var head = $(this).find('.edit-content').text()
         toggleLoader($('.loader'))
@@ -401,11 +464,14 @@
         $.ajax({
             url: '/product',
             type: 'post',
-            data: { data: id },
+            data: {
+                data: id
+            },
             success: function (results) {
                 results.forEach(data => {
-                    showProduct($('.list-product'), data.id, data.product, data.category, data.photo, data.price)
-     
+                    showProduct($('.list-product'), data.id, data.product, data.category,
+                        data.photo, data.price)
+
                 });
 
                 setTimeout(function () {
@@ -420,6 +486,5 @@
         })
 
     })
-
 </script>
 {% endblock %}
