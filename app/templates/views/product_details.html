@@ -53,23 +53,24 @@
             <div class="modal-body">
                 <div class="input-group">
                     <label for="name">Name</label>
-                    <input type="text" id="name">
+                    <input type="text" name="name" id="name">
                 </div>
                 <div class="input-group">
                     <label for="price">Price</label>
-                    <input type="number" id="price">
+                    <input type="number" name="price" id="price" value="0.00">
                 </div>
                 <div class="input-group">
                     <label for="currency">Currency</label>
-                    <select id="currency">
+                    <select id="currency" name="currency">
                         <option value="dollar">$</option>
                         <option value="riel">R</option>
                     </select>
                 </div>
                 <div class="input-group">
                     <label for="description">Description</label>
-                    <input type="text" id="description">
+                    <input type="text" id="description" name="description">
                 </div>
+                
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary save-btn">Save</button>
@@ -85,18 +86,36 @@
 <script>
     $('.add-value').on('click', function () {
         var property = $(this).parents('.property-values').attr('id')
+        var  title = $(this).parent().prev('.sub-content').text()
+        $('.modal-title').text(title)
         $('.save-btn').attr('id', property)
     })
     $('.save-btn').on('click', function() {
         var product = $('.product-title').attr('id')
         var property = $(this).attr('id')
 
-        var name = $('#name').val()
+        var value = $('#name').val()
         var price = $('#price').val()
         var currency = $('#currency').val()
         var description = $('#description').val()
 
-        console.log(product, property, name, price, currency, description)
+        console.log(product, property, value, price, currency, description)
+        var form = new FormData()
+        form.append('value', value)
+        form.append('product', product)
+        form.append('property', property)
+        form.append('price', price)
+        form.append('currency', currency)
+        form.append('description', description)
+        $.ajax({
+            url: '/value/add',
+            method: 'POST',
+            processData: false,
+            data: form,
+            success: function(data) {
+                console.log(data)
+            }
+        })
         
     })
 </script>

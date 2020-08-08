@@ -1,5 +1,5 @@
 from app import app, bcrypt, db, login_manager, c, upload
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm
 from app import CategorySchema
 from flask import render_template, redirect, request, jsonify
@@ -406,3 +406,19 @@ def color_photo(id):
 def product(id):
     product = tblProduct.query.get(id)
     return render_template('views/product_details.html', product=product)
+
+@app.route('/value/add', methods=['POST'])
+def add_value():
+    product_id = request.form['product']
+    property_id = request.form['property']
+    value = request.form['value']
+    price = request.form['price']
+    currency = request.form['currency']
+    description = request.form['description']
+
+    id = str(uuid())
+
+    model = tblValue(id=id, value=value, price=price, currency=currency, description=description, createdBy=current_user.id, productId=product_id, propertyId=property_id)
+    db.session.add(model)
+    db.session.commit()
+    return jsonify({'id': id, 'value': value, 'price': price, 'currency': currency, 'description': description})
