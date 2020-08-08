@@ -1142,7 +1142,7 @@ table tbody tr {
     align-items: center;
 }
 
-.add-value {
+.property-values button, .property-values div {
     width: 200px;
     height: 130px;
     border-radius: 10px;
@@ -1153,7 +1153,15 @@ table tbody tr {
     cursor: pointer;
     margin: 5px;
     border: none;
+}
+
+.value {
+    flex-direction: column;
     
+}
+
+.value p {
+    margin: 0;
 }
 
 @keyframes spin {

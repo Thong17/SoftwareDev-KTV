@@ -416,7 +416,7 @@ def add_value():
     currency = request.form['currency']
     description = request.form['description']
 
-    id = str(uuid())
+    id = str(uuid4())
 
     model = tblValue(id=id, value=value, price=price, currency=currency, description=description, createdBy=current_user.id, productId=product_id, propertyId=property_id)
     db.session.add(model)

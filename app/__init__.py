@@ -109,6 +109,8 @@ class tblProperty(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
+    values = db.relationship('tblValue', backref='property', lazy=True, cascade="all, delete-orphan", single_parent=True)
+
 
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -121,7 +123,7 @@ class tblProduct(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     brandId = db.Column(db.String(36), db.ForeignKey('tbl_brand.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
-    values = db.relationship('tblValue', backref='values', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    values = db.relationship('tblValue', backref='product', lazy=True, cascade="all, delete-orphan", single_parent=True)
     photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
     colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
     
