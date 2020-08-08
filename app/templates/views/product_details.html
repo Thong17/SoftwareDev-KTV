@@ -96,14 +96,14 @@
 
 {% block script %}
 <script>
-    $('.add-value').on('click', function () {
+    $(document).on('click', '.add-value', function () {
         var property = $(this).parents('.property-values').attr('id')
         var  title = $(this).parent().prev('.sub-content').text()
         $('.modal-title').text(title)
         $('.save-btn').attr('id', property)
     })
     $('.save-btn').on('click', function() {
-        var product = $('.product-title').attr('id')
+        var product = $('.details-title').attr('id')
         var property = $(this).attr('id')
 
         var value = $('#name').val()

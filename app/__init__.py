@@ -187,5 +187,26 @@ class CategorySchema(ModelSchema):
     class Meta:
         model = tblCategory
 
+class ValueSchema(ModelSchema):
+    class Meta:
+        model = tblValue
+
+class PhotoSchema(ModelSchema):
+    class Meta:
+        model = tblPhoto
+
+class ColorSchema(ModelSchema):
+    photos = fields.Nested(PhotoSchema, many=True)
+    class Meta:
+        model = tblColor
+
+class ProductSchema(ModelSchema):
+    photos = fields.Nested(PhotoSchema, many=True)
+    values = fields.Nested(ValueSchema(many=True), many=True)
+    colors = fields.Nested(ColorSchema, many=True)
+    properties = fields.Nested(CategorySchema(many=True), many=True)
+    class Meta:
+        model = tblProduct
+
         
 from app import route

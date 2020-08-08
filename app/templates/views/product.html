@@ -68,6 +68,19 @@
         console.log(this)
     })
 
+    $('.list-product').on('click', '.fa-pencil-square-o', function(e) {
+        e.preventDefault()
+        var id = $(this).closest('.product-item').attr('id')
+        $.ajax({
+            url: '/product/'+id,
+            method: 'POST',
+            success: function(data) {
+                console.log(data)
+            }
+        })
+        return false
+    })
+
     $(document).on('change', '#color', function () {
         $('#color-img').html(`<div class="image-item">
                                         <img src="/static/uploads/default.png" id="image-src">
@@ -134,9 +147,9 @@
     $('#product-nav').on('input', '#product', function () {
         var product = $(this).val()
         if (product == '') {
-            $('#details-title').text('Product Name')
+            $('.details-title').text('Product Name')
         } else {
-            $('#details-title').text(product)
+            $('.details-title').text(product)
         }
     })
 
@@ -188,7 +201,7 @@
 
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
-            $('.list-product').html(productDetails)
+            $('.list-product').html(showProductDetails({image: 'camera-{{current_user.theme}}.svg', colors: "", product: "Product Name", category: "category", description: "description", currency: "$", price: "0.00", properties: "", value: "", id: ""}))
 
             gsap.to('#brand-nav', {
                 x: '-100%',

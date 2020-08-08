@@ -163,33 +163,77 @@
                     </a>`)
         }
 
-        var productDetails = `<div class="product-details">
-                                    <div class="details-left">
-                                        <div class="details-img">
-                                            <img src="static/svg/camera-light.svg" alt="" srcset="">
-                                        </div>
-                                        <div class="details-colors">
-                                            
-                                        </div>
-                                        <div class="details-details">
-                                            <div class="details">
-                                                <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">Product Name</p>
-                                                <p class="color-text" id="details-category" style="font-size: 12px;">category</p>
-                                            </div>
-                                            <p class="color-text mt-2" id="details-description" style="font-size: 12px;"><p>
-                                        </div>
-                                    </div>
-                                    <div class="details-right">
-                                        <div class="details-header">
-                                            <span class="details-symbol color-font">$</span>
-                                            <span class="details-price color-font"></span>
-                                        </div>
-                                        <div class="details-property"></div>
-                                    </div>
-                                </div>`
         
-        function showProductDeails(params) {
+        function showProductDetails(params) {
+            var image = params.image
+            var colors = params.colors
+            var product = params.product
+            var category = params.category
+            var description = params.description
+            var currency = params.currency
+            var price = params.price
+            var properties = params.properties
+            var values = params.values
+            var id = params.id
 
+            var color_element = ''
+
+            if (colors.length > 0) {
+                colors.forEach(color => {
+                    color_element += '<span style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
+                });
+            }
+
+            var property_element = ''
+
+            if (properties.length > 0) {
+                properties.forEach(property => {
+                    var value_element = ''
+                    if (values.length > 0) {
+                        values.forEach(value => {
+                            if (value.propertyId == property.id) {
+                                value_element += `<div class="value">
+                                                    <p>`+value.value+`</p>
+                                                    <p>`+value.price+`</p>
+                                                    <p>`+value.currency+`</p>
+                                                    <p>`+value.description+`</p>
+                                                </div>`
+                            }
+                            
+                        });
+                    }
+                    property_element += `<h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>`+property.property+`</h5>
+                                        <div class="property-values" id="`+property.id+`">
+                                            <button type="button" class="add-value" data-toggle="modal" data-target="#addValue">
+                                                <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
+                                            </button>
+                                            `+value_element+`
+                                        </div>`
+                });
+            }
+
+            return `<div class="product-details">
+                        <div class="details-left">
+                            <div class="details-img">
+                                <img src="static/svg/`+image+`" alt="" srcset="">
+                            </div>
+                            <div class="details-colors">`+color_element+`</div>
+                            <div class="details-details">
+                                <div class="details">
+                                    <p class="color-font text-wrapper details-title" id="`+id+`" style="font-size: 14px;">`+product+`</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+category+`</p>
+                                </div>
+                                <p class="color-text mt-2" id="details-description" style="font-size: 12px;">`+description+`<p>
+                            </div>
+                        </div>
+                        <div class="details-right">
+                            <div class="details-header">
+                                <span class="details-symbol color-font">`+currency+`</span>
+                                <span class="details-price color-font">`+price+`</span>
+                            </div>
+                            <div class="details-property">`+property_element+`</div>
+                        </div>
+                    </div>`
         }
 
         function showProductForm(params) {
