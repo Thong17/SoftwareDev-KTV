@@ -31,7 +31,7 @@
                 <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right"
                         aria-hidden="true"></i>{{ property.property }}</h5>
                 <div class="property-values" id="{{ property.id }}">
-                    <button type="button" class="add-value" data-toggle="modal" data-target="#modalCart">
+                    <button type="button" class="add-value" data-toggle="modal" data-target="#addValue">
                         <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
                     </button>
                     {% if product.values %}
@@ -52,7 +52,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="addValue" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -119,6 +119,8 @@
             data: {product: product, property: property, value: value, price: price, currency: currency, description: description},
             success: function(data) {
                 console.log(data)
+                $('#addValue').modal('hide')
+                window.location.reload()
             }
         })
         
