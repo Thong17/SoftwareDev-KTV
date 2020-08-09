@@ -191,7 +191,7 @@
                     var value_element = ''
                     if (values.length > 0) {
                         values.forEach(value => {
-                            if (value.propertyId == property.id) {
+                            if (value.property == property.id) {
                                 value_element += `<div class="value">
                                                     <p>`+value.value+`</p>
                                                     <p>`+value.price+`</p>
@@ -215,7 +215,7 @@
             return `<div class="product-details">
                         <div class="details-left">
                             <div class="details-img">
-                                <img src="static/svg/`+image+`" alt="" srcset="">
+                                <img src="`+image+`" alt="" srcset="">
                             </div>
                             <div class="details-colors">`+color_element+`</div>
                             <div class="details-details">
@@ -241,6 +241,13 @@
             var product = params.product
             var price = params.price
             var description = params.description
+            var colors = params.colors
+            var element = ''
+            if (colors.length > 0) {
+                colors.forEach(color => {
+                    element += '<option value="'+color.id+'">'+color.color+'</option>'
+                });
+            }
             var productForm = `<h5 class="color-font m-0">Product</h5>
                     <div class="slide-form" style="width: 100%;">
                         <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
@@ -250,7 +257,7 @@
                             <div class="form-group selector">
                                 <p class="detail-content">Use category for specific products</p>
                                 <select name="category" id="category" class="form-control input-color" required>
-                                    <option disabled value="">Select category</option>
+                                    <option disabled selected="selected" value="">Select category</option>
                                     {% if categories %}
                                         {% for category in categories %}
                                             {% if category.id == "`+category+`" %}
@@ -321,6 +328,7 @@
                                     <div class="col-sm-9 pr-0 selector">
                                         <select name="color" id="color" class="form-control input-color" required>
                                             <option disabled selected="selected" value="">Select color</option>
+                                            `+element+`
                                         </select>   
                                     </div>
                                     <div class="col-sm-3" style="width=100%">
@@ -348,7 +356,7 @@
                         </div>
                     </div>
                     <button class="btn btn-block border color-font submit-product">Create</button>
-                    <button class="btn btn-block border color-font save-product hide">Upload</button>`
+                    <button class="btn btn-block border color-font save-product hide">Save</button>`
             return productForm
         }
 

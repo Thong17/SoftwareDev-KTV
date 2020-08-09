@@ -64,28 +64,50 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
+    $(document).on('click', '.save-product', function () {
+        var id = $(this).attr('id')
+        var product = $('#product').val()
+        var price = $('#price').val()
+        var currency = $('#currency').val()
+        var description = $('#details').val()
+        var category = $('#category').val()
+
+        $.ajax({
+            url: '/product/save/'+id,
+            type: 'POST',
+            data: {product: product, price: price, currency: currency, description: description, category: category},
+            success: function(data) {
+                console.log(data)
+            }
+        })
+
+        console.log(product, price, currency, description, category)
+    })
+
     $('.list-product').on('click', '.product-item', function () {
         console.log(this)
     })
 
     $('.list-product').on('click', '.fa-pencil-square-o', function (e) {
         e.preventDefault()
-        
+        var id = $(this).closest('.product-item').attr('id')
         toggleEdit($('#product-nav'), $('#brand-nav'))
+        
         gsap.to('#product-nav', {
             x: 0
         })
 
         $('.add-product').attr("disabled", true)
         $('.add-product p').addClass('clear')
-        var id = $(this).closest('.product-item').attr('id')
+        
         $.ajax({
             url: '/product/' + id,
             method: 'POST',
             success: function (data) {
                 console.log(data)
+                var photo = 'static/uploads/'+data.photo
                 $('.list-product').html(showProductDetails({
-                    image: data.photo,
+                    image: photo,
                     colors: data.colors,
                     product: data.product,
                     category: data.category.category,
@@ -107,10 +129,16 @@
                             category: data.category.category,
                             product: data.product,
                             price: data.price,
-                            description: data.description
+                            description: data.description,
+                            colors: data.colors
                         }))
 
+                        $('.pickr').attr('id', id)
+
                         $('.product-image').removeClass('hide')
+                        
+                        toggleEdit($('.save-product'), $('.submit-product'))
+                        $('.save-product').attr('id', data['id'])
 
                         uploadColor('.pickr', 'color-name')
 
@@ -125,8 +153,8 @@
 
     $(document).on('change', '#color', function () {
         $('#color-img').html(`<div class="image-item">
-                                        <img src="/static/uploads/default.png" id="image-src">
-                                    </div>`)
+                                <img src="/static/uploads/default.png" id="image-src">
+                            </div>`)
         var color = $('#color option:selected').text()
         if ($('#color').val() != '') {
             $('#photo').attr('disabled', false)
@@ -143,9 +171,8 @@
         var photos = document.querySelector('#photo').files
         var color = $('#color').val()
         var name = $('#product').val()
-        var product = document.querySelector('.save-product').id
+        var product = document.querySelector('.pickr').id
         uploadPhoto(photos, color, product, this, '/color/photo')
-
     })
 
     $(document).on('change', '#product-photo', function () {
@@ -153,13 +180,6 @@
         var name = $('#product').val()
         var product = document.querySelector('.save-product').id
         uploadPhoto(photo, '', product, this, '/product/photo')
-    })
-
-    $(document).on('click', '.save-product', function () {
-        var files = document.querySelector('#photo').files
-        var color = $('#color').val()
-        var pid = $(this).attr('id')
-        console.log(files, color, pid)
     })
 
     $(document).on('submit', '#product-form', function () {
@@ -221,14 +241,6 @@
 
     $('#product-nav').on('click', '.submit-product', function () {
         $('.submit-btn').click()
-        var id = $(this).attr('id')
-        var product = $('#product').val()
-        var price = $('#price').val()
-        var currency = $('#currency').val()
-        var description = $('#details').val()
-        var category = $('#category').val()
-
-        console.log(product, price, currency, description, category)
     })
 
     $('.content-header').on('click', '.add-product', function () {
@@ -244,7 +256,7 @@
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
             $('.list-product').html(showProductDetails({
-                image: 'camera-{{current_user.theme}}.svg',
+                image: 'static/svg/camera-{{current_user.theme}}.svg',
                 colors: "",
                 product: "Product Name",
                 category: "category",
@@ -267,7 +279,8 @@
                         category: "Select category",
                         product: "",
                         price: "",
-                        description: ""
+                        description: "",
+                        colors: ""
                     }))
 
                     uploadColor('.pickr', 'color-name')

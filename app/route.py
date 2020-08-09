@@ -1,7 +1,7 @@
-from app import app, bcrypt, db, login_manager, c, upload
+from app import app, bcrypt, db, login_manager, c, upload, delete_photo
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue
-from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProductSchema
-from app import CategorySchema
+from app import LoginForm, RegisterForm, CategoryForm, BrandForm
+from app import CategorySchema, ProductSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -349,6 +349,9 @@ def products():
 @app.route('/product/photo/<id>', methods=['POST'])
 def product_photo(id):
     alt = request.form['name']
+    Product = tblProduct.query.get(id)
+    if Product.photo != 'default.png':
+        delete_photo('uploads', Product.photo)
     jsons = []
     for file in request.files:
         photo = request.files[file]
@@ -356,7 +359,6 @@ def product_photo(id):
         filename = str(uuid4()) + '.' + extension
         photo.filename = filename
         uploaded = upload.save(photo)
-        Product = tblProduct.query.get(id)
         Product.photo = filename
         db.session.commit()
         json = {
@@ -430,3 +432,21 @@ def add_value():
     db.session.commit()
     return jsonify({'id': id, 'value': value, 'price': price, 'currency': currency, 'description': description})
 
+@app.route('/product/save/<id>', methods=['POST'])
+def save_product(id):
+    Product = tblProduct.query.get(id)
+
+    category = request.form['category']
+    product = request.form['product']
+    currency = request.form['currency']
+    price = request.form['price']
+    description = request.form['description']
+
+    Product.product = product
+    Product.currency = currency
+    Product.price = price
+    Product.description = description
+    Product.category = category
+
+    db.session.commit()
+    return jsonify({'data': 'success'})

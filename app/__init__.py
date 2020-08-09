@@ -39,6 +39,14 @@ upload = UploadSet('photos', IMAGES)
 configure_uploads(app, upload)
 patch_request_class(app)
 
+#Custome function
+def delete_photo(folder, photo):
+    photo = basedir + '/static/' + folder + "/" + photo
+    try:
+        os.remove(photo)
+    except:
+        return 'No file found'
+
 
 # Flask Form
 class LoginForm(FlaskForm, UserMixin):
@@ -207,6 +215,5 @@ class ProductSchema(ModelSchema):
     properties = fields.Nested(CategorySchema(many=True), many=True)
     class Meta:
         model = tblProduct
-
         
 from app import route
