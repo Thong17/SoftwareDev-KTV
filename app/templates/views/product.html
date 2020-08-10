@@ -59,11 +59,50 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="addValue" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Your cart</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="property-name">Name</label>
+                    <input type="text" name="property-name" id="property-name">
+                </div>
+                <div class="input-group">
+                    <label for="property-price">Price</label>
+                    <input type="number" name="property-price" id="property-price" value="0.00">
+                </div>
+                <div class="input-group">
+                    <label for="property-currency">Currency</label>
+                    <select id="property-currency" name="property-currency">
+                        <option value="dollar">$</option>
+                        <option value="riel">R</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="property-description">Description</label>
+                    <input type="text" id="property-description" name="property-description">
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary save-btn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
+ 
     $(document).on('click', '.save-product', function () {
         var id = $(this).attr('id')
         var product = $('#product').val()
@@ -71,17 +110,18 @@
         var currency = $('#currency').val()
         var description = $('#details').val()
         var category = $('#category').val()
-
-        $.ajax({
-            url: '/product/save/'+id,
-            type: 'POST',
-            data: {product: product, price: price, currency: currency, description: description, category: category},
-            success: function(data) {
-                console.log(data)
-            }
-        })
-
-        console.log(product, price, currency, description, category)
+        if (category != null) {
+            $.ajax({
+                url: '/product/save/'+id,
+                type: 'POST',
+                data: {product: product, price: price, currency: currency, description: description, category: category},
+                success: function(data) {
+                    console.log(data)
+                }
+            })
+        }
+        console.log(id, product, price, currency, description, category)
+        
     })
 
     $('.list-product').on('click', '.product-item', function () {
@@ -104,7 +144,7 @@
             url: '/product/' + id,
             method: 'POST',
             success: function (data) {
-                console.log(data)
+                console.log('brand', data)
                 var photo = 'static/uploads/'+data.photo
                 $('.list-product').html(showProductDetails({
                     image: photo,
@@ -126,7 +166,7 @@
                         $('.add-product').attr("disabled", false)
 
                         $('#product-nav').html(showProductForm({
-                            category: data.category.category,
+                            category: data.productOfCategory,
                             product: data.product,
                             price: data.price,
                             description: data.description,

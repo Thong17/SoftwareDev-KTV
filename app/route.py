@@ -446,7 +446,7 @@ def save_product(id):
     Product.currency = currency
     Product.price = price
     Product.description = description
-    Product.category = category
+    Product.categoryId = category
 
     db.session.commit()
     return jsonify({'data': 'success'})

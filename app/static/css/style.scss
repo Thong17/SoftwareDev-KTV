@@ -904,6 +904,8 @@ table tbody tr {
 .sub-content {
     font-size: 15px;
     margin: 20px 0 0 0;
+    display: flex;
+    justify-content: flex-start;
 }
 
 .detail-content {
@@ -1047,9 +1049,13 @@ table tbody tr {
 }
 
 .details-left {
-    width: 200px;
+    width: 500px;
     height: 100%;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .details-img {
@@ -1070,6 +1076,7 @@ table tbody tr {
     height: 100%;
     position: relative;
     padding: 20px;
+    overflow: auto;
 }
 
 .details-header {
@@ -1139,14 +1146,17 @@ table tbody tr {
 }
 
 .property-values {
+    position: relative;
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    width: 100%;
+    overflow-x: scroll;
 }
 
 .property-values button, .property-values div {
-    width: 200px;
-    height: 130px;
+    min-width: 200px;
+    min-height: 130px;
     border-radius: 10px;
     display: flex;
     justify-content: center;

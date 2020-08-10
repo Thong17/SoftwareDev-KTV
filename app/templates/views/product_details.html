@@ -4,7 +4,7 @@
 <div class="wrap-container">
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 750px;">
-            <h3 class="color-font product-title" id="{{ product.id }}">{{ product.product }}</h3>
+            <h3 class="color-font details-title" id="{{ product.id }}">{{ product.product }}</h3>
             <div class="flex-start">
                 {% if product.currency == 'dollar' %}
                 <p>$</p>
@@ -28,12 +28,11 @@
         <div class="column-wrapper" style="width: 100%;">
             <div class="list-properties">
                 {% for property in product.productOfCategory.properties %}
-                <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right"
-                        aria-hidden="true"></i>{{ property.property }}</h5>
-                <div class="property-values" id="{{ property.id }}">
-                    <button type="button" class="add-value" data-toggle="modal" data-target="#addValue">
-                        <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
-                    </button>
+                <div class="flex-between mt-3" style="width: 100%;">
+                    <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ property.property }}</h5>
+                    <button class="btn border color-font btn-slim add-value" id="{{ property.id }}" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
+                </div>
+                <div class="property-values">
                     {% if product.values %}
                         {% for value in product.values %}
                             {% if value.propertyId == property.id %}
@@ -64,23 +63,23 @@
             </div>
             <div class="modal-body">
                 <div class="input-group">
-                    <label for="name">Name</label>
-                    <input type="text" name="name" id="name">
+                    <label for="property-name">Name</label>
+                    <input type="text" name="property-name" id="property-name">
                 </div>
                 <div class="input-group">
-                    <label for="price">Price</label>
-                    <input type="number" name="price" id="price" value="0.00">
+                    <label for="property-price">Price</label>
+                    <input type="number" name="property-price" id="property-price" value="0.00">
                 </div>
                 <div class="input-group">
-                    <label for="currency">Currency</label>
-                    <select id="currency" name="currency">
+                    <label for="property-currency">Currency</label>
+                    <select id="property-currency" name="property-currency">
                         <option value="dollar">$</option>
                         <option value="riel">R</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label for="description">Description</label>
-                    <input type="text" id="description" name="description">
+                    <label for="property-description">Description</label>
+                    <input type="text" id="property-description" name="property-description">
                 </div>
                 
             </div>
@@ -96,34 +95,6 @@
 
 {% block script %}
 <script>
-    $(document).on('click', '.add-value', function () {
-        var property = $(this).parents('.property-values').attr('id')
-        var  title = $(this).parent().prev('.sub-content').text()
-        $('.modal-title').text(title)
-        $('.save-btn').attr('id', property)
-    })
-    $('.save-btn').on('click', function() {
-        var product = $('.details-title').attr('id')
-        var property = $(this).attr('id')
 
-        var value = $('#name').val()
-        var price = $('#price').val()
-        var currency = $('#currency').val()
-        var description = $('#description').val()
-
-        console.log(product, property, value, price, currency, description)
-        
-        $.ajax({
-            url: '/value/add',
-            method: 'POST',
-            data: {product: product, property: property, value: value, price: price, currency: currency, description: description},
-            success: function(data) {
-                console.log(data)
-                $('#addValue').modal('hide')
-                window.location.reload()
-            }
-        })
-        
-    })
 </script>
 {% endblock %}

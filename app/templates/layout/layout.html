@@ -163,7 +163,7 @@
                     </a>`)
         }
 
-        
+
         function showProductDetails(params) {
             var image = params.image
             var colors = params.colors
@@ -193,45 +193,47 @@
                         values.forEach(value => {
                             if (value.property == property.id) {
                                 value_element += `<div class="value">
-                                                    <p>`+value.value+`</p>
-                                                    <p>`+value.price+`</p>
-                                                    <p>`+value.currency+`</p>
-                                                    <p>`+value.description+`</p>
+                                                    <p>`+ value.value + `</p>
+                                                    <p>`+ value.price + `</p>
+                                                    <p>`+ value.currency + `</p>
+                                                    <p>`+ value.description + `</p>
                                                 </div>`
                             }
-                            
+
                         });
                     }
-                    property_element += `<h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>`+property.property+`</h5>
-                                        <div class="property-values" id="`+property.id+`">
-                                            <button type="button" class="add-value" data-toggle="modal" data-target="#addValue">
-                                                <i class="fa fa-plus-circle color-font" aria-hidden="true"></i>
-                                            </button>
-                                            `+value_element+`
+                    property_element += `<div class="flex-between mt-3">
+                                            <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>`+ property.property + `</h5>
+                                            <button class="btn border color-font btn-slim add-value" id="`+ property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
+                                        </div>
+                                        <div class="property-values">
+                                            `+ value_element + `
                                         </div>`
                 });
             }
 
             return `<div class="product-details">
                         <div class="details-left">
-                            <div class="details-img">
-                                <img src="`+image+`" alt="" srcset="">
-                            </div>
-                            <div class="details-colors">`+color_element+`</div>
                             <div class="details-details">
                                 <div class="details">
-                                    <p class="color-font text-wrapper details-title" id="`+id+`" style="font-size: 14px;">`+product+`</p>
-                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+category+`</p>
+                                    <p class="color-font text-wrapper details-title" id="`+ id + `" style="font-size: 14px;">` + product + `</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+ category + `</p>
                                 </div>
-                                <p class="color-text mt-2" id="details-description" style="font-size: 12px;">`+description+`<p>
+                                <div class="details-header">
+                                    <span class="details-symbol color-font">`+ currency + `</span>
+                                    <span class="details-price color-font">`+ price + `</span>
+                                </div>
+                                <p class="color-text mt-2" id="details-description" style="font-size: 12px;">`+ description + `<p>
                             </div>
+                            
+                            <div class="details-img">
+                                <img src="`+ image + `" alt="" srcset="">
+                            </div>
+                            <div class="details-colors">`+ color_element + `</div>
+                            
                         </div>
                         <div class="details-right">
-                            <div class="details-header">
-                                <span class="details-symbol color-font">`+currency+`</span>
-                                <span class="details-price color-font">`+price+`</span>
-                            </div>
-                            <div class="details-property">`+property_element+`</div>
+                            <div class="details-property">`+ property_element + `</div>
                         </div>
                     </div>`
         }
@@ -245,7 +247,7 @@
             var element = ''
             if (colors.length > 0) {
                 colors.forEach(color => {
-                    element += '<option value="'+color.id+'">'+color.color+'</option>'
+                    element += '<option value="' + color.id + '">' + color.color + '</option>'
                 });
             }
             var productForm = `<h5 class="color-font m-0">Product</h5>
@@ -328,7 +330,7 @@
                                     <div class="col-sm-9 pr-0 selector">
                                         <select name="color" id="color" class="form-control input-color" required>
                                             <option disabled selected="selected" value="">Select color</option>
-                                            `+element+`
+                                            `+ element + `
                                         </select>   
                                     </div>
                                     <div class="col-sm-3" style="width=100%">
@@ -368,19 +370,19 @@
         }
 
         function uploadPhoto(files, color, product, self, url) {
-            
+
             const validtypes = ['image/gif', 'image/jpeg', 'image/png']
             this.color = color
             this.product = product
             this.url = url
             this.files = files
             this.self = self
-            
+
             var imgtag = $(this.self).closest('.upload-container').find('.image-containers').attr('id')
             var name = $(this.self).closest('.slide-form').find('#product').val()
             var loader = $(this.self).closest('.upload-container').find('.bubbling')
 
-            
+
             toggleLoader(loader)
             var form = new FormData()
             form.append('color', this.color)
@@ -419,10 +421,10 @@
                         var element = ''
                         data.forEach(photo => {
                             element += `<div class="image-item">
-                                            <img src="/static/uploads/`+photo.photoSrc+`" alt="`+photo.photoAlt+`">
+                                            <img src="/static/uploads/`+ photo.photoSrc + `" alt="` + photo.photoAlt + `">
                                         </div>`
                         })
-                        $('#'+imgtag).html(element)
+                        $('#' + imgtag).html(element)
                         setTimeout(function () {
                             toggleLoader(loader)
                         }, 1000)
@@ -438,7 +440,7 @@
         function uploadColor(picker, input) {
             if ($('.pcr-app').length) {
                 $('.pcr-app').remove()
-            } 
+            }
             this.picker = picker
             this.input = input
             const pickr = Pickr.create({
@@ -468,13 +470,13 @@
                 }
             })
 
-            $('.pcr-interaction').prepend('<input type="text" class="pcr-name" id="'+this.input+'" placeholder="Name" style="width: 50%; text-align: left">')
-            
+            $('.pcr-interaction').prepend('<input type="text" class="pcr-name" id="' + this.input + '" placeholder="Name" style="width: 50%; text-align: left">')
+
 
             pickr.on('save', (color, instance) => {
                 $('.pcr-save').attr('disabled', true)
                 const hex = color.toHEXA().toString()
-                const name = $('#'+this.input).val()
+                const name = $('#' + this.input).val()
                 console.log(name)
                 const id = $(this.picker).attr('id')
                 if (name != '') {
@@ -488,17 +490,48 @@
                         success: function (data) {
                             $('#color').append(`<option value="` + data.id + `">` + data.color + `</option>`)
                             $('.pcr-save').attr('disabled', false)
-                            $('.details-colors').append(`<span style="background-color: `+data.hex+`"></span>`)
+                            $('.details-colors').append(`<span style="background-color: ` + data.hex + `"></span>`)
                             $('.pcr-name').val('')
                             pickr.hide()
                         }
                     })
                 } else {
-                    $('#'+this.input).focus()
+                    $('#' + this.input).focus()
                     $('.pcr-save').attr('disabled', false)
                 }
             })
         }
+
+        $(document).on('click', '.add-value', function () {
+            var property = $(this).attr('id')
+            var title = $(this).prev('.sub-content').text()
+            console.log(property, title)
+            $('.modal-title').text(title)
+            $('.save-btn').attr('id', property)
+        })
+        $('.save-btn').on('click', function () {
+            var product = $('.details-title').attr('id')
+            var property = $(this).attr('id')
+
+            var value = $('#property-name').val()
+            var price = $('#property-price').val()
+            var currency = $('#property-currency').val()
+            var description = $('#property-description').val()
+
+            console.log(product, property, value, price, currency, description)
+
+            $.ajax({
+                url: '/value/add',
+                method: 'POST',
+                data: { product: product, property: property, value: value, price: price, currency: currency, description: description },
+                success: function (data) {
+                    console.log(data)
+                    $('#addValue').modal('hide')
+                    window.location.reload()
+                }
+            })
+
+        })
     </script>
 </body>
 
