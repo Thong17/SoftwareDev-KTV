@@ -3,7 +3,7 @@
 {% block content %}
 <div class="wrap-container">
     <div class="row-wrapper">
-        <div class="column-wrapper" style="width: 750px;">
+        <div class="column-wrapper" style="min-width: 500px;">
             <h3 class="color-font details-title" id="{{ product.id }}">{{ product.product }}</h3>
             <div class="flex-start">
                 {% if product.currency == 'dollar' %}
@@ -36,12 +36,24 @@
                     {% if product.values %}
                         {% for value in product.values %}
                             {% if value.propertyId == property.id %}
-                            <div class="value">
-                                <p>{{ value.value }}</p>
-                                <p>{{ value.price }}</p>
-                                <p>{{ value.currency }}</p>
-                                <p>{{ value.description }}</p>
-                            </div>
+                            <label class="value color-font container-input">
+                                <div class="flex-between-start">
+                                    <div class="flex-column-start-start">
+                                        <h5>{{ value.value }}</h5>
+                                        <p style="font-size: 11px" class="color-text">{{ value.description }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex-end color-text" style="font-size: 18px">
+                                    {% if value.currency == 'riel' %}
+                                        <p>R</p>
+                                    {% else %}
+                                        <p>$</p>
+                                    {% endif %}
+                                    <p>{{ value.price }}</p>
+                                </div>
+                                <input type="radio" name="{{ property.id }}">
+                                <span class="checkbox"></span>
+                            </label>
                             {% endif %}
                         {% endfor %}
                     {% endif %}

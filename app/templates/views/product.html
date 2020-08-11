@@ -146,6 +146,7 @@
             success: function (data) {
                 console.log('brand', data)
                 var photo = 'static/uploads/'+data.photo
+                data.values.sort(dynamicSort('price'))
                 $('.list-product').html(showProductDetails({
                     image: photo,
                     colors: data.colors,
@@ -172,6 +173,15 @@
                             description: data.description,
                             colors: data.colors
                         }))
+
+                        var options = $('#category').children()
+
+                        Array.from(options).forEach(option => {
+                            if (data.productOfCategory == $(option).val()) {
+                                console.log(data.productOfCategory)
+                                $(option).prop('selected', true)
+                            }
+                        })
 
                         $('.pickr').attr('id', id)
 

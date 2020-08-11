@@ -430,7 +430,7 @@ def add_value():
     model = tblValue(id=id, value=value, price=price, currency=currency, description=description, createdBy=current_user.id, productId=product_id, propertyId=property_id)
     db.session.add(model)
     db.session.commit()
-    return jsonify({'id': id, 'value': value, 'price': price, 'currency': currency, 'description': description})
+    return jsonify({'id': id, 'value': value, 'price': price, 'currency': currency, 'description': description, 'property': property_id})
 
 @app.route('/product/save/<id>', methods=['POST'])
 def save_product(id):

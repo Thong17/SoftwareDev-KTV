@@ -4,6 +4,57 @@
   margin: 0;
 }
 
+.container-input {
+  position: relative;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.container-input input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkbox {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  height: 25px;
+  width: 25px;
+  background-color: var(--color-menu);
+  border-radius: 50%;
+}
+
+.container-input:hover input ~ .checkbox {
+  background-color: var(--color-bg);
+}
+
+.container-input input:checked ~ .checkbox {
+  background-color: #2196F3;
+}
+
+.checkbox:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.container-input input:checked ~ .checkbox:after {
+  display: block;
+}
+
+.container-input .checkbox:after {
+  top: 9px;
+  left: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
 textarea:focus,
 textarea.form-control:focus,
 input.form-control:focus,
@@ -56,6 +107,7 @@ h5,
 p,
 a {
   color: var(--color-font);
+  margin: 0;
 }
 
 select:invalid,
@@ -77,7 +129,7 @@ html[data-theme='light'] {
   --color-hover: rgba(0, 0, 0, 0.3);
   --color-btn-hover: rgba(240, 240, 240, 0.9);
   --color-shadow: rgba(1, 1, 1, 0.1);
-  --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
+  --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
 }
 
 html[data-theme='dark'] {
@@ -90,7 +142,7 @@ html[data-theme='dark'] {
   --color-hover: rgba(255, 255, 255, 0.3);
   --color-btn-hover: rgba(37, 37, 37, 0.5);
   --color-shadow: rgba(1, 1, 1, 0.5);
-  --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
+  --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
 }
 
 html,
@@ -247,6 +299,18 @@ textarea:valid + label {
           justify-content: flex-end;
 }
 
+.flex-between-start {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
 .flex-between-end {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -257,6 +321,22 @@ textarea:valid + label {
   -webkit-box-align: end;
       -ms-flex-align: end;
           align-items: flex-end;
+}
+
+.flex-column-start-start {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
 }
 
 .flex-between-end h5 {
@@ -896,7 +976,8 @@ table tbody tr {
   border-radius: 30px;
 }
 
-.loader, .bubbling {
+.loader,
+.bubbling {
   position: absolute;
   top: 0;
   left: 0;
@@ -1120,6 +1201,16 @@ table tbody tr {
           justify-content: flex-start;
 }
 
+.sub-details {
+  font-size: 13px;
+  font-weight: 300 !important;
+  letter-spacing: .1em;
+  margin: 4px 0 10px;
+  position: relative;
+  text-align: left;
+  color: var(--color-text);
+}
+
 .detail-content {
   font-size: 13px;
   margin: 0 0 5px 0;
@@ -1282,7 +1373,6 @@ table tbody tr {
   left: 0;
   height: 100%;
   width: 100%;
-  border-radius: 5px;
   text-align: center;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1298,12 +1388,11 @@ table tbody tr {
   transition: 0.5s ease-in-out;
   text-decoration: none !important;
   background-color: var(--color-bg);
-  border: 1px solid var(--color-hr);
   cursor: pointer;
 }
 
 .details-left {
-  width: 500px;
+  width: 400px;
   height: 100%;
   position: relative;
   display: -webkit-box;
@@ -1330,24 +1419,20 @@ table tbody tr {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
-  padding: 10px;
+  width: 100%;
 }
 
 .details-right {
   width: 100%;
   height: 100%;
   position: relative;
-  padding: 20px;
+  padding: 0px 20px 20px 20px;
   overflow: auto;
 }
 
@@ -1397,7 +1482,7 @@ table tbody tr {
 
 ::-webkit-scrollbar {
   width: 5px;
-  height: 8px;
+  height: 5px;
   background-color: var(--color-bg);
 }
 
@@ -1440,43 +1525,45 @@ table tbody tr {
 
 .property-values {
   position: relative;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  display: -ms-grid;
+  display: grid;
+  grid-gap: 20px;
+  -ms-grid-columns: (minmax(180px, 1fr))[auto-fill];
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  -ms-grid-rows: (minmax(100px, 100px))[auto-fill];
+      grid-template-rows: repeat(auto-fill, minmax(100px, 100px));
   width: 100%;
-  overflow-x: scroll;
 }
 
-.property-values button, .property-values div {
-  min-width: 200px;
-  min-height: 130px;
+.property-values .value {
+  height: 100px;
   border-radius: 10px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  background-color: var(--color-menu);
-  cursor: pointer;
-  margin: 5px;
-  border: none;
-}
-
-.value {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  background-color: var(--color-menu);
+  cursor: pointer;
+  padding: 10px;
+  border: none;
+}
+
+.btn-value {
+  height: 100px;
+  margin-left: 5px;
+  background-color: var(--color-bg);
+  border-radius: 10px;
+  z-index: 10;
+}
+
+.fixed {
+  position: fixed;
 }
 
 .value p {

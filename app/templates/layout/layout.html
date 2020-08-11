@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
+    <title>Welcome {% block title %}{% endblock %} </title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
         integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -130,6 +130,21 @@
 
         }
 
+        function dynamicSort(property) {
+            var sortOrder = 1;
+            if(property[0] === "-") {
+                sortOrder = -1;
+                property = property.substr(1);
+            }
+            return function (a,b) {
+                /* next line works with strings and numbers, 
+                * and you may want to customize it to your needs
+                */
+                var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+                return result * sortOrder;
+            }
+        }
+
         function showProduct(element, id, product, category, photo, price) {
             this.element = element
             this.id = id
@@ -184,29 +199,48 @@
                 });
             }
 
+            if (currency == 'riel') {
+                currency = 'R'
+            } else {
+                currency = '$'
+            }
+
             var property_element = ''
 
             if (properties.length > 0) {
                 properties.forEach(property => {
-                    var value_element = ''
+                    var value_element = '<button class="btn border btn-value color-font"><p class="plus">+</p></button>'
                     if (values.length > 0) {
                         values.forEach(value => {
+                            if (value.currency == 'riel') {
+                                value.currency = 'R'
+                            } else {
+                                value.currency = '$'
+                            }
                             if (value.property == property.id) {
-                                value_element += `<div class="value">
-                                                    <p>`+ value.value + `</p>
-                                                    <p>`+ value.price + `</p>
-                                                    <p>`+ value.currency + `</p>
-                                                    <p>`+ value.description + `</p>
-                                                </div>`
+                                value_element += `<label class="value color-font container-input">
+                                                    <div class="flex-between-start">
+                                                        <div class="flex-column-start-start">
+                                                            <h5>`+ value.value + `</h5>
+                                                            <p style="font-size: 11px" class="color-text">`+ value.description + `</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-end color-text" style="font-size: 18px">
+                                                        <p>`+ value.currency + `</p>
+                                                        <p>`+ value.price + `</p>
+                                                    </div>
+                                                    <input type="radio" name="`+ property.id + `">
+                                                    <span class="checkbox"></span>
+                                                </label>`
                             }
 
                         });
                     }
-                    property_element += `<div class="flex-between mt-3">
-                                            <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>`+ property.property + `</h5>
-                                            <button class="btn border color-font btn-slim add-value" id="`+ property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
+                    property_element += `<div class="flex-column-start-start mt-4">
+                                            <h5 class="color-font mb-3">` + property.property + `</h5>
+                                            <button class="hide btn border color-font btn-slim add-value" id="`+ property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
                                         </div>
-                                        <div class="property-values">
+                                        <div class="property-values" id="`+ property.id + `">
                                             `+ value_element + `
                                         </div>`
                 });
@@ -214,25 +248,24 @@
 
             return `<div class="product-details">
                         <div class="details-left">
-                            <div class="details-details">
-                                <div class="details">
-                                    <p class="color-font text-wrapper details-title" id="`+ id + `" style="font-size: 14px;">` + product + `</p>
-                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+ category + `</p>
-                                </div>
-                                <div class="details-header">
-                                    <span class="details-symbol color-font">`+ currency + `</span>
-                                    <span class="details-price color-font">`+ price + `</span>
-                                </div>
-                                <p class="color-text mt-2" id="details-description" style="font-size: 12px;">`+ description + `<p>
-                            </div>
-                            
                             <div class="details-img">
                                 <img src="`+ image + `" alt="" srcset="">
                             </div>
                             <div class="details-colors">`+ color_element + `</div>
-                            
+                            <p class="color-text mt-2" id="details-description" style="font-size: 12px; text-align: left">`+ description + `<p>
                         </div>
                         <div class="details-right">
+                            <div class="details-details">
+                                <div class="details">
+                                    <p class="color-font text-wrapper details-title" id="`+ id + `" style="font-size: 23px;">` + product + `</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+ category + `</p>
+                                </div>
+                                <div class="details-header" style="font-size: 23px">
+                                    <span class="details-symbol color-font">`+ currency + `</span>
+                                    <span class="details-price color-font">`+ price + `</span>
+                                </div>
+                            </div> 
+                            <hr></hr>                           
                             <div class="details-property">`+ property_element + `</div>
                         </div>
                     </div>`
@@ -262,11 +295,7 @@
                                     <option disabled selected="selected" value="">Select category</option>
                                     {% if categories %}
                                         {% for category in categories %}
-                                            {% if category.id == "`+category+`" %}
-                                                <option selected="selected" value="{{category.id}}">{{category.category}}</option>
-                                            {% else %}
-                                                <option value="{{category.id}}">{{category.category}}</option>
-                                            {% endif %}
+                                            <option value="{{category.id}}">{{category.category}}</option>
                                         {% endfor %}
                                     {% else %}
                                     <option value="">No category</option>
@@ -388,7 +417,6 @@
             form.append('color', this.color)
             form.append('name', name)
 
-            console.log(imgtag, loader, name)
             if (this.files.length > 0) {
                 this.files.forEach((file, index) => {
                     if (jQuery.inArray(file.type, validtypes) == -1) {
@@ -417,7 +445,6 @@
 
                     },
                     success: function (data) {
-                        console.log(data)
                         var element = ''
                         data.forEach(photo => {
                             element += `<div class="image-item">
@@ -427,6 +454,9 @@
                         $('#' + imgtag).html(element)
                         setTimeout(function () {
                             toggleLoader(loader)
+                            if (url = '/product/photo') {
+                                $('.details-img').html('<img src="/static/uploads/' + data[0].photoSrc + '" alt="' + data[0].photoAlt + '">')
+                            }
                         }, 1000)
                     }
                 })
@@ -527,10 +557,30 @@
                 success: function (data) {
                     console.log(data)
                     $('#addValue').modal('hide')
-                    window.location.reload()
+                    if (data.currency == 'riel') {
+                        data.currency = 'R'
+                    } else {
+                        data.currency = '$'
+                    }
+                    $('.property-values#' + data.property).prepend(`<label class="value color-font container-input">
+                                                    <div class="flex-between-start">
+                                                        <div class="flex-column-start-start">
+                                                            <h5>`+ data.value + `</h5>
+                                                            <p style="font-size: 11px" class="color-text">`+ data.description + `</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-end color-text" style="font-size: 18px">
+                                                        <p>`+ data.currency + `</p>
+                                                        <p>`+ data.price + `</p>
+                                                    </div>
+                                                    <input type="radio" name="`+ data.property + `">
+                                                    <span class="checkbox"></span>
+                                                </label>`)
                 }
             })
-
+        })
+        $(document).on('click', '.btn-value', function () {
+            $(this).parent().prev().find('.add-value').click()
         })
     </script>
 </body>
