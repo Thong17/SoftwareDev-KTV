@@ -2,6 +2,7 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto+Mono:300);
 * {
   margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 .container-input {
@@ -20,16 +21,18 @@
 
 .checkbox {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  bottom: 10px;
+  left: 10px;
   height: 25px;
   width: 25px;
   background-color: var(--color-menu);
   border-radius: 50%;
+  -webkit-transition: 0.3s ease;
+  transition: 0.3s ease;
 }
 
 .container-input:hover input ~ .checkbox {
-  background-color: var(--color-bg);
+  background-color: var(--color-menu);
 }
 
 .container-input input:checked ~ .checkbox {
@@ -115,10 +118,6 @@ select option[value=""] {
   color: var(--color-hover) !important;
 }
 
-.modal {
-  z-index: 100000;
-}
-
 html[data-theme='light'] {
   --color-bg: #ffffff;
   --color-menu: rgb(240, 240, 240);
@@ -151,6 +150,19 @@ body {
   background-color: var(--color-bg);
   -webkit-transition: 0.3s ease-in-out;
   transition: 0.3s ease-in-out;
+}
+
+.modal-content {
+  background-color: var(--color-bg);
+  color: var(--color-font);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--color-hr);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--color-hr);
 }
 
 .form-container {
@@ -501,11 +513,13 @@ main {
 .color-font {
   color: var(--color-font);
   font-weight: 300;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 .color-text {
   color: var(--color-text);
   font-weight: 300;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 .hover:hover {
@@ -941,6 +955,7 @@ table tbody tr {
 
 .action-btn {
   width: 40px;
+  height: 100%;
   margin-left: 20px;
 }
 
@@ -1096,6 +1111,28 @@ table tbody tr {
   height: 100%;
   border-radius: 5px;
   overflow: hidden;
+}
+
+.image-containers .carousel-item img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center;
+     object-position: center;
+  z-index: -1;
+}
+
+.image-containers .carousel-item {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.image-containers div {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .image-item {
@@ -1290,6 +1327,7 @@ table tbody tr {
 .details-img img {
   height: 100%;
   width: 100%;
+  background-color: var(--color-bg);
   -o-object-fit: contain;
      object-fit: contain;
   -o-object-position: center;
@@ -1325,6 +1363,24 @@ table tbody tr {
   width: 100%;
 }
 
+.details-appearance {
+  margin-top: 20px;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
 .product-btn {
   width: 50px;
   height: 23px;
@@ -1351,6 +1407,13 @@ table tbody tr {
 }
 
 .product-item:hover .product-btn {
+  background-color: var(--color-btn-hover);
+  opacity: 1;
+  -webkit-transform: scale(0.9);
+          transform: scale(0.9);
+}
+
+.value:hover .product-btn {
   background-color: var(--color-btn-hover);
   opacity: 1;
   -webkit-transform: scale(0.9);
@@ -1568,6 +1631,40 @@ table tbody tr {
 
 .value p {
   margin: 0;
+}
+
+.carousel-inner img {
+  width: 100%;
+  height: 200px;
+}
+
+.carousel-control-next:hover,
+.carousel-control-prev:hover {
+  background-color: var(--color-hr);
+}
+
+.carousel-indicators {
+  margin-bottom: 0;
+}
+
+.carousel-control-next i,
+.carousel-control-prev i {
+  color: var(--color-text);
+}
+
+.carousel-indicators li {
+  background-color: var(--color-text);
+}
+
+.carousel-indicators li:active {
+  background-color: var(--color-font);
+}
+
+.edit-color {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  z-index: 10;
 }
 
 @-webkit-keyframes spin {

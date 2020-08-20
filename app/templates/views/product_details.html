@@ -3,7 +3,7 @@
 {% block content %}
 <div class="wrap-container">
     <div class="row-wrapper">
-        <div class="column-wrapper" style="min-width: 500px;">
+        <div class="column-wrapper" style="width: 500px;">
             <h3 class="color-font details-title" id="{{ product.id }}">{{ product.product }}</h3>
             <div class="flex-start">
                 {% if product.currency == 'dollar' %}
@@ -24,22 +24,25 @@
                 {% endfor %}
             </div>
             {% endif %}
+            <p class="color-text mt-2" id="details-description" style="font-size: 12px; text-align: left">{{ product.description }}<p>
+            <h5 class="color-font mt-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>Appearance</h5>
         </div>
         <div class="column-wrapper" style="width: 100%;">
             <div class="list-properties">
                 {% for property in product.productOfCategory.properties %}
-                <div class="flex-between mt-3" style="width: 100%;">
-                    <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ property.property }}</h5>
-                    <button class="btn border color-font btn-slim add-value" id="{{ property.id }}" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
+                <div class="flex-between" style="width: 100%;">
+                    <h5 class="color-font mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ property.property }}</h5>
+                    <button class="hide btn border color-font btn-slim add-value" id="{{ property.id }}" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
                 </div>
-                <div class="property-values">
+                <div class="property-values mb-4 property-{{property.id}}">
+                    <button class="btn border btn-value color-font"><p class="plus">+</p></button>
                     {% if product.values %}
                         {% for value in product.values %}
                             {% if value.propertyId == property.id %}
                             <label class="value color-font container-input">
                                 <div class="flex-between-start">
                                     <div class="flex-column-start-start">
-                                        <h5>{{ value.value }}</h5>
+                                        <h5 class="color-font">{{ value.value }}</h5>
                                         <p style="font-size: 11px" class="color-text">{{ value.description }}</p>
                                     </div>
                                 </div>
@@ -63,40 +66,20 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="addValue" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="addValue" role="dialog"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Your cart</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <h4 class="modal-title color-font" id="myModalLabel">Your cart</h4>
             </div>
             <div class="modal-body">
-                <div class="input-group">
-                    <label for="property-name">Name</label>
-                    <input type="text" name="property-name" id="property-name">
-                </div>
-                <div class="input-group">
-                    <label for="property-price">Price</label>
-                    <input type="number" name="property-price" id="property-price" value="0.00">
-                </div>
-                <div class="input-group">
-                    <label for="property-currency">Currency</label>
-                    <select id="property-currency" name="property-currency">
-                        <option value="dollar">$</option>
-                        <option value="riel">R</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="property-description">Description</label>
-                    <input type="text" id="property-description" name="property-description">
-                </div>
                 
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary save-btn">Save</button>
+                <button type="button" class="btn color-font" data-dismiss="modal">Cancel</button>
+                <button class="btn border save-btn color-font">Save</button>
+                <button class="hide btn border edit-value color-font">Edit</button>
             </div>
         </div>
     </div>

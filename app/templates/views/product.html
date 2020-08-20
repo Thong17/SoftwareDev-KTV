@@ -59,40 +59,19 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="addValue" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="addValue" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="width: 370px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Your cart</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <h4 class="modal-title color-font" id="myModalLabel">Your cart</h4>
             </div>
             <div class="modal-body">
-                <div class="input-group">
-                    <label for="property-name">Name</label>
-                    <input type="text" name="property-name" id="property-name">
-                </div>
-                <div class="input-group">
-                    <label for="property-price">Price</label>
-                    <input type="number" name="property-price" id="property-price" value="0.00">
-                </div>
-                <div class="input-group">
-                    <label for="property-currency">Currency</label>
-                    <select id="property-currency" name="property-currency">
-                        <option value="dollar">$</option>
-                        <option value="riel">R</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="property-description">Description</label>
-                    <input type="text" id="property-description" name="property-description">
-                </div>
-                
+
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary save-btn">Save</button>
+                <button type="button" class="btn color-font" data-dismiss="modal">Cancel</button>
+                <button class="btn border save-btn color-font">Save</button>
+                <button class="hide btn border edit-btn color-font">Edit</button>
             </div>
         </div>
     </div>
@@ -102,50 +81,145 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
- 
+    $(document).on('click', '.span-color', function () {
+        var id = $(this).attr('id')
+        console.log(id)
+        $.ajax({
+            url: '/color/'+id,
+            type: 'POST',
+            success: function(data) {
+                console.log(data)
+                $('.details-img').html(showColorPhotos(data.photos, 'color-photo'))
+            }
+        })
+    })
+
+    $('.list-product').on('click', '.edit-value', function() {
+        var label = $(this).parent().parent()
+        var id = $(label).attr('id')
+
+        var name = $(label).find('#value-value').text()
+        var price = $(label).find('#value-price').text()
+        var currency = $(label).find('#value-currency').text()
+        var description = $(label).find('#value-description').text()
+
+        console.log(name, price, currency, description)
+
+        if (currency == '$') {
+            currency = 'dollar'
+        } else {
+            currency = 'riel'
+        }
+        $('#addValue').modal('show')
+        $('.edit-btn').attr('id', id)
+        toggleEdit($('.edit-btn'), $('.save-btn'))
+        $('.modal-body').html(valueForm(name, price, currency, description))
+        return false
+    })
+    
+    $('.edit-btn').on('click', function() {
+        var id = $(this).attr('id')
+        var value = $('#property-name').val()
+        var price = $('#property-price').val()
+        var currency = $('#property-currency').val()
+        var description = $('#property-description').val()
+
+        if (value == '') {
+            $('#property-name').focus()
+        } else {
+            $.ajax({
+                url: '/value/save/'+id,
+                type: 'POST',
+                data: { value: value, price: price, currency: currency, description: description },
+                success: function(data) {
+                    console.log(data)
+                    $('#addValue').modal('hide')
+                    if (data.currency == 'riel') {
+                        data.currency = 'R'
+                    } else {
+                        data.currency = '$'
+                    }
+                    $('label#'+id).find('#value-value').text(data.value)
+                    $('label#'+id).find('#value-price').text(data.price)
+                    $('label#'+id).find('#value-currency').text(data.currency)
+                    $('label#'+id).find('#value-description').text(data.description)
+                }
+            })
+        }
+    })
+
+    $('.list-product').on('click', '.delete-value', function() {
+        if (confirm('Are you sure you want to delete this value?')) {
+            var id = $(this).parent().parent().attr('id')
+            $.ajax({
+                url: '/value/remove/'+id,
+                type: 'POST',
+                success: function(data) {
+                    console.log(data)
+                    $('label#'+id).fadeOut(300, function() {
+                        $(this).remove()
+                    })
+                }
+            })
+        }
+        return false
+    })
+
     $(document).on('click', '.save-product', function () {
         var id = $(this).attr('id')
         var product = $('#product').val()
         var price = $('#price').val()
         var currency = $('#currency').val()
+        var cost = $('#cost').val()
+        var quantity = $('#quantity').val()
         var description = $('#details').val()
         var category = $('#category').val()
         if (category != null) {
             $.ajax({
-                url: '/product/save/'+id,
+                url: '/product/save/' + id,
                 type: 'POST',
-                data: {product: product, price: price, currency: currency, description: description, category: category},
-                success: function(data) {
+                data: { product: product, price: price, cost: cost, quantity: quantity, currency: currency, description: description, category: category },
+                success: function (data) {
+                    console.log(data)
+                    alert('Done')
+                }
+            })
+        }
+    })
+
+    $('.list-product').on('click', '.delete-product', function () {
+        event.preventDefault()
+        var id = $(this).closest('.product-item').attr('id')
+        if (confirm('Are you sure you want to delete this product?')) {
+            $.ajax({
+                url: '/product/remove/' + id,
+                type: 'POST',
+                success: function (data) {
                     console.log(data)
                 }
             })
         }
-        console.log(id, product, price, currency, description, category)
-        
+        return false
     })
 
-    $('.list-product').on('click', '.product-item', function () {
-        console.log(this)
-    })
-
-    $('.list-product').on('click', '.fa-pencil-square-o', function (e) {
-        e.preventDefault()
+    $('.list-product').on('click', '.edit-product', function () {
+        event.preventDefault()
         var id = $(this).closest('.product-item').attr('id')
         toggleEdit($('#product-nav'), $('#brand-nav'))
-        
+
         gsap.to('#product-nav', {
             x: 0
         })
 
         $('.add-product').attr("disabled", true)
         $('.add-product p').addClass('clear')
-        
+
         $.ajax({
             url: '/product/' + id,
             method: 'POST',
             success: function (data) {
                 console.log('brand', data)
-                var photo = 'static/uploads/'+data.photo
+                var photo = 'static/uploads/' + data.photo
                 data.values.sort(dynamicSort('price'))
                 $('.list-product').html(showProductDetails({
                     image: photo,
@@ -170,6 +244,8 @@
                             category: data.productOfCategory,
                             product: data.product,
                             price: data.price,
+                            cost: data.cost,
+                            quantity: data.quantity,
                             description: data.description,
                             colors: data.colors
                         }))
@@ -186,14 +262,12 @@
                         $('.pickr').attr('id', id)
 
                         $('.product-image').removeClass('hide')
-                        
+
                         toggleEdit($('.save-product'), $('.submit-product'))
                         $('.save-product').attr('id', data['id'])
 
                         uploadColor('.pickr', 'color-name')
-
                         $('#brand-id').val(data.productOfBrand)
-                        
                     }
                 })
             }
@@ -205,11 +279,29 @@
         $('#color-img').html(`<div class="image-item">
                                 <img src="/static/uploads/default.png" id="image-src">
                             </div>`)
+        var id = $('#color option:selected').attr('id')
         var color = $('#color option:selected').text()
+        var loader = $('#color-img').closest('.upload-container').find('.bubbling')
+        console.log(loader)
         if ($('#color').val() != '') {
+            toggleLoader(loader)
             $('#photo').attr('disabled', false)
             $('.upload-label').removeClass('disabled')
             $('.selected-color').html(color)
+            $('.edit-color').css('background-color', $('#color').val())
+            $('.edit-color').attr('id', id)
+            $.ajax({
+                url: '/color/' + id,
+                type: 'POST',
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#color-img').html(showColorPhotos(data.photos, 'color-images'))
+                        toggleLoader(loader)
+                    }, 500)
+                    console.log(data)
+                    
+                }
+            })
         } else {
             $('#photo').attr('disabled', true)
             $('.upload-label').addClass('disabled')
@@ -219,7 +311,8 @@
 
     $(document).on('change', '#photo', function () {
         var photos = document.querySelector('#photo').files
-        var color = $('#color').val()
+        /*color change*/
+        var color = $('#color option:selected').attr('id')
         var name = $('#product').val()
         var product = document.querySelector('.pickr').id
         uploadPhoto(photos, color, product, this, '/color/photo')
@@ -329,6 +422,8 @@
                         category: "Select category",
                         product: "",
                         price: "",
+                        cost: "",
+                        quantity: "",
                         description: "",
                         colors: ""
                     }))

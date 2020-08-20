@@ -1,7 +1,7 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm
-from app import CategorySchema, ProductSchema
+from app import CategorySchema, ProductSchema, ColorSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -311,14 +311,16 @@ def theme():
 def add_product():
     product = request.form['product']
     price = request.form['price']
+    cost = request.form['cost']
     category = request.form['category']
     currency = request.form['currency']
+    quantity = request.form['quantity']
     description = request.form['details']
     brand = request.form['brand']
 
     id = str(uuid4())
 
-    Model = tblProduct(id=id, product=product, price=price, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
+    Model = tblProduct(id=id, product=product, price=price, cost=cost, quantity=quantity, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
     
     db.session.add(Model)
     db.session.commit()
@@ -363,8 +365,8 @@ def product_photo(id):
         db.session.commit()
         json = {
             'photoId': Product.id,
-            'photoSrc': filename,
-            'photoAlt': alt
+            'src': filename,
+            'alt': alt
         }
         jsons.append(json)
     return jsonify(jsons)
@@ -395,14 +397,10 @@ def color_photo(id):
         Photo = tblPhoto(id=pid, src=filename, alt=alt, createdBy=current_user.id, colorId=cid, productId=id)
         db.session.add(Photo)
         db.session.commit()
-        json = {
-            'colorId': cid,
-            'photoId': pid,
-            'photoSrc': filename,
-            'photoAlt': alt
-        }
-        jsons.append(json)
-    return jsonify(jsons)
+        color = tblColor.query.get(cid)
+        json = ColorSchema()
+        result = json.dump(color)
+    return jsonify(result)
 
 @app.route('/product/<id>', methods=['POST', 'GET'])
 def product(id):
@@ -440,6 +438,8 @@ def save_product(id):
     product = request.form['product']
     currency = request.form['currency']
     price = request.form['price']
+    cost = request.form['cost']
+    quantity = request.form['quantity']
     description = request.form['description']
 
     Product.product = product
@@ -447,6 +447,47 @@ def save_product(id):
     Product.price = price
     Product.description = description
     Product.categoryId = category
+    Product.cost = cost
+    Product.quantity = quantity
 
     db.session.commit()
     return jsonify({'data': 'success'})
+
+@app.route('/product/remove/<id>', methods=['POST'])
+def remove_product(id):
+    product = tblProduct.query.get(id)
+    if product.photo != 'default.png':
+        delete_photo('uploads', product.photo)
+    try:
+        db.session.delete(product)
+        db.session.commit()
+        return jsonify({'result': 'Success'})
+    except:
+        return jsonify({'result': 'Faild'})
+
+@app.route('/value/save/<id>', methods=['POST'])
+def save_value(id):
+    value = tblValue.query.get(id)
+    value.value = request.form['value']
+    value.price = request.form['price']
+    value.currency = request.form['currency']
+    value.description = request.form['description']
+    try:
+        db.session.commit()
+        return jsonify({'resutl': 'success', 'value': value.value, 'price': value.price, 'currency': value.currency, 'description': value.description})
+    except:
+        return jsonify({'resutl': 'failed'})
+
+@app.route('/value/remove/<id>', methods=['POST'])
+def remove_value(id):
+    value = tblValue.query.get(id)
+    db.session.delete(value)
+    db.session.commit()
+    return jsonify({'result': 'Success'})
+
+@app.route('/color/<id>', methods=['POST'])
+def get_color(id):
+    color = tblColor.query.get(id)
+    json = ColorSchema()
+    result = json.dump(color)
+    return jsonify(result)

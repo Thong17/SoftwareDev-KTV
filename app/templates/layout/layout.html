@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
         integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="{{url_for('static', filename='css/dist/style.css')}}">
 
     {% block style %}{% endblock %}
@@ -105,8 +104,113 @@
                     $('html').attr('data-theme', data['theme'])
                 }
             })
-
         })
+ 
+        function valueForm(name, price, currency, details) {
+            this.name = name
+            this.price = price
+            this.details = details
+            this.currency = currency
+            var element = ''
+            if (this.currency == 'riel') {
+                element = `<option value="dollar">$</option>
+                            <option value="riel" selected="selected">R</option>`
+            } else {
+                element = `<option value="dollar" selected="seleceted">$</option>
+                            <option value="riel">R</option>`
+            }
+            return `<div class="form-group">
+                    <input class="form-control input-color" type="text" name="property-name" id="property-name" value="`+this.name+`">
+                    <label class="label name" for="property-name">Name</label>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 pr-0">
+                        <div class="form-group">
+                            <input class="form-control input-color" type="number" name="property-price" id="property-price" value="`+this.price+`">
+                            <label class="label price" for="property-price">Price</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <select class="form-control input-color" id="property-currency" name="property-currency">
+                                `+element+`
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group pb-3">
+                    <textarea class="form-control input-color" type="text" id="property-description" name="property-description" style="min-height: 100px;">`+this.details+`</textarea>
+                    <label class="label description" for="property-description">Description</label>
+                </div>`
+        }
+
+        function uploadColor(picker, input) {
+            if ($('.pcr-app').length) {
+                $('.pcr-app').remove()
+            }
+            this.picker = picker
+            this.input = input
+            const pickr = Pickr.create({
+                el: this.picker,
+                theme: 'classic', // or 'monolith', or 'nano'
+                defaultRepresentation: 'HEX',
+                default: '#111111',
+                useAsButton: true,
+                components: {
+                    // Main components
+                    preview: true,
+                    opacity: true,
+                    hue: true,
+
+                    // Input / output Options
+                    interaction: {
+                        hex: false,
+                        rgba: false,
+                        hsla: false,
+                        hsva: false,
+                        cmyk: false,
+                        input: true,
+                        clear: false,
+                        save: true
+                    }
+                }
+            })
+
+            $('.pcr-interaction').prepend('<input type="text" class="pcr-name" id="' + this.input + '" placeholder="Name" style="width: 50%; text-align: left">')
+
+
+            pickr.on('save', (color, instance) => {
+                $('.pcr-save').attr('disabled', true)
+                const hex = color.toHEXA().toString()
+                const name = $('#' + this.input).val()
+                const id = $(this.picker).attr('id')
+                if (this.picker == 'editkr') {
+                    console.log('Editing')
+                } else {
+                    console.log('Adding')
+                    if (name != '') {
+                        $.ajax({
+                            url: '/product/color/' + id,
+                            type: 'post',
+                            data: { 'hex': hex, 'color': name },
+                            beforeSend: function () {
+
+                            },
+                            success: function (data) {
+                                $('#color').append(`<option value="` + data.hex + `" id="`+ data.id +`">` + data.color + `</option>`)
+                                $('.pcr-save').attr('disabled', false)
+                                $('.details-colors').append(`<span class="span-color pickr" id="` + data.id + `" style="background-color: ` + data.hex + `"></span>`)
+                                $('.pcr-name').val('')
+                                pickr.hide()
+                            }
+                        })
+                    } else {
+                        $('#' + this.input).focus()
+                        $('.pcr-save').attr('disabled', false)
+                    }
+                }
+            })
+        }
 
         function toggleEdit(show, hide) {
             this.show = show
@@ -158,8 +262,8 @@
                             <div class="item-img">
                                 <img src="static/uploads/`+ this.photo + `" alt="" srcset="">
                                 <div class="product-btn color-text">
-                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    <i class="fa fa-pencil-square-o edit-product" aria-hidden="true"></i>
+                                    <i class="fa fa-trash-o delete-product" aria-hidden="true"></i>
                                 </div>
                             </div>
                             <div class="item-details">
@@ -195,7 +299,7 @@
 
             if (colors.length > 0) {
                 colors.forEach(color => {
-                    color_element += '<span style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
+                    color_element += '<span class="span-color" id="' + color.id + '" style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
                 });
             }
 
@@ -218,16 +322,20 @@
                                 value.currency = '$'
                             }
                             if (value.property == property.id) {
-                                value_element += `<label class="value color-font container-input">
+                                value_element += `<label class="value container-input" id="`+ value.id +`">
+                                                    <div class="product-btn color-text">
+                                                        <i class="fa fa-pencil-square-o edit-value" aria-hidden="true"></i>
+                                                        <i class="fa fa-trash-o delete-value" aria-hidden="true"></i>
+                                                    </div>
                                                     <div class="flex-between-start">
                                                         <div class="flex-column-start-start">
-                                                            <h5>`+ value.value + `</h5>
-                                                            <p style="font-size: 11px" class="color-text">`+ value.description + `</p>
+                                                            <h5 class="color-font" id="value-value">`+ value.value + `</h5>
+                                                            <p style="font-size: 11px" class="color-text" id="value-description">`+ value.description + `</p>
                                                         </div>
                                                     </div>
-                                                    <div class="flex-end color-text" style="font-size: 18px">
-                                                        <p>`+ value.currency + `</p>
-                                                        <p>`+ value.price + `</p>
+                                                    <div class="flex-end" style="font-size: 18px">
+                                                        <p class="color-text" id="value-currency">`+ value.currency + `</p>
+                                                        <p class="color-text" id="value-price">`+ value.price + `</p>
                                                     </div>
                                                     <input type="radio" name="`+ property.id + `">
                                                     <span class="checkbox"></span>
@@ -237,10 +345,10 @@
                         });
                     }
                     property_element += `<div class="flex-column-start-start mt-4">
-                                            <h5 class="color-font mb-3">` + property.property + `</h5>
+                                            <h5 class="color-font mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>` + property.property + `</h5>
                                             <button class="hide btn border color-font btn-slim add-value" id="`+ property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
                                         </div>
-                                        <div class="property-values" id="`+ property.id + `">
+                                        <div class="property-values property-`+ property.id +`">
                                             `+ value_element + `
                                         </div>`
                 });
@@ -252,7 +360,10 @@
                                 <img src="`+ image + `" alt="" srcset="">
                             </div>
                             <div class="details-colors">`+ color_element + `</div>
-                            <p class="color-text mt-2" id="details-description" style="font-size: 12px; text-align: left">`+ description + `<p>
+                            <div class="details-appearance">
+                                <p class="color-text mt-2" id="details-description" style="font-size: 12px; text-align: left">`+ description + `<p>
+                                <h5 class="color-font mt-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>Appearance</h5>
+                            </div>
                         </div>
                         <div class="details-right">
                             <div class="details-details">
@@ -277,10 +388,13 @@
             var price = params.price
             var description = params.description
             var colors = params.colors
+            var cost = params.cost
+            var quantity = params.quantity
             var element = ''
             if (colors.length > 0) {
                 colors.forEach(color => {
-                    element += '<option value="' + color.id + '">' + color.color + '</option>'
+                    /*color change*/
+                    element += '<option value="' + color.hex + '" id="' + color.id + '">' + color.color + '</option>'
                 });
             }
             var productForm = `<h5 class="color-font m-0">Product</h5>
@@ -325,6 +439,22 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="form-group">
+                                        <input type="number" class="form-control input-color" name="cost" id="cost" value="`+ cost + `"
+                                            required>
+                                        <label for="cost" class="label cost">Cost</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 selector pl-0">
+                                    <div class="form-group">
+                                        <input type="number" class="form-control input-color" name="quantity" id="quantity" value="`+ quantity + `"
+                                            required>
+                                        <label for="quantity" class="label quantity">Quantity</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <textarea name="details" id="details"
                                     class="form-control input-color textarea" required>`+ description + `</textarea>
@@ -356,14 +486,17 @@
                             <div class="form-group selector">
                                 <p class="detail-content">Add color for product</p>
                                 <div class="row">
-                                    <div class="col-sm-9 pr-0 selector">
+                                    <div class="col-sm-2">
+                                        <button class="btn input-color edit-color"></button>
+                                    </div>
+                                    <div class="col-sm-7 p-0 selector">
                                         <select name="color" id="color" class="form-control input-color" required>
                                             <option disabled selected="selected" value="">Select color</option>
                                             `+ element + `
                                         </select>   
                                     </div>
-                                    <div class="col-sm-3" style="width=100%">
-                                        <button class="btn pickr input-color" style="width: 100%">+</button>
+                                    <div class="col-sm-3">
+                                        <button class="btn pickr input-color">+</button>
                                     </div>
                                 </div>
                             </div>
@@ -445,18 +578,18 @@
 
                     },
                     success: function (data) {
-                        var element = ''
-                        data.forEach(photo => {
-                            element += `<div class="image-item">
-                                            <img src="/static/uploads/`+ photo.photoSrc + `" alt="` + photo.photoAlt + `">
-                                        </div>`
-                        })
-                        $('#' + imgtag).html(element)
+                        
                         setTimeout(function () {
-                            toggleLoader(loader)
-                            if (url = '/product/photo') {
-                                $('.details-img').html('<img src="/static/uploads/' + data[0].photoSrc + '" alt="' + data[0].photoAlt + '">')
+                            if (this.url == '/product/photo') {
+                                $('.details-img').html('<img src="/static/uploads/' + data[0].src + '" alt="' + data[0].alt + '">')
+                                var element = `<div class="image-item">
+                                                    <img src="/static/uploads/`+ data[0].src + `" alt="` + data[0].alt + `">
+                                                </div>`
+                                $('#' + imgtag).html(element)            
+                            } else {
+                                $('#' + imgtag).html(showColorPhotos(data.photos, 'color-images'))
                             }
+                            toggleLoader(loader)
                         }, 1000)
                     }
                 })
@@ -467,79 +600,18 @@
 
         }
 
-        function uploadColor(picker, input) {
-            if ($('.pcr-app').length) {
-                $('.pcr-app').remove()
-            }
-            this.picker = picker
-            this.input = input
-            const pickr = Pickr.create({
-                el: this.picker,
-                theme: 'classic', // or 'monolith', or 'nano'
-                defaultRepresentation: 'HEX',
-                default: '#111111',
-                useAsButton: true,
-                components: {
-
-                    // Main components
-                    preview: true,
-                    opacity: true,
-                    hue: true,
-
-                    // Input / output Options
-                    interaction: {
-                        hex: false,
-                        rgba: false,
-                        hsla: false,
-                        hsva: false,
-                        cmyk: false,
-                        input: true,
-                        clear: false,
-                        save: true
-                    }
-                }
-            })
-
-            $('.pcr-interaction').prepend('<input type="text" class="pcr-name" id="' + this.input + '" placeholder="Name" style="width: 50%; text-align: left">')
-
-
-            pickr.on('save', (color, instance) => {
-                $('.pcr-save').attr('disabled', true)
-                const hex = color.toHEXA().toString()
-                const name = $('#' + this.input).val()
-                console.log(name)
-                const id = $(this.picker).attr('id')
-                if (name != '') {
-                    $.ajax({
-                        url: '/product/color/' + id,
-                        type: 'post',
-                        data: { 'hex': hex, 'color': name },
-                        beforeSend: function () {
-
-                        },
-                        success: function (data) {
-                            $('#color').append(`<option value="` + data.id + `">` + data.color + `</option>`)
-                            $('.pcr-save').attr('disabled', false)
-                            $('.details-colors').append(`<span style="background-color: ` + data.hex + `"></span>`)
-                            $('.pcr-name').val('')
-                            pickr.hide()
-                        }
-                    })
-                } else {
-                    $('#' + this.input).focus()
-                    $('.pcr-save').attr('disabled', false)
-                }
-            })
-        }
-
         $(document).on('click', '.add-value', function () {
             var property = $(this).attr('id')
-            var title = $(this).prev('.sub-content').text()
+            var title = $(this).prev().text()
             console.log(property, title)
             $('.modal-title').text(title)
+            $('.modal-body').html(valueForm('', '0.00', '', ''))
+            toggleEdit($('.save-btn'), $('.edit-btn'))
             $('.save-btn').attr('id', property)
         })
+
         $('.save-btn').on('click', function () {
+            event.stopPropagation()
             var product = $('.details-title').attr('id')
             var property = $(this).attr('id')
 
@@ -547,41 +619,96 @@
             var price = $('#property-price').val()
             var currency = $('#property-currency').val()
             var description = $('#property-description').val()
+            console.log(value)
 
-            console.log(product, property, value, price, currency, description)
+            if (value == '') {
+                $('#property-name').focus()
+                console.log('empty')
+            } else {
+                console.log('Not empty')
+                $.ajax({
+                    url: '/value/add',
+                    method: 'POST',
+                    data: { product: product, property: property, value: value, price: price, currency: currency, description: description },
+                    success: function (data) {
+                        $('#addValue').modal('hide')
+                        if (data.currency == 'riel') {
+                            data.currency = 'R'
+                        } else {
+                            data.currency = '$'
+                        }
+                        var element = `<label class="value container-input" id="`+ data.id +`">
+                                        <div class="product-btn color-text">
+                                            <i class="fa fa-pencil-square-o edit-value" aria-hidden="true"></i>
+                                            <i class="fa fa-trash-o delete-value" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="flex-between-start">
+                                            <div class="flex-column-start-start">
+                                                <h5 class="color-font" id="value-value">`+ data.value + `</h5>
+                                                <p style="font-size: 11px" class="color-text" id="value-description">`+ data.description + `</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex-end color-text" style="font-size: 18px">
+                                            <p class="color-text" id="value-currency">`+ data.currency + `</p>
+                                            <p class="color-text" id="value-price">`+ data.price + `</p>
+                                        </div>
+                                        <input type="radio" name="`+ data.property + `">
+                                        <span class="checkbox"></span></label>`
 
-            $.ajax({
-                url: '/value/add',
-                method: 'POST',
-                data: { product: product, property: property, value: value, price: price, currency: currency, description: description },
-                success: function (data) {
-                    console.log(data)
-                    $('#addValue').modal('hide')
-                    if (data.currency == 'riel') {
-                        data.currency = 'R'
-                    } else {
-                        data.currency = '$'
+                        var values = $('.property-'+data.property)
+                        console.log(values)
+                        values.append(element)
                     }
-                    $('.property-values#' + data.property).prepend(`<label class="value color-font container-input">
-                                                    <div class="flex-between-start">
-                                                        <div class="flex-column-start-start">
-                                                            <h5>`+ data.value + `</h5>
-                                                            <p style="font-size: 11px" class="color-text">`+ data.description + `</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-end color-text" style="font-size: 18px">
-                                                        <p>`+ data.currency + `</p>
-                                                        <p>`+ data.price + `</p>
-                                                    </div>
-                                                    <input type="radio" name="`+ data.property + `">
-                                                    <span class="checkbox"></span>
-                                                </label>`)
-                }
-            })
+                })
+            }
         })
         $(document).on('click', '.btn-value', function () {
             $(this).parent().prev().find('.add-value').click()
         })
+
+        function showColorPhotos(data, carousel) {
+            this.data = data
+            this.carousel = carousel
+            var element = '<div id="'+this.carousel+'" class="carousel slide" data-ride="carousel">'
+            var indicators = '<ul class="carousel-indicators">'
+            var images = '<div class="carousel-inner">'
+            if (this.data.length > 1) {
+                this.data.forEach((photo, i) => {
+                    if (i == 0) {
+                        indicators += '<li class="active" data-target="#'+this.carousel+'" data-slide-to="'+i+'"></li>'
+                        images += `<div class="carousel-item active" id="`+photo.id+`">
+                                    <img src="static/uploads/`+photo.src+`" alt="`+photo.alt+`">
+                                </div>`
+                    } else {
+                        indicators += '<li data-target="#'+this.carousel+'" data-slide-to="'+i+'"></li>'
+                        images += `<div class="carousel-item" id="`+photo.id+`">
+                                    <img src="static/uploads/`+photo.src+`" alt="`+photo.alt+`">
+                                </div>`
+                    }
+                    element += `<a class="carousel-control-prev" href="#`+this.carousel+`" data-slide="prev">
+                                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                </a>
+                                <a class="carousel-control-next" href="#`+this.carousel+`" data-slide="next">
+                                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                </a>`
+                })
+            } else {
+                if (this.data.length) {
+                    images += `<div class="carousel-item active" id="`+photo.id+`">
+                                    <img src="static/uploads/`+this.data[0].src+`" alt="`+this.data[0].alt+`">
+                                </div>`
+                } else {
+                    images += `<div class="carousel-item active">
+                                <img src="static/uploads/default.png" alt="No photo">
+                            </div>`
+                }
+            }
+            indicators += '</ul>'
+            images += '</div>'
+            element += indicators + images + `</div>`
+            return element
+            console.log('function is finished')
+        }
     </script>
 </body>
 

@@ -124,6 +124,8 @@ class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     product = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    cost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    quantity = db.Column(db.Numeric(10,2), nullable=True, default=1)
     currency = db.Column(db.String(20), nullable=False)
     photo = db.Column(db.String(255), nullable=True, default='default.png')
     description = db.Column(db.Text(), nullable=True, default='')
@@ -131,10 +133,19 @@ class tblProduct(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     brandId = db.Column(db.String(36), db.ForeignKey('tbl_brand.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
+    appearance = db.relationship('tblAppearance', backref='appearance', lazy=True, cascade="all, delete-orphan", single_parent=True)
     values = db.relationship('tblValue', backref='product', lazy=True, cascade="all, delete-orphan", single_parent=True)
     photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
     colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
     
+class tblAppearance(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    width = db.Column(db.String(50), nullable=True)
+    height = db.Column(db.String(50), nullable=True)
+    weight = db.Column(db.String(50), nullable=True)
+    depth = db.Column(db.String(50), nullable=True)
+    productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+
 class tblValue(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     value = db.Column(db.String(50), nullable=False)
