@@ -81,20 +81,45 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
+    $(document).on('click', '.pcr-delete', function() {
+        console.log(this)
+        var id = $(this).attr('id')
+        if (confirm('Are you sure you want to delete this color?')) {
+            $.ajax({
+                url: 'color/remove/'+id,
+                type: 'POST',
+                success: function(data) {
+                    console.log(data)
+                    if (data['result'] == 'Success') {
+                        $('#color option:selected').remove()
+                        $("#color").val($("#color option:first").val());
+                        $('.edit-color').css('background-color', 'var(--color-bg)')
+                        $('#pickr-edit').remove()
+                        $('.details-colors').find('#'+id).fadeOut(300, function() {
+                            $(this).remove()
+                        })
+                        $('.details-img').html(showColorPhotos(data.photos, 'no-photo'))
+                        $('#color-img').html(showColorPhotos(data.photos, 'no-photo'))
+                    }
+                }
+            })
+        }
+    })
+
     $(document).on('click', '.span-color', function () {
         var id = $(this).attr('id')
         console.log(id)
         $.ajax({
-            url: '/color/'+id,
+            url: '/color/' + id,
             type: 'POST',
-            success: function(data) {
+            success: function (data) {
                 console.log(data)
                 $('.details-img').html(showColorPhotos(data.photos, 'color-photo'))
             }
         })
     })
 
-    $('.list-product').on('click', '.edit-value', function() {
+    $('.list-product').on('click', '.edit-value', function () {
         var label = $(this).parent().parent()
         var id = $(label).attr('id')
 
@@ -116,8 +141,8 @@
         $('.modal-body').html(valueForm(name, price, currency, description))
         return false
     })
-    
-    $('.edit-btn').on('click', function() {
+
+    $('.edit-btn').on('click', function () {
         var id = $(this).attr('id')
         var value = $('#property-name').val()
         var price = $('#property-price').val()
@@ -128,10 +153,10 @@
             $('#property-name').focus()
         } else {
             $.ajax({
-                url: '/value/save/'+id,
+                url: '/value/save/' + id,
                 type: 'POST',
                 data: { value: value, price: price, currency: currency, description: description },
-                success: function(data) {
+                success: function (data) {
                     console.log(data)
                     $('#addValue').modal('hide')
                     if (data.currency == 'riel') {
@@ -139,24 +164,24 @@
                     } else {
                         data.currency = '$'
                     }
-                    $('label#'+id).find('#value-value').text(data.value)
-                    $('label#'+id).find('#value-price').text(data.price)
-                    $('label#'+id).find('#value-currency').text(data.currency)
-                    $('label#'+id).find('#value-description').text(data.description)
+                    $('label#' + id).find('#value-value').text(data.value)
+                    $('label#' + id).find('#value-price').text(data.price)
+                    $('label#' + id).find('#value-currency').text(data.currency)
+                    $('label#' + id).find('#value-description').text(data.description)
                 }
             })
         }
     })
 
-    $('.list-product').on('click', '.delete-value', function() {
+    $('.list-product').on('click', '.delete-value', function () {
         if (confirm('Are you sure you want to delete this value?')) {
             var id = $(this).parent().parent().attr('id')
             $.ajax({
-                url: '/value/remove/'+id,
+                url: '/value/remove/' + id,
                 type: 'POST',
-                success: function(data) {
+                success: function (data) {
                     console.log(data)
-                    $('label#'+id).fadeOut(300, function() {
+                    $('label#' + id).fadeOut(300, function () {
                         $(this).remove()
                     })
                 }
@@ -196,6 +221,9 @@
                 type: 'POST',
                 success: function (data) {
                     console.log(data)
+                    $('.list-product').find('#'+id).fadeOut(300, function() {
+                        $(this).remove()
+                    })
                 }
             })
         }
@@ -207,10 +235,6 @@
         var id = $(this).closest('.product-item').attr('id')
         toggleEdit($('#product-nav'), $('#brand-nav'))
 
-        gsap.to('#product-nav', {
-            x: 0
-        })
-
         $('.add-product').attr("disabled", true)
         $('.add-product p').addClass('clear')
 
@@ -218,7 +242,7 @@
             url: '/product/' + id,
             method: 'POST',
             success: function (data) {
-                console.log('brand', data)
+                console.log('form', data)
                 var photo = 'static/uploads/' + data.photo
                 data.values.sort(dynamicSort('price'))
                 $('.list-product').html(showProductDetails({
@@ -247,7 +271,8 @@
                             cost: data.cost,
                             quantity: data.quantity,
                             description: data.description,
-                            colors: data.colors
+                            colors: data.colors,
+                            image: photo
                         }))
 
                         var options = $('#category').children()
@@ -268,6 +293,10 @@
 
                         uploadColor('.pickr', 'color-name')
                         $('#brand-id').val(data.productOfBrand)
+
+                        gsap.to('#product-nav', {
+                            x: 0
+                        })
                     }
                 })
             }
@@ -293,13 +322,80 @@
             $.ajax({
                 url: '/color/' + id,
                 type: 'POST',
-                success: function(data) {
-                    setTimeout(function() {
+                success: function (data) {
+                    setTimeout(function () {
                         $('#color-img').html(showColorPhotos(data.photos, 'color-images'))
+                        $('.pcr-app').each((i, obj) => {
+                            if ($(obj).attr('id') == 'pickr-edit') {
+                                $(obj).remove()
+                            }
+                        })
+                        const pickr = Pickr.create({
+                            el: '.edit-color',
+                            theme: 'classic', // or 'monolith', or 'nano'
+                            defaultRepresentation: 'HEX',
+                            default: data.hex,
+                            useAsButton: true,
+                            components: {
+                                // Main components
+                                preview: true,
+                                opacity: true,
+                                hue: true,
+
+                                // Input / output Options
+                                interaction: {
+                                    hex: false,
+                                    rgba: false,
+                                    hsla: false,
+                                    hsva: false,
+                                    cmyk: false,
+                                    input: true,
+                                    clear: false,
+                                    save: true
+                                }
+                            }
+                        })
+
+                        $('.pcr-app').each((i, obj) => {
+                            if ($(obj).attr('id') != 'pickr-add') {
+                                $(obj).attr('id', 'pickr-edit')
+                                $(obj).find('.pcr-interaction').attr('id', 'pcr-save-btn')
+                            }
+                        })
+
+                        
+                        $('#pcr-save-btn').prepend('<input value="' + data.color + '" type="text" class="pcr-name" id="edit-name" placeholder="Name" style="width: 36%; text-align: left">')
+                        $('#pcr-save-btn').append('<input value="Delete" type="button" class="pcr-delete" id="'+data.id+'">')
+                        
+                        pickr.on('save', (color, instance) => {
+                            $('.pcr-save').attr('disabled', true)
+                            const hex = color.toHEXA().toString()
+                            const name = $('#edit-name').val()
+
+                            if (name != '') {
+                                $.ajax({
+                                    url: '/color/save/' + id,
+                                    type: 'post',
+                                    data: { 'hex': hex, 'color': name },
+                                    success: function (res) {
+                                        console.log(res)
+                                        $('#color option:selected').attr('value', res.hex)
+                                        $('#color option:selected').text(res.color)
+                                        $('.pcr-save').attr('disabled', false)
+                                        $('.details-colors').find('#'+data.id).css('background-color', res.hex)
+                                        $('.details-colors').find('#'+data.id).attr('title', res.color)
+                                        $('.edit-color').css('background-color', res.hex)
+                                        $('#edit-name').val(res.color)
+                                        pickr.hide()
+                                    }
+                                })
+                            } else {
+                                $('#edit-name').focus()
+                                $('.pcr-save').attr('disabled', false)
+                            }
+                        })
                         toggleLoader(loader)
                     }, 500)
-                    console.log(data)
-                    
                 }
             })
         } else {
@@ -425,7 +521,8 @@
                         cost: "",
                         quantity: "",
                         description: "",
-                        colors: ""
+                        colors: "",
+                        image: '/static/uploads/default.png'
                     }))
 
                     uploadColor('.pickr', 'color-name')

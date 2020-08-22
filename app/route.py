@@ -456,6 +456,11 @@ def save_product(id):
 @app.route('/product/remove/<id>', methods=['POST'])
 def remove_product(id):
     product = tblProduct.query.get(id)
+    if product.colors:
+        for color in product.colors:
+            if color.photos:
+                for photo in color.photos:
+                    delete_photo('uploads', photo.src)
     if product.photo != 'default.png':
         delete_photo('uploads', product.photo)
     try:
@@ -491,3 +496,24 @@ def get_color(id):
     json = ColorSchema()
     result = json.dump(color)
     return jsonify(result)
+
+@app.route('/color/save/<id>', methods=['POST'])
+def save_color(id):
+    color = tblColor.query.get(id)
+    color.color = request.form['color']
+    color.hex = request.form['hex']
+    db.session.commit()
+    return jsonify({'color': color.color, 'hex': color.hex})
+
+@app.route('/color/remove/<id>', methods=['POST'])
+def remove_color(id):
+    color = tblColor.query.get(id)
+    if color.photos:
+        for photo in color.photos:
+            delete_photo('uploads', photo.src)
+    try:
+        db.session.delete(color)
+        db.session.commit()
+        return jsonify({'result': 'Success', 'photos': []})
+    except:
+        return jsonify({'result': 'Failed'})

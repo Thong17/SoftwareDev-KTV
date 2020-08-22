@@ -145,9 +145,11 @@
         }
 
         function uploadColor(picker, input) {
-            if ($('.pcr-app').length) {
-                $('.pcr-app').remove()
-            }
+            $('.pcr-app').each((i, obj) => {
+                if ($(obj).attr('id') == 'pickr-add') {
+                    $(obj).remove()
+                }
+            })
             this.picker = picker
             this.input = input
             const pickr = Pickr.create({
@@ -175,8 +177,14 @@
                     }
                 }
             })
+            $('.pcr-app').each((i, obj) => {
+                if ($(obj).attr('id') != 'pickr-edit') {
+                    $(obj).attr('id', 'pickr-add')
+                    $(obj).find('.pcr-interaction').attr('id', 'pcr-add-btn')
+                }
+            })
 
-            $('.pcr-interaction').prepend('<input type="text" class="pcr-name" id="' + this.input + '" placeholder="Name" style="width: 50%; text-align: left">')
+            $('#pcr-add-btn').prepend('<input value="" type="text" class="pcr-name" id="' + this.input + '" placeholder="Name" style="width: 50%; text-align: left">')
 
 
             pickr.on('save', (color, instance) => {
@@ -184,30 +192,26 @@
                 const hex = color.toHEXA().toString()
                 const name = $('#' + this.input).val()
                 const id = $(this.picker).attr('id')
-                if (this.picker == 'editkr') {
-                    console.log('Editing')
-                } else {
-                    console.log('Adding')
-                    if (name != '') {
-                        $.ajax({
-                            url: '/product/color/' + id,
-                            type: 'post',
-                            data: { 'hex': hex, 'color': name },
-                            beforeSend: function () {
+                console.log('Adding')
+                if (name != '') {
+                    $.ajax({
+                        url: '/product/color/' + id,
+                        type: 'post',
+                        data: { 'hex': hex, 'color': name },
+                        beforeSend: function () {
 
-                            },
-                            success: function (data) {
-                                $('#color').append(`<option value="` + data.hex + `" id="`+ data.id +`">` + data.color + `</option>`)
-                                $('.pcr-save').attr('disabled', false)
-                                $('.details-colors').append(`<span class="span-color pickr" id="` + data.id + `" style="background-color: ` + data.hex + `"></span>`)
-                                $('.pcr-name').val('')
-                                pickr.hide()
-                            }
-                        })
-                    } else {
-                        $('#' + this.input).focus()
-                        $('.pcr-save').attr('disabled', false)
-                    }
+                        },
+                        success: function (data) {
+                            $('#color').append(`<option value="` + data.hex + `" id="`+ data.id +`">` + data.color + `</option>`)
+                            $('.pcr-save').attr('disabled', false)
+                            $('.details-colors').append(`<span class="span-color pickr" id="` + data.id + `" style="background-color: ` + data.hex + `"></span>`)
+                            $('.pcr-name').val('')
+                            pickr.hide()
+                        }
+                    })
+                } else {
+                    $('#' + this.input).focus()
+                    $('.pcr-save').attr('disabled', false)
                 }
             })
         }
@@ -390,6 +394,7 @@
             var colors = params.colors
             var cost = params.cost
             var quantity = params.quantity
+            var image = params.image
             var element = ''
             if (colors.length > 0) {
                 colors.forEach(color => {
@@ -471,7 +476,7 @@
                                 <div class="upload-container">
                                     <div class="image-containers" id="product-img">
                                         <div class="image-item">
-                                            <img src="/static/uploads/default.png" id="product-src">
+                                            <img src="`+image+`" id="product-src">
                                         </div>
                                     </div>
                                     <div class="bubbling hide">
