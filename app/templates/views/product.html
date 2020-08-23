@@ -233,8 +233,7 @@
     $('.list-product').on('click', '.edit-product', function () {
         event.preventDefault()
         var id = $(this).closest('.product-item').attr('id')
-        toggleEdit($('#product-nav'), $('#brand-nav'))
-
+        
         $('.add-product').attr("disabled", true)
         $('.add-product p').addClass('clear')
 
@@ -263,7 +262,7 @@
                     duration: 0.2,
                     onComplete: function () {
                         $('.add-product').attr("disabled", false)
-
+                        toggleEdit($('#product-nav'), $('#brand-nav'))
                         $('#product-nav').html(showProductForm({
                             category: data.productOfCategory,
                             product: data.product,
@@ -693,6 +692,7 @@
                 success: function (data) {
                     if (data['msg'] == 'Success') {
                         console.log('done')
+                        window.location.reload()
 
                     } else {
                         console.log('failed')

@@ -69,14 +69,14 @@
         </main>
     </header>
     <footer>
-        <p class="color-font">Developed by thong</p>
+        <p class="color-text">Developed by thong</p>
 
     </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/js/mdb.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/js/mdb.min.js">
+    </script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
     <script src="https://unpkg.com/ionicons@5.1.0/dist/ionicons.js"></script>
@@ -98,14 +98,16 @@
             $.ajax({
                 url: '/theme/change',
                 method: 'POST',
-                data: { data: theme },
+                data: {
+                    data: theme
+                },
                 success: function (data) {
                     console.log(data)
                     $('html').attr('data-theme', data['theme'])
                 }
             })
         })
- 
+
         function valueForm(name, price, currency, details) {
             this.name = name
             this.price = price
@@ -120,26 +122,31 @@
                             <option value="riel">R</option>`
             }
             return `<div class="form-group">
-                    <input class="form-control input-color" type="text" name="property-name" id="property-name" value="`+this.name+`">
+                    <input class="form-control input-color" type="text" name="property-name" id="property-name" value="` +
+                this.name +
+                `">
                     <label class="label name" for="property-name">Name</label>
                 </div>
                 <div class="row">
                     <div class="col-md-8 pr-0">
                         <div class="form-group">
-                            <input class="form-control input-color" type="number" name="property-price" id="property-price" value="`+this.price+`">
+                            <input class="form-control input-color" type="number" name="property-price" id="property-price" value="` +
+                this.price + `">
                             <label class="label price" for="property-price">Price</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <select class="form-control input-color" id="property-currency" name="property-currency">
-                                `+element+`
+                                ` + element +
+                `
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="form-group pb-3">
-                    <textarea class="form-control input-color" type="text" id="property-description" name="property-description" style="min-height: 100px;">`+this.details+`</textarea>
+                    <textarea class="form-control input-color" type="text" id="property-description" name="property-description" style="min-height: 100px;">` +
+                this.details + `</textarea>
                     <label class="label description" for="property-description">Description</label>
                 </div>`
         }
@@ -184,7 +191,8 @@
                 }
             })
 
-            $('#pcr-add-btn').prepend('<input value="" type="text" class="pcr-name" id="' + this.input + '" placeholder="Name" style="width: 50%; text-align: left">')
+            $('#pcr-add-btn').prepend('<input value="" type="text" class="pcr-name" id="' + this.input +
+                '" placeholder="Name" style="width: 50%; text-align: left">')
 
 
             pickr.on('save', (color, instance) => {
@@ -197,14 +205,19 @@
                     $.ajax({
                         url: '/product/color/' + id,
                         type: 'post',
-                        data: { 'hex': hex, 'color': name },
+                        data: {
+                            'hex': hex,
+                            'color': name
+                        },
                         beforeSend: function () {
 
                         },
                         success: function (data) {
-                            $('#color').append(`<option value="` + data.hex + `" id="`+ data.id +`">` + data.color + `</option>`)
+                            $('#color').append(`<option value="` + data.hex + `" id="` + data.id +
+                                `">` + data.color + `</option>`)
                             $('.pcr-save').attr('disabled', false)
-                            $('.details-colors').append(`<span class="span-color pickr" id="` + data.id + `" style="background-color: ` + data.hex + `"></span>`)
+                            $('.details-colors').append(`<span class="span-color pickr" id="` + data
+                                .id + `" style="background-color: ` + data.hex + `"></span>`)
                             $('.pcr-name').val('')
                             pickr.hide()
                         }
@@ -240,14 +253,14 @@
 
         function dynamicSort(property) {
             var sortOrder = 1;
-            if(property[0] === "-") {
+            if (property[0] === "-") {
                 sortOrder = -1;
                 property = property.substr(1);
             }
-            return function (a,b) {
+            return function (a, b) {
                 /* next line works with strings and numbers, 
-                * and you may want to customize it to your needs
-                */
+                 * and you may want to customize it to your needs
+                 */
                 var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
                 return result * sortOrder;
             }
@@ -261,10 +274,10 @@
             this.price = price
             this.category = category
             this.element.append(`
-                    <a class="product-item" id="`+ this.id + `" href="/product/` + this.id + `">
+                    <a class="product-item" id="` + this.id + `" href="/product/` + this.id + `">
                         <div class="item-wrapper">
                             <div class="item-img">
-                                <img src="static/uploads/`+ this.photo + `" alt="" srcset="">
+                                <img src="static/uploads/` + this.photo + `" alt="" srcset="">
                                 <div class="product-btn color-text">
                                     <i class="fa fa-pencil-square-o edit-product" aria-hidden="true"></i>
                                     <i class="fa fa-trash-o delete-product" aria-hidden="true"></i>
@@ -272,11 +285,15 @@
                             </div>
                             <div class="item-details">
                                 <div class="details">
-                                    <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">`+ this.product + `</p>
-                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+ this.category + `</p>
+                                    <p class="color-font text-wrapper" id="details-title" style="font-size: 14px;">` +
+                this.product + `</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">` + this
+                .category +
+                `</p>
                                 </div>
                                 <div class="flex-between-end color-text" style="width: 100%;">
-                                    <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol">$</span><span class="price-tag">`+ this.price + `</span></p>
+                                    <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol">$</span><span class="price-tag">` +
+                this.price + `</span></p>
                                     <p style="font-size: 12px;">
                                         <i class="fa fa-heart-o" aria-hidden="true"></i>
                                     </p>
@@ -303,7 +320,8 @@
 
             if (colors.length > 0) {
                 colors.forEach(color => {
-                    color_element += '<span class="span-color" id="' + color.id + '" style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
+                    color_element += '<span class="span-color" id="' + color.id +
+                        '" style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
                 });
             }
 
@@ -317,7 +335,8 @@
 
             if (properties.length > 0) {
                 properties.forEach(property => {
-                    var value_element = '<button class="btn border btn-value color-font"><p class="plus">+</p></button>'
+                    var value_element =
+                        '<button class="btn border btn-value color-font"><p class="plus">+</p></button>'
                     if (values.length > 0) {
                         values.forEach(value => {
                             if (value.currency == 'riel') {
@@ -326,34 +345,39 @@
                                 value.currency = '$'
                             }
                             if (value.property == property.id) {
-                                value_element += `<label class="value container-input" id="`+ value.id +`">
+                                value_element += `<label class="value container-input" id="` + value
+                                    .id + `">
                                                     <div class="product-btn color-text">
                                                         <i class="fa fa-pencil-square-o edit-value" aria-hidden="true"></i>
                                                         <i class="fa fa-trash-o delete-value" aria-hidden="true"></i>
                                                     </div>
                                                     <div class="flex-between-start">
                                                         <div class="flex-column-start-start">
-                                                            <h5 class="color-font" id="value-value">`+ value.value + `</h5>
-                                                            <p style="font-size: 11px" class="color-text" id="value-description">`+ value.description + `</p>
+                                                            <h5 class="color-font" id="value-value">` + value.value +
+                                    `</h5>
+                                                            <p style="font-size: 11px" class="color-text" id="value-description">` + value.description + `</p>
                                                         </div>
                                                     </div>
                                                     <div class="flex-end" style="font-size: 18px">
-                                                        <p class="color-text" id="value-currency">`+ value.currency + `</p>
-                                                        <p class="color-text" id="value-price">`+ value.price + `</p>
+                                                        <p class="color-text" id="value-currency">` + value.currency + `</p>
+                                                        <p class="color-text" id="value-price">` + value.price + `</p>
                                                     </div>
-                                                    <input type="radio" name="`+ property.id + `">
+                                                    <input type="radio" name="` + property.id + `">
                                                     <span class="checkbox"></span>
                                                 </label>`
                             }
 
                         });
                     }
-                    property_element += `<div class="flex-column-start-start mt-4">
-                                            <h5 class="color-font mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>` + property.property + `</h5>
-                                            <button class="hide btn border color-font btn-slim add-value" id="`+ property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
+                    property_element +=
+                        `<div class="flex-column-start-start mt-4">
+                                            <h5 class="color-font mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>` +
+                        property.property + `</h5>
+                                            <button class="hide btn border color-font btn-slim add-value" id="` +
+                        property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
                                         </div>
-                                        <div class="property-values property-`+ property.id +`">
-                                            `+ value_element + `
+                                        <div class="property-values property-` + property.id + `">
+                                            ` + value_element + `
                                         </div>`
                 });
             }
@@ -361,27 +385,29 @@
             return `<div class="product-details">
                         <div class="details-left">
                             <div class="details-img">
-                                <img src="`+ image + `" alt="" srcset="">
+                                <img src="` + image + `" alt="" srcset="">
                             </div>
-                            <div class="details-colors">`+ color_element + `</div>
+                            <div class="details-colors">` + color_element +
+                `</div>
                             <div class="details-appearance">
-                                <p class="color-text mt-2" id="details-description" style="font-size: 12px; text-align: left">`+ description + `<p>
+                                <p class="color-text mt-2" id="details-description" style="font-size: 12px; text-align: left">` + description + `<p>
                                 <h5 class="color-font mt-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>Appearance</h5>
                             </div>
                         </div>
                         <div class="details-right">
                             <div class="details-details">
                                 <div class="details">
-                                    <p class="color-font text-wrapper details-title" id="`+ id + `" style="font-size: 23px;">` + product + `</p>
-                                    <p class="color-text" id="details-category" style="font-size: 12px;">`+ category + `</p>
+                                    <p class="color-font text-wrapper details-title" id="` + id +
+                `" style="font-size: 23px;">` + product + `</p>
+                                    <p class="color-text" id="details-category" style="font-size: 12px;">` + category + `</p>
                                 </div>
                                 <div class="details-header" style="font-size: 23px">
-                                    <span class="details-symbol color-font">`+ currency + `</span>
-                                    <span class="details-price color-font">`+ price + `</span>
+                                    <span class="details-symbol color-font">` + currency + `</span>
+                                    <span class="details-price color-font">` + price + `</span>
                                 </div>
                             </div> 
                             <hr></hr>                           
-                            <div class="details-property">`+ property_element + `</div>
+                            <div class="details-property">` + property_element + `</div>
                         </div>
                     </div>`
         }
@@ -399,10 +425,15 @@
             if (colors.length > 0) {
                 colors.forEach(color => {
                     /*color change*/
-                    element += '<option value="' + color.hex + '" id="' + color.id + '">' + color.color + '</option>'
+                    element += '<option value="' + color.hex + '" id="' + color.id + '">' + color.color +
+                        '</option>'
                 });
             }
-            var productForm = `<h5 class="color-font m-0">Product</h5>
+            if (category != '') {
+
+            }
+            var productForm =
+                `<h5 class="color-font m-0">Product</h5>
                     <div class="slide-form" style="width: 100%;">
                         <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;"
                             id="product-form">
@@ -411,7 +442,7 @@
                             <div class="form-group selector">
                                 <p class="detail-content">Use category for specific products</p>
                                 <select name="category" id="category" class="form-control input-color" required>
-                                    <option disabled selected="selected" value="">Select category</option>
+                                    <option disabled="disabled" selected="selected" value="">Select category</option>
                                     {% if categories %}
                                         {% for category in categories %}
                                             <option value="{{category.id}}">{{category.category}}</option>
@@ -423,14 +454,16 @@
                             </div>
                             <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product Informations</h5>
                             <div class="form-group">
-                                <input type="text" class="form-control input-color" name="product" id="product" value="`+ product + `" required>
+                                <input type="text" class="form-control input-color" name="product" id="product" value="` + product +
+                `" required>
                                 <label for="product" class="label product">Product</label>
                             </div>
                             
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="price" id="price" value="`+ price + `"
+                                        <input type="number" class="form-control input-color" name="price" id="price" value="` + price +
+                `"
                                             required>
                                         <label for="price" class="label price">Price</label>
                                     </div>
@@ -447,14 +480,15 @@
                             <div class="row">
                                 <div class="col-md-7">
                                     <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="cost" id="cost" value="`+ cost + `"
+                                        <input type="number" class="form-control input-color" name="cost" id="cost" value="` + cost +
+                `"
                                             required>
                                         <label for="cost" class="label cost">Cost</label>
                                     </div>
                                 </div>
                                 <div class="col-md-5 selector pl-0">
                                     <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="quantity" id="quantity" value="`+ quantity + `"
+                                        <input type="number" class="form-control input-color" name="quantity" id="quantity" value="` + quantity + `"
                                             required>
                                         <label for="quantity" class="label quantity">Quantity</label>
                                     </div>
@@ -462,7 +496,7 @@
                             </div>
                             <div class="form-group">
                                 <textarea name="details" id="details"
-                                    class="form-control input-color textarea" required>`+ description + `</textarea>
+                                    class="form-control input-color textarea" required>` + description + `</textarea>
                                 <label for="details" class="label details">Description</label>
                             </div>
                             
@@ -476,7 +510,7 @@
                                 <div class="upload-container">
                                     <div class="image-containers" id="product-img">
                                         <div class="image-item">
-                                            <img src="`+image+`" id="product-src">
+                                            <img src="` + image + `" id="product-src">
                                         </div>
                                     </div>
                                     <div class="bubbling hide">
@@ -497,7 +531,7 @@
                                     <div class="col-sm-7 p-0 selector">
                                         <select name="color" id="color" class="form-control input-color" required>
                                             <option disabled selected="selected" value="">Select color</option>
-                                            `+ element + `
+                                            ` + element + `
                                         </select>   
                                     </div>
                                     <div class="col-sm-3">
@@ -531,7 +565,8 @@
 
         function uuid() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8)
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8)
                 return v.toString(16)
             })
         }
@@ -568,36 +603,41 @@
                             return false
                         } else {
                             form.append(index, file)
+                            $.ajax({
+                                url: this.url + '/' + this.product,
+                                type: 'post',
+                                data: form,
+                                contentType: false,
+                                cache: false,
+                                processData: false,
+                                beforeSend: function () {
+
+                                },
+                                success: function (data) {
+
+                                    setTimeout(function () {
+                                        if (this.url == '/product/photo') {
+                                            $('.details-img').html(
+                                                '<img src="/static/uploads/' + data[0]
+                                                .src + '" alt="' + data[0].alt + '">')
+                                            var element = `<div class="image-item">
+                                                    <img src="/static/uploads/` + data[0].src + `" alt="` + data[0]
+                                                .alt + `">
+                                                </div>`
+                                            $('#' + imgtag).html(element)
+                                        } else {
+                                            $('#' + imgtag).html(showColorPhotos(data
+                                                .photos, 'color-images'))
+                                        }
+                                        toggleLoader(loader)
+                                    }, 1000)
+                                }
+                            })
                         }
                     }
                 })
 
-                $.ajax({
-                    url: this.url + '/' + this.product,
-                    type: 'post',
-                    data: form,
-                    contentType: false,
-                    cache: false,
-                    processData: false,
-                    beforeSend: function () {
 
-                    },
-                    success: function (data) {
-                        
-                        setTimeout(function () {
-                            if (this.url == '/product/photo') {
-                                $('.details-img').html('<img src="/static/uploads/' + data[0].src + '" alt="' + data[0].alt + '">')
-                                var element = `<div class="image-item">
-                                                    <img src="/static/uploads/`+ data[0].src + `" alt="` + data[0].alt + `">
-                                                </div>`
-                                $('#' + imgtag).html(element)            
-                            } else {
-                                $('#' + imgtag).html(showColorPhotos(data.photos, 'color-images'))
-                            }
-                            toggleLoader(loader)
-                        }, 1000)
-                    }
-                })
             } else {
                 console.log('No file selected')
                 toggleLoader(loader)
@@ -634,7 +674,14 @@
                 $.ajax({
                     url: '/value/add',
                     method: 'POST',
-                    data: { product: product, property: property, value: value, price: price, currency: currency, description: description },
+                    data: {
+                        product: product,
+                        property: property,
+                        value: value,
+                        price: price,
+                        currency: currency,
+                        description: description
+                    },
                     success: function (data) {
                         $('#addValue').modal('hide')
                         if (data.currency == 'riel') {
@@ -642,25 +689,26 @@
                         } else {
                             data.currency = '$'
                         }
-                        var element = `<label class="value container-input" id="`+ data.id +`">
+                        var element = `<label class="value container-input" id="` + data.id + `">
                                         <div class="product-btn color-text">
                                             <i class="fa fa-pencil-square-o edit-value" aria-hidden="true"></i>
                                             <i class="fa fa-trash-o delete-value" aria-hidden="true"></i>
                                         </div>
                                         <div class="flex-between-start">
                                             <div class="flex-column-start-start">
-                                                <h5 class="color-font" id="value-value">`+ data.value + `</h5>
-                                                <p style="font-size: 11px" class="color-text" id="value-description">`+ data.description + `</p>
+                                                <h5 class="color-font" id="value-value">` + data.value +
+                            `</h5>
+                                                <p style="font-size: 11px" class="color-text" id="value-description">` + data.description + `</p>
                                             </div>
                                         </div>
                                         <div class="flex-end color-text" style="font-size: 18px">
-                                            <p class="color-text" id="value-currency">`+ data.currency + `</p>
-                                            <p class="color-text" id="value-price">`+ data.price + `</p>
+                                            <p class="color-text" id="value-currency">` + data.currency + `</p>
+                                            <p class="color-text" id="value-price">` + data.price + `</p>
                                         </div>
-                                        <input type="radio" name="`+ data.property + `">
+                                        <input type="radio" name="` + data.property + `">
                                         <span class="checkbox"></span></label>`
 
-                        var values = $('.property-'+data.property)
+                        var values = $('.property-' + data.property)
                         console.log(values)
                         values.append(element)
                     }
@@ -674,33 +722,34 @@
         function showColorPhotos(data, carousel) {
             this.data = data
             this.carousel = carousel
-            var element = '<div id="'+this.carousel+'" class="carousel slide" data-ride="carousel">'
+            var element = '<div id="' + this.carousel + '" class="carousel slide" data-ride="carousel">'
             var indicators = '<ul class="carousel-indicators">'
             var images = '<div class="carousel-inner">'
             if (this.data.length > 1) {
                 this.data.forEach((photo, i) => {
                     if (i == 0) {
-                        indicators += '<li class="active" data-target="#'+this.carousel+'" data-slide-to="'+i+'"></li>'
-                        images += `<div class="carousel-item active" id="`+photo.id+`">
-                                    <img src="static/uploads/`+photo.src+`" alt="`+photo.alt+`">
+                        indicators += '<li class="active" data-target="#' + this.carousel +
+                            '" data-slide-to="' + i + '"></li>'
+                        images += `<div class="carousel-item active" id="` + photo.id + `">
+                                    <img src="static/uploads/` + photo.src + `" alt="` + photo.alt + `">
                                 </div>`
                     } else {
-                        indicators += '<li data-target="#'+this.carousel+'" data-slide-to="'+i+'"></li>'
-                        images += `<div class="carousel-item" id="`+photo.id+`">
-                                    <img src="static/uploads/`+photo.src+`" alt="`+photo.alt+`">
+                        indicators += '<li data-target="#' + this.carousel + '" data-slide-to="' + i + '"></li>'
+                        images += `<div class="carousel-item" id="` + photo.id + `">
+                                    <img src="static/uploads/` + photo.src + `" alt="` + photo.alt + `">
                                 </div>`
                     }
-                    element += `<a class="carousel-control-prev" href="#`+this.carousel+`" data-slide="prev">
+                    element += `<a class="carousel-control-prev" href="#` + this.carousel + `" data-slide="prev">
                                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                                 </a>
-                                <a class="carousel-control-next" href="#`+this.carousel+`" data-slide="next">
+                                <a class="carousel-control-next" href="#` + this.carousel + `" data-slide="next">
                                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                                 </a>`
                 })
             } else {
                 if (this.data.length) {
-                    images += `<div class="carousel-item active" id="`+photo.id+`">
-                                    <img src="static/uploads/`+this.data[0].src+`" alt="`+this.data[0].alt+`">
+                    images += `<div class="carousel-item active" id="` + photo.id + `">
+                                    <img src="static/uploads/` + this.data[0].src + `" alt="` + this.data[0].alt + `">
                                 </div>`
                 } else {
                     images += `<div class="carousel-item active">

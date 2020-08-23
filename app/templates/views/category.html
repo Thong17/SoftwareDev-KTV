@@ -157,7 +157,7 @@
         $('#prop-header').html(
             '<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">' +
             $(header).text() +
-            '</h5></div><button class="btn border color-font add-prop btn-slim" id="' +
+            '</h5></div><button disabled class="btn border color-font add-prop btn-slim" id="' +
             id + '"><p class="plus">+</p></button>')
         $.ajax({
             url: '/category/' + id,
@@ -174,7 +174,10 @@
                     tl.from('#list-properties tr', {
                         opacity: 0,
                         x: -10,
-                        stagger: 0.1
+                        stagger: 0.1,
+                        onComplete: function() {
+                            $('.add-prop').attr("disabled", false)
+                        }
                     })
                 }, 300)
 

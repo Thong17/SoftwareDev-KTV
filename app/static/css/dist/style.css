@@ -129,6 +129,8 @@ html[data-theme='light'] {
   --color-btn-hover: rgba(240, 240, 240, 0.9);
   --color-shadow: rgba(1, 1, 1, 0.1);
   --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+  --color-label: #696969;
+  --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
 }
 
 html[data-theme='dark'] {
@@ -142,6 +144,8 @@ html[data-theme='dark'] {
   --color-btn-hover: rgba(37, 37, 37, 0.5);
   --color-shadow: rgba(1, 1, 1, 0.5);
   --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+  --color-label: #e6e6e6;
+  --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
 }
 
 html,
@@ -273,7 +277,7 @@ input:valid + label {
 
 .input:focus + label,
 .input:valid + label {
-  color: #111;
+  color: #333;
 }
 
 textarea:focus + label,
