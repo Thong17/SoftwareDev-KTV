@@ -1325,13 +1325,13 @@ table tbody tr {
 
 .item-img {
   height: 160px;
+  background-color: var(--color-bg);
 }
 
 .item-img img,
 .details-img img {
-  height: 100%;
   width: 100%;
-  background-color: var(--color-bg);
+  height: 100%;
   -o-object-fit: contain;
      object-fit: contain;
   -o-object-position: center;
@@ -1489,9 +1489,9 @@ table tbody tr {
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
   width: 100%;
 }
 
@@ -1538,6 +1538,17 @@ table tbody tr {
   background-color: var(--color-hr);
   -webkit-box-shadow: 0 0 0 3px rgba(255, 255, 255, 0), 0 0 0 4px rgba(214, 214, 214, 0), inset 0 2px 2px 0 rgba(0, 0, 0, 0.2);
           box-shadow: 0 0 0 3px rgba(255, 255, 255, 0), 0 0 0 4px rgba(214, 214, 214, 0), inset 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.product-arrival {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+}
+
+.product-arrival img {
+  width: 37px;
+  height: 37px;
 }
 
 ::-webkit-scrollbar-track {

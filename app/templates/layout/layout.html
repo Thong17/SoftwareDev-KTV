@@ -102,7 +102,6 @@
                     data: theme
                 },
                 success: function (data) {
-                    console.log(data)
                     $('html').attr('data-theme', data['theme'])
                 }
             })
@@ -200,7 +199,6 @@
                 const hex = color.toHEXA().toString()
                 const name = $('#' + this.input).val()
                 const id = $(this.picker).attr('id')
-                console.log('Adding')
                 if (name != '') {
                     $.ajax({
                         url: '/product/color/' + id,
@@ -266,13 +264,18 @@
             }
         }
 
-        function showProduct(element, id, product, category, photo, price) {
+        function showProduct(element, id, product, category, photo, price, arrival) {
             this.element = element
             this.id = id
             this.product = product
             this.photo = photo
             this.price = price
             this.category = category
+            this.arrival = arrival
+            var duration = ''
+            if (this.arrival < 7) {
+                duration = 'static/svg/new-{{current_user.theme}}.svg'
+            }
             this.element.append(`
                     <a class="product-item" id="` + this.id + `" href="/product/` + this.id + `">
                         <div class="item-wrapper">
@@ -281,6 +284,9 @@
                                 <div class="product-btn color-text">
                                     <i class="fa fa-pencil-square-o edit-product" aria-hidden="true"></i>
                                     <i class="fa fa-trash-o delete-product" aria-hidden="true"></i>
+                                </div>
+                                <div class="product-arrival">
+                                    <img src="` + duration + `" alt="" srcset="">
                                 </div>
                             </div>
                             <div class="item-details">
@@ -593,53 +599,51 @@
             if (this.files.length > 0) {
                 this.files.forEach((file, index) => {
                     if (jQuery.inArray(file.type, validtypes) == -1) {
-                        console.log('Invalide file!')
+                        alert('Invalide file!')
                         toggleLoader(loader)
                         return false
                     } else {
                         if (file.size > 2000000) {
-                            console.log('Image size too big ')
+                            alert('Image size too big ')
                             toggleLoader(loader)
                             return false
                         } else {
                             form.append(index, file)
-                            $.ajax({
-                                url: this.url + '/' + this.product,
-                                type: 'post',
-                                data: form,
-                                contentType: false,
-                                cache: false,
-                                processData: false,
-                                beforeSend: function () {
-
-                                },
-                                success: function (data) {
-
-                                    setTimeout(function () {
-                                        if (this.url == '/product/photo') {
-                                            $('.details-img').html(
-                                                '<img src="/static/uploads/' + data[0]
-                                                .src + '" alt="' + data[0].alt + '">')
-                                            var element = `<div class="image-item">
-                                                    <img src="/static/uploads/` + data[0].src + `" alt="` + data[0]
-                                                .alt + `">
-                                                </div>`
-                                            $('#' + imgtag).html(element)
-                                        } else {
-                                            $('#' + imgtag).html(showColorPhotos(data
-                                                .photos, 'color-images'))
-                                        }
-                                        toggleLoader(loader)
-                                    }, 1000)
-                                }
-                            })
                         }
                     }
                 })
+                $.ajax({
+                    url: this.url + '/' + this.product,
+                    type: 'post',
+                    data: form,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    beforeSend: function () {
 
+                    },
+                    success: function (data) {
 
+                        setTimeout(function () {
+                            if (this.url == '/product/photo') {
+                                $('.details-img').html(
+                                    '<img src="/static/uploads/' + data[0]
+                                    .src + '" alt="' + data[0].alt + '">')
+                                var element = `<div class="image-item">
+                                        <img src="/static/uploads/` + data[0].src + `" alt="` + data[0]
+                                    .alt + `">
+                                    </div>`
+                                $('#' + imgtag).html(element)
+                            } else {
+                                $('#' + imgtag).html(showColorPhotos(data
+                                    .photos, 'color-images'))
+                            }
+                            toggleLoader(loader)
+                        }, 1000)
+                    }
+                })
             } else {
-                console.log('No file selected')
+                alert('No file selected')
                 toggleLoader(loader)
             }
 
@@ -648,7 +652,6 @@
         $(document).on('click', '.add-value', function () {
             var property = $(this).attr('id')
             var title = $(this).prev().text()
-            console.log(property, title)
             $('.modal-title').text(title)
             $('.modal-body').html(valueForm('', '0.00', '', ''))
             toggleEdit($('.save-btn'), $('.edit-btn'))
@@ -664,13 +667,10 @@
             var price = $('#property-price').val()
             var currency = $('#property-currency').val()
             var description = $('#property-description').val()
-            console.log(value)
 
             if (value == '') {
                 $('#property-name').focus()
-                console.log('empty')
             } else {
-                console.log('Not empty')
                 $.ajax({
                     url: '/value/add',
                     method: 'POST',
@@ -709,7 +709,6 @@
                                         <span class="checkbox"></span></label>`
 
                         var values = $('.property-' + data.property)
-                        console.log(values)
                         values.append(element)
                     }
                 })
@@ -761,7 +760,6 @@
             images += '</div>'
             element += indicators + images + `</div>`
             return element
-            console.log('function is finished')
         }
     </script>
 </body>
