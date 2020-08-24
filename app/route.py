@@ -1,7 +1,7 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm
-from app import CategorySchema, ProductSchema, ColorSchema
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -111,8 +111,17 @@ def setting():
 def custome():
     if request.method == 'POST':
         categories = tblCategory.query.all()
-        json = CategorySchema()
-        result = json.dump(categories, many=True)
+        category_schema = CategorySchema()
+        category = category_schema.dump(categories, many=True)
+
+        brands = tblBrand.query.all()
+        brand_schema = BrandSchema()
+        brand = brand_schema.dump(brands, many=True)
+
+        result = {}
+        result['categories'] = category
+        result['brands'] = brand
+
         return jsonify(result)
     return render_template('views/custome.html')
 

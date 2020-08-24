@@ -481,18 +481,6 @@
 
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
-            $('.list-product').html(showProductDetails({
-                image: 'static/svg/camera-{{current_user.theme}}.svg',
-                colors: "",
-                product: "Product Name",
-                category: "category",
-                description: "description",
-                currency: "$",
-                price: "0.00",
-                properties: "",
-                values: "",
-                id: ""
-            }))
 
             gsap.to('#brand-nav', {
                 x: '-100%',
@@ -516,7 +504,29 @@
 
                     $('#brand-id').val(id)
                     gsap.to('#product-nav', {
-                        x: 0
+                        x: 0,
+                        onComplete: function() {
+                            
+                        }
+                    })
+
+                    $('.list-product').html(showProductDetails({
+                        image: 'static/svg/camera-{{current_user.theme}}.svg',
+                        colors: "",
+                        product: "Product Name",
+                        category: "category",
+                        description: "description",
+                        currency: "$",
+                        price: "0.00",
+                        properties: "",
+                        values: "",
+                        id: ""
+                    }))
+
+                    gsap.from('.details-title, #details-category, .details-price, .details-symbol, .details-appearance, .details-property', {
+                        opacity: 0,
+                        duration: 1,
+                        delay: 0.3
                     })
                 }
             })

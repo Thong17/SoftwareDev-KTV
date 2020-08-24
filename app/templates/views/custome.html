@@ -117,21 +117,32 @@
             url: '/custome',
             method: 'POST',
             success: function (data) {
-                var labels = [];
-                var quantities = [];
-                var colors = [];
-                
+                var category = {
+                    labels: [],
+                    quantities: [],
+                    colors: []
+                }
 
-                data.forEach(category => {
-                    labels.push(category.category)
-                    quantities.push(category.properties.length)
-                    colors.push(generateColor())
+                data.categories.forEach(c => {
+                    category.labels.push(c.category)
+                    category.quantities.push(c.products.length)
+                    category.colors.push(generateColor())
 
                 });
-                var pieObj = {}
-                pieObj.labels = labels
-                pieObj.quantities = quantities
-                pieObj.colors = colors
+
+                var brand = {
+                    labels: [],
+                    quantities: [],
+                    colors: []
+                }
+
+                data.brands.forEach(b => {
+                    brand.labels.push(b.brand)
+                    brand.quantities.push(b.products.length)
+                    brand.colors.push(generateColor())
+
+                });
+
 
                 var pie = document.getElementById('pie')
                 var pieCanvas = document.getElementById('pieChart')
@@ -140,8 +151,8 @@
                 var doughnutCanvas = document.getElementById('doughnutChart')
 
 
-                _Chart(pie, pieCanvas, 'pie', pieObj)
-                _Chart(doughnut, doughnutCanvas, 'doughnut', pieObj)
+                _Chart(pie, pieCanvas, 'doughnut', category)
+                _Chart(doughnut, doughnutCanvas, 'pie', brand)
             }
         })
     })
