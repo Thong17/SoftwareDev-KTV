@@ -108,6 +108,10 @@
 
     $(document).on('click', '.span-color', function () {
         var id = $(this).attr('id')
+        Array.from($('.details-colors').children()).forEach(color => {
+            $(color).removeClass('active')
+        })
+        $(this).addClass('active')
         $.ajax({
             url: '/color/' + id,
             type: 'POST',
@@ -736,7 +740,10 @@
 
             }
         })
+    })
 
+    $('.carousel-item').on('click', function() {
+        console.log(this)
     })
 </script>
 {% endblock %}

@@ -326,8 +326,7 @@
 
             if (colors.length > 0) {
                 colors.forEach(color => {
-                    color_element += '<span class="span-color" id="' + color.id +
-                        '" style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
+                    color_element += '<span class="span-color" id="' + color.id + '" style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
                 });
             }
 
@@ -600,13 +599,15 @@
                 this.files.forEach((file, index) => {
                     if (jQuery.inArray(file.type, validtypes) == -1) {
                         alert('Invalide file!')
-                        toggleLoader(loader)
-                        return false
+                        setTimeout(function() {
+                            toggleLoader(loader)
+                        }, 500)
                     } else {
                         if (file.size > 2000000) {
                             alert('Image size too big ')
-                            toggleLoader(loader)
-                            return false
+                            setTimeout(function() {
+                                toggleLoader(loader)
+                            }, 500)
                         } else {
                             form.append(index, file)
                         }
@@ -747,7 +748,7 @@
                 })
             } else {
                 if (this.data.length) {
-                    images += `<div class="carousel-item active" id="` + photo.id + `">
+                    images += `<div class="carousel-item active" id="` + data[0].id + `">
                                     <img src="static/uploads/` + this.data[0].src + `" alt="` + this.data[0].alt + `">
                                 </div>`
                 } else {

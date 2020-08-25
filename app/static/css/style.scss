@@ -1212,8 +1212,9 @@ table tbody tr {
 }
 
 .details-colors {
+    position: relative;
     width: 100%;
-    height: 27px;
+    height: 30px;
     margin-top: 10px;
     display: flex;
     justify-content: center;
@@ -1221,11 +1222,12 @@ table tbody tr {
 }
 
 .details-colors span {
-    width: 27px;
-    height: 27px;
-    margin: 0 5px;
+    width: 30px;
+    height: 30px;
+    margin: 0 7px;
     border-radius: 50%;
     background-color: var(--color-hr);
+    transition: 0.5s ease;
     box-shadow: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
 }
 
@@ -1348,6 +1350,24 @@ table tbody tr {
     height: 100%;
     padding: 5px;
     z-index: 10;
+}
+
+.image-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(50%, 50%);
+    padding: 5px;
+    border-radius: 50%;
+    background-color: var(--color-hr);
+}
+
+.image-btn i {
+    color: var(--color-text);
+}
+
+.span-color.active {
+    transform: scale(1.1);
 }
 
 @keyframes spin {
