@@ -274,7 +274,7 @@
             this.arrival = arrival
             var duration = ''
             if (this.arrival < 1) {
-                duration = 'static/svg/new-{{current_user.theme}}.svg'
+                duration = '<img src="static/svg/new-{{current_user.theme}}.svg" alt="" srcset="">'
             }
             this.element.append(`
                     <a class="product-item" id="` + this.id + `" href="/product/` + this.id + `">
@@ -286,7 +286,7 @@
                                     <i class="fa fa-trash-o delete-product" aria-hidden="true"></i>
                                 </div>
                                 <div class="product-arrival">
-                                    <img src="` + duration + `" alt="" srcset="">
+                                    `+ duration +`
                                 </div>
                             </div>
                             <div class="item-details">
