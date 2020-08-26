@@ -407,9 +407,9 @@ def color_photo(id):
         Photo = tblPhoto(id=pid, src=filename, alt=alt, createdBy=current_user.id, colorId=cid, productId=id)
         db.session.add(Photo)
         db.session.commit()
-        color = tblColor.query.get(cid)
-        json = ColorSchema()
-        result = json.dump(color)
+    color = tblColor.query.get(cid)
+    json = ColorSchema()
+    result = json.dump(color)
     return jsonify(result)
 
 @app.route('/product/<id>', methods=['POST', 'GET'])
@@ -527,3 +527,19 @@ def remove_color(id):
         return jsonify({'result': 'Success', 'photos': []})
     except:
         return jsonify({'result': 'Failed'})
+
+@app.route('/property/<id>', methods=['POST'])
+def _property(id):
+    category = tblCategory.query.get(id)
+    c = CategorySchema()
+    result_property = c.dump(category)
+    
+    product = tblProduct.query.get(request.form['product'])
+    p = ProductSchema()
+    if product:
+        result_product = p.dump(product)
+    else:
+        result_product = ''
+    
+
+    return jsonify({'property': result_property, 'product': result_product})

@@ -81,19 +81,19 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
-    $(document).on('click', '.pcr-delete', function() {
+    $(document).on('click', '.pcr-delete', function () {
         var id = $(this).attr('id')
         if (confirm('Are you sure you want to delete this color?')) {
             $.ajax({
-                url: 'color/remove/'+id,
+                url: 'color/remove/' + id,
                 type: 'POST',
-                success: function(data) {
+                success: function (data) {
                     if (data['result'] == 'Success') {
                         $('#color option:selected').remove()
                         $("#color").val($("#color option:first").val());
                         $('.edit-color').css('background-color', 'var(--color-bg)')
                         $('#pickr-edit').remove()
-                        $('.details-colors').find('#'+id).fadeOut(300, function() {
+                        $('.details-colors').find('#' + id).fadeOut(300, function () {
                             $(this).remove()
                         })
                         $('.details-img').html(showColorPhotos(data.photos, 'no-photo'))
@@ -217,7 +217,7 @@
                 url: '/product/remove/' + id,
                 type: 'POST',
                 success: function (data) {
-                    $('.list-product').find('#'+id).fadeOut(300, function() {
+                    $('.list-product').find('#' + id).fadeOut(300, function () {
                         $(this).remove()
                     })
                 }
@@ -229,7 +229,7 @@
     $('.list-product').on('click', '.edit-product', function () {
         event.preventDefault()
         var id = $(this).closest('.product-item').attr('id')
-        
+
         $('.add-product').attr("disabled", true)
         $('.add-product p').addClass('clear')
 
@@ -251,6 +251,18 @@
                     values: data.values,
                     id: data.id
                 }))
+
+                gsap.from('.details-title, #details-category, .details-colors, .details-details, .details-appearance, .details-property, .details-img', {
+                    opacity: 0,
+                    duration: 1,
+                    delay: 0.3
+                })
+                gsap.from('.description-container span, .description-container p', {
+                    opacity: 0,
+                    x: 50,
+                    delay: 0.3,
+                    stagger: 0.1
+                })
 
                 gsap.to('#brand-nav', {
                     x: '-100%',
@@ -355,10 +367,10 @@
                             }
                         })
 
-                        
+
                         $('#pcr-save-btn').prepend('<input value="' + data.color + '" type="text" class="pcr-name" id="edit-name" placeholder="Name" style="width: 36%; text-align: left">')
-                        $('#pcr-save-btn').append('<input value="Delete" type="button" class="pcr-delete" id="'+data.id+'">')
-                        
+                        $('#pcr-save-btn').append('<input value="Delete" type="button" class="pcr-delete" id="' + data.id + '">')
+
                         pickr.on('save', (color, instance) => {
                             $('.pcr-save').attr('disabled', true)
                             const hex = color.toHEXA().toString()
@@ -373,8 +385,8 @@
                                         $('#color option:selected').attr('value', res.hex)
                                         $('#color option:selected').text(res.color)
                                         $('.pcr-save').attr('disabled', false)
-                                        $('.details-colors').find('#'+data.id).css('background-color', res.hex)
-                                        $('.details-colors').find('#'+data.id).attr('title', res.color)
+                                        $('.details-colors').find('#' + data.id).css('background-color', res.hex)
+                                        $('.details-colors').find('#' + data.id).attr('title', res.color)
                                         $('.edit-color').css('background-color', res.hex)
                                         $('#edit-name').val(res.color)
                                         pickr.hide()
@@ -424,6 +436,12 @@
                 toggleEdit($('.save-product'), $('.submit-product'))
                 $('.save-product').attr('id', data['id'])
                 $('.pickr').attr('id', data['id'])
+                $('.details-title').attr('id', data['id'])
+                var values = document.querySelectorAll('.btn-value')
+                Array.from(values).forEach(value => {
+                    $(value).attr('disabled', false)
+                    $(value).removeClass('disabled')
+                })
             }
         })
     })
@@ -457,7 +475,80 @@
 
     $('#product-nav').on('change', '#category', function () {
         var category = $('#category option:selected').text()
+        id = $(this).val()
+        product = $('.details-title').attr('id')
         $('#details-category').text(category)
+        gsap.from('#details-category', {
+            opacity: 0,
+            scale: 0.5
+        })
+        $.ajax({
+            url: '/property/' + id,
+            type: 'POST',
+            data: { product: product },
+            success: function (data) {
+                var properties = ''
+                var element = ''
+                if (product != '') {
+                    element = '<button class="btn border btn-value color-font"><p class="plus">+</p></button>'
+                } else {
+                    element = '<button class="btn border btn-value color-font disabled" disabled><p class="plus">+</p></button>'
+                }
+                if (data.property.properties.length) {
+                    data.property.properties.forEach((property, i) => {
+                        var value_element = ''
+                        if (data.product != '') {
+                            if (data.product.values.length > 0) {
+                                data.product.values.forEach(value => {
+                                    if (value.currency == 'riel') {
+                                        value.currency = 'R'
+                                    } else {
+                                        value.currency = '$'
+                                    }
+                                    if (value.property == property.id) {
+                                        value_element += `<label class="value container-input" id="` + value
+                                            .id + `">
+                                                        <div class="product-btn color-text">
+                                                            <i class="fa fa-pencil-square-o edit-value" aria-hidden="true"></i>
+                                                            <i class="fa fa-trash-o delete-value" aria-hidden="true"></i>
+                                                        </div>
+                                                        <div class="flex-between-start">
+                                                            <div class="flex-column-start-start">
+                                                                <h5 class="color-font" id="value-value">` + value.value +
+                                            `</h5>
+                                                                <p style="font-size: 11px" class="color-text" id="value-description">` + value.description + `</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-end" style="font-size: 18px">
+                                                            <p class="color-text" id="value-currency">` + value.currency + `</p>
+                                                            <p class="color-text" id="value-price">` + value.price + `</p>
+                                                        </div>
+                                                        <input type="radio" name="` + property.id + `">
+                                                        <span class="checkbox"></span>
+                                                    </label>`
+                                    }
+                                })
+                            }
+                        }
+                        properties += `<div class="flex-column-start-start mt-4">
+                                        <h5 class="color-font mb-3 property-title"><i class="fa fa-caret-right right" aria-hidden="true"></i>` +
+                            property.property + `</h5>
+                                        <button class="hide btn border color-font btn-slim add-value" id="` +
+                            property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
+                                    </div>
+                                    <div class="property-values property-` + property.id + `">
+                                        ` + element + value_element + `
+                                    </div>`
+                    })
+                }
+
+                $('.details-property').html(properties)
+                gsap.from('.value, .btn-value, .property-title', {
+                    opacity: 0,
+                    scale: 0.7
+                })
+            }
+        })
     })
 
     $('#product-nav').on('change', '#currency', function () {
@@ -509,8 +600,8 @@
                     $('#brand-id').val(id)
                     gsap.to('#product-nav', {
                         x: 0,
-                        onComplete: function() {
-                            
+                        onComplete: function () {
+
                         }
                     })
 
@@ -527,10 +618,16 @@
                         id: ""
                     }))
 
-                    gsap.from('.details-title, #details-category, .details-price, .details-symbol, .details-appearance, .details-property', {
+                    gsap.from('.details-title, #details-category, .details-details, .details-appearance, .details-property, .details-img', {
                         opacity: 0,
                         duration: 1,
                         delay: 0.3
+                    })
+                    gsap.from('.description-container span, .description-container p', {
+                        opacity: 0,
+                        x: 50,
+                        delay: 0.3,
+                        stagger: 0.1
                     })
                 }
             })
@@ -742,7 +839,7 @@
         })
     })
 
-    $('.carousel-item').on('click', function() {
+    $('.carousel-item').on('click', function () {
         console.log(this)
     })
 </script>
