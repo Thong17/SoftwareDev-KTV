@@ -50,9 +50,9 @@
                 {% if categories %}
                 {% for category in categories %}
                 <div class="flex-between item color-font" id="{{ category.id }}">
-                    <p class="edit-content" contenteditable="true">{{ category.category }}</p>
-                    <p class="btn-clear" onclick="return removeCategory(this)">+</p>
-                    <p class="checkmark hide">L</p>
+                    <p class="edit-content notranslate" contenteditable="true">{{ category.category }}</p>
+                    <p class="btn-clear notranslate" onclick="return removeCategory(this)">+</p>
+                    <p class="checkmark hide notranslate">L</p>
                 </div>
                 {% endfor %}
                 {% endif %}
@@ -87,7 +87,7 @@
                             <td style="width: 50%; font-weight: 500;">Description</td>
                         </tr>
                     </thead>
-                    <tbody id="list-properties">
+                    <tbody id="list-properties" class="notranslate">
 
                     </tbody>
                     <div class="loader hide">
@@ -155,7 +155,7 @@
         var id = $(this).attr('id')
         var header = $(this).children()[0]
         $('#prop-header').html(
-            '<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="color-font">' +
+            '<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="notranslate color-font">' +
             $(header).text() +
             '</h5></div><button disabled class="btn border color-font add-prop btn-slim" id="' +
             id + '"><p class="plus">+</p></button>')
@@ -289,9 +289,9 @@
             success: function (data) {
                 if (data['redirect'] == '/category') {
                     var element = `<div class="flex-between item color-font" id="`+data['id']+`">
-                        <p class="edit-content" contenteditable="true">`+data['name']+`</p>
-                        <p class="btn-clear" onclick="return removeCategory(this)">+</p>
-                        <p class="checkmark hide">L</p>
+                        <p class="notranslate edit-content" contenteditable="true">`+data['name']+`</p>
+                        <p class="notranslate btn-clear" onclick="return removeCategory(this)">+</p>
+                        <p class="notranslate checkmark hide">L</p>
                     </div>`
                     $('.item-container .form').before(element)
                     $('#category').val('')
@@ -499,15 +499,20 @@
         $(check).on('mousedown', function () {
             var new_content = $(this).parent().find('.edit-content').text()
             isContented = true
-            $.ajax({
-                url: '/category/update/' + id,
-                method: 'POST',
-                data: { data: new_content },
-                success: function (data) {
-                    $('#' + id).find('.edit-content').text(new_content)
-                    toggleEdit($(clear), $(check))
-                }
-            })
+            if (new_content != '') {
+                $.ajax({
+                    url: '/category/update/' + id,
+                    method: 'POST',
+                    data: { data: new_content },
+                    success: function (data) {
+                        $('#' + id).find('.edit-content').text(new_content)
+                        toggleEdit($(clear), $(check))
+                    }
+                })
+            } else {
+                alert('Please fill the text')
+                $('#' + id).find('.edit-content').text(old_content)
+            }
         })
 
         $(this).on('focusout', function () {

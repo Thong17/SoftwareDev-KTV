@@ -20,9 +20,9 @@
                     {% if brands %}
                     {% for brand in brands %}
                     <div class="flex-between item color-font" id="{{ brand.id }}">
-                        <p class="edit-content" contenteditable="true">{{ brand.brand }}</p>
-                        <p class="btn-clear" onclick="return removeBrand(this)">+</p>
-                        <p class="checkmark hide">L</p>
+                        <p class="edit-content notranslate" contenteditable="true">{{ brand.brand }}</p>
+                        <p class="btn-clear notranslate" onclick="return removeBrand(this)">+</p>
+                        <p class="checkmark notranslate hide">L</p>
                     </div>
                     {% endfor %}
                     {% endif %}
@@ -719,9 +719,9 @@
             success: function (data) {
                 if (data['redirect'] == '/brand') {
                     var element = `<div class="flex-between item color-font" id="` + data['id'] + `">
-                        <p class="edit-content" contenteditable="true">` + data['name'] + `</p>
-                        <p class="btn-clear" onclick="return removeBrand(this)">+</p>
-                        <p class="checkmark hide">L</p>
+                        <p class="notranslate edit-content" contenteditable="true">` + data['name'] + `</p>
+                        <p class="notranslate btn-clear" onclick="return removeBrand(this)">+</p>
+                        <p class="notranslate checkmark hide">L</p>
                     </div>`
                     $('.item-container .form').before(element)
                     $('#brand').val('')
@@ -775,17 +775,22 @@
         $(check).on('mousedown', function () {
             var new_content = $(this).parent().find('.edit-content').text()
             isContented = true
-            $.ajax({
-                url: '/brand/update/' + id,
-                method: 'POST',
-                data: {
-                    data: new_content
-                },
-                success: function (data) {
-                    $('#' + id).find('.edit-content').text(new_content)
-                    toggleEdit($(clear), $(check))
-                }
-            })
+            if (new_content != '') {
+                $.ajax({
+                    url: '/brand/update/' + id,
+                    method: 'POST',
+                    data: {
+                        data: new_content
+                    },
+                    success: function (data) {
+                        $('#' + id).find('.edit-content').text(new_content)
+                        toggleEdit($(clear), $(check))
+                    }
+                })
+            } else {
+                alert('Please fill the text')
+                $('#' + id).find('.edit-content').text(old_content)
+            }
         })
 
         $(this).on('focusout', function () {
@@ -828,7 +833,7 @@
         toggleLoader($('.loader'))
         $('.list-product').empty()
         $('.content-header').html(
-            '<div class="flex-between"><h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>' +
+            '<div class="flex-between"><h5 class="notranslate color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>' +
             head + '</h5><button class="btn border color-font add-product btn-slim" id="' +
             id + '"><p class="plus">+</p></button></div>')
 
