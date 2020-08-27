@@ -93,7 +93,7 @@
                         $("#color").val($("#color option:first").val());
                         $('.edit-color').css('background-color', 'var(--color-bg)')
                         $('#pickr-edit').remove()
-                        $('.details-colors').find('#' + id).fadeOut(300, function () {
+                        $('.details-colors').find('#' + id).parent().fadeOut(300, function () {
                             $(this).remove()
                         })
                         $('.details-img').html(showColorPhotos(data.photos, 'no-photo'))
@@ -107,16 +107,28 @@
     })
 
     $(document).on('click', '.span-color', function () {
-        var id = $(this).attr('id')
+        var self = $(this)
+        var id = self.attr('id')
+        self.bind('click', function () {
+            return false;
+        });
+        
         Array.from($('.details-colors').children()).forEach(color => {
             $(color).removeClass('active')
         })
-        $(this).addClass('active')
+        self.parent().addClass('active')
         $.ajax({
             url: '/color/' + id,
             type: 'POST',
             success: function (data) {
                 $('.details-img').html(showColorPhotos(data.photos, 'color-photo'))
+                gsap.from('.details-img', {
+                    opacity: 0,
+                    duration: 0.8,
+                    onComplete: function() {
+                        self.unbind('click')
+                    }
+                })
             }
         })
     })
@@ -259,8 +271,9 @@
                 })
                 gsap.from('.description-container span, .description-container p', {
                     opacity: 0,
-                    x: 50,
-                    delay: 0.3,
+                    x: 70,
+                    duration: 0.7,
+                    delay: 0.2,
                     stagger: 0.1
                 })
 
@@ -480,7 +493,7 @@
         $('#details-category').text(category)
         gsap.from('#details-category', {
             opacity: 0,
-            scale: 0.5
+            duration: 0.7
         })
         $.ajax({
             url: '/property/' + id,
@@ -543,7 +556,11 @@
                 }
 
                 $('.details-property').html(properties)
-                gsap.from('.value, .btn-value, .property-title', {
+                gsap.from('.property-title', {
+                    opacity: 0,
+                    duration: 0.5
+                })
+                gsap.from('.value, .btn-value', {
                     opacity: 0,
                     scale: 0.7
                 })
@@ -625,8 +642,9 @@
                     })
                     gsap.from('.description-container span, .description-container p', {
                         opacity: 0,
-                        x: 50,
-                        delay: 0.3,
+                        x: 70,
+                        duration: 0.7,
+                        delay: 0.2,
                         stagger: 0.1
                     })
                 }

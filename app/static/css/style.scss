@@ -123,7 +123,7 @@ html[data-theme='light'] {
     --color-shadow: rgba(1, 1, 1, 0.1);
     --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
     --color-label: #696969;
-    --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
 }
 
 html[data-theme='dark'] {
@@ -138,7 +138,7 @@ html[data-theme='dark'] {
     --color-shadow: rgba(1, 1, 1, 0.5);
     --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
     --color-label: #e6e6e6;
-    --color-inset: 0 0 0 3px hsla(0,0%,100%,0), 0 0 0 4px hsla(0,0%,83.9%,0), inset 0 2px 2px 0 rgba(0,0,0,.2);
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
 
 }
 
@@ -518,10 +518,13 @@ main {
 }
 
 .input-color,
-.input-color:focus {
+.input-color:focus,
+.goog-te-combo,
+.goog-te-combo:focus {
     background-color: var(--color-bg);
     color: var(--color-text);
     border-color: var(--color-hr);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
 }
 
 .table-data {
@@ -1221,20 +1224,33 @@ table tbody tr {
     position: relative;
     width: 100%;
     height: 30px;
-    margin-top: 10px;
+    margin-top: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.details-colors span {
-    width: 30px;
-    height: 30px;
-    margin: 0 7px;
+.span-border {
+    position: relative;
+    width: 35px;
+    height: 35px;
+    padding: 3px;
+    margin: 0 3px;
     border-radius: 50%;
-    background-color: var(--color-hr);
-    transition: 0.5s ease;
+    transition: 0.3s ease;
+}
+
+.span-color {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: var(--color-bg);
     box-shadow: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+}
+
+.span-border.active {
+    border: 1px solid var(--color-hr);
 }
 
 .product-arrival {
@@ -1324,6 +1340,14 @@ table tbody tr {
     margin: 0;
 }
 
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0 20px;
+    overflow: hidden;
+}
+
 .carousel-inner img {
     width: 100%;
     height: 200px;
@@ -1372,10 +1396,6 @@ table tbody tr {
     color: var(--color-text);
 }
 
-.span-color.active {
-    transform: scale(1.1);
-}
-
 .caret-right {
     display: inline-block;
     border: 1px solid var(--color-text);
@@ -1386,6 +1406,35 @@ table tbody tr {
     height: 5px;
     margin: 0 13px 0 0px;
     transform: translate(0, -6px) rotate(45deg);
+}
+
+#google_translate_element {
+    margin-left: 18px;
+}
+
+.translated-ltr {
+    margin-top: -40px;
+}
+
+.translated-ltr {
+    margin-top: -40px;
+}
+
+.goog-te-banner-frame {
+    display: none;
+    margin-top: -20px;
+}
+
+select.goog-te-combo {
+    margin: 0 !important;
+}
+
+.goog-logo-link {
+    display: none !important;
+}
+
+.goog-te-gadget {
+    color: transparent !important;
 }
 
 @keyframes spin {

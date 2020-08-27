@@ -56,7 +56,6 @@
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Link 1</a>
                     <a class="dropdown-item" href="#">Link 2</a>
-                    <a class="dropdown-item" href="#">Link 3</a>
                     <div class="dropdown-divider"></div>
                     <form action="/logout" method="post" style="width: auto;">
                         <input type="submit" value="Logout">
@@ -80,6 +79,7 @@
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
     <script src="https://unpkg.com/ionicons@5.1.0/dist/ionicons.js"></script>
+    <script src="{{url_for('static', filename='js/translate.js')}}"></script>
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
     {% block script %}{% endblock %}
     <script>
@@ -214,8 +214,8 @@
                             $('#color').append(`<option value="` + data.hex + `" id="` + data.id +
                                 `">` + data.color + `</option>`)
                             $('.pcr-save').attr('disabled', false)
-                            $('.details-colors').append(`<span class="span-color pickr" id="` + data
-                                .id + `" style="background-color: ` + data.hex + `"></span>`)
+                            $('.details-colors').append(`<div class="span-border"><span class="span-color" id="` + data
+                                .id + `" style="background-color: ` + data.hex + `"></span></div>`)
                             $('.pcr-name').val('')
                             pickr.hide()
                         }
@@ -326,7 +326,7 @@
 
             if (colors.length > 0) {
                 colors.forEach(color => {
-                    color_element += '<span class="span-color" id="' + color.id + '" style="background-color: ' + color.hex + '" title="' + color.color + '"></span>'
+                    color_element += '<div class="span-border"><span class="span-color" id="' + color.id + '" style="background-color: ' + color.hex + '" title="' + color.color + '"></span></div>'
                 });
             }
 

@@ -10,6 +10,19 @@
             <option value="dark">Dark</option>
         </select>
     </div>
-    
+    <br>
+    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Language</h5>
+    <p class="paragraph ml-4 mt-2">Choose your language</p>
+    <div class="select-list">
+        <div id="google_translate_element"></div>
+    </div>
 </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            $('.goog-te-combo').addClass('input-color')
+        })
+    </script>
 {% endblock %}
