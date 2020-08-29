@@ -84,6 +84,18 @@
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
     {% block script %}{% endblock %}
     <script>
+        var menus = document.querySelectorAll('.menu-bar li')
+        if (menus.length > 0) {
+            var url = window.location.pathname.split('/')[1]
+            Array.from(menus).forEach(menu => {
+                console.log(menu)
+                $(menu).removeClass('active')
+                if ($(menu).attr('class').split('-')[1] == url) {
+                    $(menu).addClass('active')
+                }
+            })
+        }
+
         var theme = $('html').attr('data-theme')
 
         $.each($('#select-theme option'), function () {
@@ -287,7 +299,7 @@
                                     <i class="fa fa-trash-o delete-product" aria-hidden="true"></i>
                                 </div>
                                 <div class="product-arrival">
-                                    `+ duration +`
+                                    `+ duration + `
                                 </div>
                             </div>
                             <div class="item-details">
@@ -296,7 +308,7 @@
                 this.product + `">` +
                 this.product + `</p>
                                     <p class="color-text" id="details-category" style="font-size: 12px;">` + this
-                .category +
+                    .category +
                 `</p>
                                 </div>
                                 <div class="notranslate flex-between-end color-text" style="width: 100%;">
@@ -309,6 +321,17 @@
                             </div>
                         </div>
                     </a>`)
+        }
+
+        function convertUTCDateToLocalDate(date) {
+            var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+
+            var offset = date.getTimezoneOffset() / 60;
+            var hours = date.getHours();
+
+            newDate.setHours(hours - offset);
+
+            return newDate;
         }
 
 
@@ -353,14 +376,14 @@
                             }
                             if (value.property == property.id) {
                                 value_element += `<label class="value container-input" id="` + value
-                                                    .id + `">
+                                    .id + `">
                                                     <div class="product-btn color-text">
                                                         <i class="fa fa-pencil-square-o edit-value" aria-hidden="true"></i>
                                                         <i class="fa fa-trash-o delete-value" aria-hidden="true"></i>
                                                     </div>
                                                     <div class="flex-between-start">
                                                         <div class="flex-column-start-start">
-                                                            <h5 class="color-font notranslate" id="value-value">` + value.value +`</h5>
+                                                            <h5 class="color-font notranslate" id="value-value">` + value.value + `</h5>
                                                             <p style="font-size: 11px" class="color-text" id="value-description">` + value.description + `</p>
                                                         </div>
                                                     </div>
@@ -377,10 +400,10 @@
                     }
                     property_element +=
                         `<div class="flex-column-start-start mt-4">
-                            <h5 class="color-font notranslate mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>` +
-                                property.property + `</h5>
-                            <button class="notranslate hide btn border color-font btn-slim add-value" id="` +
-                            property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
+                            <h5 class="color-font mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>` +
+                        property.property + `</h5>
+                            <button class="hide btn border color-font btn-slim add-value" id="` +
+                        property.id + `" data-toggle="modal" data-target="#addValue"><p class="plus">+</p></button>
                         </div>
                         <div class="property-values property-` + property.id + `">
                             ` + value_element + `
@@ -405,7 +428,7 @@
                                     <p class="notranslate color-font text-wrapper details-title" id="` + id +
                 `" style="font-size: 23px;">` + product + `</p>
                                     <div class="flex-start">
-                                        <p class="color-text" id="details-category" style="font-size: 12px;">` + category + `</p>
+                                        <p class="notranslate color-text" id="details-category" style="font-size: 12px;">` + category + `</p>
                                         <div class="flex-start ml-1 description-container" style="width: 80%">
                                             <span class="caret-right"></span>
                                             <p class="color-text text-wrapper" id="details-description" style="font-size: 12px; text-align: left;">` + description + `<p>
@@ -418,7 +441,7 @@
                                 </div>
                             </div> 
                             <hr></hr>                           
-                            <div class="details-property">` + property_element + `</div>
+                            <div class="notranslate details-property">` + property_element + `</div>
                         </div>
                     </div>`
         }
@@ -429,10 +452,22 @@
             var price = params.price
             var description = params.description
             var colors = params.colors
-            var cost = params.cost
-            var quantity = params.quantity
+            var discount = params.discount
+            var period = params.period
+            var percentage = ''
             var image = params.image
             var element = ''
+
+            if (period == null) {
+                period = ''
+            }
+
+            if (discount == '') {
+                percentage = '<span class="percentage hide">%</span>'
+            } else {
+                percentage = '<span class="percentage">%</span>'
+            }
+
             if (colors.length > 0) {
                 colors.forEach(color => {
                     /*color change*/
@@ -452,14 +487,14 @@
                             <input type="hidden" name="brand" id="brand-id">
                             <div class="form-group selector">
                                 <p class="detail-content">Use category for specific products</p>
-                                <select name="category" id="category" class="form-control input-color" required>
+                                <select name="category" id="category" class="form-control input-color notranslate" required>
                                     <option disabled="disabled" selected="selected" value="">Select category</option>
                                     {% if categories %}
                                         {% for category in categories %}
                                             <option value="{{category.id}}">{{category.category}}</option>
                                         {% endfor %}
                                     {% else %}
-                                    <option value="">No category</option>
+                                    <option value="" disabled="disabled">No category</option>
                                     {% endif %}
                                 </select>
                             </div>
@@ -489,19 +524,19 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-7">
+                                <div class="col-md-5 pr-0" style="position: relative">
+                                    `+ percentage + `
                                     <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="cost" id="cost" value="` + cost +
+                                        <input type="number" min="0" max="100" class="form-control input-color" name="discount" id="discount" value="` + discount +
                 `"
-                                            required>
-                                        <label for="cost" class="label cost">Cost</label>
+                required>
+                                        <label for="discount" class="label discount text-wrapper">Discount</label>
                                     </div>
                                 </div>
-                                <div class="col-md-5 selector pl-0">
-                                    <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="quantity" id="quantity" value="` + quantity + `"
-                                            required>
-                                        <label for="quantity" class="label quantity">Quantity</label>
+                                <div class="col-md-7 selector">
+                                    <div class="form-group date-field">
+                                        <input type="date" class="form-control input-color" name="period" id="period" value="` + period + `">
+                                        <label for="period" class="label period">Period</label>
                                     </div>
                                 </div>
                             </div>
@@ -510,8 +545,6 @@
                                     class="form-control input-color textarea" required>` + description + `</textarea>
                                 <label for="details" class="label details">Description</label>
                             </div>
-                            
-                            <input type="submit" value="Save" class="submit-btn hide">
                         </form>
                         
                         <div class="product-image hide">
@@ -535,7 +568,7 @@
                             </div>
                             <div class="form-group selector">
                                 <p class="detail-content">Add color for product</p>
-                                <div class="row">
+                                <div class="row notranslate">
                                     <div class="col-sm-2">
                                         <button class="btn input-color edit-color"></button>
                                     </div>
@@ -633,10 +666,10 @@
                                 if (this.url == '/product/photo') {
                                     $('.details-img').html(
                                         '<img src="/static/uploads/' + data[0]
-                                        .src + '" alt="' + data[0].alt + '">')
+                                            .src + '" alt="' + data[0].alt + '">')
                                     var element = `<div class="image-item">
                                             <img src="/static/uploads/` + data[0].src + `" alt="` + data[0]
-                                        .alt + `">
+                                            .alt + `">
                                         </div>`
                                     $('#' + imgtag).html(element)
                                 } else {

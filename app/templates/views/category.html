@@ -1,7 +1,5 @@
 {% extends 'views/custome.html' %}
 
-
-
 {% block content %}
 <div class="wrap-container">
 
@@ -87,7 +85,7 @@
                             <td style="width: 50%; font-weight: 500;">Description</td>
                         </tr>
                     </thead>
-                    <tbody id="list-properties" class="notranslate">
+                    <tbody id="list-properties">
 
                     </tbody>
                     <div class="loader hide">
@@ -111,7 +109,7 @@
         this.description = description
 
         return `<tr id="prp-` + this.id + `" class="color-font hover">
-                    <td><span>` + this.property + `</span><input type="text" value="` + this.property + `" class="input-color form-control hide"></td>
+                    <td class="notranslate"><span>` + this.property + `</span><input type="text" value="` + this.property + `" class="input-color form-control hide"></td>
                     <td class="selector"><span>` + this.type + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
                     <td class="flex-between-center"><span>` + this.description + `</span><input type="text" value="` +
             this.description +
@@ -121,16 +119,6 @@
 
     }
 
-    function convertUTCDateToLocalDate(date) {
-        var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
-
-        var offset = date.getTimezoneOffset() / 60;
-        var hours = date.getHours();
-
-        newDate.setHours(hours - offset);
-
-        return newDate;
-    }
     $('#add-category').on('click', function () {
         var form = $('.form').toggleClass('display')
         if (form.hasClass('display')) {
@@ -198,7 +186,7 @@
                 }
                 element += `<tr class="property-form">
                             <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
-                                    placeholder="Property"></div></td>
+                                    placeholder="Name"></div></td>
                             <td><select name="type" id="type" class="form-control input-color">
                                     <option value="text">Text</option>
                                     <option value="currency">Currency</option>

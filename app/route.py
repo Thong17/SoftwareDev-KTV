@@ -1,7 +1,7 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -320,16 +320,19 @@ def theme():
 def add_product():
     product = request.form['product']
     price = request.form['price']
-    cost = request.form['cost']
+    discount = request.form['discount']
     category = request.form['category']
     currency = request.form['currency']
-    quantity = request.form['quantity']
-    description = request.form['details']
+    period = request.form['period']
+    description = request.form['description']
     brand = request.form['brand']
+    
+    if period == '':
+        period = None
 
     id = str(uuid4())
 
-    Model = tblProduct(id=id, product=product, price=price, cost=cost, quantity=quantity, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
+    Model = tblProduct(id=id, product=product, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
     
     db.session.add(Model)
     db.session.commit()
@@ -448,17 +451,20 @@ def save_product(id):
     product = request.form['product']
     currency = request.form['currency']
     price = request.form['price']
-    cost = request.form['cost']
-    quantity = request.form['quantity']
+    period = request.form['period']
+    discount = request.form['discount']
     description = request.form['description']
+
+    if period == '':
+        period = None
 
     Product.product = product
     Product.currency = currency
     Product.price = price
     Product.description = description
     Product.categoryId = category
-    Product.cost = cost
-    Product.quantity = quantity
+    Product.discount = discount
+    Product.period = period
 
     db.session.commit()
     return jsonify({'data': 'success'})
@@ -543,3 +549,7 @@ def _property(id):
     
 
     return jsonify({'property': result_property, 'product': result_product})
+
+@app.route('/stock')
+def stock():
+    return render_template('views/stock.html')

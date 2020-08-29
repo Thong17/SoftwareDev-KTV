@@ -119,14 +119,13 @@ class tblProperty(db.Model):
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
     values = db.relationship('tblValue', backref='property', lazy=True, cascade="all, delete-orphan", single_parent=True)
 
-
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     product = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    cost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    quantity = db.Column(db.Numeric(10,2), nullable=True, default=1)
     currency = db.Column(db.String(20), nullable=False)
+    discount = db.Column(db.String(3), nullable=True, default='')
+    period = db.Column(db.Date, nullable=True)
     photo = db.Column(db.String(255), nullable=True, default='default.png')
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
@@ -137,7 +136,18 @@ class tblProduct(db.Model):
     values = db.relationship('tblValue', backref='product', lazy=True, cascade="all, delete-orphan", single_parent=True)
     photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
     colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    
+
+class tblStock(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    cost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    currency = db.Column(db.String(20), nullable=False)
+    rate = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    quantity = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    adjust = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    colorId = db.Column(db.String(36), db.ForeignKey('tbl_color.id'), nullable=False)
+
 class tblAppearance(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     width = db.Column(db.String(50), nullable=True)
@@ -174,6 +184,7 @@ class tblColor(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+    stocks = db.relationship('tblStock', backref='stocksOfColor', lazy=True, cascade="all, delete-orphan", single_parent=True)
     photos = db.relationship('tblPhoto', backref='photosOfColor', lazy=True, cascade="all, delete-orphan", single_parent=True)
 
 class tblPhoto(db.Model):
@@ -226,5 +237,10 @@ class ProductSchema(ModelSchema):
     properties = fields.Nested(CategorySchema(many=True), many=True)
     class Meta:
         model = tblProduct
+
+class StockSchema(ModelSchema):
+    colors = fields.Nested(ColorSchema, many=True)
+    class Meta:
+        model = tblStock
         
 from app import route

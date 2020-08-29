@@ -81,6 +81,16 @@
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
+    $(document).on('focus', '#discount', function() {
+        $('.percentage').removeClass('hide')
+    })
+
+    $(document).on('focusout', '#discount', function() {
+        if ($(this).val() == '') {
+            $('.percentage').addClass('hide')
+        }
+    })
+
     $(document).on('click', '.pcr-delete', function () {
         var id = $(this).attr('id')
         if (confirm('Are you sure you want to delete this color?')) {
@@ -205,19 +215,26 @@
         var product = $('#product').val()
         var price = $('#price').val()
         var currency = $('#currency').val()
-        var cost = $('#cost').val()
-        var quantity = $('#quantity').val()
+        var discount = $('#discount').val()
+        var period = $('#period').val()
         var description = $('#details').val()
         var category = $('#category').val()
+        
         if (category != null) {
-            $.ajax({
-                url: '/product/save/' + id,
-                type: 'POST',
-                data: { product: product, price: price, cost: cost, quantity: quantity, currency: currency, description: description, category: category },
-                success: function (data) {
-                    alert('Done')
-                }
-            })
+            if (product == '') {
+                $('#product').focus()
+            } else if (price == '') {
+                $('#price').focus()
+            } else {
+                $.ajax({
+                    url: '/product/save/' + id,
+                    type: 'POST',
+                    data: { product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category },
+                    success: function (data) {
+                        alert('Done')
+                    }
+                })
+            }
         }
     })
 
@@ -229,7 +246,7 @@
                 url: '/product/remove/' + id,
                 type: 'POST',
                 success: function (data) {
-                    $('.list-product').find('#' + id).fadeOut(300, function () {
+                    $('.list-product').find('#' + id).fadeOut(500, function () {
                         $(this).remove()
                     })
                 }
@@ -287,8 +304,8 @@
                             category: data.productOfCategory,
                             product: data.product,
                             price: data.price,
-                            cost: data.cost,
-                            quantity: data.quantity,
+                            discount: data.discount,
+                            period: data.period,
                             description: data.description,
                             colors: data.colors,
                             image: photo
@@ -382,7 +399,7 @@
 
 
                         $('#pcr-save-btn').prepend('<input value="' + data.color + '" type="text" class="pcr-name" id="edit-name" placeholder="Name" style="width: 36%; text-align: left">')
-                        $('#pcr-save-btn').append('<input value="Delete" type="button" class="pcr-delete" id="' + data.id + '">')
+                        $('#pcr-save-btn').append('<input value="Delete" type="button" class="pcr-delete ml-1" id="' + data.id + '">')
 
                         pickr.on('save', (color, instance) => {
                             $('.pcr-save').attr('disabled', true)
@@ -437,26 +454,44 @@
         uploadPhoto(photo, '', product, this, '/product/photo')
     })
 
-    $(document).on('submit', '#product-form', function () {
+    $(document).on('click', '.submit-product', function () {
         event.preventDefault();
-        $.ajax({
-            url: $(this).attr('action'),
-            type: $(this).attr('method'),
-            dataType: 'json',
-            data: $(this).serialize(),
-            success: function (data) {
-                $('.product-image').removeClass('hide')
-                toggleEdit($('.save-product'), $('.submit-product'))
-                $('.save-product').attr('id', data['id'])
-                $('.pickr').attr('id', data['id'])
-                $('.details-title').attr('id', data['id'])
-                var values = document.querySelectorAll('.btn-value')
-                Array.from(values).forEach(value => {
-                    $(value).attr('disabled', false)
-                    $(value).removeClass('disabled')
+        var brand = $('#brand-id').val()
+        var product = $('#product').val()
+        var price = $('#price').val()
+        var currency = $('#currency').val()
+        var discount = $('#discount').val()
+        var period = $('#period').val()
+        var description = $('#details').val()
+        var category = $('#category').val()
+        
+        if (category != null) {
+            if (product == '') {
+                $('#product').focus()
+            } else if (price == '') {
+                $('#price').focus()
+            } else {
+                $.ajax({
+                    url: '/product/add',
+                    type: 'POST',
+                    data: {brand: brand, product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category },
+                    success: function (data) {
+                        $('.product-image').removeClass('hide')
+                        toggleEdit($('.save-product'), $('.submit-product'))
+                        $('.save-product').attr('id', data['id'])
+                        $('.pickr').attr('id', data['id'])
+                        $('.details-title').attr('id', data['id'])
+                        var values = document.querySelectorAll('.btn-value')
+                        Array.from(values).forEach(value => {
+                            $(value).attr('disabled', false)
+                            $(value).removeClass('disabled')
+                        })
+                    }
                 })
             }
-        })
+        } else {
+            alert('No category selected')
+        }
     })
 
     $('.list-product').on('scroll', function () {
@@ -577,10 +612,6 @@
         }
     })
 
-    $('#product-nav').on('click', '.submit-product', function () {
-        $('.submit-btn').click()
-    })
-
     $('.content-header').on('click', '.add-product', function () {
         $('.add-product').attr("disabled", true)
         var id = $(this).attr('id')
@@ -605,8 +636,8 @@
                         category: "Select category",
                         product: "",
                         price: "",
-                        cost: "",
-                        quantity: "",
+                        discount: "",
+                        period: "",
                         description: "",
                         colors: "",
                         image: '/static/uploads/default.png'
