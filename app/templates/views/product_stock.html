@@ -1,0 +1,566 @@
+{% extends 'views/custome.html' %}
+
+{% block content %}
+<div class="wrap-container" style="box-sizing: border-box;">
+    <div class="row-wrapper">
+        <div class="column-wrapper" style="width: 350px;">
+            <div class="column-header" style="grid-template-rows: 1fr 65px; height: 200px;">
+                <div class="box today color-text" style="grid-row: 2/3;">
+                    <div class="box-icon">
+                        <p style="font-size: 16px;" class="currency-format">{{ total_cost }}</p>
+                        <p>Total Cost</p>
+                    </div>
+                </div>
+                <div class="box total color-text" style="grid-row: 2/3;">
+                    <div class="box-icon">
+                        <i class="fa fa-inbox" aria-hidden="true"></i>
+                        <p>Stock</p>
+                    </div>
+                    <div class="box-result">
+                        <p id="total_stock">{{ total_stock }}</p>
+                    </div>
+                </div>
+                <div class="box cover">
+                    <img src="/static/uploads/{{ product.photo }}" alt="">
+                </div>
+            </div>
+            <div class="item-container">
+                <div class="flex-between-end mt-4">
+                    <h5 class="color-font" style="font-size: 18px;">Colors</h5>
+                </div>
+                <hr class="mt-2">
+                {% if product.colors %}
+                {% for color in product.colors %}
+                <div class="flex-between item color-font" id="{{ color.id }}">
+                    <div class="flex-start-center">
+                        <span
+                            style="margin-right: 15px; display: inline-block; width: 10px; height: 10px; border-radius: 10px; background-color: {{color.hex}};"></span>
+                        <p class="notranslate">{{ color.color }}</p>
+                    </div>
+                    <p class="color-text"><i class="fa fa-caret-right" aria-hidden="true"></i></p>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="border-right"></div>
+        <div class="column-wrapper" style="width: 100%;">
+            <div class="content-header">
+                <div class="flex-between-center" id="prop-header">
+                    <h5 class="notranslate color-font"><i class="fa fa-caret-right mr-2"
+                            aria-hidden="true"></i>{{ product.product }}</h5>
+                    <button class="btn border color-font btn-slim" id="add-stock">
+                        <p class="plus">+</p>
+                    </button>
+                </div>
+            </div>
+            <div class="content-body">
+                <div class="inset-shadow hide"></div>
+                <div class="product-container">
+                    <button id="refresh-chart" class="color-text">
+                        <ion-icon name="reload-outline"></ion-icon>
+                    </button>
+                    <button id="to-stock" class="color-text">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                    <div class="chart-container" id="stock">
+                        <canvas id="stockCanvas"></canvas>
+                    </div>
+                    <div class="stock-container">
+                        <table class="table stock-table">
+                            <thead>
+                                <tr class="color-font">
+                                    <td style="width: 13%;">Color</td>
+                                    <td style="width: 10%;">Cost</td>
+                                    <td style="width: 5%;">Currency</td>
+                                    <td style="width: 10%;">Rate</td>
+                                    <td style="width: 10%;">Quantity</td>
+                                    <td style="width: 10%;">Adjust</td>
+                                    <td style="width: 20%;">Total</td>
+                                </tr>
+                            </thead>
+                            <tbody id="list-stocks">
+                                {% if product %}
+                                {% for stock in product.stocks %}
+                                <tr title="{{stock.createdOn}}" class="color-text" id="{{stock.id}}">
+                                    {% if stock.color|length %}
+                                    {% for color in product.colors %}
+                                    {% if stock.color == color.id %}
+                                    <td id="{{color.id}}">{{color.color}}</td>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% else %}
+                                    <td id="">...</td>
+                                    {% endif %}
+                                    <td>{{(stock.cost|round(2)|string).rstrip('0').rstrip('.')}}</td>
+                                    <td>{{stock.currency}}</td>
+                                    <td>{{(stock.rate|round(2)|string).rstrip('0').rstrip('.')}}</td>
+                                    <td>{{stock.quantity}}</td>
+                                    <td>{{stock.adjust}}</td>
+                                    <td class="flex-between-center">
+                                        {% set total = stock.cost * stock.quantity %}
+
+                                        <span style="text-decoration: underline;" class="total-cost currency-format"
+                                            title="{{ total * stock.rate }}">{{total}}</span>
+                                        <div class="flex-between-center action-btn">
+                                            <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
+                                            <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                                <tr class="stock-form color-text">
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="loader hide">
+                    <div class="loading"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+<script>
+    $(document).ready(function () {
+        // start chart
+
+        var stocks = $('#list-stocks').children()
+        var data = {
+            labels: [],
+            datasets: []
+        }
+
+
+        Array.from(stocks).reverse().forEach(s => {
+            data.labels.push($(s).children('td').eq(0).text())
+            data.datasets.push($(s).children('td').eq(4).text())
+        })
+
+        var stock = document.getElementById('stock')
+        var stockCanvas = document.getElementById('stockCanvas')
+
+        var canvas = stockCanvas
+
+        canvas.width = stock.offsetWidth
+        canvas.height = stock.offsetHeight
+
+        $(window).on('resize', function () {
+            canvas.width = stock.offsetWidth
+            canvas.height = stock.offsetHeight
+        })
+
+        var ctx = canvas.getContext('2d')
+
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "Quantity",
+                    data: data.datasets,
+                    spanGaps: true,
+                }]
+            }
+        })
+
+        function addData(chart, label, data) {
+            chart.data.labels.push(label)
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            })
+            chart.update()
+        }
+
+        // end chart
+
+        $('.item-container').on('click', '.item', function (e) {
+            var id = $(this).attr('id')
+            var header = $(this).children()[0]
+
+            var containers = $('.item-container').children()
+
+            stocks = $('#list-stocks').children()
+
+            myLineChart.destroy()
+
+
+            if ($(this).hasClass('is-selected')) {
+                $(this).removeClass('is-selected')
+
+                myLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: "Quantity",
+                            data: data.datasets,
+                            spanGaps: true,
+                        }]
+                    }
+                })
+            } else {
+                Array.from(containers).forEach(item => {
+                    $(item).removeClass('is-selected')
+                });
+                $(this).addClass('is-selected')
+
+                myLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: "Quantity",
+                            data: [],
+                            spanGaps: true,
+                        }]
+                    }
+                })
+
+                Array.from(stocks).reverse().forEach(s => {
+                    if ($(s).children('td').eq(0).attr('id') == id) {
+                        addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(4).text())
+                    }
+                })
+            }
+        })
+
+
+        $('.total-cost').hover(
+            function () {
+                var tds = $(this).parent().parent().children()
+                $(tds[1]).addClass('active')
+                $(tds[4]).addClass('active')
+            }, function () {
+                var tds = $(this).parent().parent().children()
+                $(tds[1]).removeClass('active')
+                $(tds[4]).removeClass('active')
+            }
+        )
+
+        currencyFormat('$', 0, true)
+
+        $('#refresh-chart').on('click', function () {
+            if ($('#add-stock').find('p').hasClass('clear')) {
+                $('#add-stock').find('p').removeClass('clear')
+                $('.stock-form').empty()
+            }
+            var isSelected = false
+
+            stocks = $('#list-stocks').children()
+
+            myLineChart.destroy()
+            myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: "Quantity",
+                        data: [],
+                        spanGaps: true,
+                    }]
+                }
+            })
+
+            Array.from(document.querySelectorAll('.item')).forEach(i => {
+                if ($(i).hasClass('is-selected')) {
+                    var id = $(i).attr('id')
+
+                    Array.from(stocks).reverse().forEach(s => {
+                        if ($(s).children('td').eq(0).attr('id') == id) {
+                            addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(4).text())
+                        }
+                    })
+                    isSelected = true
+                }
+            })
+
+            if (isSelected == false) {
+                Array.from(stocks).reverse().forEach(s => {
+                    addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(4).text())
+                })
+            }
+        })
+
+        $('#to-stock').on('click', function () {
+            document.querySelector('.stock-container').scrollIntoView({
+                behavior: 'smooth'
+            });
+            $(this).fadeOut()
+        })
+
+        $('.product-container').on('scroll', function () {
+            if ($(this).scrollTop()) {
+                $('#to-stock, #refresh-chart').fadeOut()
+            } else {
+                $('#to-stock, #refresh-chart').fadeIn()
+            }
+        })
+    })
+
+    var total = {
+        cost: 0,
+        quantity: 0
+    }
+
+    function stockForm(color, cost, currency, rate, quantity, adjust, total, id) {
+        var button = ''
+        var result = ''
+        if (cost == '') {
+            button = `<div class="flex-between-center action-btn"><span class="stock-close pointer">
+                    <ion-icon name="close-outline"></ion-icon>
+                </span>
+                <span class="pointer stock-add">
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                </span></div>`
+            result = '$' + total
+        } else {
+            button = `<div class="flex-between-center action-btn"><span id="` + id + `" class="stock-cancel pointer">
+                    <ion-icon name="close-outline"></ion-icon>
+                </span>
+                <span class="pointer stock-save" id="`+ id + `">
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                </span></div>`
+            result = total
+        }
+
+        return `<input type="hidden" id="input-product" value="{{product.id}}">
+        <td class="pl-0">
+                <select name="type" id="select-color" class="form-empty input-color color-text">
+                    {% if product.colors %}
+                        {% for color in product.colors %}
+                        <option value="{{ color.id }}">{{ color.color }}</option>
+                        {% endfor %}
+                    {% else %}
+                    <option value="">No color</option>
+                    {% endif %}
+                </select>
+            </td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-cost" value="`+ cost + `"
+                    placeholder="Cost"></td>
+            <td><select id="select-currency" class="form-empty input-color color-text">
+                    <option value="dollar">$</option>
+                    <option disabled value="riel">&#x17DB;</option>
+                </select></td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-rate"
+                    placeholder="Rate" value="`+ rate + `"></td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-quantity"
+                    placeholder="Quantity" value="`+ quantity + `"></td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-adjust"
+                    placeholder="Adjust" value="`+ adjust + `"></td>
+            <td class="flex-between">
+                <span style="text-decoration: underline;" id="calculated-result">`+ result + `</span>
+                `+ button + `
+            </td>`
+    }
+
+    $('#add-stock').on('click', function () {
+        if ($(this).find('p').hasClass('clear')) {
+            $(this).find('p').removeClass('clear')
+            $('.stock-form').empty()
+        } else {
+            $(this).find('p').addClass('clear')
+            $('.stock-form').html(stockForm('', '', '', '', '', '', '0.00', ''))
+            total.cost = 0
+            total.quantity = 0
+        }
+    })
+
+    $(document).on('input', '#input-cost, #input-quantity', function () {
+
+        if ($(this).attr('id') == 'input-cost') {
+            total.cost = $(this).val()
+        } else {
+            total.quantity = $(this).val()
+        }
+
+        var result = total.cost * total.quantity
+        $('#calculated-result').text(accounting.formatMoney(result))
+    })
+
+    $(document).on('click', '.stock-edit', function () {
+        $('#refresh-chart').attr('disabled', true)
+        var tr = $(this).parent().parent().parent()
+        var tds = $(tr).children()
+        var tmp = tds
+        var id = $(tr).attr('id')
+
+        var color = $(tds[0]).attr('id')
+
+        $(tr).html(stockForm(color, $(tds[1]).text(), '', $(tds[3]).text(), $(tds[4]).text(), $(tds[5]).text(), $(tds[6]).find('span').text(), id))
+
+        Array.from($(tr).find('#select-color').children()).forEach(option => {
+            if ($(option).val() == color) {
+                $(option).attr('selected', 'selected')
+            }
+        })
+
+        total.cost = $('#input-cost').val()
+        total.quantity = $('#input-quantity').val()
+
+        $(document).on('click', '.stock-cancel', function () {
+            $(tr).html(`<td id="` + color + `">` + $(tmp[0]).text() + `</td>
+                        <td>`+ $(tmp[1]).text() + `</td>
+                        <td>`+ $(tmp[2]).text() + `</td>
+                        <td>`+ $(tmp[3]).text() + `</td>
+                        <td>`+ $(tmp[4]).text() + `</td>
+                        <td>`+ $(tmp[5]).text() + `</td>
+                        <td class="flex-between-center">
+                            <span style="text-decoration: underline;" title="`+ accounting.formatMoney($(tmp[6]).find('span').attr('title'), '\u17DB', 0) + `">` + accounting.formatMoney($(tmp[6]).text()) + `</span>
+                            <div class="flex-between-center action-btn">
+                                <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
+                                <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
+                            </div>
+                        </td>`)
+            $('#refresh-chart').attr('disabled', false)
+            total.cost = 0
+            total.quantity = 0
+        })
+    })
+
+    $(document).on('click', '.stock-save', function () {
+        var id = $(this).parent().parent().parent().attr('id')
+        var color = $('#select-color')
+        var cost = $('#input-cost')
+        var currency = $('#select-currency')
+        var rate = $('#input-rate')
+        var quantity = $('#input-quantity')
+        var adjust = $('#input-adjust')
+        var product = $('#input-product')
+        var color_name = '...'
+
+        if (color.val() != '') {
+            color_name = $('#select-color option:selected').text()
+        }
+
+        var validated = [cost, currency, quantity]
+        var isError = false
+
+        validated.reverse().forEach(field => {
+            if (field.val() == '' || field.val() < 0) {
+                field.focus()
+                isError = true
+            }
+        })
+
+        if (isError == false) {
+            $.ajax({
+                url: '/stock/save/' + id,
+                type: 'POST',
+                data: { color: color.val(), cost: cost.val(), currency: currency.val(), rate: rate.val(), quantity: quantity.val(), adjust: adjust.val() },
+                success: function (data) {
+                    console.log(data)
+                    if (data.data == 'success') {
+                        $('#list-stocks').find('#' + id).html(`<td id="` + color.val() + `">` + color_name + `</td>
+                                                            <td>`+ cost.val() + `</td>
+                                                            <td>`+ currency.val() + `</td>
+                                                            <td>`+ rate.val() + `</td>
+                                                            <td>`+ quantity.val() + `</td>
+                                                            <td>`+ adjust.val() + `</td>
+                                                            <td class="flex-between-center">
+                                                                <span style="text-decoration: underline;" title="`+ accounting.formatMoney(cost.val() * quantity.val() * rate.val(), 'R') + `">` + accounting.formatMoney(cost.val() * quantity.val()) + `</span>
+                                                                <div class="flex-between-center action-btn">
+                                                                    <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
+                                                                    <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
+                                                                </div> 
+                                                            </td>`)
+                        $('#total_stock').text(data.total_stock)
+                        $('#refresh-chart').attr('disabled', false)
+                    }
+                }
+            })
+        }
+    })
+
+    $(document).on('click', '.stock-delete', function () {
+        var id = $(this).parent().parent().parent().attr('id')
+        if (confirm('Are you sure you want to delete this stock?')) {
+            $.ajax({
+                url: '/stock/delete/' + id,
+                type: 'POST',
+                success: function (data) {
+                    console.log(data)
+                    if (data.data == 'success') {
+                        $('#list-stocks').find('#' + id).fadeOut('slow', function () {
+                            $(this).remove()
+                        })
+                        $('#total_stock').text(data.total_stock)
+                    }
+                }
+            })
+        }
+    })
+
+    $(document).on('click', '.stock-add', function () {
+        var color = $('#select-color')
+        var cost = $('#input-cost')
+        var currency = $('#select-currency')
+        var rate = $('#input-rate')
+        var quantity = $('#input-quantity')
+        var adjust = $('#input-adjust')
+        var product = $('#input-product')
+        var color_name = '...'
+
+        if (color.val() != '') {
+            color_name = $('#select-color option:selected').text()
+        }
+
+        var validated = [cost, currency, quantity]
+        var isError = false
+
+        validated.reverse().forEach(field => {
+            if (field.val() == '' || field.val() < 0) {
+                field.focus()
+                isError = true
+            }
+        })
+
+        if (isError == false) {
+            $.ajax({
+                url: '/stock/add',
+                type: 'POST',
+                data: { color: color.val(), cost: cost.val(), currency: currency.val(), rate: rate.val(), quantity: quantity.val(), adjust: adjust.val(), product: product.val() },
+                success: function (data) {
+                    if (data.data == 'success') {
+                        $('#list-stocks').prepend(` <tr class="color-text" id="` + data.id + `">
+                                                    <td id="`+ color.val() + `">` + color_name + `</td>
+                                                    <td>`+ data.cost + `</td>
+                                                    <td>`+ data.currency + `</td>
+                                                    <td>`+ data.rate + `</td>
+                                                    <td>`+ data.quantity + `</td>
+                                                    <td>`+ data.adjust.toFixed(2) + `</td>
+                                                    <td class="flex-between-center">
+                                                        <span style="text-decoration: underline;" title="`+ accounting.formatMoney(data.cost * data.quantity * data.rate, '\u17DB', 0) + `">` + accounting.formatMoney(data.cost * data.quantity) + `</span>
+                                                        <div class="flex-between-center action-btn">
+                                                            <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
+                                                            <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
+                                                        </div>
+                                                    </td>
+                                                </tr>`)
+                        $('#total_stock').text(data.total_stock)
+
+                    } else {
+                        alert(data.data)
+                    }
+                    cost.val('').focus()
+                    rate.val('')
+                    quantity.val('')
+                    adjust.val('')
+                    $('#calculated-result').text('$0.00')
+                }
+            })
+        }
+    })
+
+    $(document).on('click', '.stock-close', function () {
+        $('#add-stock').click()
+    })
+</script>
+{% endblock %}

@@ -9,7 +9,7 @@
     </li>
     <li class="menu-brand">
         <a href="/brand">
-            Brand
+            Product
         </a>
     </li>
     <li class="menu-stock">
@@ -18,7 +18,7 @@
         </a>
     </li>
     <li class="menu-advertise">
-        <a href="/advertise">
+        <a href="/#advertise">
             Advertise
         </a>
     </li>
@@ -63,60 +63,6 @@
 {% endblock %}
 {% block script %}
 <script>
-    function _Chart(div, canvas, type, data) {
-        this.div = div
-        this.canvas = canvas
-        this.type = type
-        this.data = data
-
-        var canvas = this.canvas
-
-        canvas.width = this.div.offsetWidth
-        canvas.height = this.div.offsetHeight
-
-        $(window).on('resize', function () {
-            canvas.width = this.div.offsetWidth
-            canvas.height = this.div.offsetHeight
-        })
-        var bgColor = $('.grid-item').css('background-color')
-        var fontColor = $('.color-font').css('color')
-
-        var ctxP = canvas.getContext('2d');
-        var myPieChart = new Chart(ctxP, {
-            type: this.type,
-            data: {
-                labels: this.data.labels,
-                datasets: [{
-                    data: this.data.quantities,
-                    backgroundColor: this.data.colors
-                }]
-            },
-            options: {
-                responsive: true,
-                elements: {
-                    arc: {
-                        borderColor: bgColor
-                    }
-                },
-                legend: {
-                    display: true,
-                    labels: {
-                        fontColor: fontColor,
-                        padding: 30
-                    },
-                    position: 'left'
-                },
-            }
-        });
-    }
-    function generateColor() {
-        var letters = '456789AB';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 8)];
-        }
-        return color;
-    }
     $(document).ready(function () {
         $.ajax({
             url: '/custome',

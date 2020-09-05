@@ -40,7 +40,7 @@
         </li>
         <li>
             <a href="/setting">
-                <i class="fa fa-sliders" aria-hidden="true"></i>
+                <i class="fa fa-cog" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
@@ -73,6 +73,7 @@
 
     </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/js/mdb.min.js">
@@ -81,14 +82,90 @@
     <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
     <script src="https://unpkg.com/ionicons@5.1.0/dist/ionicons.js"></script>
     <script src="{{url_for('static', filename='js/translate.js')}}"></script>
+    <script src="{{url_for('static', filename='js/accounting.js')}}"></script>
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
-    {% block script %}{% endblock %}
     <script>
+        function currencyFormat(currency, decimal, isAttribute) {
+            if (currency == '') {
+                currency = '$'
+            }
+            if (decimal == '') {
+                decimal = 2
+            } 
+            if (isAttribute == '') {
+                isAttribute = false
+            }
+            var numbers = document.querySelectorAll('.currency-format')
+            Array.from(numbers).forEach(n => {
+                var text = $(n).text()
+                var title = $(n).attr('title')
+                $(n).text(accounting.formatMoney(text, currency, decimal))
+                if (isAttribute) {
+                    $(n).attr('title', accounting.formatMoney(title, '\u17DB', 0))
+                }
+            })
+        }
+
+        function _Chart(div, canvas, type, data) {
+            this.div = div
+            this.canvas = canvas
+            this.type = type
+            this.data = data
+
+            var canvas = this.canvas
+
+            canvas.width = this.div.offsetWidth
+            canvas.height = this.div.offsetHeight
+
+            $(window).on('resize', function () {
+                canvas.width = this.div.offsetWidth
+                canvas.height = this.div.offsetHeight
+            })
+            var bgColor = $('.grid-item').css('background-color')
+            var fontColor = $('.color-font').css('color')
+
+            var ctxP = canvas.getContext('2d');
+            var myPieChart = new Chart(ctxP, {
+                type: this.type,
+                data: {
+                    labels: this.data.labels,
+                    datasets: [{
+                        data: this.data.quantities,
+                        backgroundColor: this.data.colors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    elements: {
+                        arc: {
+                            borderColor: bgColor
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        labels: {
+                            fontColor: fontColor,
+                            padding: 30
+                        },
+                        position: 'left'
+                    },
+                }
+            });
+        }
+
+        function generateColor() {
+            var letters = '456789AB';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 8)];
+            }
+            return color;
+        }
+
         var menus = document.querySelectorAll('.menu-bar li')
         if (menus.length > 0) {
             var url = window.location.pathname.split('/')[1]
             Array.from(menus).forEach(menu => {
-                console.log(menu)
                 $(menu).removeClass('active')
                 if ($(menu).attr('class').split('-')[1] == url) {
                     $(menu).addClass('active')
@@ -119,6 +196,142 @@
                 }
             })
         })
+
+        function searchProducts(input, list, filter) {
+            this.input = input.toUpperCase();
+            this.list = list
+            this.filter = filter
+
+            Array.from(this.list).forEach((l, i) => {
+                var value = $(l).find(this.filter).text().toUpperCase()
+                if (value.indexOf(this.input) > -1) {
+                    $(l).css('display', 'block')
+                } else {
+                    $(l).css('display', 'none')
+                }
+            })
+        }
+
+        function sortElement(property, order) {
+            var sortOrder = 1;
+            if (property[0] === "-") {
+                sortOrder = -1;
+                property = property.substr(1);
+            }
+
+            return function (a, b) {
+                var first = accounting.unformat($(a).find(property).text())
+                var second = accounting.unformat($(b).find(property).text())
+                var f_date = new Date($(a).find(property).text())
+                var s_date = new Date($(b).find(property).text())
+                switch (order) {
+                    case 'price-desc':
+                        var result = (parseFloat(first) > parseFloat(second)) ? -1 : (parseFloat(first) < parseFloat(second)) ? 1 : 0;
+                        break;
+                    case 'price-asc':
+                        var result = (parseFloat(first) < parseFloat(second)) ? -1 : (parseFloat(first) > parseFloat(second)) ? 1 : 0;
+                        break
+                    case 'title-asc':
+                        var result = (first < second) ? -1 : (first > second) ? 1 : 0;
+                        break
+                    case 'date-asc':
+                        var result = (f_date > s_date) ? -1 : (f_date < s_date) ? 1 : 0;
+                        break
+                    case 'date-desc':
+                        var result = (f_date < s_date) ? -1 : (f_date > s_date) ? 1 : 0;
+                        break
+                }
+                return result * sortOrder;
+            }
+        }
+
+        function filterProduct(list, property, order) {
+            list.sort(sortElement(property, order))
+        }
+
+        function selectMenu(list, menu, type, input) {
+            this.menu = menu
+            this.list = list
+            this.type = type
+            this.input = input.toUpperCase();
+
+            var menus = []
+            var types = []
+            var result = []
+            var temp = []
+
+            Array.from(this.menu).forEach(m => {
+                if ($(m).hasClass('active')) {
+                    menus.push($(m).attr('id'))
+                }
+            })
+
+            Array.from(this.type).forEach(t => {
+                if ($(t).hasClass('active')) {
+                    types.push($(t).attr('id'))
+                }
+            })
+
+            if (menus.length > 0) {
+                Array.from(this.list).forEach(l => {
+                    if (menus.indexOf($(l).find('#details-brand').val()) !== -1) {
+                        if (types.length > 0) {
+                            if (types.indexOf($(l).find('#details-categ').val()) !== -1) {
+                                var value = $(l).find('#details-title').text().toUpperCase()
+                                if (value.indexOf(this.input) > -1) {
+                                    $(l).css('display', 'block')
+                                }
+                                temp.push(l)
+                            } else {
+                                $(l).css('display', 'none')
+                            }
+                        } else {
+                            var value = $(l).find('#details-title').text().toUpperCase()
+                            if (value.indexOf(this.input) > -1) {
+                                $(l).css('display', 'block')
+                            }
+                            temp.push(l)
+                        }
+                    } else {
+                        $(l).css('display', 'none')
+                    }
+                })
+            } else if (types.length > 0) {
+                Array.from(this.list).forEach(l => {
+                    if (types.indexOf($(l).find('#details-categ').val()) !== -1) {
+                        if (menus.length > 0) {
+                            if (menus.indexOf($(l).find('#details-brand').val()) !== -1) {
+                                var value = $(l).find('#details-title').text().toUpperCase()
+                                if (value.indexOf(this.input) > -1) {
+                                    $(l).css('display', 'block')
+                                }
+                                temp.push(l)
+                            } else {
+                                $(l).css('display', 'none')
+                            }
+                        } else {
+                            var value = $(l).find('#details-title').text().toUpperCase()
+                            if (value.indexOf(this.input) > -1) {
+                                $(l).css('display', 'block')
+                            }
+                            temp.push(l)
+                        }
+                    } else {
+                        $(l).css('display', 'none')
+                    }
+                })
+            }
+            else {
+                Array.from(this.list).forEach(l => {
+                    var value = $(l).find('#details-title').text().toUpperCase()
+                    if (value.indexOf(this.input) > -1) {
+                        $(l).css('display', 'block')
+                    }
+                    temp.push(l)
+                })
+            }
+            return temp
+        }
 
         function valueForm(name, price, currency, details) {
             this.name = name
@@ -255,11 +468,15 @@
             } else {
                 this.loader.addClass('hide')
             }
-
         }
 
-        function filterProducts(list, filter) {
-
+        function toggleActive(element) {
+            this.element = element
+            if (this.element.hasClass('active')) {
+                this.element.removeClass('active')
+            } else {
+                this.element.addClass('active').focus()
+            }
         }
 
         function dynamicSort(property) {
@@ -269,9 +486,6 @@
                 property = property.substr(1);
             }
             return function (a, b) {
-                /* next line works with strings and numbers, 
-                 * and you may want to customize it to your needs
-                 */
                 var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
                 return result * sortOrder;
             }
@@ -312,7 +526,7 @@
                 `</p>
                                 </div>
                                 <div class="notranslate flex-between-end color-text" style="width: 100%;">
-                                    <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol">$</span><span class="price-tag">` +
+                                    <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol"></span><span class="price-tag currency-format">` +
                 this.price + `</span></p>
                                     <p style="font-size: 12px;">
                                         <i class="fa fa-heart-o" aria-hidden="true"></i>
@@ -508,7 +722,7 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <input type="number" class="form-control input-color" name="price" id="price" value="` + price +
+                                        <input type="number" step="any" class="form-control input-color" name="price" id="price" value="` + price +
                 `"
                                             required>
                                         <label for="price" class="label price">Price</label>
@@ -802,7 +1016,9 @@
             element += indicators + images + `</div>`
             return element
         }
+        
     </script>
+    {% block script %}{% endblock %}
 </body>
 
 </html>

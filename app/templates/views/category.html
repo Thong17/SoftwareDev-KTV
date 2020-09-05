@@ -37,13 +37,13 @@
                 </div>
             </div>
             <br>
-            <div class="flex-between-end">
+            <div class="flex-between-end mt-1">
                 <h5 class="color-font">Categories</h5>
                 <button class="btn border color-font btn-slim" id="add-category">
                     <p class="plus">+</p>
                 </button>
             </div>
-            <hr>
+            <hr class="mt-2">
             <div class="item-container">
                 {% if categories %}
                 {% for category in categories %}
@@ -76,13 +76,13 @@
                     <h3 class="color-font">Category</h3>
                 </div>
             </div>
-            <div class="content-body">
+            <div class="content-body" style="overflow-y: auto;">
                 <table class="table">
                     <thead>
                         <tr class="color-font">
-                            <td style="width: 30%; font-weight: 500;">Column</td>
-                            <td style="width: 20%; font-weight: 500;">Type</td>
-                            <td style="width: 50%; font-weight: 500;">Description</td>
+                            <td style="width: 30%;">Column</td>
+                            <td style="width: 20%;">Type</td>
+                            <td style="width: 50%;">Description</td>
                         </tr>
                     </thead>
                     <tbody id="list-properties">
@@ -108,7 +108,7 @@
         this.type = type
         this.description = description
 
-        return `<tr id="prp-` + this.id + `" class="color-font hover">
+        return `<tr id="prp-` + this.id + `" class="color-text hover">
                     <td class="notranslate"><span>` + this.property + `</span><input type="text" value="` + this.property + `" class="input-color form-control hide"></td>
                     <td class="selector"><span>` + this.type + `</span><select class="form-control input-color hide"><option value="text">Text</option><option value="currency">Currency</option><option value="number">Number</option><option value="checkbox">Checkbox</option></select></td>
                     <td class="flex-between-center"><span>` + this.description + `</span><input type="text" value="` +
@@ -472,7 +472,6 @@
         }
     }
     $(document).on('click', '.edit-content', function () {
-        event.stopPropagation()
         var id = $(this).parent().attr('id')
 
         var old_content = $(this).parent().find('.edit-content').text()
@@ -510,11 +509,7 @@
             toggleEdit($(clear), $(check))
             
         })
-        
+        event.stopPropagation()
     })
-
-
-
-
 </script>
 {% endblock %}

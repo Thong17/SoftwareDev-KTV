@@ -309,6 +309,7 @@ def udpate_brand(id):
         return jsonify({'msg': 'Failed'})
 
 @app.route('/theme/change', methods=['POST'])
+@login_required
 def theme():
     theme = request.form['data']
     user = tblUser.query.get(current_user.id)
@@ -341,6 +342,7 @@ def add_product():
 
 
 @app.route('/product', methods=['POST'])
+@login_required
 def products():
     id = request.form['data']
     Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId).filter_by(brandId=id).all()
@@ -370,7 +372,7 @@ def product_photo(id):
     jsons = []
     for file in request.files:
         photo = request.files[file]
-        extension = photo.filename.split('.')[1]
+        extension = photo.filename.rsplit('.', 1)[1]
         filename = str(uuid4()) + '.' + extension
         photo.filename = filename
         uploaded = upload.save(photo)
@@ -402,7 +404,7 @@ def color_photo(id):
     jsons = []
     for file in request.files:
         photo = request.files[file]
-        extension = photo.filename.split('.')[1]
+        extension = photo.filename.rsplit('.', 1)[1]
         filename = str(uuid4()) + '.' + extension
         photo.filename = filename
         uploaded = upload.save(photo)
@@ -416,6 +418,7 @@ def color_photo(id):
     return jsonify(result)
 
 @app.route('/product/<id>', methods=['POST', 'GET'])
+@login_required
 def product(id):
     product = tblProduct.query.get(id)
     if request.method == 'POST':
@@ -551,5 +554,91 @@ def _property(id):
     return jsonify({'property': result_property, 'product': result_product})
 
 @app.route('/stock')
-def stock():
-    return render_template('views/stock.html')
+@login_required
+def stocks():
+    products = tblProduct.query.all()
+    brands = tblBrand.query.all()
+    categories = tblCategory.query.all()
+    return render_template('views/stock.html', products=products, brands=brands, categories=categories)
+
+@app.route('/stock/product/<id>')
+@login_required
+def stock(id):
+    product = tblProduct.query.get(id)
+    total_stock = 0
+    sum_cost = 0
+    sum_quantity = 0
+    if product.stocks:
+        for stock in product.stocks:
+            total_stock += stock.quantity
+            sum_cost += stock.cost
+            sum_quantity += stock.quantity
+    total_cost = sum_cost * sum_quantity
+
+    product.stocks.sort(key=lambda r: r.createdOn, reverse=True)
+
+    return render_template('views/product_stock.html', product=product, total_stock=total_stock, total_cost=total_cost)
+
+@app.route('/stock/add', methods=['POST'])
+def add_stock():
+    color = request.form['color']
+    cost = request.form['cost']
+    quantity = request.form['quantity']
+    currency = request.form['currency']
+    rate = request.form['rate']
+    adjust = request.form['adjust']
+    product = request.form['product']
+
+    if adjust == '':
+        adjust = 0.00
+
+    if rate == '':
+        rate = 4000
+
+    id = str(uuid4())
+
+    model = tblStock(id=id, cost=cost, quantity=quantity, currency=currency, rate=rate, adjust=adjust, productId=product, color=color, createdBy=current_user.id)
+    try:
+        db.session.add(model)
+        db.session.commit()
+        total_stock = 0
+        for stock in model.stocksOfProduct.stocks:
+            total_stock += stock.quantity
+        return jsonify({'data': 'success', 'id': id, 'cost': cost, 'quantity': quantity, 'currency': currency, 'rate': rate, 'adjust': adjust, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S')})
+    except:
+        return jsonify({'data': 'failed'})
+
+
+@app.route('/stock/delete/<id>', methods=['POST'])
+def delete_stock(id):
+    stock = tblStock.query.get(id)
+    total_stock = 0
+    delete_stock = stock.quantity
+    for s in stock.stocksOfProduct.stocks:
+        total_stock += s.quantity
+    try:
+        db.session.delete(stock)
+        db.session.commit()
+        total_stock -= delete_stock
+        return jsonify({'data': 'success', 'total_stock': total_stock})
+    except:
+        return jsonify({'data': 'failed'}) 
+    
+@app.route('/stock/save/<id>', methods=['POST'])
+def save_stock(id):
+    stock = tblStock.query.get(id)
+    stock.color = request.form['color']
+    stock.cost = request.form['cost']
+    stock.currency = request.form['currency']
+    stock.rate = request.form['rate']
+    stock.quantity = request.form['quantity']
+    stock.adjust = request.form['adjust']
+    try:
+        db.session.commit()
+        total_stock = 0
+        if stock.stocksOfProduct.stocks:
+            for s in stock.stocksOfProduct.stocks:
+                total_stock += s.quantity
+        return jsonify({'data': 'success', 'total_stock': total_stock})
+    except:
+        return jsonify({'data': 'failed'})
