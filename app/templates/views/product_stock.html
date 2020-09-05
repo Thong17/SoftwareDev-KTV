@@ -4,27 +4,65 @@
 <div class="wrap-container" style="box-sizing: border-box;">
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 350px;">
-            <div class="column-header" style="grid-template-rows: 1fr 65px; height: 200px;">
-                <div class="box today color-text" style="grid-row: 2/3;">
+            <div class="column-header" style="grid-template-rows: 1fr 65px 65px; height: 275px;">
+                <div class="box total color-text" style="grid-row: 3/4; grid-column: 1/3;">
                     <div class="box-icon">
-                        <p style="font-size: 16px;" class="currency-format">{{ total_cost }}</p>
-                        <p>Total Cost</p>
-                    </div>
-                </div>
-                <div class="box total color-text" style="grid-row: 2/3;">
-                    <div class="box-icon">
-                        <i class="fa fa-inbox" aria-hidden="true"></i>
-                        <p>Stock</p>
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        <p>Total</p>
                     </div>
                     <div class="box-result">
-                        <p id="total_stock">{{ total_stock }}</p>
+                        <p id="total_cost" class="currency-format">{{ total_cost }}</p>
+                    </div> 
+                </div>
+
+                <div class="box today color-text" style="grid-row: 2/3;">
+                    <div class="box-icon">
+                        <ion-icon name="pricetags"></ion-icon>
+                        <p>Price</p>
                     </div>
+                    <div class="box-result">
+                        <p style="font-size: 16px;" class="currency-format">{{ product.price }}</p>
+                    </div> 
+                </div>
+                <div class="box stocks color-text">
+                    <div id="stocks" class="carousel slide" data-ride="carousel">
+
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="box-container flex-between-end">
+                                    <div class="box-icon">
+                                        <i class="fa fa-inbox" aria-hidden="true"></i>
+                                        <p>Stock</p>
+                                    </div>
+                                    <div class="box-result">
+                                        <p id="total_stock">{{ total_stock }}</p>
+                                    </div> 
+                                </div>
+                            </div>
+                        {% if stocks %}
+                            {% for stock in stocks %}
+                                <div class="carousel-item">
+                                    <div class="box-container flex-between-end">
+                                        <div class="box-icon">
+                                            <i class="fa fa-inbox" aria-hidden="true"></i>
+                                            <p>{{ stock.color }}</p>
+                                        </div>
+                                        <div class="box-result">
+                                            <p class="total_quantity" id="{{stock.color}}-quantity">{{ stock.quantity }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        </div>
+                    </div>
+
                 </div>
                 <div class="box cover">
                     <img src="/static/uploads/{{ product.photo }}" alt="">
                 </div>
             </div>
-            <div class="item-container">
+            <div class="item-container" style="height: 330px;">
                 <div class="flex-between-end mt-4">
                     <h5 class="color-font" style="font-size: 18px;">Colors</h5>
                 </div>
@@ -84,11 +122,15 @@
                                 {% for stock in product.stocks %}
                                 <tr title="{{stock.createdOn}}" class="color-text" id="{{stock.id}}">
                                     {% if stock.color|length %}
-                                    {% for color in product.colors %}
-                                    {% if stock.color == color.id %}
-                                    <td id="{{color.id}}">{{color.color}}</td>
-                                    {% endif %}
-                                    {% endfor %}
+                                        {% if product.colors %}
+                                            {% for color in product.colors %}
+                                                {% if stock.color == color.id %}
+                                                <td id="{{color.id}}">{{color.color}}</td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <td id="">...</td>
+                                        {% endif %}
                                     {% else %}
                                     <td id="">...</td>
                                     {% endif %}
@@ -456,6 +498,7 @@
                 type: 'POST',
                 data: { color: color.val(), cost: cost.val(), currency: currency.val(), rate: rate.val(), quantity: quantity.val(), adjust: adjust.val() },
                 success: function (data) {
+
                     console.log(data)
                     if (data.data == 'success') {
                         $('#list-stocks').find('#' + id).html(`<td id="` + color.val() + `">` + color_name + `</td>
@@ -472,6 +515,11 @@
                                                                 </div> 
                                                             </td>`)
                         $('#total_stock').text(data.total_stock)
+
+                        data.stocks.forEach(s => {
+                            $('#stocks').find('#'+s.color+'-quantity').text(s.quantity)
+                        })
+
                         $('#refresh-chart').attr('disabled', false)
                     }
                 }
@@ -481,6 +529,8 @@
 
     $(document).on('click', '.stock-delete', function () {
         var id = $(this).parent().parent().parent().attr('id')
+        var color_name = $(this).parent().parent().parent().children().eq(0).text()
+        var quantity = $(this).parent().parent().parent().children().eq(4).text()
         if (confirm('Are you sure you want to delete this stock?')) {
             $.ajax({
                 url: '/stock/delete/' + id,
@@ -492,6 +542,21 @@
                             $(this).remove()
                         })
                         $('#total_stock').text(data.total_stock)
+                        if (color_name != '...') {
+                            var t = data.total_stock
+                            var e = '#'
+                            Array.from(document.querySelectorAll('.total_quantity')).forEach(q => {
+                                var i = $(q).attr('id')
+                                var c = i.split('-')[0]
+                                if (c != color_name) {
+                                    t -= parseInt($(q).text())
+                                } else {
+                                    e += i
+                                }
+                            })
+
+                            $('#stocks').find(e).text(t)
+                        }
                     }
                 }
             })
@@ -545,7 +610,20 @@
                                                     </td>
                                                 </tr>`)
                         $('#total_stock').text(data.total_stock)
-
+                        var t = data.total_stock
+                        var e = '#'
+                        if (color_name != '...') {
+                            Array.from(document.querySelectorAll('.total_quantity')).forEach(q => {
+                                var i = $(q).attr('id')
+                                var c = i.split('-')[0]
+                                if (c != color_name) {
+                                    t -= parseInt($(q).text())
+                                } else {
+                                    e += i
+                                }
+                            })
+                            $('#stocks').find(e).text(t)
+                        }
                     } else {
                         alert(data.data)
                     }

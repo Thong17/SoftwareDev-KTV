@@ -527,6 +527,10 @@ def save_color(id):
 @app.route('/color/remove/<id>', methods=['POST'])
 def remove_color(id):
     color = tblColor.query.get(id)
+    if color.colorsOfProduct.stocks:
+        for stock in color.colorsOfProduct.stocks:
+            if stock.color == id:
+                stock.color = ''
     if color.photos:
         for photo in color.photos:
             delete_photo('uploads', photo.src)
@@ -567,17 +571,31 @@ def stock(id):
     product = tblProduct.query.get(id)
     total_stock = 0
     sum_cost = 0
-    sum_quantity = 0
+    total_cost = 0
     if product.stocks:
         for stock in product.stocks:
             total_stock += stock.quantity
-            sum_cost += stock.cost
-            sum_quantity += stock.quantity
-    total_cost = sum_cost * sum_quantity
+            sum_cost = stock.cost * stock.quantity
+            total_cost += sum_cost
 
     product.stocks.sort(key=lambda r: r.createdOn, reverse=True)
+    stocks = []
+    if product.colors:
+        for color in product.colors:
+            total_quantity = 0
+            if product.stocks:
+                for stock in product.stocks:
+                    if stock.color == color.id:
+                        total_quantity += stock.quantity
+            
+            stock = {
+                'color': color.color,
+                'quantity': total_quantity
+            }
 
-    return render_template('views/product_stock.html', product=product, total_stock=total_stock, total_cost=total_cost)
+            stocks.append(stock)
+
+    return render_template('views/product_stock.html', product=product, total_stock=total_stock, total_cost=total_cost, stocks=stocks)
 
 @app.route('/stock/add', methods=['POST'])
 def add_stock():
@@ -639,6 +657,21 @@ def save_stock(id):
         if stock.stocksOfProduct.stocks:
             for s in stock.stocksOfProduct.stocks:
                 total_stock += s.quantity
-        return jsonify({'data': 'success', 'total_stock': total_stock})
+
+        stocks = []
+        if stock.stocksOfProduct.colors:
+            for color in stock.stocksOfProduct.colors:
+                total_quantity = 0
+                if stock.stocksOfProduct.stocks:
+                    for s in stock.stocksOfProduct.stocks:
+                        if s.color == color.id:
+                            total_quantity += s.quantity
+                st = {
+                    'color': color.color,
+                    'quantity': total_quantity
+                }
+                stocks.append(st)
+
+        return jsonify({'data': 'success', 'total_stock': total_stock, 'stocks': stocks})
     except:
         return jsonify({'data': 'failed'})
