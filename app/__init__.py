@@ -8,6 +8,7 @@ from marshmallow_sqlalchemy import ModelSchema
 from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, TextAreaField, FileField, DecimalField
 from wtforms.validators import DataRequired, Length, Optional, Email, EqualTo
 from wtforms.fields.html5 import DateField, DateTimeLocalField
+from flask_wtf.file import FileAllowed, FileField, FileRequired
 from flask_login import UserMixin, LoginManager
 from flask_uploads import UploadSet, configure_uploads, patch_request_class, IMAGES
 from marshmallow import fields
@@ -62,6 +63,7 @@ class RegisterForm(FlaskForm):
     birthdate = DateField('Date of Birth', validators=[Optional()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=20)])
+    photo = FileField('Photo', validators=[FileAllowed(upload), Optional()])
     confirm = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
@@ -73,6 +75,16 @@ class CategoryForm(FlaskForm):
 class BrandForm(FlaskForm):
     brand = StringField('Brand', validators=[DataRequired(), Length(max=20)])
     description = TextAreaField('Description')
+    submit = SubmitField('Save')
+
+class ProfileForm(FlaskForm):
+    status = SelectField('Status', choices=[('Single', 'Single'), ('In Relationship', 'In Relationship'), ('Married', 'Married')])
+    phone = StringField('Phone', validators=[Optional(), Length(min=6, max=13)])
+    company = StringField('Company', validators=[Optional(), Length(min=2 ,max=20)])
+    hometown = StringField('Hometown', validators=[Optional(), Length(min=2 ,max=255)])
+    location = StringField('Location', validators=[Optional(), Length(max=255)])
+    photo = FileField('Photo', validators=[FileAllowed(upload), Optional()])
+    bio = TextAreaField('Bio', validators=[Optional()])
     submit = SubmitField('Save')
 
 
@@ -92,6 +104,19 @@ class tblUser(db.Model, UserMixin):
     isAdmin = db.Column(db.Boolean, default=False)
     isConfirm = db.Column(db.Boolean, default=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    profile = db.relationship('tblProfile', backref='profile', lazy=True)
+
+class tblProfile(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    photo = db.Column(db.String(255), nullable=True, default='default.png')
+    status = db.Column(db.String(20), nullable=True, default='Single')
+    phone = db.Column(db.String(13), nullable=True, default='')
+    company = db.Column(db.String(20), nullable=True, default='')
+    hometown = db.Column(db.String(255), nullable=True, default='')
+    location = db.Column(db.String(255), nullable=True, default='')
+    bio = db.Column(db.Text(), nullable=True, default='')
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 category_brand = db.Table('category_brand',
     db.Column('category_id', db.String(36), db.ForeignKey('tbl_category.id')),
@@ -122,6 +147,7 @@ class tblProperty(db.Model):
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     product = db.Column(db.String(50), nullable=False)
+    isStock = db.Column(db.Boolean, default=True)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     currency = db.Column(db.String(20), nullable=False)
     discount = db.Column(db.String(3), nullable=True, default='')
@@ -204,6 +230,15 @@ class tblActivity(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
+class tblTransaction(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
+    discount = db.Column(db.String(3), nullable=True, default='')
+    isComplete = db.Column(db.Boolean, default=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+
 class BrandSchema(ModelSchema):
     class Meta:
         model = tblBrand
@@ -231,7 +266,12 @@ class ColorSchema(ModelSchema):
     class Meta:
         model = tblColor
 
+class StockSchema(ModelSchema):
+    class Meta:
+        model = tblStock
+
 class ProductSchema(ModelSchema):
+    stocks = fields.Nested(StockSchema, many=True)
     photos = fields.Nested(PhotoSchema, many=True)
     values = fields.Nested(ValueSchema(many=True), many=True)
     colors = fields.Nested(ColorSchema, many=True)

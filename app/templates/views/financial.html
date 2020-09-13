@@ -1,0 +1,44 @@
+{% extends 'layout/layout.html' %}
+
+{% block navbar %}
+<ul class="menu-bar">
+    <li class="menu-cashing">
+        <a href="/cashing" class="cashing">
+            Cashing
+        </a>
+    </li>
+    <li class="menu-order">
+        <a href="/queue" class="queue">
+            Queue
+        </a>
+    </li>
+    <li class="menu-stock">
+        <a href="/stock" class="stock">
+            Stock
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container grid-container">
+    <div class="grid-item">
+        <div class="item-header">
+            In Come
+        </div>
+        <div class="item-body" id="pie">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+</div>
+<div class="authentication {{ authentication }}"></div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function() {
+        if ($('.authentication').hasClass('require')) {
+            $('#loginModal').modal('show')
+        }
+    })
+</script>
+{% endblock %}

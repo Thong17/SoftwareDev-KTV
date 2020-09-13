@@ -1,0 +1,946 @@
+{% extends 'views/financial.html' %}
+
+{% block style %}
+<style>
+    @font-face {
+        font-family: "Ionicons";
+        src: url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.eot?v=2.0.1");
+        src: url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.eot?v=2.0.1#iefix") format("embedded-opentype"), url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.ttf?v=2.0.1") format("truetype"), url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.woff?v=2.0.1") format("woff"), url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.svg?v=2.0.1#Ionicons") format("svg");
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    td {
+        padding: 5px !important;
+        font-size: 13px !important;
+    }
+
+    tbody tr td {
+        font-size: 11px !important;
+    }
+
+    tbody tr td:hover {
+        color: var(--color-font) !important;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .cancel-btn:hover i {
+        color: var(--color-font);
+    }
+
+    .description {
+        max-width: 50px !important;
+    }
+
+    [contenteditable="true"]:active,
+    [contenteditable="true"]:focus {
+        border: 1px solid var(--color-hr);
+        border-radius: 7px;
+        outline: none;
+        transform: scale(1.1) !important;
+    }
+
+    p[contenteditable="true"] {
+        cursor: text;
+    }
+
+    .order-wrapper {
+        padding: 10px 20px 10px 10px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--color-menu);
+        z-index: 10;
+        transition: 0.3s ease;
+    }
+
+    #list-orders {
+        height: 100%;
+    }
+
+    thead tr {
+        background-color: var(--color-menu);
+    }
+
+    .content-menu {
+        border: none;
+    }
+
+    .wrap-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .col-filter {
+        width: 100%;
+        padding-right: 20px;
+    }
+
+    .col-order {
+        width: 530px;
+        position: relative;
+    }
+
+    .drawer-btn {
+        color: crimson;
+        margin: 0 0 0 5px;
+    }
+
+    .search-btn {
+        background-color: var(--color-menu);
+        height: 34px;
+        border: none;
+        padding: 0 6px 0 16px !important;
+    }
+
+    .search-input {
+        background-color: var(--color-menu) !important;
+    }
+
+    .grid-products {
+        grid-column-gap: 20px;
+        grid-row-gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+        grid-template-rows: repeat(auto-fill, minmax(200px, 200px)) !important;
+        padding: 15px 15px 0 15px;
+    }
+
+    .grid-products .product-item {
+        height: 200px;
+        background-color: var(--color-menu);
+        cursor: default;
+    }
+
+    .grid-products .product-item .item-wrapper .item-img {
+        height: 110px;
+        background-color: var(--color-bg);
+    }
+
+    .grid-products .product-item .item-wrapper .item-details {
+        height: calc(100% - 110px);
+    }
+
+    .product-btn {
+        background-color: rgba(31, 31, 31, 0.3);
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        font-size: 38px !important;
+        color: dodgerblue !important;
+        top: 0;
+        right: 0;
+        transform: scale(1) !important;
+        border-radius: none;
+        border-radius: 0;
+    }
+
+    .drawer-dropdown {
+        left: -120px !important;
+    }
+
+    .list-products .product-item {
+        height: 130px;
+        padding: 10px 0;
+    }
+
+    .list-products .product-item .item-wrapper .item-details .details .color-font {
+        font-size: 18px !important;
+    }
+
+    .list-products .product-item .item-wrapper .item-details div:nth-child(2) p:first-child {
+        font-size: 13px !important;
+    }
+
+    .list-products .product-item .item-wrapper .item-img {
+        width: 130px;
+        height: 110px;
+    }
+
+    .product-item.active .product-btn {
+        color: crimson !important;
+    }
+
+    #placeOrder:hover {
+        color: var(--color-font) !important;
+    }
+
+    .form-empty {
+        padding: 5px;
+    }
+
+    .form-empty:disabled:hover {
+        border-color: var(--color-hr);
+    }
+
+    .list-products .product-item .item-wrapper .item-img .product-btn {
+        top: 0;
+        left: 0;
+    }
+
+    .order-btn {
+        border: 1px solid var(--color-hr);
+        border-radius: 20px;
+        margin-left: 10px;
+        background-color: var(--color-menu);
+        padding: 5px 10px 5px 5px;
+
+    }
+
+    .order-icon {
+        position: relative;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 31px;
+        height: 31px;
+        background-color: var(--color-menu);
+        border-radius: 50%;
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .sum-order {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        font-size: 11px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        color: var(--color-font);
+        background-color: dodgerblue;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .property-values {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .modal-wrapper {
+        height: 65vh;
+        position: relative;
+    }
+
+    .details-img {
+        width: 170px;
+        height: 170px;
+    }
+
+    .config-list {
+        border-top: 1px solid var(--color-hr);
+        margin-top: 10px;
+        padding: 5px 0;
+    }
+
+    .config-list p {
+        text-align: start;
+    }
+
+    .value-active {
+        color: dodgerblue;
+    }
+
+    .span-border.active {
+        border: 1px solid dodgerblue;
+    }
+
+    .alert-btn {
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        font-size: 23px;
+        z-index: 100;
+    }
+
+    input#input-discount::after {
+        content: "%";
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .details-colors {
+        position: relative;
+        display: grid;
+        grid-gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-rows: repeat(auto-fill, minmax(75px, 75px));
+        width: 100%;
+        height: auto;
+    }
+
+    .span-border {
+        position: relative;
+        width: 100%;
+        height: 75px;
+        padding: 7px 10px 5px 10px;
+        margin: 0;
+        border-radius: 10px;
+        transition: 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        transition: 0 ease;
+        background-color: var(--color-menu);
+        border: none;
+        box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .span-border.active,
+    .span-border:hover {
+        border: none;
+    }
+
+    .span-border.active::after {
+        content: "\f3a7";
+        color: dodgerblue;
+        position: absolute;
+        font-family: "Ionicons";
+        top: 5px;
+        right: 10px;
+        font-size: 18px;
+    }
+
+    .span-color {
+        width: 33px;
+        height: 33px;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+    <div class="col-filter" style="border-right: 1px solid var(--color-hr);">
+        <!-- Begin -->
+        <div class="content-menu flex-between">
+            <div class="dropdown" id="list-cates">
+                <div class="menu-icon" data-toggle="dropdown">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="dropdown-menu">
+                    {% if categories %}
+                    {% for category in categories %}
+                    <div class="dropdown-item category-item" id="{{category.id}}">{{category.category}}</div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="dropdown-item">No categories</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="menu-items flex-start-center color-text notranslate">
+                {% if brands %}
+                {% for brand in brands %}
+                <div class="menu-item" id="{{ brand.id }}">{{ brand.brand }}</div>
+                {% endfor %}
+                {% else %}
+                <div class="menu-item">...</div>
+                {% endif %}
+            </div>
+            <div class="menu-btn flex-end-center color-text">
+                <div class="view-btn"><i class="fa fa-list-ul list-btn" aria-hidden="true"></i></i></div>
+                <div class="view-btn active"><i class="fa fa-th grid-btn" aria-hidden="true"></i></div>
+                <div class="dropdown" id="list-filters">
+                    <div class="sort-btn" data-toggle="dropdown"><i class="fa fa-sliders" aria-hidden="true"></i></div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item sort-item" id="title">Title</div>
+                        <div class="dropdown-item sort-item" id="newest">Newest</div>
+                        <div class="dropdown-item sort-item" id="oldest">Oldest</div>
+                        <div class="dropdown-item sort-item" id="most-expensive">Most expensive</div>
+                        <div class="dropdown-item sort-item" id="cheapest">Cheapest</div>
+                    </div>
+                </div>
+                <div class="search-btn flex-between notranslate color-text">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <input type="text" class="search-input color-text pl-2" placeholder="Search">
+                </div>
+                <div class="dropdown" id="list-cates">
+                    <div class="menu-icon drawer-btn" data-toggle="dropdown">
+                        <i class="fa fa-usd" aria-hidden="true"></i>
+                    </div>
+                    <div class="dropdown-menu drawer-dropdown">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid-products product-container">
+            <div class="empty-result hide color-text">No product found...</div>
+            {% if products %}
+            {% for product in products %}
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+                <input type="hidden" id="details-brand" value="{{product.brandId}}">
+                <input type="hidden" id="details-categ" value="{{product.categoryId}}">
+                <div class="item-wrapper">
+                    <div class="item-img">
+                        <img src="/static/uploads/{{product.photo}}">
+                        <div class="product-btn color-text" title="Add product to list">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <div class="details">
+                            <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
+                                title="{{product.product}}">{{product.product}}</p>
+                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            </p>
+                            <p class="color-text" id="details-category" style="font-size: 10px;">
+                                {{product.productOfCategory.category}}</p>
+                            <p class="color-text hide" id="details-description" style="font-size: 10px;">
+                                {{product.description}}</p>
+                            <p class="price-tag currency-format hide">{{ product.price }}</p>
+                        </div>
+                        <div class="notranslate flex-between-end color-text" style="width: 100%;">
+                            <p class="color-font text-wrapper" id="details-price"
+                                style="font-size: 14px; width: 110px;">
+                                <span class="symbol"></span><span class="stock-tag" style="font-size: 12px;">
+                                    {% if product.isStock == True %}
+                                    {% set total_stock = namespace(value=0) %}
+                                    {% if product.stocks %}
+                                    {% for stock in product.stocks %}
+                                    {% set total_stock.value = total_stock.value + stock.quantity %}
+                                    {% endfor %}
+                                    {% if total_stock.value > 0 %}
+                                    {{ total_stock.value }} Available
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    No stock
+                                    {% endif %}
+                                </span></p>
+                            <p style="font-size: 12px;">
+                                <i class="fa fa-heart-o" aria-hidden="true"></i>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-result color-text">No product found...</div>
+            {% endif %}
+        </div>
+
+
+        <!-- Noted -->
+    </div>
+    <div class="col-order pl-4">
+        <h4 class="color-font" style="text-align: center;">Invoice</h4>
+        <div class="order-container mt-2">
+            <table class="table order-table notranslate">
+                <thead>
+                    <tr class="color-font">
+                        <td style="width: 50%;">Description</td>
+                        <td class="text-center" style="width: 20%;">Price</td>
+                        <td class="text-center" style="width: 15%;">Disc</td>
+                        <td class="text-center" style="width: 15%;">Qty</td>
+                        <td class="text-center" style="width: 20%;">Amount</td>
+                        <td class="text-center cancel-btn"></td>
+                    </tr>
+                </thead>
+                <tbody id="list-orders">
+                    <tr class="order-form color-text notranslate"></tr>
+                </tbody>
+            </table>
+            <div class="order-wrapper flex-between-center">
+                <button class="btn color-text order-btn" id="placeOrder">
+                    <span class="mr-2 order-icon">
+                        <span class="sum-order notranslate">0</span>
+                        <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
+                    </span>
+                    <span>Place Order</span>
+                </button>
+                <div class="arrow arrow-left animate-left-to-right">
+                    <div class="flex-between-center">
+                        <span class="mr-3 color-text">Total:</span>
+                        <span id="sumTotal" class="color-font currency-format notranslate">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="productProperty" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{{url_for('static', filename='js/printThis.js')}}"></script>
+<script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
+<script>
+
+    var orderLists = []
+
+    $(document).on('submit', '#orderForm', function () {
+        event.preventDefault()
+        var discount = $('#input-discount').val()
+        var quantity = $('#input-quantity').val()
+        var id = $('#input-product').val()
+        var details = $('#input-details').val()
+
+        if (quantity < 1) {
+            $('#input-quantity').focus()
+            alert('Value must be atleast 1')
+        } else {
+
+            var orderList = {}
+
+            orderLists.forEach(o => {
+                if (o.orderId == id) {
+                    orderList = o
+                }
+            })
+
+            orderList.discount = discount
+            orderList.quantity = quantity
+
+            var jsonObj = JSON.stringify(orderList)
+
+            $.ajax({
+                url: '/order/product/' + orderList.productId,
+                type: 'POST',
+                data: {
+                    data: jsonObj
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('#list-orders tr:last').before(showOrder('test', details, data.data.price, data.data.discount, data.data.quantity, data.data.amount))
+                        $('.order-form').empty()
+                        if (data.data.isStock != false) {
+                            if (data.data.stock == 0) {
+                                data.data.stock = 'Out of stock'
+                            } else {
+                                data.data.stock = data.data.stock+' Available'
+                            }
+                            $('#'+orderList.productId).find('.stock-tag').text(data.data.stock)
+                        }
+                        var total = accounting.unformat($('#sumTotal').text())
+                        total += data.data.amount
+                        $('#sumTotal').text(accounting.formatMoney(total))
+
+                        var order = parseInt($('.sum-order').text())
+                        order += data.data.quantity
+                        $('.sum-order').text(order)
+                    } else {
+                        alert(data.data.message)
+                    }
+                }
+            })
+        }
+
+        return false
+    })
+
+    $(document).on('click', '.continue-btn', function () {
+        var orderId = generatString(23)
+
+        var validation = {
+            isSelected: true
+        }
+
+        var orderList = {
+            'orderId': orderId,
+            'colorId': '',
+            'discount': 0,
+            'quantity': 0,
+            'productId': '',
+            'values': []
+        }
+
+        var properties = document.querySelectorAll('.property-values')
+        var colors = $('.details-colors').children()
+        var details = $('.details-title').text()
+        var id = $('.details-title').attr('id')
+        var cost = accounting.unformat($('.details-price').text())
+
+        orderList.productId = id
+
+        if (colors.length > 0) {
+            validation.isSelected = false
+            Array.from(colors).forEach(c => {
+                var color = $(c).find('.span-color').attr('title')
+
+                if ($(c).hasClass('active')) {
+                    details += '-' + color
+                    validation.isSelected = true
+                    orderList.colorId = $(c).find('.span-color').attr('id')
+                }
+            })
+        }
+
+        Array.from(properties).forEach(p => {
+            var valueObj = {}
+            var pid = $(p).attr('id').split('_')[1]
+            var pname = $(p).attr('id').split('_')[0].toLowerCase()
+            var vname = $('.value').find('input[name=' + pname + ']:checked').parent().find('#value-value').text()
+
+            var value = $('.value').find('input[name=' + pname + ']:checked').val()
+            if (value != undefined) {
+                valueObj['propertyName'] = pname
+                valueObj['propertyId'] = pid
+                valueObj['valueId'] = value
+                orderList.values.push(valueObj)
+
+                if ($(p).children().length > 1) {
+                    details += '-' + vname
+                }
+            }
+        })
+
+        orderLists.push(orderList)
+
+        if (validation.isSelected == true) {
+            // Stockform
+            $('.order-form').html(orderForm(orderId, details, cost, '', '', accounting.formatMoney(0)))
+            $('.order-form').find('#input-discount').focus()
+            $('#productProperty').modal('hide')
+
+        } else {
+            alert('Color must be selected')
+        }
+    })
+
+    $(document).on('click', '.cancel-btn', function () {
+        $(this).closest('tr').fadeOut('slow', function () {
+            $(this).remove()
+        })
+    })
+
+    $(document).on('input', '#input-quantity', function () {
+        if ($(this).val() != '' && $(this).val() > 0) {
+            toggleEdit($(this).closest('.order-form').find('.save-btn'), $(this).closest('.order-form').find('.cancel-btn'))
+        } else {
+            toggleEdit($(this).closest('.order-form').find('.cancel-btn'), $(this).closest('.order-form').find('.save-btn'))
+        }
+        var price = $(this).closest('tr').find('#input-price').val()
+        var discount = $(this).closest('tr').find('#input-discount').val()
+        var quantity = $(this).val()
+        var total = (price - (price * discount / 100)) * quantity
+        $('#calculated-result').text(accounting.formatMoney(total))
+    })
+
+    $(document).on('input', '#input-discount', function () {
+        if ($(this).val() < 0) {
+            $(this).val(0)
+        }
+        if ($(this).val() > 100) {
+            $(this).val(100)
+        }
+
+        var price = $(this).closest('tr').find('#input-price').val()
+        var quantity = $(this).closest('tr').find('#input-quantity').val()
+        var discount = $(this).val()
+        var total = (price - (price * discount / 100)) * quantity
+        $('#calculated-result').text(accounting.formatMoney(total))
+
+    })
+
+    $(document).on('keypress', '#input-discount', function (e) {
+        if (e.which == 13) {
+            $('#input-quantity').focus()
+        }
+    })
+
+    $(document).on('click', '.span-border', function () {
+        var self = $(this).find('.span-color')
+        var id = self.attr('id')
+        self.bind('click', function () {
+            return false;
+        });
+
+        Array.from($('.details-colors').children()).forEach(color => {
+            $(color).removeClass('active')
+        })
+        self.parent().addClass('active')
+        $.ajax({
+            url: '/color/' + id,
+            type: 'POST',
+            success: function (data) {
+                $('.details-img').html(showColorPhotos(data.photos, 'color-photo'))
+                gsap.from('.details-img', {
+                    opacity: 0,
+                    duration: 0.8,
+                    onComplete: function () {
+                        self.unbind('click')
+                    }
+                })
+            }
+        })
+    })
+
+    $('.product-btn').on('click', function () {
+        var id = $(this).closest('.product-item').attr('id')
+        $('#productProperty').modal('show')
+        $.ajax({
+            url: '/product/' + id,
+            type: 'POST',
+            success: function (data) {
+                var photo = '/static/uploads/' + data.photo
+                data.values.sort(dynamicSort('price'))
+                $('#productProperty').find('.modal-content').html(productConfiguration({
+                    image: photo,
+                    colors: data.colors,
+                    product: data.product,
+                    category: data.category.category,
+                    description: data.description,
+                    currency: data.currency,
+                    price: data.price,
+                    properties: data.category.properties,
+                    values: data.values,
+                    id: data.id,
+                    stocks: data.stocks
+                }))
+            }
+        })
+    })
+
+    $(document).on('click', '.save-btn', function () {
+        $('#orderForm').submit()
+    })
+
+    function orderForm(id, details, cost, discount, quantity, total) {
+
+        return `<input type="hidden" id="input-product" value="` + id + `">
+            <td><input type="text" class="form-empty color-text input-color" title="`+ details + `" id="input-details" value="` + details + `"
+                    placeholder="Details" disabled></td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-price" value="`+ cost + `"
+                    placeholder="Price" disabled></td>
+            <td><input min="1" max="100" type="number" class="form-empty color-text input-color" id="input-discount" value="`+ discount + `"
+                    placeholder="Disc"></td>
+            <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
+                    placeholder="Qty" value="`+ quantity + `"></form></td>
+            <td id="calculated-result" style="text-align:center;"">`+ total + `</td>
+            <td class="cancel-btn">
+                <ion-icon name="close-outline"></ion-icon>
+            </td>
+            <td class="save-btn hide">
+                <ion-icon name="checkmark-outline"></ion-icon>
+            </td>
+            <td class="remove-btn hide">
+                <i class="fa fa-trash-o" aria-hidden="true"></i>
+            </td>`
+    }
+
+    $(document).ready(function () {
+        $(document).on('change', '.input-radio', function () {
+            var pid = $(this).closest('.property-values').attr('id').split('_')[1]
+            var name = $(this).closest('.value').find('#value-value').text()
+            var description = $(this).closest('.value').find('#value-description').text()
+            var price = $(this).closest('.value').find('#value-price').text()
+
+
+            $('#value-price').text()
+
+            var values = $(this).closest('.property-values').children()
+            Array.from(values).forEach(v => {
+                var v_price = $(v).find('#value-price').text()
+                var n_price = accounting.formatMoney(accounting.unformat(v_price) - accounting.unformat(price), {
+                    precision: 0,
+                    format: {
+                        pos: "+%s%v",
+                        neg: "-%s%v",
+                        zero: '<ion-icon class="value-active" name="checkmark-done-outline"></ion-icon>'
+                    }
+                })
+
+                $(v).find('#value-price').html(n_price)
+
+            })
+
+            var details_price = accounting.unformat($('.details-price').text()) + accounting.unformat(price)
+
+            $('.details-price').text(accounting.formatMoney(details_price))
+
+            var configList = document.querySelectorAll('.config-list')
+            Array.from(configList).forEach(c => {
+                if ($(c).attr('id') == pid) {
+                    $(c).find('.value-description').text(description.toLowerCase() + ' ' + name.toLowerCase())
+                }
+            })
+        })
+
+        $('[data-toggle="tooltip"]').tooltip({
+            trigger: 'hover'
+        })
+        currencyFormat()
+
+        $('.arrow').addClass('active')
+
+        currencyFormat()
+        var products = Array.from(document.querySelectorAll('.product-item'))
+
+        var temp_products = products
+
+        $('.search-input').on('input', function () {
+            searchProducts($(this).val(), temp_products, '#details-title')
+        })
+
+        $('.menu-item, .category-item').on('click', function () {
+            var menus = document.querySelectorAll('.menu-item')
+            var cates = document.querySelectorAll('.category-item')
+            var input = $('.search-input').val()
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active')
+                temp_products = selectMenu(products, menus, cates, input)
+            } else {
+                $(this).addClass('active')
+                temp_products = selectMenu(products, menus, cates, input)
+            }
+            event.stopPropagation()
+        })
+
+        $('.list-btn').on('click', function () {
+            var views = document.querySelectorAll('.view-btn')
+            Array.from(views).forEach(v => {
+                $(v).removeClass('active')
+            })
+            $(this).parent().addClass('active')
+            $('.product-container').removeClass('grid-products')
+            $('.product-container').addClass('list-products')
+        })
+
+        $('.grid-btn').on('click', function () {
+            var views = document.querySelectorAll('.view-btn')
+            Array.from(views).forEach(v => {
+                $(v).removeClass('active')
+            })
+            $(this).parent().addClass('active')
+            $('.product-container').removeClass('list-products')
+            $('.product-container').addClass('grid-products')
+        })
+
+        $('.fa-search').on('click', function () {
+            toggleActive($('.search-input'))
+        })
+
+        $('#list-cates').attrchange({
+            trackValues: true,
+            callback: function (evnt) {
+                if (evnt.attributeName == "class") {
+                    if (evnt.newValue.search(/open/i) == -1) {
+                        if ($('#list-cates').hasClass('show')) {
+                            $('.menu-icon').addClass('active')
+                        } else {
+                            $('.menu-icon').removeClass('active')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('#list-filters').attrchange({
+            trackValues: true,
+            callback: function (evnt) {
+                if (evnt.attributeName == "class") {
+                    if (evnt.newValue.search(/open/i) == -1) {
+                        if ($('#list-filters').hasClass('show')) {
+                            $('.sort-btn').addClass('active')
+                        } else {
+                            $('.sort-btn').removeClass('active')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('.sort-item').on('click', function () {
+            var items = document.querySelectorAll('.sort-item')
+            Array.from(items).forEach(item => {
+                $(item).removeClass('active')
+            })
+            toggleActive($(this))
+
+            var filter = $(this).attr('id')
+
+            if (filter == 'selected') {
+                console.log(filter)
+            } else {
+                switch (filter) {
+                    case 'most-expensive':
+                        filterProduct(products, '.price-tag', 'price-desc')
+                        break
+                    case 'cheapest':
+                        filterProduct(products, '.price-tag', 'price-asc')
+                        break
+                    case 'title':
+                        filterProduct(products, '#details-title', 'title-asc')
+                        break
+                    case 'newest':
+                        filterProduct(products, '#details-date', 'date-asc')
+                        break
+                    case 'oldest':
+                        filterProduct(products, '#details-date', 'date-desc')
+                        break
+                }
+            }
+
+            var i = 1
+            products.forEach(p => {
+                $(p).attr('order', i)
+                i++
+            })
+
+            $('.product-container').append($('.product-container .product-item').sort(function (a, b) {
+                return a.getAttribute('order') - b.getAttribute('order')
+            }))
+        })
+    })
+
+    function showOrder(id, description, price, discount, quantity, amount) {
+        return `<tr class="color-text" id="`+ id +`">
+                    <td class="description" id="order-description">`+ description +`</td>
+                    <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
+                                                                                    precision: 2,
+                                                                                    format: {
+                                                                                        pos: "%s%v",
+                                                                                        neg: "%s%v",
+                                                                                        zero: '%s%v'
+                                                                                    }
+                                                                                }).replace(/\.0+$/,'') +`</td>
+                    <td>
+                        <p class="color-text text-center" contenteditable="true" id="order-discount">`+ discount +`%</p>
+                    </td>
+                    <td>
+                        <p class="color-text text-center" contenteditable="true" id="order-quantity">`+ quantity +`</p>
+                    </td>
+                    <td class="text-center currency-format" id="order-amount">`+ accounting.formatMoney(amount, {
+                                                                                    precision: 2,
+                                                                                    format: {
+                                                                                        pos: "%s%v",
+                                                                                        neg: "%s%v",
+                                                                                        zero: '%s%v'
+                                                                                    }
+                                                                                }).replace(/\.0+$/,'') +`</td>
+                    <td class="cancel-btn hide">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </td>
+                    <td class="save-btn hide">
+                        <ion-icon name="checkmark-outline"></ion-icon>
+                    </td>
+                    <td class="remove-btn">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </td>
+                </tr>`
+    }
+</script>
+{% endblock %}

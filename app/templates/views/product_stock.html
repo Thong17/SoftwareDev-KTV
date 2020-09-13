@@ -1,4 +1,4 @@
-{% extends 'views/custome.html' %}
+{% extends 'views/financial.html' %}
 
 {% block content %}
 <div class="wrap-container" style="box-sizing: border-box;">
@@ -11,8 +11,8 @@
                         <p>Total</p>
                     </div>
                     <div class="box-result">
-                        <p id="total_cost" class="currency-format">{{ total_cost }}</p>
-                    </div> 
+                        <p id="total_cost" class="currency-format text-wrapper notranslate">{{ total_cost }}</p>
+                    </div>
                 </div>
 
                 <div class="box today color-text" style="grid-row: 2/3;">
@@ -20,12 +20,24 @@
                         <ion-icon name="pricetags"></ion-icon>
                         <p>Price</p>
                     </div>
-                    <div class="box-result">
-                        <p style="font-size: 16px;" class="currency-format">{{ product.price }}</p>
-                    </div> 
+                    <div class="box-result notranslate">
+                        <p style="font-size: 16px;" title="{{ product.price }}" class="currency-format text-wrapper">{{ product.price }}</p>
+                    </div>
                 </div>
                 <div class="box stocks color-text">
                     <div id="stocks" class="carousel slide" data-ride="carousel">
+                        <ul class="carousel-indicators">
+                            <li data-target="#stocks" data-slide-to="0" class="active"
+                                style="border: none; width: 6px; height: 6px; border-radius: 50%; margin-bottom: 4px;">
+                            </li>
+                            {% if stocks %}
+                            {% for stock in stocks %}
+                            <li data-target="#stocks" data-slide-to="{{ loop.index }}"
+                                style="border: none; width: 6px; height: 6px; border-radius: 50%; margin-bottom: 4px;">
+                            </li>
+                            {% endfor %}
+                            {% endif %}
+                        </ul>
 
                         <div class="carousel-inner">
                             <div class="carousel-item active">
@@ -35,25 +47,28 @@
                                         <p>Stock</p>
                                     </div>
                                     <div class="box-result">
-                                        <p id="total_stock">{{ total_stock }}</p>
-                                    </div> 
-                                </div>
-                            </div>
-                        {% if stocks %}
-                            {% for stock in stocks %}
-                                <div class="carousel-item">
-                                    <div class="box-container flex-between-end">
-                                        <div class="box-icon">
-                                            <i class="fa fa-inbox" aria-hidden="true"></i>
-                                            <p>{{ stock.color }}</p>
-                                        </div>
-                                        <div class="box-result">
-                                            <p class="total_quantity" id="{{stock.color}}-quantity">{{ stock.quantity }}</p>
-                                        </div>
+                                        <p id="total_stock" class="notranslate">{{ total_stock }}</p>
                                     </div>
                                 </div>
+                            </div>
+                            {% if stocks %}
+                            {% for stock in stocks %}
+                            <div class="carousel-item">
+                                <div class="box-container flex-between-end">
+                                    <div class="box-icon">
+                                        <i class="fa fa-inbox" aria-hidden="true"></i>
+                                        <p class="text-wrapper">{{ stock.color }}</p>
+                                    </div>
+                                    <div class="box-result">
+                                        {% autoescape false %}
+                                        <p class="total_quantity notranslate" id="{{stock.color | replace(' ', '_')}}-quantity">{{ stock.quantity }}</p>
+                                        
+                                        {% endautoescape %}
+                                    </div>
+                                </div>
+                            </div>
                             {% endfor %}
-                        {% endif %}
+                            {% endif %}
                         </div>
                     </div>
 
@@ -122,24 +137,24 @@
                                 {% for stock in product.stocks %}
                                 <tr title="{{stock.createdOn}}" class="color-text" id="{{stock.id}}">
                                     {% if stock.color|length %}
-                                        {% if product.colors %}
-                                            {% for color in product.colors %}
-                                                {% if stock.color == color.id %}
-                                                <td id="{{color.id}}">{{color.color}}</td>
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            <td id="">...</td>
-                                        {% endif %}
+                                    {% if product.colors %}
+                                    {% for color in product.colors %}
+                                    {% if stock.color == color.id %}
+                                    <td id="{{color.id}}" class="notranslate">{{color.color}}</td>
+                                    {% endif %}
+                                    {% endfor %}
                                     {% else %}
                                     <td id="">...</td>
                                     {% endif %}
-                                    <td>{{(stock.cost|round(2)|string).rstrip('0').rstrip('.')}}</td>
+                                    {% else %}
+                                    <td id="">...</td>
+                                    {% endif %}
+                                    <td class="notranslate">{{(stock.cost|round(2)|string).rstrip('0').rstrip('.')}}</td>
                                     <td>{{stock.currency}}</td>
-                                    <td>{{(stock.rate|round(2)|string).rstrip('0').rstrip('.')}}</td>
-                                    <td>{{stock.quantity}}</td>
-                                    <td>{{stock.adjust}}</td>
-                                    <td class="flex-between-center">
+                                    <td class="notranslate">{{(stock.rate|round(2)|string).rstrip('0').rstrip('.')}}</td>
+                                    <td class="notranslate">{{stock.quantity}}</td>
+                                    <td class="notranslate">{{stock.adjust}}</td>
+                                    <td class="flex-between-center notranslate">
                                         {% set total = stock.cost * stock.quantity %}
 
                                         <span style="text-decoration: underline;" class="total-cost currency-format"
@@ -268,7 +283,7 @@
 
                 Array.from(stocks).reverse().forEach(s => {
                     if ($(s).children('td').eq(0).attr('id') == id) {
-                        addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(4).text())
+                        addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(1).text())
                     }
                 })
             }
@@ -317,7 +332,7 @@
 
                     Array.from(stocks).reverse().forEach(s => {
                         if ($(s).children('td').eq(0).attr('id') == id) {
-                            addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(4).text())
+                            addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(1).text())
                         }
                     })
                     isSelected = true
@@ -326,7 +341,7 @@
 
             if (isSelected == false) {
                 Array.from(stocks).reverse().forEach(s => {
-                    addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(4).text())
+                    addData(myLineChart, $(s).children('td').eq(0).text(), $(s).children('td').eq(1).text())
                 })
             }
         })
@@ -375,7 +390,7 @@
 
         return `<input type="hidden" id="input-product" value="{{product.id}}">
         <td class="pl-0">
-                <select name="type" id="select-color" class="form-empty input-color color-text">
+                <select name="type" id="select-color" class="form-empty input-color color-text notranslate">
                     {% if product.colors %}
                         {% for color in product.colors %}
                         <option value="{{ color.id }}">{{ color.color }}</option>
@@ -398,7 +413,7 @@
             <td><input type="number" class="form-empty color-text input-color" id="input-adjust"
                     placeholder="Adjust" value="`+ adjust + `"></td>
             <td class="flex-between">
-                <span style="text-decoration: underline;" id="calculated-result">`+ result + `</span>
+                <span style="text-decoration: underline;" id="calculated-result" class="notranslate">`+ result + `</span>
                 `+ button + `
             </td>`
     }
@@ -410,6 +425,7 @@
         } else {
             $(this).find('p').addClass('clear')
             $('.stock-form').html(stockForm('', '', '', '', '', '', '0.00', ''))
+            $('.stock-form').find('#input-cost').focus()
             total.cost = 0
             total.quantity = 0
         }
@@ -424,7 +440,7 @@
         }
 
         var result = total.cost * total.quantity
-        $('#calculated-result').text(accounting.formatMoney(result))
+        $(this).parent().parent().find('#calculated-result').text(accounting.formatMoney(result))
     })
 
     $(document).on('click', '.stock-edit', function () {
@@ -448,13 +464,13 @@
         total.quantity = $('#input-quantity').val()
 
         $(document).on('click', '.stock-cancel', function () {
-            $(tr).html(`<td id="` + color + `">` + $(tmp[0]).text() + `</td>
-                        <td>`+ $(tmp[1]).text() + `</td>
+            $(tr).html(`<td id="` + color + `" class="notranslate">` + $(tmp[0]).text() + `</td>
+                        <td class="notranslate">`+ $(tmp[1]).text() + `</td>
                         <td>`+ $(tmp[2]).text() + `</td>
-                        <td>`+ $(tmp[3]).text() + `</td>
-                        <td>`+ $(tmp[4]).text() + `</td>
-                        <td>`+ $(tmp[5]).text() + `</td>
-                        <td class="flex-between-center">
+                        <td class="notranslate">`+ $(tmp[3]).text() + `</td>
+                        <td class="notranslate">`+ $(tmp[4]).text() + `</td>
+                        <td class="notranslate">`+ $(tmp[5]).text() + `</td>
+                        <td class="flex-between-center notranslate">
                             <span style="text-decoration: underline;" title="`+ accounting.formatMoney($(tmp[6]).find('span').attr('title'), '\u17DB', 0) + `">` + accounting.formatMoney($(tmp[6]).text()) + `</span>
                             <div class="flex-between-center action-btn">
                                 <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
@@ -469,17 +485,17 @@
 
     $(document).on('click', '.stock-save', function () {
         var id = $(this).parent().parent().parent().attr('id')
-        var color = $('#select-color')
-        var cost = $('#input-cost')
-        var currency = $('#select-currency')
-        var rate = $('#input-rate')
-        var quantity = $('#input-quantity')
-        var adjust = $('#input-adjust')
-        var product = $('#input-product')
+        var color = $('#'+id).find('#select-color')
+        var cost = $('#'+id).find('#input-cost')
+        var currency = $('#'+id).find('#select-currency')
+        var rate = $('#'+id).find('#input-rate')
+        var quantity = $('#'+id).find('#input-quantity')
+        var adjust = $('#'+id).find('#input-adjust')
+        var product = $('#'+id).find('#input-product')
         var color_name = '...'
 
         if (color.val() != '') {
-            color_name = $('#select-color option:selected').text()
+            color_name = $('#'+id).find('#select-color option:selected').text()
         }
 
         var validated = [cost, currency, quantity]
@@ -501,13 +517,13 @@
 
                     console.log(data)
                     if (data.data == 'success') {
-                        $('#list-stocks').find('#' + id).html(`<td id="` + color.val() + `">` + color_name + `</td>
-                                                            <td>`+ cost.val() + `</td>
+                        $('#list-stocks').find('#' + id).html(`<td id="` + color.val() + `" class="notranslate">` + color_name + `</td>
+                                                            <td class="notranslate">`+ cost.val() + `</td>
                                                             <td>`+ currency.val() + `</td>
-                                                            <td>`+ rate.val() + `</td>
-                                                            <td>`+ quantity.val() + `</td>
-                                                            <td>`+ adjust.val() + `</td>
-                                                            <td class="flex-between-center">
+                                                            <td class="notranslate">`+ rate.val() + `</td>
+                                                            <td class="notranslate">`+ quantity.val() + `</td>
+                                                            <td class="notranslate">`+ adjust.val() + `</td>
+                                                            <td class="flex-between-center notranslate">
                                                                 <span style="text-decoration: underline;" title="`+ accounting.formatMoney(cost.val() * quantity.val() * rate.val(), 'R') + `">` + accounting.formatMoney(cost.val() * quantity.val()) + `</span>
                                                                 <div class="flex-between-center action-btn">
                                                                     <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
@@ -515,9 +531,10 @@
                                                                 </div> 
                                                             </td>`)
                         $('#total_stock').text(data.total_stock)
+                        $('#total_cost').text(accounting.formatMoney(data.total_cost))
 
                         data.stocks.forEach(s => {
-                            $('#stocks').find('#'+s.color+'-quantity').text(s.quantity)
+                            $('#stocks').find('#' + s.color.split(' ').join('_') + '-quantity').text(s.quantity)
                         })
 
                         $('#refresh-chart').attr('disabled', false)
@@ -542,13 +559,14 @@
                             $(this).remove()
                         })
                         $('#total_stock').text(data.total_stock)
+                        $('#total_cost').text(accounting.formatMoney(data.total_cost))
                         if (color_name != '...') {
                             var t = data.total_stock
                             var e = '#'
                             Array.from(document.querySelectorAll('.total_quantity')).forEach(q => {
                                 var i = $(q).attr('id')
                                 var c = i.split('-')[0]
-                                if (c != color_name) {
+                                if (c != color_name.split(' ').join('_')) {
                                     t -= parseInt($(q).text())
                                 } else {
                                     e += i
@@ -564,17 +582,18 @@
     })
 
     $(document).on('click', '.stock-add', function () {
-        var color = $('#select-color')
-        var cost = $('#input-cost')
-        var currency = $('#select-currency')
-        var rate = $('#input-rate')
-        var quantity = $('#input-quantity')
-        var adjust = $('#input-adjust')
-        var product = $('#input-product')
+        
+        var color = $(this).parent().parent().parent().find('#select-color')
+        var cost = $(this).parent().parent().parent().find('#input-cost')
+        var currency = $(this).parent().parent().parent().find('#select-currency')
+        var rate = $(this).parent().parent().parent().find('#input-rate')
+        var quantity = $(this).parent().parent().parent().find('#input-quantity')
+        var adjust = $(this).parent().parent().parent().find('#input-adjust')
+        var product = $(this).parent().parent().parent().find('#input-product')
         var color_name = '...'
 
         if (color.val() != '') {
-            color_name = $('#select-color option:selected').text()
+            color_name = $(this).parent().parent().parent().find('#select-color option:selected').text()
         }
 
         var validated = [cost, currency, quantity]
@@ -595,13 +614,13 @@
                 success: function (data) {
                     if (data.data == 'success') {
                         $('#list-stocks').prepend(` <tr class="color-text" id="` + data.id + `">
-                                                    <td id="`+ color.val() + `">` + color_name + `</td>
-                                                    <td>`+ data.cost + `</td>
+                                                    <td id="`+ color.val() + `" class="notranslate">` + color_name + `</td>
+                                                    <td class="notranslate">`+ data.cost + `</td>
                                                     <td>`+ data.currency + `</td>
-                                                    <td>`+ data.rate + `</td>
-                                                    <td>`+ data.quantity + `</td>
-                                                    <td>`+ data.adjust.toFixed(2) + `</td>
-                                                    <td class="flex-between-center">
+                                                    <td class="notranslate">`+ data.rate + `</td>
+                                                    <td class="notranslate">`+ data.quantity + `</td>
+                                                    <td class="notranslate">`+ data.adjust.toFixed(2) + `</td>
+                                                    <td class="flex-between-center notranslate">
                                                         <span style="text-decoration: underline;" title="`+ accounting.formatMoney(data.cost * data.quantity * data.rate, '\u17DB', 0) + `">` + accounting.formatMoney(data.cost * data.quantity) + `</span>
                                                         <div class="flex-between-center action-btn">
                                                             <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
@@ -610,13 +629,14 @@
                                                     </td>
                                                 </tr>`)
                         $('#total_stock').text(data.total_stock)
+                        $('#total_cost').text(accounting.formatMoney(data.total_cost))
                         var t = data.total_stock
                         var e = '#'
                         if (color_name != '...') {
                             Array.from(document.querySelectorAll('.total_quantity')).forEach(q => {
                                 var i = $(q).attr('id')
                                 var c = i.split('-')[0]
-                                if (c != color_name) {
+                                if (c != color_name.split(' ').join('_')) {
                                     t -= parseInt($(q).text())
                                 } else {
                                     e += i

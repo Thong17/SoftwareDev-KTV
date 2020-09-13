@@ -213,12 +213,19 @@
     $(document).on('click', '.save-product', function () {
         var id = $(this).attr('id')
         var product = $('#product').val()
+        var isStock = $('#is-stock')
         var price = $('#price').val()
         var currency = $('#currency').val()
         var discount = $('#discount').val()
         var period = $('#period').val()
         var description = $('#details').val()
         var category = $('#category').val()
+
+        if ($(isStock).prop('checked') == true) {
+            isStock = true
+        } else {
+            isStock = false
+        }
         
         if (category != null) {
             if (product == '') {
@@ -229,7 +236,7 @@
                 $.ajax({
                     url: '/product/save/' + id,
                     type: 'POST',
-                    data: { product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category },
+                    data: { product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
                     success: function (data) {
                         alert('Done')
                     }
@@ -303,6 +310,7 @@
                         $('#product-nav').html(showProductForm({
                             category: data.productOfCategory,
                             product: data.product,
+                            stock: data.isStock,
                             price: data.price,
                             discount: data.discount,
                             period: data.period,
@@ -458,12 +466,19 @@
         event.preventDefault();
         var brand = $('#brand-id').val()
         var product = $('#product').val()
+        var isStock = $('#is-stock')
         var price = $('#price').val()
         var currency = $('#currency').val()
         var discount = $('#discount').val()
         var period = $('#period').val()
         var description = $('#details').val()
         var category = $('#category').val()
+
+        if ($(isStock).prop('checked') == true) {
+            isStock = true
+        } else {
+            isStock = false
+        }
         
         if (category != null) {
             if (product == '') {
@@ -474,7 +489,7 @@
                 $.ajax({
                     url: '/product/add',
                     type: 'POST',
-                    data: {brand: brand, product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category },
+                    data: {brand: brand, product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
                     success: function (data) {
                         $('.product-image').removeClass('hide')
                         toggleEdit($('.save-product'), $('.submit-product'))
@@ -635,6 +650,7 @@
                     $('#product-nav').html(showProductForm({
                         category: "Select category",
                         product: "",
+                        stock: true,
                         price: "",
                         discount: "",
                         period: "",

@@ -1,0 +1,36 @@
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog cascading-modal modal-avatar modal-sm" role="document">
+            <!--Content-->
+            <div class="modal-content">
+
+                <!--Header-->
+                <div class="modal-header">
+                    <img src="static/uploads/{{ current_user.profile[0].photo }}" alt="avatar"
+                        class="rounded-circle img-responsive">
+                </div>
+                <!--Body-->
+                <div class="modal-body text-center mb-1">
+
+                    <h5 class="mb-2">{{ current_user.username }}</h5>
+
+                    <div class="form-group" id="pwd">
+                        <form id="authenticateForm" style="width: 100%;">
+                            <input type="hidden" value="{{ current_user.id }}">
+                            <input type="password" type="text" id="userPassword"
+                                class="form-control input-color input-modal" required>
+                            <label for="userPassword" class="label userPassword">Password</label>
+                            <input type="submit" class="hide" onclick="$('#authenticateForm').submit();">
+                        </form>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn color-text btn-block btn-modal" id="loginUser">Continue</button>
+                    </div>
+                </div>
+
+            </div>
+            <!--/.Content-->
+        </div>
+    </div>
+    <!--Modal: Login with Avatar Form-->

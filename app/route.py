@@ -1,6 +1,6 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock
-from app import LoginForm, RegisterForm, CategoryForm, BrandForm
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile
+from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
@@ -9,6 +9,7 @@ import json, simplejson
 from datetime import datetime, timedelta, date
 from sqlalchemy import func
 from decimal import Decimal
+from functools import wraps
 
 
 @login_manager.user_loader
@@ -85,7 +86,11 @@ def register():
             try:
                 db.session.add(requestedUser)
                 db.session.commit()
-
+                pid = str(uuid4())
+                profileUser = tblProfile(id=pid, createdBy=id)
+                db.session.add(profileUser)
+                db.session.commit()
+                login_user(requestedUser)
                 return redirect('/')
             except SQLAlchemyError as error:
                 print(str(error))
@@ -93,13 +98,98 @@ def register():
                 return 'Register failed'
     return render_template('views/register.html', form=form)
 
-
 @app.route('/logout', methods=['POST'])
 def logout():
     logout_user()
     return redirect('/login')
 
+@app.route('/user/save/<id>', methods=['POST'])
+def save_user(id):
+    user = tblUser.query.get(id)
+    username = request.form['username']
+    fullname = request.form['fullname']
+    gender = request.form['gender']
+    birthdate = request.form['birthdate']
+    email = request.form['email']
 
+    firstname = fullname.split(' ')[0]
+    lastname = fullname.split(' ')[1]
+
+    if birthdate == '':
+        birthdate = None
+
+    user.username = username
+    user.firstname = firstname
+    user.lastname = lastname
+    user.gender = gender
+    user.birthdate = birthdate
+    user.email = email
+
+    db.session.commit()
+
+    return jsonify({'result': 'Success'})
+
+@app.route('/profile')
+def profile():
+    form = ProfileForm()
+    try:
+        profile = tblProfile.query.get(current_user.profile[0].id)
+    except:
+        pid = str(uuid4())
+        profile = tblProfile(id=pid, createdBy=current_user.id)
+        db.session.add(profile)
+        db.session.commit()
+    return render_template('views/profile.html', form=form, profile=profile)
+
+@app.route('/profile/save/<id>', methods=['POST'])
+def save_profile(id):
+    form = ProfileForm()
+    profile = tblProfile.query.get(id)
+    if form.validate_on_submit():
+        status = request.form['status']
+        phone = request.form['phone']
+        company = request.form['company']
+        hometown = request.form['hometown']
+        location = request.form['location']
+        bio = request.form['bio']
+
+        profile.status = status
+        profile.phone = phone
+        profile.company = company
+        profile.hometown = hometown
+        profile.location = location
+        profile.bio = bio 
+
+        try: 
+            db.session.commit()
+            return redirect('/profile')
+        except:
+            return render_template('views/profile.html', form=form)
+
+    return render_template('views/profile.html', form=form)
+
+@app.route('/profile/photo/<id>', methods=['POST'])
+def save_photo(id):
+    Profile = tblProfile.query.get(id)
+    if Profile.photo != 'default.png':
+        delete_photo('uploads', Profile.photo)
+    jsons = []
+    for file in request.files:
+        photo = request.files[file]
+        extension = photo.filename.rsplit('.', 1)[1]
+        filename = str(uuid4()) + '.' + extension
+        photo.filename = filename
+        uploaded = upload.save(photo)
+        Profile.photo = filename
+        db.session.commit()
+        json = {
+            'photoId': Profile.id,
+            'src': filename,
+        }
+        jsons.append(json)
+    return jsonify(jsons)
+
+    
 @app.route('/setting')
 @login_required
 def setting():
@@ -327,13 +417,19 @@ def add_product():
     period = request.form['period']
     description = request.form['description']
     brand = request.form['brand']
+    isStock = request.form['isStock']
+
+    if isStock == 'true':
+        isStock = True
+    else:
+        isStock = False
     
     if period == '':
         period = None
 
     id = str(uuid4())
 
-    Model = tblProduct(id=id, product=product, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
+    Model = tblProduct(id=id, product=product, isStock=isStock, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
     
     db.session.add(Model)
     db.session.commit()
@@ -454,14 +550,21 @@ def save_product(id):
     product = request.form['product']
     currency = request.form['currency']
     price = request.form['price']
+    isStock = request.form['isStock']
     period = request.form['period']
     discount = request.form['discount']
     description = request.form['description']
+
+    if isStock == 'true':
+        isStock = True
+    else:
+        isStock = False
 
     if period == '':
         period = None
 
     Product.product = product
+    Product.isStock = isStock
     Product.currency = currency
     Product.price = price
     Product.description = description
@@ -620,9 +723,13 @@ def add_stock():
         db.session.add(model)
         db.session.commit()
         total_stock = 0
+        total_costs = 0
+        total_cost = 0
         for stock in model.stocksOfProduct.stocks:
             total_stock += stock.quantity
-        return jsonify({'data': 'success', 'id': id, 'cost': cost, 'quantity': quantity, 'currency': currency, 'rate': rate, 'adjust': adjust, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S')})
+            total_cost = stock.cost * stock.quantity
+            total_costs += total_cost 
+        return jsonify({'data': 'success', 'id': id, 'cost': cost, 'quantity': quantity, 'currency': currency, 'rate': rate, 'adjust': adjust, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S'), 'total_cost': total_costs})
     except:
         return jsonify({'data': 'failed'})
 
@@ -631,14 +738,21 @@ def add_stock():
 def delete_stock(id):
     stock = tblStock.query.get(id)
     total_stock = 0
+    total_costs = 0
+    total_cost = 0
+
     delete_stock = stock.quantity
+    delete_cost = stock.cost * stock.quantity
     for s in stock.stocksOfProduct.stocks:
         total_stock += s.quantity
+        total_cost = s.cost * s.quantity
+        total_costs += total_cost
     try:
         db.session.delete(stock)
         db.session.commit()
         total_stock -= delete_stock
-        return jsonify({'data': 'success', 'total_stock': total_stock})
+        total_costs -= delete_cost
+        return jsonify({'data': 'success', 'total_stock': total_stock, 'total_cost': total_costs})
     except:
         return jsonify({'data': 'failed'}) 
     
@@ -654,9 +768,13 @@ def save_stock(id):
     try:
         db.session.commit()
         total_stock = 0
+        total_costs = 0
+        total_cost = 0
         if stock.stocksOfProduct.stocks:
             for s in stock.stocksOfProduct.stocks:
                 total_stock += s.quantity
+                total_cost = s.cost * s.quantity
+                total_costs += total_cost
 
         stocks = []
         if stock.stocksOfProduct.colors:
@@ -672,6 +790,123 @@ def save_stock(id):
                 }
                 stocks.append(st)
 
-        return jsonify({'data': 'success', 'total_stock': total_stock, 'stocks': stocks})
+        return jsonify({'data': 'success', 'total_stock': total_stock, 'stocks': stocks, 'total_cost': total_costs})
     except:
         return jsonify({'data': 'failed'})
+
+@app.route('/financial', defaults={'arg': None})
+@app.route('/financial/<arg>')
+@login_required
+def financial(arg):
+    if arg is not None:
+        return render_template('views/financial.html', authentication='require')
+    else:
+        return render_template('views/financial.html', authentication='')
+
+
+# token for authenticate
+cashier_token = ''
+def generate_token(new_token):
+    global cashier_token
+    cashier_token = new_token
+
+
+@app.route('/authenticate', methods=['POST'])
+@login_required
+def authenticate():
+    msg = {
+        'password': [],
+        'redirect': ''
+    }
+    password = request.form['password']
+    try:
+        if password == '':
+            msg['password'].append('Password cannot be empty')
+            return jsonify(msg)
+        else:
+            isMatch = bcrypt.check_password_hash(current_user.password, password)
+            if isMatch is True:
+                token = str(uuid4())
+                generate_token(token)
+                msg['redirect'] = '/cashing/'+token
+                return jsonify(msg)
+            msg['password'].append('Password is not correct')
+            return jsonify(msg)
+    except:
+        msg['password'].append('Connection is not available')
+        return jsonify(msg)
+
+@app.route('/cashing/<token>')
+@login_required
+def cashing(token):
+    if token == cashier_token:   
+        products = tblProduct.query.all()
+        brands = tblBrand.query.all()
+        categories = tblCategory.query.all()
+        # generate_token('')
+        return render_template('views/cashing.html', products=products, brands=brands, categories=categories)
+    else:
+        return redirect('/financial/authentication')
+
+@app.route('/order/product/<id>', methods=['POST'])
+def order(id):
+    product = tblProduct.query.get(id)
+    data = json.loads(request.form['data'])
+
+    resultObj = {
+        'data': {},
+        'result': ''
+    }
+
+    if data['colorId'] == '':
+        data['colorId'] = None
+
+    if data['discount'] == '':
+        data['discount'] = 0
+
+    discount = Decimal(data['discount'])
+    quantity = Decimal(data['quantity'])
+
+    price = product.price
+    for v in data['values']:
+        value = tblValue.query.get(v['valueId'])
+        price += value.price 
+    
+    amount = price - (price * discount / 100)
+
+
+    if product.isStock and len(product.stocks) > 0:
+        total_stocks = 0
+        sum_stocks = 0
+        for stock in product.stocks:
+            if stock.color == data['colorId']:
+                sum_stocks += stock.quantity
+            total_stocks += stock.quantity
+        available = sum_stocks - quantity
+        if available >= 0:
+            sum_quantity = quantity
+            for stock in product.stocks:
+                if sum_quantity > 0:
+                    if stock.color == data['colorId'] and stock.quantity > 0:
+                        if stock.quantity < sum_quantity:
+                            stock_quantity = stock.quantity
+                            stock.quantity = 0
+                            sum_quantity -= stock_quantity
+                        else:
+                            stock.quantity -= sum_quantity
+                            sum_quantity = 0
+            amount *= quantity
+            total_stocks -= quantity
+            db.session.commit()
+            resultObj['result'] = 'success'
+            resultObj['data'] = {'amount': amount, 'stock': total_stocks, 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+        else:
+            resultObj['result'] = 'failed'
+            resultObj['data'] = {'message': 'This color has only '+str(sum_stocks)+' left'}
+    else:
+        amount *= quantity
+        resultObj['result'] = 'success'
+        resultObj['data'] = {'amount': amount, 'quantity': quantity, 'price': price, 'isStock': False, 'discount': discount}
+    return jsonify(resultObj)
+
+    

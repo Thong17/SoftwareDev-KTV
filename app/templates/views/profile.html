@@ -1,0 +1,397 @@
+{% extends 'layout/layout.html' %}
+
+{% block style %}
+<style>
+    .form-group {
+        padding-top: 13px;
+    }
+
+    .profile-container {
+        position: relative;
+    }
+
+    .profile {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .profile .profile-img {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        border: 1px solid var(--color-hr);
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .profile .profile-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
+    }
+
+    .profile .profile-name {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+    }
+
+    .profile .profile-name .name {
+        font-size: 28px;
+    }
+
+    .profile .profile-name .dob {
+        font-size: 13px;
+    }
+
+    .profile-details {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .profile-details .details-tag {
+        text-align: start;
+        font-size: 15px;
+        width: 30%;
+    }
+
+    .profile-details .details-value {
+        text-align: start;
+        font-size: 15px;
+        width: 100%;
+    }
+
+    .details {
+        margin-top: 30px;
+        position: relative;
+        padding: 50px 20px 20px 20px;
+        border-radius: 20px;
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .profile-btn {
+        opacity: 0;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: var(--color-menu);
+        width: 37px;
+        height: 27px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: var(--color-text);
+        transform: scale(0.7);
+        transition: 0.3s ease;
+    }
+
+    .details:hover .profile-btn {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+
+    .upload-label {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        object-fit: cover;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .upload-label span {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        position: absolute;
+        border-radius: 5px;
+    }
+
+    .upload-label span i {
+        font-size: 27px;
+        position: absolute;
+        bottom: 0px;
+        right: -50px;
+        opacity: 0;
+        transition: 0.3s ease;
+    }
+
+    .upload-label:hover span i {
+        opacity: 1;
+    }
+
+    .upload-input {
+        visibility: hidden;
+    }
+
+    .form-control {
+        border-radius: 10px;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container" style="margin-top: -20px;">
+    <div class="row">
+        <div class="col-md-8 px-5">
+            <div class="profile-container">
+                <div class="profile">
+                    <div class="profile-img" id="{{ profile.id }}">
+                        <img class="img-src" src="static/uploads/{{ profile.photo }}" alt="Profile image">
+                        <label for="photo" class="upload-label">
+                            <span>
+                                <input type="file" name="photo" id="photo" class="upload-input">
+                                <i class="fa fa-camera" aria-hidden="true" class="upload-icon"></i>
+                            </span>
+                        </label>
+                        <div class="bubbling hide">
+                            <img src="/static/svg/bubbling-{{current_user.theme}}.svg">
+                        </div>
+                    </div>
+                    <div class="profile-name ml-3">
+                        <div class="name color-font">{{ current_user.username }}</div>
+                        <div class="dob color-text">{{ current_user.email }}</div>
+                    </div>
+                </div>
+                <hr>
+                <div class="details" style="width: 60%;">
+                    <div class="profile-btn">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        <ion-icon name="close-outline" class="icon-close hide"></ion-icon>
+                    </div>
+                    <input type="hidden" value="{{ current_user.id }}" id="input-id">
+                    <div class="profile-details">
+                        <div class="details-tag color-text">
+                            Username
+                        </div>
+                        <div style="width: 100%;">
+                            <p class="details-value color-font" id="username">: {{ current_user.username }}</p>
+                            <input type="text" id="input-username" class="form-control input-color color-text hide" value="{{ current_user.username }}">
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="details-tag color-text">
+                            Full Name
+                        </div>
+                        <div style="width: 100%;">
+                            <p class="details-value color-font" id="fullname">: {{ current_user.firstname }} {{ current_user.lastname }}</p>
+                            <input type="text" id="input-fullname" class="form-control input-color color-text hide"  value="{{ current_user.firstname }} {{ current_user.lastname }}">
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="details-tag color-text">
+                            Gender
+                        </div>
+                        <div style="width: 100%;">
+                            <p class="details-value color-font" id="gender">: {{ current_user.gender }}</p>
+                            <select name="gender" id="select-gender" class="form-control input-color color-text hide">
+                                {% if current_user.gender == 'M' %}
+                                <option selected value="M">Male</option>
+                                <option value="F">Female</option>
+                                {% else %}
+                                <option value="M">Male</option>
+                                <option selected value="F">Female</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="details-tag color-text">
+                            Birthdate
+                        </div>
+                        <div style="width: 100%;">
+                            <p class="details-value color-font" id="birthdate">: {{ current_user.birthdate }}</p>
+                            <input type="date" id="input-birthdate" class="form-control input-color color-text hide" value="{{ current_user.birthdate }}">
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="details-tag color-text">
+                            Email
+                        </div>
+                        <div style="width: 100%;">
+                            <p class="details-value color-font" id="email">: {{ current_user.email }}</p>
+                            <input type="email" id="input-email" class="form-control input-color color-text hide" value="{{ current_user.email }}">
+                        </div>
+                    </div>
+                    <div class="form-group p-0 m-0" style="display: flex; justify-content: flex-end; align-items: center;">
+                        <button class="btn color-text border" id="saveDetails" style="opacity: 0; transition: 0.3s ease;">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 px-5" style="border-left: 1px solid var(--color-hr);">
+            <h5 class="color-text">Description</h5>
+            <hr>
+            <form action="/profile/save/{{ profile.id }}" method="post" style="width: 100%;">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-4 pr-0">
+                        <div class="form-group">
+                            {{ form.status.label(class='color-text') }}
+                            {{ form.status(class='form-control color-text input-color') }}
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            {{ form.phone.label(class='color-text') }}
+                            {% if form.phone.errors %}
+                            {{ form.phone(class='form-control color-text input-color is-invalid', value=profile.phone) }}
+                            <div class="invalid-feedback">
+                                {% for error in form.phone.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.phone(class='form-control color-text input-color', value=profile.phone) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form.company.label(class='color-text') }}
+                    {% if form.company.errors %}
+                    {{ form.company(class='form-control color-text input-color is-invalid', value=profile.company) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.company.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.company(class='form-control color-text input-color', value=profile.company) }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.hometown.label(class='color-text') }}
+                    {% if form.hometown.errors %}
+                    {{ form.hometown(class='form-control color-text input-color is-invalid', value=profile.hometown) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.hometown.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.hometown(class='form-control color-text input-color', value=profile.hometown) }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.location.label(class='color-text') }}
+                    {% if form.location.errors %}
+                    {{ form.location(class='form-control color-text input-color is-invalid', value=profile.location) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.location.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.location(class='form-control color-text input-color', value=profile.location) }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.bio.label(class='color-text') }}
+                    {{ form.bio(class='form-control color-text input-color') }}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class='btn border btn-block mt-3 color-text', id='saveProfile') }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    $('#photo').on('change', function () {
+        var files = document.querySelector('#photo').files
+        var id = $(this).closest('.profile').find('.profile-img').attr('id')
+        uploadFile(files, this, '/profile/photo/'+id, function(result, data) {
+            if (result == 'Success') {
+                $('.profile-img').find('.img-src').attr('src', 'static/uploads/'+data[0].src)
+            } else {
+                toggleLoader(data)
+                if (result != '') {
+                    $(data).addClass('hide')
+                    alert(result)
+                }
+            }
+        })
+    })
+
+    $('.profile-btn').on('click', '.fa-pencil-square-o', function() {
+        toggleEdit($(this).parent().parent().find('.form-control'), $(this).parent().parent().find('.details-value'))
+        toggleEdit($(this).next(), $(this))
+        $('#saveDetails').css('opacity', '1')
+    })
+
+    $('.profile-btn').on('click', '.icon-close', function() {
+        toggleEdit($(this).parent().parent().find('.details-value'), $(this).parent().parent().find('.form-control'))
+        toggleEdit($(this).prev(), $(this))
+        $('#saveDetails').css('opacity', '0')
+    })
+
+    $('#saveDetails').on('click', function() {
+        var id = $('#input-id').val()
+        var username = $('#input-username')
+        var fullname = $('#input-fullname')
+        var gender = $('#select-gender')
+        var birthdate = $('#input-birthdate')
+        var email = $('#input-email')
+
+        var error = []
+
+        var validated = [username, fullname, gender, email]
+
+        validated.forEach(v => {
+            if ($(v).val() == '') {
+                $(v).focus()
+                error.push(v)
+            }
+        })
+
+        var birth = new Date(birthdate.val())
+        var now = new Date()
+        now.setHours(0,0,0,0)
+
+        if (birth > now) {
+            alert('Your age is not valid')
+        }
+
+        var form = new FormData()
+        form.append('username', username.val())
+        form.append('fullname', fullname.val())
+        form.append('gender', gender.val())
+        form.append('birthdate', birthdate.val())
+        form.append('email', email.val())
+
+        $.ajax({
+            url: '/user/save/'+id,
+            method: 'POST',
+            data: form,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                if (data.result == 'Success') {
+                    window.location.reload()
+                } else {
+                    alert(data.result)
+                }
+            }
+        })
+    })
+</script>
+
+{% endblock %}
