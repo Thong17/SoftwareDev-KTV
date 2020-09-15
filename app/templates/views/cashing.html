@@ -313,6 +313,38 @@
         height: 33px;
         border-radius: 50%;
     }
+
+    .money-add {
+        cursor: pointer;
+    }
+
+    #list-money .form-empty {
+        border-radius: 7px;
+        padding-left: 7px;
+    }
+
+    .drawer-time {
+        width: auto;
+        height: 100%;
+        padding: 3px 3px 3px 10px;
+        border-radius: 23px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        border: 1px solid var(--color-hr);
+    }
+
+    .drawer-time.active .time-btn {
+        color: limegreen;
+    }
+
+    .time-btn {
+        margin-left: 3px;
+        cursor: pointer;
+        color: crimson;
+        font-size: 28px;
+    }
+
 </style>
 {% endblock %}
 
@@ -363,13 +395,8 @@
                     <i class="fa fa-search" aria-hidden="true"></i>
                     <input type="text" class="search-input color-text pl-2" placeholder="Search">
                 </div>
-                <div class="dropdown" id="list-cates">
-                    <div class="menu-icon drawer-btn" data-toggle="dropdown">
-                        <i class="fa fa-usd" aria-hidden="true"></i>
-                    </div>
-                    <div class="dropdown-menu drawer-dropdown">
-
-                    </div>
+                <div class="menu-icon drawer-btn">
+                    <i class="fa fa-usd" aria-hidden="true"></i>
                 </div>
             </div>
         </div>
@@ -418,7 +445,7 @@
                                     Out of stock
                                     {% endif %}
                                     {% else %}
-                                    No stock
+                                    Available
                                     {% endif %}
                                 </span></p>
                             <p style="font-size: 12px;">
@@ -481,12 +508,39 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="drawerModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title color-font">Drawer</h4>
+                <div class="drawer-time active" title="Drawer is off">
+                    <span class="color-text">11h:30m</span>
+                    <ion-icon name="time-outline" class="time-btn"></ion-icon>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn color-font close-modal" data-dismiss="modal">Cancel</button>
+                <button class="btn border drawer-save color-font">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block script %}
 <script src="{{url_for('static', filename='js/printThis.js')}}"></script>
 <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
+    $('.drawer-btn').on('click', function () {
+        $('#drawerModal').find('.modal-body').html(drawerForm('Default', 4000, 0.00))
+        $('#drawerModal').modal('show')
+    })
 
     var orderLists = []
 
@@ -530,9 +584,9 @@
                             if (data.data.stock == 0) {
                                 data.data.stock = 'Out of stock'
                             } else {
-                                data.data.stock = data.data.stock+' Available'
+                                data.data.stock = data.data.stock + ' Available'
                             }
-                            $('#'+orderList.productId).find('.stock-tag').text(data.data.stock)
+                            $('#' + orderList.productId).find('.stock-tag').text(data.data.stock)
                         }
                         var total = accounting.unformat($('#sumTotal').text())
                         total += data.data.amount
@@ -729,7 +783,7 @@
                     placeholder="Disc"></td>
             <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
                     placeholder="Qty" value="`+ quantity + `"></form></td>
-            <td id="calculated-result" style="text-align:center;"">`+ total + `</td>
+            <td id="calculated-result" style="text-align:center;">`+ total + `</td>
             <td class="cancel-btn">
                 <ion-icon name="close-outline"></ion-icon>
             </td>
@@ -907,30 +961,30 @@
     })
 
     function showOrder(id, description, price, discount, quantity, amount) {
-        return `<tr class="color-text" id="`+ id +`">
-                    <td class="description" id="order-description">`+ description +`</td>
+        return `<tr class="color-text" id="` + id + `">
+                    <td class="description" id="order-description">`+ description + `</td>
                     <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
-                                                                                    precision: 2,
-                                                                                    format: {
-                                                                                        pos: "%s%v",
-                                                                                        neg: "%s%v",
-                                                                                        zero: '%s%v'
-                                                                                    }
-                                                                                }).replace(/\.0+$/,'') +`</td>
+            precision: 2,
+            format: {
+                pos: "%s%v",
+                neg: "%s%v",
+                zero: '%s%v'
+            }
+        }).replace(/\.0+$/, '') + `</td>
                     <td>
-                        <p class="color-text text-center" contenteditable="true" id="order-discount">`+ discount +`%</p>
+                        <p class="color-text text-center" contenteditable="true" id="order-discount">`+ discount + `%</p>
                     </td>
                     <td>
-                        <p class="color-text text-center" contenteditable="true" id="order-quantity">`+ quantity +`</p>
+                        <p class="color-text text-center" contenteditable="true" id="order-quantity">`+ quantity + `</p>
                     </td>
                     <td class="text-center currency-format" id="order-amount">`+ accounting.formatMoney(amount, {
-                                                                                    precision: 2,
-                                                                                    format: {
-                                                                                        pos: "%s%v",
-                                                                                        neg: "%s%v",
-                                                                                        zero: '%s%v'
-                                                                                    }
-                                                                                }).replace(/\.0+$/,'') +`</td>
+            precision: 2,
+            format: {
+                pos: "%s%v",
+                neg: "%s%v",
+                zero: '%s%v'
+            }
+        }).replace(/\.0+$/, '') + `</td>
                     <td class="cancel-btn hide">
                         <ion-icon name="close-outline"></ion-icon>
                     </td>
@@ -942,5 +996,259 @@
                     </td>
                 </tr>`
     }
+
+    function drawerForm(counter, rate, startCost) {
+
+        return `
+                <div class="row">
+                    <div class="col-md-4 pr-0">
+                        <div class="form-group">
+                            <input class="form-control input-color" step="any" type="number" name="drawer-rate" id="drawer-rate" value="` +
+                                rate + `">
+                            <label class="label rate" for="drawer-rate">Rate</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <input class="form-control input-color" type="text" name="drawer-counter" id="drawer-counter" value="` +
+                        counter +
+                        `">
+                            <label class="label counter" for="drawer-counter">Counter</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 pr-0">
+                        <div class="form-group">
+                            <input class="form-control input-color" step="any" type="number" name="drawer-cost" id="drawer-cost" value="` +
+                startCost + `">
+                            <label class="label cost" for="drawer-cost">Start Cost</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <select name="drawer-currency" id="drawer-currency" class="form-control input-color">
+                                <option value="dollar" selected><span>&#36;</span></option>
+                                <option value="riel"><span>&#6107;</span></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="money-container mt-3" style="height: 230px; overflow: auto">
+                    <table class="table money-table">
+                        <thead>
+                            <tr class="color-font">
+                                <td style="width: 35%;"><ion-icon name="add-outline" class="money-add mr-2" style="vertical-align: middle"></ion-icon>Money</td>
+                                <td style="width: 15%; text-align:center;">Currency</td>
+                                <td style="width: 20%; text-align:center;">Unit</td>
+                                <td style="width: 25%; text-align:center;">Total</td>
+                                <td style="width: 5%;"></td>
+                            </tr>
+                        </thead>
+                        <tbody id="list-money" class="color-text">
+                            <tr class="pre-divied">
+                                <td class="pre-cost">...</td>
+                                <td class="pre-currency" style="text-align:center;">...</td>
+                                <td class="pre-unit" style="text-align:center;">...</td>
+                                <td class="pre-total" style="text-align:center;">...</td>
+                                <td class="money-btn">
+                                    <ion-icon name="bulb-outline" class="pre-icon hide" title="Money calculated"></ion-icon>
+                                </td>
+                            </tr>
+                            <tr class="money-form color-text">
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                `
+    }
+
+    function moneyForm(money, currency, unit, total) {
+        var select = `<select name="money-currency" id="money-currency" class="form-empty color-text input-color">`
+        if (currency == 'dollar') {
+            select += `<option value="dollar" selected><span>&#36;</span></option>
+                        <option value="riel"><span>&#6107;</span></option>
+                    </select>`
+        } else {
+            select += `<option value="dollar"><span>&#36;</span></option>
+                        <option value="riel" selected><span>&#6107;</span></option>
+                    </select>`
+        }
+        select += '</div>'
+        return `<td class="pl-0">
+                    <input type="number" class="form-empty color-text input-color" id="money-money" value="` + money + `"
+                    placeholder="Money">
+                </td>
+                <td>
+                    `+select+`
+                </td>
+                <td>
+                    <input min="1" type="number" class="form-empty color-text input-color" id="money-unit" value="`+ unit + `"
+                    placeholder="Unit">
+                </td>
+                <td>
+                    <input type="number" class="form-empty color-text input-color" id="money-total" value="`+ total + `"
+                    placeholder="Total">
+                </td>
+                <td class="money-btn">
+                    <ion-icon name="checkmark-outline" class="money-save hide"></ion-icon>
+                    <ion-icon name="close-outline" class="money-delete"></ion-icon>
+                </td>`
+    }
+
+
+    // Testing
+    $(document).on('input', '#drawer-cost', function() {
+        var currency = $('#drawer-currency option:selected').text()
+        var value = $(this).val()
+
+        $('#list-money').find('.pre-currency').text(currency)
+
+        if (value < 1 || value == '') {
+            $('#list-money').find('.pre-cost').text(0)
+            $('#list-money').find('.pre-total').text(0)
+        } else {
+            $('#list-money').find('.pre-cost').text(value)
+            $('#list-money').find('.pre-total').text(value)
+        }
+        $('.pre-icon').removeClass('hide')
+    })
+
+    $(document).on('change', '#drawer-currency', function() {
+        $('#list-money').find('.pre-currency').text($('#drawer-currency option:selected').text())
+        var cost = $('#drawer-cost').val()
+        var rate = $('#drawer-rate').val()
+
+        var total = $('.pre-total').text()
+
+        if ($(this).val() == 'dollar') {
+            cost /= rate
+            total /= rate
+        } else {
+            cost *= rate
+            total *= rate
+        }
+        $('#drawer-cost').val(cost)
+        if (cost < 1 || cost == '') {
+            $('#list-money').find('.pre-cost').text(0)
+            $('#list-money').find('.pre-total').text(0)
+        } else {
+            $('#list-money').find('.pre-cost').text(total)
+            $('#list-money').find('.pre-total').text(total)
+        }
+    })
+
+    $(document).on('click', '.money-add', function() {
+        $('.money-form').html(moneyForm('', 'dollar', '', ''))
+    })
+
+    $(document).on('input', '#money-money, #money-unit', function() {
+        var money = $(this).closest('tr').find('#money-money').val()
+        var unit = $(this).closest('tr').find('#money-unit').val()
+        var cost = $('#drawer-cost').val()
+        var rate = $('#drawer-rate').val()
+        var currency = $(this).closest('tr').find('#money-currency').val()
+
+        if ($('#drawer-currency').val() == 'riel') {
+            cost /= rate
+        }
+
+        var total = 0
+        
+        if (currency == 'riel') {
+            money /= rate
+        }
+
+        total = money * unit
+
+        if (total > cost) {
+            total = cost
+            $(this).closest('tr').find('#money-unit').val(Math.floor(total / money))
+        } 
+        if (total < 0) {
+            total = 0
+        }
+
+        if ($('#drawer-currency').val() == 'riel') {
+            $(this).closest('tr').find('#money-total').val(total * rate)
+
+            $('.pre-total').text((cost - total) * rate)
+            $('.pre-cost').text((cost - total) * rate)
+
+        } else {
+            $(this).closest('tr').find('#money-total').val(total)
+
+            $('.pre-total').text(cost - total)
+            $('.pre-cost').text(cost - total)
+        }
+
+    })
+
+    $(document).on('input', '#money-total', function() {
+        var currency = $(this).closest('tr').find('#money-currency').val()
+        var rate = $('#drawer-rate').val()
+        var cost = $('#drawer-cost').val()
+
+        if (cost == '') {
+            cost = 0
+        }
+
+        var total = $(this).closest('tr').find('#money-total').val()
+        var unit = $(this).closest('tr').find('#money-unit').val()
+
+        if (parseFloat(total) > parseFloat(cost)) {
+            total = cost
+            $(this).closest('tr').find('#money-total').val(total)
+        }
+
+        money = total / unit
+        
+        $(this).closest('tr').find('#money-money').val(Math.floor(money))
+    })
+
+    $(document).on('change', '#money-currency', function() {
+        var rate = $('#drawer-rate').val()
+        var money = $(this).closest('tr').find('#money-money').val()
+        var total = $(this).closest('tr').find('#money-total').val()
+        if ($(this).val() == 'riel') {
+            money *= rate
+            total *= rate
+        } else {
+            money /= rate
+            total /= rate
+        }
+        $(this).closest('tr').find('#money-total').val(total)
+        $(this).closest('tr').find('#money-money').val(money)
+    })
+
+
+    function convertCurrency(number, rate, currency, callback) {
+        if (currency == 'riel') {
+            callback(number * rate)
+        } else {
+            callback(number / rate)
+        }
+    }
+
+    function calculateMoney(total, money, unit, currency) {
+
+    }
+
+    // End testing
+
+
+
+
+    
+
+
+    $(document).on('click', '.money-delete', function() {
+        $(this).closest('tr').children().fadeOut('slow', function() {
+            $(this).closest('tr').empty()
+        })
+    })
+
 </script>
 {% endblock %}

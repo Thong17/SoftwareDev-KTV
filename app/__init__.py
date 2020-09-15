@@ -101,10 +101,13 @@ class tblUser(db.Model, UserMixin):
     theme = db.Column(db.String(20), nullable=True, default='light')
     language = db.Column(db.String(20), nullable=True, default='english')
     publicId = db.Column(db.String(50), nullable=False)
+    token = db.Column(db.String(36), nullable=True, default='')
+    drawer = db.Column(db.String(36), nullable=True, default='')
     isAdmin = db.Column(db.Boolean, default=False)
     isConfirm = db.Column(db.Boolean, default=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     profile = db.relationship('tblProfile', backref='profile', lazy=True)
+    drawers = db.relationship('tblDrawer', backref='drawers', lazy=True)
 
 class tblProfile(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -230,14 +233,78 @@ class tblActivity(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
-class tblTransaction(db.Model):
+
+
+# Working
+class tblDrawer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
+    key = db.Column(db.String(36), nullable=True, default='')
+    rate = db.Column(db.Numeric(10,2), nullable=True, default=4000)
+    counter = db.Column(db.String(50), nullable=True, default='')
+    startCost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    currency = db.Column(db.String(20), nullable=False)
+    startedOn = db.Column(db.DateTime, default=datetime.utcnow)
+    endedOn = db.Column(db.DateTime, nullable=True)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    moneys = db.relationship('tblMoney', backref='moneys', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    payments = db.relationship('tblPayment', backref='payments', lazy=True, cascade="all, delete-orphan", single_parent=True)
+
+class tblMoney(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    money = db.Column(db.Numeric(10,0), nullable=True, default=0.00)
+    currency = db.Column(db.String(20), nullable=False)
     quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
-    discount = db.Column(db.String(3), nullable=True, default='')
-    isComplete = db.Column(db.Boolean, default=False)
+    drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
+# End
+
+
+
+
+class tblQuantity(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    stock = db.Column(db.Numeric(10,0), nullable=True, default=0)
+    quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
+    stockId = db.Column(db.String(36), db.ForeignKey('tbl_stock.id'), nullable=False)
+    transactionId = db.Column(db.String(36), db.ForeignKey('tbl_transaction.id'), nullable=False)
+
+
+# Pending
+class tblCustomer(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    firstname = db.Column(db.String(20), nullable=True)
+    lastname = db.Column(db.String(20), nullable=True)
+    gender = db.Column(db.String(1), nullable=True)
+    birthdate = db.Column(db.Date, nullable=True)
+    email = db.Column(db.String(100), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+
+payment = db.Table('payment',
+    db.Column('payment_id', db.String(36), db.ForeignKey('tbl_payment.id')),
+    db.Column('transaction_id', db.String(36), db.ForeignKey('tbl_transaction.id'))
+)
+
+class tblTransaction(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    isComplete = db.Column(db.Boolean, default=False)
+    discount = db.Column(db.String(3), nullable=True, default='')
+    price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    description = db.Column(db.Text(), nullable=True, default='')
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade="all, delete-orphan", single_parent=True)
+
+
+# Pending
+class tblPayment(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    invoice = db.Column(db.String(20), nullable=True)
+    amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
+    transactions = db.relationship('tblTransaction', secondary=payment, backref='transactions', lazy='dynamic')
+
 
 class BrandSchema(ModelSchema):
     class Meta:

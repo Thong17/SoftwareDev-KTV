@@ -5,7 +5,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
 }
 
-tbody tr, tbody tr td {
+tbody tr, tbody tr td, tbody tr td ion-icon, tbody tr td i {
   vertical-align: middle !important;
 }
 
@@ -967,6 +967,7 @@ main {
   background-color: var(--color-bg);
   color: var(--color-text);
   border-color: var(--color-hr);
+  font-weight: 300;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif !important;
 }
 

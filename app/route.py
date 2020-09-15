@@ -1,5 +1,5 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema
 from flask import render_template, redirect, request, jsonify
@@ -804,13 +804,6 @@ def financial(arg):
         return render_template('views/financial.html', authentication='')
 
 
-# token for authenticate
-cashier_token = ''
-def generate_token(new_token):
-    global cashier_token
-    cashier_token = new_token
-
-
 @app.route('/authenticate', methods=['POST'])
 @login_required
 def authenticate():
@@ -827,8 +820,9 @@ def authenticate():
             isMatch = bcrypt.check_password_hash(current_user.password, password)
             if isMatch is True:
                 token = str(uuid4())
-                generate_token(token)
+                current_user.token = token
                 msg['redirect'] = '/cashing/'+token
+                db.session.commit()
                 return jsonify(msg)
             msg['password'].append('Password is not correct')
             return jsonify(msg)
@@ -839,11 +833,10 @@ def authenticate():
 @app.route('/cashing/<token>')
 @login_required
 def cashing(token):
-    if token == cashier_token:   
+    if token == current_user.token:   
         products = tblProduct.query.all()
         brands = tblBrand.query.all()
         categories = tblCategory.query.all()
-        # generate_token('')
         return render_template('views/cashing.html', products=products, brands=brands, categories=categories)
     else:
         return redirect('/financial/authentication')
@@ -852,6 +845,7 @@ def cashing(token):
 def order(id):
     product = tblProduct.query.get(id)
     data = json.loads(request.form['data'])
+    description = product.product
 
     resultObj = {
         'data': {},
@@ -871,9 +865,13 @@ def order(id):
     for v in data['values']:
         value = tblValue.query.get(v['valueId'])
         price += value.price 
+        description += '-'+value.value
     
     amount = price - (price * discount / 100)
 
+    tid = str(uuid4())
+    transaction = tblTransaction(id=tid, discount=discount, price= price, description=description)
+    db.session.add(transaction)
 
     if product.isStock and len(product.stocks) > 0:
         total_stocks = 0
@@ -881,32 +879,43 @@ def order(id):
         for stock in product.stocks:
             if stock.color == data['colorId']:
                 sum_stocks += stock.quantity
+            elif stock.color == '':
+                sum_stocks += stock.quantity
             total_stocks += stock.quantity
         available = sum_stocks - quantity
         if available >= 0:
             sum_quantity = quantity
             for stock in product.stocks:
-                if sum_quantity > 0:
-                    if stock.color == data['colorId'] and stock.quantity > 0:
+                if sum_quantity > 0 and stock.quantity > 0:
+                    qid = str(uuid4())
+                    if stock.color == data['colorId'] or stock.color == '':
                         if stock.quantity < sum_quantity:
                             stock_quantity = stock.quantity
                             stock.quantity = 0
+                            Quantity = tblQuantity(id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                            db.session.add(Quantity)
                             sum_quantity -= stock_quantity
                         else:
+                            Quantity = tblQuantity(id=qid, stock=stock.quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                            db.session.add(Quantity)
                             stock.quantity -= sum_quantity
                             sum_quantity = 0
             amount *= quantity
             total_stocks -= quantity
             db.session.commit()
             resultObj['result'] = 'success'
-            resultObj['data'] = {'amount': amount, 'stock': total_stocks, 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+            resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks, 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
         else:
             resultObj['result'] = 'failed'
             resultObj['data'] = {'message': 'This color has only '+str(sum_stocks)+' left'}
     else:
         amount *= quantity
         resultObj['result'] = 'success'
-        resultObj['data'] = {'amount': amount, 'quantity': quantity, 'price': price, 'isStock': False, 'discount': discount}
+        resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity, 'price': price, 'isStock': False, 'discount': discount}
     return jsonify(resultObj)
+
+@app.route('/drawer/create', methods=['POST'])
+def create_drawer():
+    return jsonify()
 
     
