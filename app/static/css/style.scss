@@ -995,6 +995,10 @@ main {
     display: none;
 }
 
+.money-container::-webkit-scrollbar {
+    display: none;
+}
+
 .flex-start {
     display: flex;
     justify-content: start;

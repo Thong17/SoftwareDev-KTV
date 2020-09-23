@@ -90,6 +90,10 @@
         margin: 0 0 0 5px;
     }
 
+    .drawer-btn.active {
+        color: limegreen;
+    }
+
     .search-btn {
         background-color: var(--color-menu);
         height: 34px;
@@ -326,16 +330,21 @@
     .drawer-time {
         width: auto;
         height: 100%;
-        padding: 3px 3px 3px 10px;
+        padding: 3px 3px 3px 1px;
         border-radius: 23px;
         display: flex;
         justify-content: flex-end;
         align-items: center;
         border: 1px solid var(--color-hr);
+        transition: 0.3s ease;
     }
 
     .drawer-time.active .time-btn {
         color: limegreen;
+    }
+
+    .drawer-time.active {
+        padding-left: 10px;
     }
 
     .time-btn {
@@ -343,6 +352,10 @@
         cursor: pointer;
         color: crimson;
         font-size: 28px;
+    }
+
+    .pre-divied {
+        background-color: var(--color-menu);
     }
 
 </style>
@@ -395,9 +408,15 @@
                     <i class="fa fa-search" aria-hidden="true"></i>
                     <input type="text" class="search-input color-text pl-2" placeholder="Search">
                 </div>
+                {% if current_user.drawer == '' %}
                 <div class="menu-icon drawer-btn">
                     <i class="fa fa-usd" aria-hidden="true"></i>
                 </div>
+                {% else %}
+                <div class="menu-icon drawer-btn active" id="{{ current_user.drawer }}">
+                    <i class="fa fa-usd" aria-hidden="true"></i>
+                </div>
+                {% endif %}
             </div>
         </div>
         <div class="grid-products product-container">
@@ -514,10 +533,21 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title color-font">Drawer</h4>
-                <div class="drawer-time active" title="Drawer is off">
-                    <span class="color-text">11h:30m</span>
+                {% if current_user.drawer == '' %}
+                <div class="drawer-time" title="Drawer is off">
+                    <span class="color-text" id="drawerTime"></span>
                     <ion-icon name="time-outline" class="time-btn"></ion-icon>
                 </div>
+                {% else %}
+                <div class="drawer-time active" title="Drawer is on">
+                    {% for drawer in current_user.drawers %}
+                    {% if drawer.id == current_user.drawer %}
+                    <span class="color-text" id="drawerTime">{{ drawer.startedOn.strftime("%b %d %Y %H:%M:%S") }}</span>
+                    {% endif %}
+                    {% endfor %}
+                    <ion-icon name="time-outline" class="time-btn"></ion-icon>
+                </div>
+                {% endif %}
             </div>
 
             <div class="modal-body">
@@ -526,7 +556,14 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn color-font close-modal" data-dismiss="modal">Cancel</button>
-                <button class="btn border drawer-save color-font">Continue</button>
+                {% if current_user.drawer == '' %}
+                    <button class="btn border drawer-save color-font">Create</button>
+                    <button class="btn border drawer-end color-font hide" id="{{ current_user.drawer }}">End</button>
+                {% else %}
+                    <button class="btn border drawer-save color-font hide">Create</button>
+                    <button class="btn border drawer-end color-font" id="{{ current_user.drawer }}">End</button>
+                {% endif %}
+                
             </div>
         </div>
     </div>
@@ -538,8 +575,15 @@
 <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
     $('.drawer-btn').on('click', function () {
-        $('#drawerModal').find('.modal-body').html(drawerForm('Default', 4000, 0.00))
-        $('#drawerModal').modal('show')
+        var id = $(this).attr('id')
+        $.ajax({
+            url: '/drawer/'+id,
+            type: 'POST',
+            success: function(data) {
+                $('#drawerModal').find('.modal-body').html(drawerForm('Default', 4000, data.data))
+                $('#drawerModal').modal('show')
+            }
+        })
     })
 
     var orderLists = []
@@ -578,7 +622,7 @@
                 dataType: 'json',
                 success: function (data) {
                     if (data.result == 'success') {
-                        $('#list-orders tr:last').before(showOrder('test', details, data.data.price, data.data.discount, data.data.quantity, data.data.amount))
+                        $('#list-orders tr:last').before(showOrder(data.data.id, details, data.data.price, data.data.discount, data.data.quantity, data.data.amount))
                         $('.order-form').empty()
                         if (data.data.isStock != false) {
                             if (data.data.stock == 0) {
@@ -961,7 +1005,7 @@
     })
 
     function showOrder(id, description, price, discount, quantity, amount) {
-        return `<tr class="color-text" id="` + id + `">
+        return `<tr class="color-text transaction-item" id="` + id + `">
                     <td class="description" id="order-description">`+ description + `</td>
                     <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
             precision: 2,
@@ -997,10 +1041,21 @@
                 </tr>`
     }
 
-    function drawerForm(counter, rate, startCost) {
+    function drawerForm(counter, rate, moneys) {
+        var element = ''
+        if (moneys.length > 0) {
+            moneys.forEach(m => {
+                element += `<tr class="color-font">
+                                <td style="width: 35%;">`+m.money+`</td>
+                                <td style="width: 15%; text-align:center;">`+m.currency+`</td>
+                                <td style="width: 20%; text-align:center;">`+m.unit+`</td>
+                                <td style="width: 25%; text-align:center;">`+m.money * m.unit+`</td>
+                                <td style="width: 5%;"></td>
+                            </tr>`
+            })
+        }
 
-        return `
-                <div class="row">
+        return `<div class="row">
                     <div class="col-md-4 pr-0">
                         <div class="form-group">
                             <input class="form-control input-color" step="any" type="number" name="drawer-rate" id="drawer-rate" value="` +
@@ -1017,24 +1072,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-8 pr-0">
-                        <div class="form-group">
-                            <input class="form-control input-color" step="any" type="number" name="drawer-cost" id="drawer-cost" value="` +
-                startCost + `">
-                            <label class="label cost" for="drawer-cost">Start Cost</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <select name="drawer-currency" id="drawer-currency" class="form-control input-color">
-                                <option value="dollar" selected><span>&#36;</span></option>
-                                <option value="riel"><span>&#6107;</span></option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="money-container mt-3" style="height: 230px; overflow: auto">
+                <div class="money-container mt-3" style="height: 370px; overflow: auto">
                     <table class="table money-table">
                         <thead>
                             <tr class="color-font">
@@ -1046,15 +1084,7 @@
                             </tr>
                         </thead>
                         <tbody id="list-money" class="color-text">
-                            <tr class="pre-divied">
-                                <td class="pre-cost">...</td>
-                                <td class="pre-currency" style="text-align:center;">...</td>
-                                <td class="pre-unit" style="text-align:center;">...</td>
-                                <td class="pre-total" style="text-align:center;">...</td>
-                                <td class="money-btn">
-                                    <ion-icon name="bulb-outline" class="pre-icon hide" title="Money calculated"></ion-icon>
-                                </td>
-                            </tr>
+                            `+element+`
                             <tr class="money-form color-text">
 
                             </tr>
@@ -1068,12 +1098,12 @@
     function moneyForm(money, currency, unit, total) {
         var select = `<select name="money-currency" id="money-currency" class="form-empty color-text input-color">`
         if (currency == 'dollar') {
-            select += `<option value="dollar" selected><span>&#36;</span></option>
-                        <option value="riel"><span>&#6107;</span></option>
+            select += `<option value="USD" selected><span>&#36;</span></option>
+                        <option value="KHR"><span>&#6107;</span></option>
                     </select>`
         } else {
-            select += `<option value="dollar"><span>&#36;</span></option>
-                        <option value="riel" selected><span>&#6107;</span></option>
+            select += `<option value="USD"><span>&#36;</span></option>
+                        <option value="KHR" selected><span>&#6107;</span></option>
                     </select>`
         }
         select += '</div>'
@@ -1098,155 +1128,170 @@
                 </td>`
     }
 
-
-    // Testing
-    $(document).on('input', '#drawer-cost', function() {
-        var currency = $('#drawer-currency option:selected').text()
-        var value = $(this).val()
-
-        $('#list-money').find('.pre-currency').text(currency)
-
-        if (value < 1 || value == '') {
-            $('#list-money').find('.pre-cost').text(0)
-            $('#list-money').find('.pre-total').text(0)
-        } else {
-            $('#list-money').find('.pre-cost').text(value)
-            $('#list-money').find('.pre-total').text(value)
-        }
-        $('.pre-icon').removeClass('hide')
-    })
-
-    $(document).on('change', '#drawer-currency', function() {
-        $('#list-money').find('.pre-currency').text($('#drawer-currency option:selected').text())
-        var cost = $('#drawer-cost').val()
-        var rate = $('#drawer-rate').val()
-
-        var total = $('.pre-total').text()
-
-        if ($(this).val() == 'dollar') {
-            cost /= rate
-            total /= rate
-        } else {
-            cost *= rate
-            total *= rate
-        }
-        $('#drawer-cost').val(cost)
-        if (cost < 1 || cost == '') {
-            $('#list-money').find('.pre-cost').text(0)
-            $('#list-money').find('.pre-total').text(0)
-        } else {
-            $('#list-money').find('.pre-cost').text(total)
-            $('#list-money').find('.pre-total').text(total)
-        }
+    $(document).on('click', '.money-delete', function() { 
+        var id = $(this).closest('tr').attr('id')
+        drawerObj.moneys.forEach((m, i) => {
+            if (m.id == id) {
+                drawerObj.moneys.splice(i, 1)
+            }
+            $(this).closest('tr').remove()
+        })
     })
 
     $(document).on('click', '.money-add', function() {
         $('.money-form').html(moneyForm('', 'dollar', '', ''))
     })
 
+    function exchangeMoney(rate, number, currency) {
+        switch (currency) {
+            case 'KHR':
+                number *= rate
+                break
+            case 'USD':
+                number /= rate
+                break
+        }
+        return number
+    }
+
+    var drawerObj = {
+        rate: 4000,
+        counter: 'Default',
+        moneys: []
+    }
+
+    var obj = {
+        'id': '',
+        'unit': 0,
+        'money': 0,
+        'currency': 'dollar',
+        'total': 0
+    }
+
     $(document).on('input', '#money-money, #money-unit', function() {
         var money = $(this).closest('tr').find('#money-money').val()
         var unit = $(this).closest('tr').find('#money-unit').val()
-        var cost = $('#drawer-cost').val()
-        var rate = $('#drawer-rate').val()
-        var currency = $(this).closest('tr').find('#money-currency').val()
-
-        if ($('#drawer-currency').val() == 'riel') {
-            cost /= rate
+        if (money == '') {
+            money = 0
         }
-
-        var total = 0
-        
-        if (currency == 'riel') {
-            money /= rate
+        if (unit == '') {
+            unit = 0
         }
-
-        total = money * unit
-
-        if (total > cost) {
-            total = cost
-            $(this).closest('tr').find('#money-unit').val(Math.floor(total / money))
-        } 
-        if (total < 0) {
-            total = 0
+        if ($(this).val() < 0) {
+            $(this).val(0)
         }
-
-        if ($('#drawer-currency').val() == 'riel') {
-            $(this).closest('tr').find('#money-total').val(total * rate)
-
-            $('.pre-total').text((cost - total) * rate)
-            $('.pre-cost').text((cost - total) * rate)
-
+        var total = parseFloat(money) * parseFloat(unit)
+        if (total > 0) {
+            toggleEdit($(this).closest('tr').find(('.money-save')), $(this).closest('tr').find(('.money-delete')))
         } else {
-            $(this).closest('tr').find('#money-total').val(total)
-
-            $('.pre-total').text(cost - total)
-            $('.pre-cost').text(cost - total)
+            toggleEdit($(this).closest('tr').find(('.money-delete')), $(this).closest('tr').find(('.money-save')))
         }
-
+        $(this).closest('tr').find('#money-total').val(total)
     })
 
     $(document).on('input', '#money-total', function() {
-        var currency = $(this).closest('tr').find('#money-currency').val()
-        var rate = $('#drawer-rate').val()
-        var cost = $('#drawer-cost').val()
-
-        if (cost == '') {
-            cost = 0
+        var input = $(this).val()
+        if (input == '' || input < 0) {
+            input = 0
         }
-
-        var total = $(this).closest('tr').find('#money-total').val()
+        $(this).closest('tr').find(('.money-save'))
+        if (input > 0) {
+            toggleEdit($(this).closest('tr').find(('.money-save')), $(this).closest('tr').find(('.money-delete')))
+        } else {
+            toggleEdit($(this).closest('tr').find(('.money-delete')), $(this).closest('tr').find(('.money-save')))
+        }
         var unit = $(this).closest('tr').find('#money-unit').val()
-
-        if (parseFloat(total) > parseFloat(cost)) {
-            total = cost
-            $(this).closest('tr').find('#money-total').val(total)
-        }
-
-        money = total / unit
-        
-        $(this).closest('tr').find('#money-money').val(Math.floor(money))
+        $(this).closest('tr').find('#money-money').val(parseInt(input / unit))
     })
 
-    $(document).on('change', '#money-currency', function() {
-        var rate = $('#drawer-rate').val()
+    $(document).on('click', '.money-save', function() {
         var money = $(this).closest('tr').find('#money-money').val()
+        var unit = $(this).closest('tr').find('#money-unit').val()
+        var currency = $(this).closest('tr').find('#money-currency').val()
         var total = $(this).closest('tr').find('#money-total').val()
-        if ($(this).val() == 'riel') {
-            money *= rate
-            total *= rate
-        } else {
-            money /= rate
-            total /= rate
+        var id = generatString(8)
+        obj = {
+            'id': id,
+            'unit': unit,
+            'money': money,
+            'currency': currency,
+            'total': total
         }
-        $(this).closest('tr').find('#money-total').val(total)
-        $(this).closest('tr').find('#money-money').val(money)
+        drawerObj.moneys.push(obj)
+        $('#list-money tr:last').before(`<tr id="`+obj.id+`">
+                                <td style="width: 35%;">`+obj.money+`</td>
+                                <td style="width: 15%; text-align:center;">`+obj.currency+`</td>
+                                <td style="width: 20%; text-align:center;">`+obj.unit+`</td>
+                                <td style="width: 25%; text-align:center;">`+obj.total+`</td>
+                                <td style="width: 5%;"><ion-icon name="close-outline" class="money-delete"></ion-icon></td>
+                                </tr>`)
     })
 
+    $(document).on('click', '.drawer-save', function() {
+        var obj = JSON.stringify(drawerObj)
+        $.ajax({
+            url: '/drawer/create',
+            type: 'POST',
+            data: {
+                data: obj
+            },
+            dataType: 'json',
+            success: function(data) {
+                if (data.data == 'Success') {
+                    $('.drawer-btn, .drawer-time').addClass('active')
+                    $('#drawerTime').html(data.startedOn)
+                    $('#list-money').html(`<tr class="money-form color-text"></tr>`)
+                    drawerObj.moneys.forEach(m => {
+                        $('#list-money tr:last').before(`<tr class="color-font">
+                            <td style="width: 35%;">`+m.money+`</td>
+                            <td style="width: 15%; text-align:center;">`+m.currency+`</td>
+                            <td style="width: 20%; text-align:center;">`+m.unit+`</td>
+                            <td style="width: 25%; text-align:center;">`+m.total+`</td>
+                            <td style="width: 5%;"></td>
+                            </tr>`)
+                        
+                    })
+                    toggleEdit($('.drawer-end'), $('.drawer-save'))
+                    $('.drawer-end, .drawer-btn').attr('id', data.id)
+                }
+            }
+        })
+    })
 
-    function convertCurrency(number, rate, currency, callback) {
-        if (currency == 'riel') {
-            callback(number * rate)
-        } else {
-            callback(number / rate)
-        }
-    }
+    $(document).on('click', '.drawer-end', function() {
+        var id = $(this).attr('id')
+        $.ajax({
+            url: '/drawer/end/'+id,
+            type: 'POST',
+            success: function(data) {
+                if (data.data == 'Success') {
+                    $('.drawer-btn, .drawer-time').removeClass('active')
+                    $('#drawerTime').empty()
+                    $('#list-money').html(`<tr class="money-form color-text"></tr>`)
+                    toggleEdit($('.drawer-save'), $('.drawer-end'))
+                    $('.drawer-btn').attr('id', 'none')
+                }
+            }
+        })
+    })
 
-    function calculateMoney(total, money, unit, currency) {
+    $(document).on('click', '.order-btn', function() {
+        var transactions = document.querySelectorAll('.transaction-item')
+        var transactionArr = []
+        Array.from(transactions).forEach(t => {
+            transactionArr.push($(t).attr('id'))
+        })
+        var json = JSON.stringify(transactionArr)
+        $.ajax({
+            url: '/payment',
+            type: 'POST',
+            data: {
+                data: json
+            },
+            dataType: 'json',
+            success: function(data) {
 
-    }
-
-    // End testing
-
-
-
-
-    
-
-
-    $(document).on('click', '.money-delete', function() {
-        $(this).closest('tr').children().fadeOut('slow', function() {
-            $(this).closest('tr').empty()
+            }
         })
     })
 

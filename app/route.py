@@ -1,7 +1,7 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -916,6 +916,42 @@ def order(id):
 
 @app.route('/drawer/create', methods=['POST'])
 def create_drawer():
-    return jsonify()
+    data = json.loads(request.form['data'])
+    id = str(uuid4())
+    Drawer = tblDrawer(id=id, key=current_user.token, rate=data['rate'], counter=data['counter'], createdBy=current_user.id)
+    db.session.add(Drawer)
+    total = 0
+    for money in data['moneys']:
+        mid = str(uuid4())
+        Money = tblMoney(id=mid, money=money['money'], currency=money['currency'], unit=money['unit'], drawerId=id)
+        total += float(money['total'])
+        db.session.add(Money)
+    Drawer.startCost = total
+    current_user.drawer = id
+    db.session.commit()
+    startedOn = Drawer.startedOn.strftime("%b %d %Y %H:%M:%S")
+    return jsonify({'data': 'Success', 'startedOn': startedOn, 'id':id})
+
+@app.route('/drawer/end/<id>', methods=['POST'])
+def end_drawer(id):
+    Drawer = tblDrawer.query.get(id)
+    Drawer.endedOn = datetime.utcnow()
+    current_user.drawer = ''
+    db.session.commit()
+    return jsonify({'data': 'Success'})
+
+@app.route('/drawer/<id>', methods=['POST'])
+def get_drawer(id):
+    try:
+        Drawer = tblDrawer.query.get(id)
+        json = DrawerSchema()
+        drawer = json.dump(Drawer)
+        return jsonify({'data': drawer['moneys']})
+    except:
+        return jsonify({'data': []})
+
+@app.route('/payment')
+def payment():
+    transactions = json.loads(request.form['data'])
 
     

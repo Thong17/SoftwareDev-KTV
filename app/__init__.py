@@ -233,8 +233,6 @@ class tblActivity(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
-
-
 # Working
 class tblDrawer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -242,7 +240,6 @@ class tblDrawer(db.Model):
     rate = db.Column(db.Numeric(10,2), nullable=True, default=4000)
     counter = db.Column(db.String(50), nullable=True, default='')
     startCost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    currency = db.Column(db.String(20), nullable=False)
     startedOn = db.Column(db.DateTime, default=datetime.utcnow)
     endedOn = db.Column(db.DateTime, nullable=True)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
@@ -253,12 +250,8 @@ class tblMoney(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     money = db.Column(db.Numeric(10,0), nullable=True, default=0.00)
     currency = db.Column(db.String(20), nullable=False)
-    quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
+    unit = db.Column(db.Numeric(10,0), nullable=True, default=0)
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
-# End
-
-
-
 
 class tblQuantity(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -310,6 +303,10 @@ class BrandSchema(ModelSchema):
     class Meta:
         model = tblBrand
 
+class MoneySchema(ModelSchema):
+    class Meta:
+        model = tblMoney
+
 class PropertySchema(ModelSchema):
     class Meta:
         model = tblProperty
@@ -319,6 +316,11 @@ class CategorySchema(ModelSchema):
     properties = fields.Nested(PropertySchema(many=True), many=True)
     class Meta:
         model = tblCategory
+
+class DrawerSchema(ModelSchema):
+    moneys = fields.Nested(MoneySchema, many=True)
+    class Meta:
+        model = tblDrawer
 
 class ValueSchema(ModelSchema):
     class Meta:
