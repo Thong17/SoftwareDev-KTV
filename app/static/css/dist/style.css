@@ -642,6 +642,22 @@ textarea:valid + label {
   cursor: default;
 }
 
+.flex-column-start-center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
 .flex-between-end h5 {
   margin: 0;
 }
@@ -1721,10 +1737,10 @@ table tbody tr {
   display: grid;
   grid-column-gap: 30px;
   grid-row-gap: 50px;
-  -ms-grid-columns: (minmax(150px, 1fr))[auto-fill];
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  -ms-grid-rows: (minmax(250px, 250px))[auto-fill];
-      grid-template-rows: repeat(auto-fill, minmax(250px, 250px));
+  -ms-grid-columns: (minmax(120px, 1fr))[auto-fill];
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  -ms-grid-rows: (minmax(200px, 200px))[auto-fill];
+      grid-template-rows: repeat(auto-fill, minmax(200px, 200px));
   padding: 15px 15px 0 15px;
   overflow-y: auto;
 }
@@ -1739,8 +1755,8 @@ table tbody tr {
 
 .list-products .product-item {
   width: 100%;
-  height: 180px;
-  padding: 20px 0;
+  height: 130px;
+  padding: 10px 0;
   position: relative;
   -webkit-transition: 0.3s ease;
   transition: 0.3s ease;
@@ -1791,7 +1807,7 @@ table tbody tr {
 }
 
 .list-products .product-item .item-wrapper .item-details .details .color-font {
-  font-size: 21px !important;
+  font-size: 18px !important;
 }
 
 .list-products .product-item .item-wrapper .item-details div:nth-child(2) {
@@ -1816,7 +1832,7 @@ table tbody tr {
 
 .list-products .product-item .item-wrapper .item-details div:nth-child(2) p:first-child {
   text-align: end;
-  font-size: 18px !important;
+  font-size: 13px !important;
 }
 
 .list-products .product-item .item-wrapper .item-details .details #details-date {
@@ -1829,8 +1845,8 @@ table tbody tr {
 
 .list-products .product-item .item-wrapper .item-img {
   position: relative;
-  width: 180px;
-  height: 150px;
+  width: 130px;
+  height: 110px;
 }
 
 .list-products .product-item .item-wrapper .item-img .product-btn {
@@ -1841,7 +1857,7 @@ table tbody tr {
 
 .grid-products .product-item {
   position: relative;
-  height: 250px;
+  height: 200px;
   border-radius: 5px;
   text-align: center;
   display: -webkit-box;
@@ -1874,7 +1890,7 @@ table tbody tr {
 
 .grid-products .product-item .item-wrapper .item-img {
   position: relative;
-  height: 160px;
+  height: 110px;
   background-color: var(--color-bg);
 }
 
@@ -1889,7 +1905,7 @@ table tbody tr {
 }
 
 .grid-products .product-item .item-wrapper .item-details {
-  height: calc(100% - 160px);
+  height: calc(100% - 110px);
   padding: 10px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2561,6 +2577,315 @@ button.form-empty:hover {
 
 .order-container {
   height: calc(100vh - 240px);
+}
+
+.btn-search-customer {
+  position: absolute;
+  top: 33px;
+  left: 13px;
+  color: var(--color-text);
+}
+
+.search-customer {
+  left: 35px;
+}
+
+#search-customer {
+  padding-left: 35px;
+  border-radius: 13px;
+}
+
+.payment-container {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 100%;
+}
+
+.payment-invoice {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  padding-top: 30px;
+}
+
+.payment-bill {
+  position: relative;
+  width: 800px;
+  height: 100%;
+  padding-top: 20px;
+}
+
+.payment-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding-left: 20px;
+}
+
+.payment-body {
+  border-top: 1px solid var(--color-hr);
+  border-right: 1px solid var(--color-hr);
+  padding: 0 20px;
+  border-top-right-radius: 10px;
+  height: 93%;
+}
+
+.payment-type {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.payment-type div {
+  padding: 3px 10px;
+  cursor: pointer;
+  border: 1px solid var(--color-bg);
+  border-bottom-color: #ffffff00;
+  margin-bottom: -1px;
+}
+
+.payment-type div.active {
+  border-radius: 10px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: var(--color-hr);
+  border-bottom-color: var(--color-bg);
+}
+
+.payment-total {
+  text-align: center;
+  font-size: 13px;
+  width: 100%;
+  background-color: var(--color-menu);
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+}
+
+.checkout-btn {
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.invoice-close {
+  position: absolute;
+  top: 5px;
+  right: 0;
+}
+
+#receive-currency {
+  position: absolute;
+  width: 53px;
+  height: 26px;
+  font-size: 10px;
+  top: 29px;
+  right: 5px;
+  border-radius: 5px;
+}
+
+#receive-cash {
+  padding-right: 63px;
+}
+
+.change-row {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-item-align: end;
+      align-self: flex-end;
+}
+
+.change-container {
+  padding: 10px;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  border: 1px solid var(--color-hr);
+  border-radius: 5px;
+}
+
+.change-left {
+  width: 50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding-right: 10px;
+}
+
+.list-changes {
+  width: 50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+
+.print-btn:hover {
+  color: var(--color-font);
+}
+
+.total-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.total-paid {
+  width: 50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 10px 10px 0 10px;
+}
+
+.total-change {
+  width: 50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 10px;
+}
+
+.invoice-body {
+  height: 100%;
+  font-size: 11px;
+  padding: 10px 20px 136px 20px;
+}
+
+.border-dashed {
+  border: 1px solid var(--color-hr);
+  border-style: dashed;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.invoice-total {
+  margin-top: -156px;
+  padding: 5px 20px 5px 20px;
+  font-size: 12px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+
+.invoice-total div {
+  width: 50%;
+}
+
+.invoice-footer {
+  height: 30px;
+  font-size: 11px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.invoice-btn {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-top: 10px;
+}
+
+.invoice-btn button {
+  border: 1px solid var(--color-hr);
+  border-radius: 5px;
+  outline: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+.print-inv {
+  background-color: var(--color-menu);
+  padding: 5px 20px;
+  margin-left: 10px;
+}
+
+.close-payment {
+  background-color: #007bff;
+  width: 100%;
+  padding: 5px;
 }
 
 @-webkit-keyframes spin {

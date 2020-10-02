@@ -133,8 +133,8 @@ class tblCategory(db.Model):
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    properties = db.relationship('tblProperty', backref='properties', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    products = db.relationship('tblProduct', backref='productOfCategory', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    properties = db.relationship('tblProperty', backref='properties', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+    products = db.relationship('tblProduct', backref='productOfCategory', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     brands = db.relationship('tblBrand', secondary=category_brand, backref='brands', lazy='dynamic')
 
 class tblProperty(db.Model):
@@ -145,7 +145,7 @@ class tblProperty(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
-    values = db.relationship('tblValue', backref='property', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    values = db.relationship('tblValue', backref='property', lazy=True, cascade='save-update, merge, delete', single_parent=True)
 
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -161,11 +161,11 @@ class tblProduct(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     brandId = db.Column(db.String(36), db.ForeignKey('tbl_brand.id'), nullable=False)
     categoryId = db.Column(db.String(36), db.ForeignKey('tbl_category.id'), nullable=False)
-    appearance = db.relationship('tblAppearance', backref='appearance', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    values = db.relationship('tblValue', backref='product', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    stocks = db.relationship('tblStock', backref='stocksOfProduct', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    appearance = db.relationship('tblAppearance', backref='appearance', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+    values = db.relationship('tblValue', backref='product', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+    photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+    colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+    stocks = db.relationship('tblStock', backref='stocksOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
 
 class tblStock(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -204,7 +204,7 @@ class tblBrand(db.Model):
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    products = db.relationship('tblProduct', backref='productOfBrand', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    products = db.relationship('tblProduct', backref='productOfBrand', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     categories = db.relationship('tblCategory', secondary=category_brand, backref='categories', lazy='dynamic')
 
 class tblColor(db.Model):
@@ -215,7 +215,7 @@ class tblColor(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
-    photos = db.relationship('tblPhoto', backref='photosOfColor', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    photos = db.relationship('tblPhoto', backref='photosOfColor', lazy=True, cascade='save-update, merge, delete', single_parent=True)
 
 class tblPhoto(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -243,13 +243,14 @@ class tblDrawer(db.Model):
     startedOn = db.Column(db.DateTime, default=datetime.utcnow)
     endedOn = db.Column(db.DateTime, nullable=True)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    moneys = db.relationship('tblMoney', backref='moneys', lazy=True, cascade="all, delete-orphan", single_parent=True)
-    payments = db.relationship('tblPayment', backref='payments', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    moneys = db.relationship('tblMoney', backref='moneys', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+    payments = db.relationship('tblPayment', backref='payments', lazy=True, cascade='save-update, merge, delete', single_parent=True)
 
 class tblMoney(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     money = db.Column(db.Numeric(10,0), nullable=True, default=0.00)
     currency = db.Column(db.String(20), nullable=False)
+    value = db.Column(db.Numeric(10,5), nullable=True, default=0.00000)
     unit = db.Column(db.Numeric(10,0), nullable=True, default=0)
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
 
@@ -283,9 +284,10 @@ class tblTransaction(db.Model):
     isComplete = db.Column(db.Boolean, default=False)
     discount = db.Column(db.String(3), nullable=True, default='')
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
-    quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade="all, delete-orphan", single_parent=True)
+    quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade='save-update, merge, delete', single_parent=True)
 
 
 # Pending
@@ -330,12 +332,22 @@ class PhotoSchema(ModelSchema):
     class Meta:
         model = tblPhoto
 
+class QuantitySchema(ModelSchema):
+    class Meta:
+        quantity = tblQuantity
+
 class ColorSchema(ModelSchema):
     photos = fields.Nested(PhotoSchema, many=True)
     class Meta:
         model = tblColor
 
+class TransactionSchema(ModelSchema):
+    quantities = fields.Nested(QuantitySchema, many=True)
+    class Meta:
+        model = tblTransaction
+
 class StockSchema(ModelSchema):
+    colors = fields.Nested(ColorSchema, many=True)
     class Meta:
         model = tblStock
 
@@ -348,9 +360,9 @@ class ProductSchema(ModelSchema):
     class Meta:
         model = tblProduct
 
-class StockSchema(ModelSchema):
-    colors = fields.Nested(ColorSchema, many=True)
+class PaymentSchema(ModelSchema):
+    transactions = fields.Nested(TransactionSchema, many=True)
     class Meta:
-        model = tblStock
+        model = tblPayment
         
 from app import route

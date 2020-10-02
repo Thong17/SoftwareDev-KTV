@@ -460,7 +460,7 @@
                             <option value="riel" selected="selected">R</option>`
             } else {
                 element = `<option value="dollar" selected="seleceted">$</option>
-                            <option value="riel">R</option>`
+                            <option disabled value="riel">R</option>`
             }
             return `<div class="form-group">
                     <input class="form-control input-color" type="text" name="property-name" id="property-name" value="` +
@@ -654,6 +654,7 @@
         }
 
         function convertUTCDateToLocalDate(date) {
+
             var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
 
             var offset = date.getTimezoneOffset() / 60;
@@ -1302,6 +1303,8 @@
                                                     <input type="radio" class="input-radio" name="`+ property.property.toLowerCase().split(' ').join('-') +`" id="` + property.id + `" `+ selected +` value="` + value.id + `">
                                                     <span class="hide checkbox"></span>
                                                 </label>`
+                            } else {
+                                value_element = '<button class="btn border btn-value color-font" disabled>...</button>'
                             }
                         })
                         propertyArr.push(propertyObj)
@@ -1367,7 +1370,7 @@
                 </div>`
         }
 
-        function generatString(length) {
+        function generateString(length) {
             var result           = '';
             var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             var charactersLength = characters.length;

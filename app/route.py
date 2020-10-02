@@ -1,11 +1,11 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
-import json, simplejson
+import json, simplejson, operator
 from datetime import datetime, timedelta, date
 from sqlalchemy import func
 from decimal import Decimal
@@ -585,12 +585,9 @@ def remove_product(id):
                     delete_photo('uploads', photo.src)
     if product.photo != 'default.png':
         delete_photo('uploads', product.photo)
-    try:
-        db.session.delete(product)
-        db.session.commit()
-        return jsonify({'result': 'Success'})
-    except:
-        return jsonify({'result': 'Faild'})
+    db.session.delete(product)
+    db.session.commit()
+    return jsonify({'result': 'Success'})
 
 @app.route('/value/save/<id>', methods=['POST'])
 def save_value(id):
@@ -867,10 +864,10 @@ def order(id):
         price += value.price 
         description += '-'+value.value
     
-    amount = price - (price * discount / 100)
+    amount = price * (1 - discount / 100)
 
     tid = str(uuid4())
-    transaction = tblTransaction(id=tid, discount=discount, price= price, description=description)
+    transaction = tblTransaction(id=tid, discount=discount, price=amount, description=description)
     db.session.add(transaction)
 
     if product.isStock and len(product.stocks) > 0:
@@ -921,9 +918,14 @@ def create_drawer():
     Drawer = tblDrawer(id=id, key=current_user.token, rate=data['rate'], counter=data['counter'], createdBy=current_user.id)
     db.session.add(Drawer)
     total = 0
+    
     for money in data['moneys']:
+        if money['currency'] == 'KHR':
+            value = float(money['money']) / float(data['rate'])
+        else:
+            value = money['money']
         mid = str(uuid4())
-        Money = tblMoney(id=mid, money=money['money'], currency=money['currency'], unit=money['unit'], drawerId=id)
+        Money = tblMoney(id=mid, money=money['money'], currency=money['currency'], unit=money['unit'], drawerId=id, value=value)
         total += float(money['total'])
         db.session.add(Money)
     Drawer.startCost = total
@@ -944,14 +946,97 @@ def end_drawer(id):
 def get_drawer(id):
     try:
         Drawer = tblDrawer.query.get(id)
-        json = DrawerSchema()
-        drawer = json.dump(Drawer)
-        return jsonify({'data': drawer['moneys']})
+        if Drawer is None:
+            moneys = []
+            rate = 4000
+            counter = 'Default'
+            return jsonify({'data': moneys, 'rate': rate, 'counter': counter})
+        else:
+            jsonObj = DrawerSchema()
+            drawer = jsonObj.dump(Drawer)
+            return jsonify({'data': drawer['moneys'], 'rate': drawer['rate'], 'counter': drawer['counter']})
     except:
         return jsonify({'data': []})
 
-@app.route('/payment')
+@app.route('/payment', methods=['POST'])
 def payment():
+    Payments = tblPayment.query.with_entities(tblPayment.id).all()
+    Drawer = tblDrawer.query.get(current_user.drawer)
     transactions = json.loads(request.form['data'])
+    if transactions:
+        id = str(uuid4())
+        invoice = 'INV'+ str(len(Payments)).zfill(7)
+        Payment = tblPayment(id=id, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
+        db.session.add(Payment)
+        total = 0
+        for transaction in transactions:
+            quantity = 0
+            Transaction = tblTransaction.query.get(transaction)
+            for q in Transaction.quantities:
+                quantity += q.quantity
+            Transaction.quantity = quantity
+            total += Transaction.price * quantity
+            Payment.transactions.append(Transaction)
+        Payment.amount = total
+        db.session.commit()
+        p = PaymentSchema()
+        result = p.dump(Payment)
+        
+        return jsonify({'result': 'Success', 'data': result, 'rate': Drawer.rate})
+    else:
+        return jsonify({'result': 'No transaction added'})
 
+@app.route('/transaction/delete/<id>', methods=['POST'])
+def delete_transaction(id):
+    Transaction = tblTransaction.query.get(id)
+    try:
+        db.session.delete(Transaction)
+        db.session.commit()
+        return jsonify({'result': 'Success'})
+    except:
+        return jsonify({'result': 'Transaction could not found'})
+
+
+@app.route('/checkout/<id>', methods=['POST'])
+def checkout(id):
+    payment = tblPayment.query.get(id)
+    drawer = tblDrawer.query.get(current_user.drawer)
+    jsonObj = json.loads(request.form['data'])
+    amounts = jsonObj['amounts']
+    amount = 0
+    for a in amounts:
+        if a['currency'] != 'USD':
+            a['amount'] = Decimal(a['amount']) / drawer.rate
+        amount += Decimal(a['amount'])
+    
+    if amount >= payment.amount:
+        moneys = []
+        change = Decimal(amount) - payment.amount
+        moneyObj = {
+            'money': change,
+            'currency': 'USD'
+        }
+        for money in (sorted(drawer.moneys, key=operator.attrgetter('value'), reverse=True)):
+            convertMoney = 0
+            if money.currency != 'USD':
+                convertMoney = money.money / drawer.rate
+            else:
+                convertMoney = money.money
+            if money.unit > 0 and convertMoney <= change:
+                for unit in range(int(money.unit)):
+                    if convertMoney <= change:
+                        moneys.append({
+                            'money': round(money.money, 4),
+                            'currency': money.currency
+                        })
+                        money.unit -= 1
+                        change -= convertMoney
+                        moneyObj['money'] = round(change, 4)
+        moneys.append(moneyObj)
+        for transaction in payment.transactions:
+            transaction.isComplete = True
+        db.session.commit()
+        return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
+    else:
+        return jsonify({'result': 'Not enough money'})
     

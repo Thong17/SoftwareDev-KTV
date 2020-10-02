@@ -553,6 +553,13 @@ textarea:valid+label {
     cursor: default;
 }
 
+.flex-column-start-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+}
+
 .flex-between-end h5 {
     margin: 0;
 }
@@ -1423,8 +1430,8 @@ table tbody tr {
     display: grid;
     grid-column-gap: 30px;
     grid-row-gap: 50px;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    grid-template-rows: repeat(auto-fill, minmax(250px, 250px));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(200px, 200px));
     padding: 15px 15px 0 15px;
     overflow-y: auto;
 }
@@ -1439,8 +1446,8 @@ table tbody tr {
 
 .list-products .product-item {
     width: 100%;
-    height: 180px;
-    padding: 20px 0;
+    height: 130px;
+    padding: 10px 0;
     position: relative;
     transition: 0.3s ease;
     border-bottom: 1px solid var(--color-hr);
@@ -1469,7 +1476,7 @@ table tbody tr {
 }
 
 .list-products .product-item .item-wrapper .item-details .details .color-font {
-    font-size: 21px !important;
+    font-size: 18px !important;
 }
 
 .list-products .product-item .item-wrapper .item-details div:nth-child(2) {
@@ -1485,7 +1492,7 @@ table tbody tr {
 
 .list-products .product-item .item-wrapper .item-details div:nth-child(2) p:first-child {
     text-align: end;
-    font-size: 18px !important;
+    font-size: 13px !important;
 }
 
 .list-products .product-item .item-wrapper .item-details .details #details-date {
@@ -1498,8 +1505,8 @@ table tbody tr {
 
 .list-products .product-item .item-wrapper .item-img {
     position: relative;
-    width: 180px;
-    height: 150px;
+    width: 130px;
+    height: 110px;
 }
 
 .list-products .product-item .item-wrapper .item-img .product-btn {
@@ -1510,7 +1517,7 @@ table tbody tr {
 
 .grid-products .product-item {
     position: relative;
-    height: 250px;
+    height: 200px;
     border-radius: 5px;
     text-align: center;
     display: flex;
@@ -1533,7 +1540,7 @@ table tbody tr {
 
 .grid-products .product-item .item-wrapper .item-img {
     position: relative;
-    height: 160px;
+    height: 110px;
     background-color: var(--color-bg);
 }
 
@@ -1546,7 +1553,7 @@ table tbody tr {
 }
 
 .grid-products .product-item .item-wrapper .item-details {
-    height: calc(100% - 160px);
+    height: calc(100% - 110px);
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -2098,6 +2105,236 @@ button.form-empty:hover {
 
 .order-container {
     height: calc(100vh - 240px);
+}
+
+.btn-search-customer {
+    position: absolute;
+    top: 33px;
+    left: 13px;
+    color: var(--color-text);
+}
+
+.search-customer {
+    left: 35px;
+}
+
+#search-customer {
+    padding-left: 35px;
+    border-radius: 13px;
+}
+
+.payment-container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.payment-invoice {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    padding-top: 30px;
+}
+
+.payment-bill {
+    position: relative;
+    width: 800px;
+    height: 100%;
+    padding-top: 20px;
+}
+
+.payment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 20px;
+}
+
+.payment-body {
+    border-top: 1px solid var(--color-hr);
+    border-right: 1px solid var(--color-hr);
+    padding: 0 20px;
+    border-top-right-radius: 10px;
+    height: 93%;
+}
+
+.payment-type {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.payment-type div {
+    padding: 3px 10px;
+    cursor: pointer;
+    border: 1px solid var(--color-bg);
+    border-bottom-color: #ffffff00;
+    margin-bottom: -1px;
+}
+
+.payment-type div.active {
+    border-radius: 10px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-color: var(--color-hr);
+    border-bottom-color: var(--color-bg);
+}
+
+.payment-total {
+    text-align: center;
+    font-size: 13px;
+    width: 100%;
+    background-color: var(--color-menu);
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+}
+
+.checkout-btn {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.invoice-close {
+    position: absolute;
+    top: 5px;
+    right: 0;
+}
+
+#receive-currency {
+    position: absolute;
+    width: 53px;
+    height: 26px;
+    font-size: 10px;
+    top: 29px;
+    right: 5px;
+    border-radius: 5px;
+}
+
+#receive-cash {
+    padding-right: 63px;
+}
+
+.change-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: flex-end;
+}
+
+.change-container {
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid var(--color-hr);
+    border-radius: 5px;
+}
+
+.change-left {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+    padding-right: 10px;
+}
+
+.list-changes {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.print-btn:hover {
+    color: var(--color-font);
+}
+
+.total-container {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+}
+
+.total-paid {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 10px 0 10px;
+}
+
+.total-change {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.invoice-body {
+    height: 100%;
+    font-size: 11px;
+    padding: 10px 20px 136px 20px;
+}
+
+.border-dashed {
+    border: 1px solid var(--color-hr);
+    border-style: dashed;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+}
+
+.invoice-total {
+    margin-top: -156px;
+    padding: 5px 20px 5px 20px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.invoice-total div {
+    width: 50%;
+}
+
+.invoice-footer {
+    height: 30px;
+    font-size: 11px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.invoice-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.invoice-btn button {
+    border: 1px solid var(--color-hr);
+    border-radius: 5px;
+    outline: none;
+    box-shadow: none;
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+.print-inv {
+    background-color: var(--color-menu);
+    padding: 5px 20px;
+    margin-left: 10px;
+}
+
+.close-payment {
+    background-color: #007bff;
+    width: 100%;
+    padding: 5px;
 }
 
 @keyframes spin {

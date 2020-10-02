@@ -168,7 +168,7 @@
         color: crimson !important;
     }
 
-    #placeOrder:hover {
+    .order-btn:hover {
         color: var(--color-font) !important;
     }
 
@@ -358,6 +358,18 @@
         background-color: var(--color-menu);
     }
 
+    .remove-btn:hover i {
+        color: var(--color-font);
+    }
+
+    .money-add, .payment-add {
+        cursor: pointer;
+    }
+
+    .payment-add {
+        background-color: var(--color-menu);
+    }
+
 </style>
 {% endblock %}
 
@@ -484,7 +496,7 @@
         <!-- Noted -->
     </div>
     <div class="col-order pl-4">
-        <h4 class="color-font" style="text-align: center;">Invoice</h4>
+        <h4 class="color-font" style="text-align: center;">Transaction</h4>
         <div class="order-container mt-2">
             <table class="table order-table notranslate">
                 <thead>
@@ -502,7 +514,7 @@
                 </tbody>
             </table>
             <div class="order-wrapper flex-between-center">
-                <button class="btn color-text order-btn" id="placeOrder">
+                <button class="btn color-text order-btn" id="">
                     <span class="mr-2 order-icon">
                         <span class="sum-order notranslate">0</span>
                         <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
@@ -524,6 +536,119 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
 
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="paymentModel" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="padding: 0; height: 80vh;">
+                <div class="payment-container">
+                    <div class="payment-bill">
+                        <div class="payment-header">
+                            <div class="payment-type">
+                                <div class="type-btn type-cash color-text active">Cash</div>
+                                <div class="type-btn type-card color-text">Card</div>
+                            </div>
+                        </div>
+                        <div class="payment-body">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <input type="number" step="any" class="form-control input-color" name="receive-cash" id="receive-cash" required>
+                                        <label for="receive-cash" class="label receive-cash">Amount</label>
+                                        <select name="receive-currency" id="receive-currency" class="form-control input-color">
+                                            <option value="USD"><span>&#36;</span></option>
+                                            <option value="KHR"><span>&#6107;</span></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 pl-0">
+                                    <div class="form-group">
+                                        <button class="btn color-text payment-add"><ion-icon name="add-outline" style="vertical-align: middle"></ion-icon></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="money-container mt-3" style="height: 100%; overflow: auto">
+                                <table class="table money-table">
+                                    <thead>
+                                        <tr class="color-font">
+                                            <td style="width: 40%;">Paid</td>
+                                            <td style="width: 15%; text-align:center;">Currency</td>
+                                            <td style="width: 10%; text-align:center;">Unit</td>
+                                            <td style="width: 25%; text-align:center;">Total</td>
+                                            <td style="width: 10%;"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="list-payment" class="color-text"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="payment-total color-text">
+                            
+                        </div>
+                    </div>
+                    <div class="payment-invoice">
+                        <div class="invoice-header">
+                            <h5 class="color-text" style="text-align: center; font-size: 23px;">SHOP</h5>
+                        </div>
+                        <div class="invoice-body">
+                            <div class="shop-details flex-column-start-center mb-1">
+                                <p class="color-text">103AEo Street 108, Sangkat Wat Phnom, Khan Daun Penh</p>
+                                <p class="color-text">Contact: {{ current_user.profile[0].phone }}</p>
+                            </div>
+                            <div class="flex-between-center pb-1">
+                                <p class="color-text">Date: <span id="invoiceDate"></span></p>
+                                <p class="color-text"><span id="invoiceTime"></span></p>
+                            </div>
+                            <div class="flex-between-center border-dashed py-1">
+                                <p class="color-text">Invoice: <span id="invoiceNo"></span></p>
+                                <p class="color-text">Cashier: <span>{{ current_user.username }}</span></p>
+                            </div>
+                            <div class="item-payment mt-2">
+                                <table class="table invoice-table">
+                                    <thead>
+                                        <tr class="color-font">
+                                            <td style="width: 40%;">Item Name</td>
+                                            <td style="width: 15%; text-align:center;">Price</td>
+                                            <td style="width: 10%; text-align:center;">Disc</td>
+                                            <td style="width: 15%; text-align:center;">Qty</td>
+                                            <td style="width: 20%; text-align:center;">Total</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="item-invoice" class="color-text"></tbody>
+                                </table> 
+                            </div>
+                        </div>
+                        <div class="invoice-total border-dashed">
+                            <div class="flex-between-start" style="width: 100%;">
+                                <p class="color-text" style="width: 50%;">Total</p>
+                                <div class="flex-between-center" style="width: 50%;">
+                                    <p class="color-text">USD:</p>
+                                    <p class="color-text" id="totalUSD"><span>&#36;</span></p>
+                                </div> 
+                            </div>
+                            <div class="flex-between-center">
+                                <p class="color-text">KHR:</p>
+                                <p class="color-text" id="totalKHR"><span>&#6107;</span></p>
+                            </div> 
+                            <div class="flex-between-center border-dashed my-1 pt-1">
+                                <p class="color-text">Cash:</p>
+                                <p class="color-text" id="totalCash">...</p>
+                            </div>
+                            <div class="flex-between-center">
+                                <p class="color-text">Change:</p>
+                                <p class="color-text" id="totalChange">...</p>
+                            </div>
+                        </div>
+                        <div class="invoice-footer">
+                            <p class="color-text">Thank you for coming</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal"><ion-icon name="close-outline"></ion-icon></button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -563,7 +688,6 @@
                     <button class="btn border drawer-save color-font hide">Create</button>
                     <button class="btn border drawer-end color-font" id="{{ current_user.drawer }}">End</button>
                 {% endif %}
-                
             </div>
         </div>
     </div>
@@ -572,15 +696,60 @@
 
 {% block script %}
 <script src="{{url_for('static', filename='js/printThis.js')}}"></script>
+<script src="{{url_for('static', filename='js/cashing.js')}}"></script>
 <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
+    $(document).on('click', '.type-btn', function() {
+        var types = $('.payment-type').children()
+        Array.from(types).forEach(t => {
+            $(t).removeClass('active')
+        })
+        $(this).addClass('active')
+        if ($(this).hasClass('type-cash')) {
+            $('.payment-body').html(`<div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <input type="number" step="any" class="form-control input-color" name="receive-cash" id="receive-cash" required>
+                                        <label for="receive-cash" class="label receive-cash">Amount</label>
+                                        <select name="receive-currency" id="receive-currency" class="form-control input-color">
+                                            <option value="USD"><span>&#36;</span></option>
+                                            <option value="KHR"><span>&#6107;</span></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 pl-0">
+                                    <div class="form-group">
+                                        <button class="btn color-text payment-add"><ion-icon name="add-outline" style="vertical-align: middle"></ion-icon></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="money-container mt-3" style="height: 100%; overflow: auto">
+                                <table class="table money-table">
+                                    <thead>
+                                        <tr class="color-font">
+                                            <td style="width: 40%;">Money</td>
+                                            <td style="width: 15%; text-align:center;">Currency</td>
+                                            <td style="width: 10%; text-align:center;">Unit</td>
+                                            <td style="width: 25%; text-align:center;">Total</td>
+                                            <td style="width: 10%;"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="list-payment" class="color-text"></tbody>
+                                </table>
+                            </div>`)
+        } else {
+            $('.payment-body').html('<div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center"><p class="color-text">Upgrade to advance mode</p></div>')
+        }
+    })
+
     $('.drawer-btn').on('click', function () {
         var id = $(this).attr('id')
         $.ajax({
             url: '/drawer/'+id,
             type: 'POST',
             success: function(data) {
-                $('#drawerModal').find('.modal-body').html(drawerForm('Default', 4000, data.data))
+                console.log(data)
+                $('#drawerModal').find('.modal-body').html(drawerForm(data.counter, data.rate, data.data))
                 $('#drawerModal').modal('show')
             }
         })
@@ -650,7 +819,7 @@
     })
 
     $(document).on('click', '.continue-btn', function () {
-        var orderId = generatString(23)
+        var orderId = generateString(23)
 
         var validation = {
             isSelected: true
@@ -1046,11 +1215,11 @@
         if (moneys.length > 0) {
             moneys.forEach(m => {
                 element += `<tr class="color-font">
-                                <td style="width: 35%;">`+m.money+`</td>
+                                <td style="width: 25%;">`+m.money+`</td>
                                 <td style="width: 15%; text-align:center;">`+m.currency+`</td>
                                 <td style="width: 20%; text-align:center;">`+m.unit+`</td>
                                 <td style="width: 25%; text-align:center;">`+m.money * m.unit+`</td>
-                                <td style="width: 5%;"></td>
+                                <td class="color-text flex-between-center"><ion-icon name="remove-outline"></ion-icon><ion-icon name="add-outline"></ion-icon></td>
                             </tr>`
             })
         }
@@ -1128,14 +1297,20 @@
                 </td>`
     }
 
-    $(document).on('click', '.money-delete', function() { 
-        var id = $(this).closest('tr').attr('id')
-        drawerObj.moneys.forEach((m, i) => {
-            if (m.id == id) {
-                drawerObj.moneys.splice(i, 1)
-            }
-            $(this).closest('tr').remove()
-        })
+    
+
+    $(document).on('click', '.money-delete', function() {
+        if ($(this).closest('tr').hasClass('money-form')) {
+            $(this).closest('tr').empty()
+        } else {
+            var id = $(this).closest('tr').attr('id')
+            drawerObj.moneys.forEach((m, i) => {
+                if (m.id == id) {
+                    drawerObj.moneys.splice(i, 1)
+                    $(this).closest('tr').remove()
+                }
+            })
+        } 
     })
 
     $(document).on('click', '.money-add', function() {
@@ -1167,6 +1342,14 @@
         'currency': 'dollar',
         'total': 0
     }
+
+    $(document).on('input', '#drawer-rate', function() {
+        drawerObj.rate = $(this).val()
+    })
+
+    $(document).on('input', '#drawer-counter', function() {
+        drawerObj.counter = $(this).val()
+    })
 
     $(document).on('input', '#money-money, #money-unit', function() {
         var money = $(this).closest('tr').find('#money-money').val()
@@ -1209,7 +1392,7 @@
         var unit = $(this).closest('tr').find('#money-unit').val()
         var currency = $(this).closest('tr').find('#money-currency').val()
         var total = $(this).closest('tr').find('#money-total').val()
-        var id = generatString(8)
+        var id = generateString(8)
         obj = {
             'id': id,
             'unit': unit,
@@ -1268,6 +1451,7 @@
                     $('.drawer-btn, .drawer-time').removeClass('active')
                     $('#drawerTime').empty()
                     $('#list-money').html(`<tr class="money-form color-text"></tr>`)
+                    drawerObj.moneys = []
                     toggleEdit($('.drawer-save'), $('.drawer-end'))
                     $('.drawer-btn').attr('id', 'none')
                 }
@@ -1275,22 +1459,19 @@
         })
     })
 
-    $(document).on('click', '.order-btn', function() {
-        var transactions = document.querySelectorAll('.transaction-item')
-        var transactionArr = []
-        Array.from(transactions).forEach(t => {
-            transactionArr.push($(t).attr('id'))
-        })
-        var json = JSON.stringify(transactionArr)
+    $(document).on('click', '.remove-btn', function() {
+        var id = $(this).closest('.transaction-item')
         $.ajax({
-            url: '/payment',
+            url: '/transaction/delete/'+id.attr('id'),
             type: 'POST',
-            data: {
-                data: json
-            },
-            dataType: 'json',
             success: function(data) {
-
+                if (data.result == 'Success') {
+                    $(id).fadeOut('slow', function() {
+                        $(this).remove()
+                    })
+                } else {
+                    alert(data.result)
+                }
             }
         })
     })
