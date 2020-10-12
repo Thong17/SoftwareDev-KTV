@@ -843,6 +843,7 @@ def order(id):
     product = tblProduct.query.get(id)
     data = json.loads(request.form['data'])
     description = product.product
+    oid = request.form['id']
 
     resultObj = {
         'data': {},
@@ -870,41 +871,47 @@ def order(id):
     transaction = tblTransaction(id=tid, discount=discount, price=amount, description=description)
     db.session.add(transaction)
 
-    if product.isStock and len(product.stocks) > 0:
-        total_stocks = 0
-        sum_stocks = 0
-        for stock in product.stocks:
-            if stock.color == data['colorId']:
-                sum_stocks += stock.quantity
-            elif stock.color == '':
-                sum_stocks += stock.quantity
-            total_stocks += stock.quantity
-        available = sum_stocks - quantity
-        if available >= 0:
-            sum_quantity = quantity
+    if product.isStock:
+        if len(product.stocks) > 0:
+            total_stocks = 0
+            sum_stocks = 0
             for stock in product.stocks:
-                if sum_quantity > 0 and stock.quantity > 0:
-                    qid = str(uuid4())
-                    if stock.color == data['colorId'] or stock.color == '':
-                        if stock.quantity < sum_quantity:
-                            stock_quantity = stock.quantity
-                            stock.quantity = 0
-                            Quantity = tblQuantity(id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
-                            db.session.add(Quantity)
-                            sum_quantity -= stock_quantity
-                        else:
-                            Quantity = tblQuantity(id=qid, stock=stock.quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
-                            db.session.add(Quantity)
-                            stock.quantity -= sum_quantity
-                            sum_quantity = 0
-            amount *= quantity
-            total_stocks -= quantity
-            db.session.commit()
-            resultObj['result'] = 'success'
-            resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks, 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+                if stock.color == data['colorId']:
+                    sum_stocks += stock.quantity
+                elif stock.color == '':
+                    sum_stocks += stock.quantity
+                total_stocks += stock.quantity
+            available = sum_stocks - quantity
+            if available >= 0:
+                sum_quantity = quantity
+                for stock in product.stocks:
+                    if sum_quantity > 0 and stock.quantity > 0:
+                        qid = str(uuid4())
+                        if stock.color == data['colorId'] or stock.color == '':
+                            if stock.quantity < sum_quantity:
+                                stock_quantity = stock.quantity
+                                stock.quantity = 0
+                                Quantity = tblQuantity(id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                db.session.add(Quantity)
+                                transaction.quantity += stock_quantity
+                                sum_quantity -= stock_quantity
+                            else:
+                                Quantity = tblQuantity(id=qid, stock=stock.quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                db.session.add(Quantity)
+                                transaction.quantity += sum_quantity
+                                stock.quantity -= sum_quantity
+                                sum_quantity = 0
+                amount *= quantity
+                total_stocks -= quantity
+                db.session.commit()
+                resultObj['result'] = 'success'
+                resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks, 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+            else:
+                resultObj['result'] = 'failed'
+                resultObj['data'] = {'message': 'This color has only '+str(sum_stocks)+' left'}
         else:
             resultObj['result'] = 'failed'
-            resultObj['data'] = {'message': 'This color has only '+str(sum_stocks)+' left'}
+            resultObj['data'] = {'message': 'This color is not available'} 
     else:
         amount *= quantity
         resultObj['result'] = 'success'
@@ -965,17 +972,13 @@ def payment():
     transactions = json.loads(request.form['data'])
     if transactions:
         id = str(uuid4())
-        invoice = 'INV'+ str(len(Payments)).zfill(7)
+        invoice = 'INV'+ str(len(Payments) + 1).zfill(7)
         Payment = tblPayment(id=id, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
         db.session.add(Payment)
         total = 0
         for transaction in transactions:
-            quantity = 0
             Transaction = tblTransaction.query.get(transaction)
-            for q in Transaction.quantities:
-                quantity += q.quantity
-            Transaction.quantity = quantity
-            total += Transaction.price * quantity
+            total += Transaction.price * Transaction.quantity
             Payment.transactions.append(Transaction)
         Payment.amount = total
         db.session.commit()
@@ -986,15 +989,49 @@ def payment():
     else:
         return jsonify({'result': 'No transaction added'})
 
+@app.route('/payment/<id>', methods=['POST'])
+def get_payment(id):
+    Drawer = tblDrawer.query.get(current_user.drawer)
+    Payment = tblPayment.query.get(id)
+    transactions = json.loads(request.form['data'])
+
+    if transactions:
+        total = 0
+        for transaction in transactions:
+            Transaction = tblTransaction.query.get(transaction)
+            if Transaction.quantities:
+                quantity = 0
+                for q in Transaction.quantities:
+                    quantity += q.quantity
+                Transaction.quantity = quantity
+            total += Transaction.price * quantity
+            if Transaction not in Payment.transactions:
+                Payment.transactions.append(Transaction)
+        Payment.amount = total
+        db.session.commit()
+
+    p = PaymentSchema()
+    payment = p.dump(Payment)
+    return jsonify({'data': payment, 'rate': Drawer.rate})
+
 @app.route('/transaction/delete/<id>', methods=['POST'])
 def delete_transaction(id):
     Transaction = tblTransaction.query.get(id)
-    try:
-        db.session.delete(Transaction)
-        db.session.commit()
-        return jsonify({'result': 'Success'})
-    except:
-        return jsonify({'result': 'Transaction could not found'})
+    pid = request.form['data']
+    quantity = 0
+    if Transaction.quantities:
+        for q in Transaction.quantities:
+            quantity += Transaction.quantity
+        q.soq.quantity += quantity
+    if pid != '':
+        Payment = tblPayment.query.get(pid)
+        Payment.amount -= Transaction.price
+    # try:
+    db.session.delete(Transaction)
+    db.session.commit()
+    return jsonify({'result': 'Success', 'quantity': quantity})
+    # except:
+    #     return jsonify({'result': 'Transaction could not found'})
 
 
 @app.route('/checkout/<id>', methods=['POST'])
@@ -1039,4 +1076,23 @@ def checkout(id):
         return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
     else:
         return jsonify({'result': 'Not enough money'})
+
+@app.route('/transaction')
+def transaction():
+    Transactions = tblTransaction.query.all()
+    return render_template('views/transaction.html', transactions=Transactions)
+
+@app.route('/transaction/reverse', methods=['POST'])
+def undo_transaction():
+    id = request.form['id']
+    transaction = tblTransaction.query.get(id)
+    if transaction.quantities:
+        for q in transaction.quantities:
+            q.soq.quantity += transaction.quantity
+    try:
+        db.session.delete(transaction)
+        db.session.commit()   
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Could not find the selected transaction'})
     

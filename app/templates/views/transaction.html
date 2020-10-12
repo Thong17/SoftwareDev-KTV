@@ -1,0 +1,79 @@
+{% extends 'views/financial.html' %}
+
+{% block content %}
+<div class="wrap-container">
+    <div class="row-wrapper">
+        <div class="column-wrapper" style="width: 350px; box-sizing: border-box; overflow: hidden;">
+            
+        </div>
+        <div class="border-right"></div>
+        <div class="column-wrapper" style="width: 100%;">
+            <div class="content-body" style="overflow-y: auto;">
+                <table class="table">
+                    <thead>
+                        <tr class="color-font">
+                            <td class="color-text" style="width: 10%;">Invoice</td>
+                            <td class="color-text">Description</td>
+                            <td class="color-text">Price</td>
+                            <td class="color-text">Quantity</td>
+                            <td class="color-text">Discount</td>
+                            <td class="color-text">Since</td>
+                            <td class="color-text">Status</td>
+                            <td class="color-text"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                            {% if transaction.isComplete == False %}
+                                <tr style="font-size: 13px;" id="{{ transaction.id }}">
+                                    <td class="color-text">
+                                        {% if transaction.transactions %}
+                                            {% for i in transaction.transactions %}
+                                                {{ i.invoice }}
+                                            {% endfor %}
+                                        {% else %}
+                                            ...
+                                        {% endif %}
+                                    </td>
+                                    <td class="color-text">{{ transaction.description }}</td>
+                                    <td class="color-text">{{ transaction.price }}</td>
+                                    <td class="color-text">{{ transaction.quantity }}</td>
+                                    <td class="color-text">{{ transaction.discount }}</td>
+                                    <td class="color-text">{{ transaction.createdOn }}</td>
+                                    <td class="color-text">{{ transaction.isComplete }}</td>
+                                    <td class="color-text"><i class="fa fa-undo undo-transaction" aria-hidden="true"></i></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $('.undo-transaction').on('click', function() {
+        var id = $(this).closest('tr').attr('id')
+        $.ajax({
+            url: '/transaction/reverse',
+            method: 'POST',
+            data: {
+                id: id
+            },
+            success: function(data) {
+                if (data.data == 'Success') {
+                    $('#'+id).fadeOut('slow', function() {
+                        $(this).remove()
+                    })
+                } else {
+                    alert(data.data)
+                }
+            }
+        })
+    })
+</script>
+{% endblock %}

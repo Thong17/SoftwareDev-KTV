@@ -1259,6 +1259,7 @@
                     var value_element = ''
 
                     if (values.length > 0) {
+                        var isSeleted = false
                         var propertyObj = {}
                         values.forEach(value => {
                             var selected = ''
@@ -1276,9 +1277,12 @@
                                 value.currency = '$'
                             }
                             if (value.property == property.id) {
-                                if (accounting.unformat(value.price) == 0) {
+                                console.log(isSeleted)
+                                if (accounting.unformat(value.price) == 0 && isSeleted == false) {
+
+                                    console.log('meet')
+                                    isSeleted = true
                                     selected = 'checked'
-                                    
                                     propertyObj['id'] = property.id
                                     propertyObj['name'] = property.property
                                     propertyObj['value'] = value.value
@@ -1288,7 +1292,7 @@
                                     configuration_element += `<div class="config-list flex-between" id="`+property.id+`">
                                                                 <p class="property-name color-text" style="font-size: 13px">`+property.property+`: <span class="color-font value-description">`+value.description.toLowerCase()+' '+value.value.toLowerCase()+`</span></p>
                                                             </div>`
-                                } 
+                                }
                                 
                                 value_element += `<label class="value container-input" id="` + value.id + `">
                                                     <div class="flex-between-start">
@@ -1303,8 +1307,6 @@
                                                     <input type="radio" class="input-radio" name="`+ property.property.toLowerCase().split(' ').join('-') +`" id="` + property.id + `" `+ selected +` value="` + value.id + `">
                                                     <span class="hide checkbox"></span>
                                                 </label>`
-                            } else {
-                                value_element = '<button class="btn border btn-value color-font" disabled>...</button>'
                             }
                         })
                         propertyArr.push(propertyObj)

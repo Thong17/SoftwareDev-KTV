@@ -4,79 +4,145 @@ paymentObj = {
 
 $(document).on('click', '.order-btn', function() {
     var id = $(this).attr('id')
-    if (id == '') {
-        var transactions = document.querySelectorAll('.transaction-item')
-        var transactionArr = []
-        Array.from(transactions).forEach(t => {
-            transactionArr.push($(t).attr('id'))
-        })
-        var json = JSON.stringify(transactionArr)
-        $.ajax({
-            url: '/payment',
-            type: 'POST',
-            data: {
-                data: json
-            },
-            dataType: 'json',
-            success: function(data) {
-                console.log(data)
-                if (data.result == 'Success') {
-                    $('.order-btn').attr('id', data.data.id)
-                    var time = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toLocaleTimeString()
-                    var date = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toDateString()
-                    $('#invoiceTime').text(time)
-                    $('#invoiceDate').text(date)
-                    $('#invoiceNo').text(data.data.invoice)
-                    $('#totalUSD').text(accounting.formatMoney(data.data.amount, {
-                        precision: 0,
-                        format: {
-                            pos: "%v%s",
-                            neg: "%v%s",
-                            zero: '...'
-                        }
-                    }))
-                    $('#totalKHR').text(accounting.formatMoney(data.data.amount * data.rate, {
-                        precision: 0,
-                        format: {
-                            pos: "%v\u17DB",
-                            neg: "%v\u17DB",
-                            zero: '...'
-                        }
-                    }))
-
-                    var invoice_item = ''
-
-                    data.data.transactions.forEach(t => {
-                        var price_before = parseFloat(t.price) / (1 - (parseFloat(t.discount) / 100))
-                        invoice_item += `<tr id="`+t.id+`">
-                                                <td>`+t.description+`</td>
-                                                <td style="text-align: center">`+Math.round(price_before, 2)+`</td>
-                                                <td style="text-align: center">`+t.discount+`</td>
-                                                <td style="text-align: center">`+t.quantity+`</td>
-                                                <td style="text-align: center">`+t.price * t.quantity+`</td>
-                                            </tr>`
-                    })
-                    
-                    $('#item-invoice').html(invoice_item)
-                    $('#totalCash').text('...')
-                    $('#totalChange').text('...')
-
-                    $('#paymentModel').modal('show')
-                    $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
-                                        <span class="color-font">Check Out: </span>
-                                        <span class="currency-format color-text" id="paymentAmount">`+data.data.amount+`</span>
-                                    </div>`)
-                    $('#receive-cash').val('').focus()
-                    $('.payment-add').attr('disabled', false)
-                    
-                } else {
-                    alert(data.result)
-                }
-            }
-        })
+    var isChange = $(this).attr('data-change')
+    var drawer = $('.drawer-btn').attr('id')
+    if (drawer == undefined) {
+        $('.drawer-btn').click()
     } else {
-        $('#paymentModel').modal('show')
+        if (isChange == 'true') {
+            var transactions = document.querySelectorAll('.transaction-item')
+            var transactionArr = []
+            Array.from(transactions).forEach(t => {
+                transactionArr.push($(t).attr('id'))
+            })
+            var json = JSON.stringify(transactionArr)
+            if (id == '') {
+                $.ajax({
+                    url: '/payment',
+                    type: 'POST',
+                    data: {
+                        data: json
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.result == 'Success') {
+                            $('.order-btn').attr('data-change', false)
+                            $('.order-btn').attr('id', data.data.id)
+                            var time = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toLocaleTimeString()
+                            var date = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toDateString()
+                            $('#invoiceTime').text(time)
+                            $('#invoiceDate').text(date)
+                            $('#invoiceNo').text(data.data.invoice)
+                            $('#totalUSD').text(accounting.formatMoney(data.data.amount, {
+                                precision: 2,
+                                format: {
+                                    pos: "%v%s",
+                                    neg: "%v%s",
+                                    zero: '...'
+                                }
+                            }))
+                            $('#totalKHR').text(accounting.formatMoney(data.data.amount * data.rate, {
+                                precision: 0,
+                                format: {
+                                    pos: "%v\u17DB",
+                                    neg: "%v\u17DB",
+                                    zero: '...'
+                                }
+                            }))
+        
+                            var invoice_item = ''
+        
+                            data.data.transactions.forEach(t => {
+                                var price_before = parseFloat(t.price) / (1 - (parseFloat(t.discount) / 100))
+                                invoice_item += `<tr id="`+t.id+`">
+                                                        <td>`+t.description+`</td>
+                                                        <td style="text-align: center">`+Math.round(price_before, 2)+`</td>
+                                                        <td style="text-align: center">`+t.discount+`</td>
+                                                        <td style="text-align: center">`+t.quantity+`</td>
+                                                        <td style="text-align: center">`+t.price * t.quantity+`</td>
+                                                    </tr>`
+                            })
+                            
+                            $('#item-invoice').html(invoice_item)
+                            $('#totalCash').text('...')
+                            $('#totalChange').text('...')
+        
+                            $('#paymentModel').modal('show')
+                            $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
+                                                <span class="color-font">Check Out: </span>
+                                                <span class="currency-format color-text" id="paymentAmount">`+data.data.amount+`</span>
+                                            </div>`)
+                            $('#receive-cash').val('').focus()
+                            $('.payment-add').attr('disabled', false)
+                            
+                        } else {
+                            alert(data.result)
+                        }
+                    }
+                })
+            } else {
+                $.ajax({
+                    url: '/payment/'+id,
+                    type: 'POST',
+                    data: {
+                        data: json
+                    },
+                    success: function(data) {
+                        $('.order-btn').attr('data-change', false)
+                        var time = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toLocaleTimeString()
+                        var date = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toDateString()
+                        $('#invoiceTime').text(time)
+                        $('#invoiceDate').text(date)
+                        $('#invoiceNo').text(data.data.invoice)
+                        $('#totalUSD').text(accounting.formatMoney(data.data.amount, {
+                            precision: 2,
+                            format: {
+                                pos: "%v%s",
+                                neg: "%v%s",
+                                zero: '...'
+                            }
+                        }))
+                        $('#totalKHR').text(accounting.formatMoney(data.data.amount * data.rate, {
+                            precision: 0,
+                            format: {
+                                pos: "%v\u17DB",
+                                neg: "%v\u17DB",
+                                zero: '...'
+                            }
+                        }))
+    
+                        var invoice_item = ''
+    
+                        data.data.transactions.forEach(t => {
+                            var price_before = parseFloat(t.price) / (1 - (parseFloat(t.discount) / 100))
+                            invoice_item += `<tr id="`+t.id+`">
+                                                    <td>`+t.description+`</td>
+                                                    <td style="text-align: center">`+Math.round(price_before, 2)+`</td>
+                                                    <td style="text-align: center">`+t.discount+`</td>
+                                                    <td style="text-align: center">`+t.quantity+`</td>
+                                                    <td style="text-align: center">`+t.price * t.quantity+`</td>
+                                                </tr>`
+                        })
+                        
+                        $('#item-invoice').html(invoice_item)
+                        $('#totalCash').text('...')
+                        $('#totalChange').text('...')
+    
+                        $('#paymentModel').modal('show')
+                        $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
+                                            <span class="color-font">Check Out: </span>
+                                            <span class="currency-format color-text" id="paymentAmount">`+data.data.amount+`</span>
+                                        </div>`)
+                        $('#receive-cash').val('').focus()
+                        $('.payment-add').attr('disabled', false)
+                    }
+                })
+            }
+        } else {
+            $('#paymentModel').modal('show')
+        }
     }
+    
     
 })
 
@@ -86,9 +152,20 @@ function amountList(id, money, currency, unit) {
                 <td class="pre-currency" style="text-align:center;">`+currency+`</td>
                 <td class="pre-unit" style="text-align:center;">`+unit+`</td>
                 <td class="pre-total" style="text-align:center;">`+money * unit+`</td>
-                <td class="color-text flex-between-center amount-btn"></td>
+                <td class="color-text flex-between-center clear-btn"><ion-icon name="close-outline"></ion-icon></td>
             </tr>`
 }
+
+$(document).on('click', '.clear-btn', function() {
+    var id = $(this).closest('tr').attr('id')
+    paymentObj.amounts.forEach((a, i) => {
+        if (a.id == id) {
+            paymentObj.amounts.splice(i, 1)
+            $('#'+id).remove()
+        }
+    })
+    console.log(paymentObj)
+})
 
 $(document).on('input', '#receive-cash', function() {
     var value = $(this).val()
@@ -118,6 +195,7 @@ $(document).on('click', '.checkout-btn', function() {
     var payment = $('.payment-total').attr('id')
     var amount = $(this).find('#paymentAmount').text()
     var json = JSON.stringify(paymentObj)
+    console.log(amount)
     $.ajax({
         url: '/checkout/'+payment,
         type: 'POST',
@@ -131,6 +209,7 @@ $(document).on('click', '.checkout-btn', function() {
         success: function(data) {
             if (data.result == 'Success') {
                 $('.payment-add').attr('disabled', true)
+                $('.clear-btn ion-icon').addClass('hide')
                 var changeObj = {
                     'moneys': [],
                     'currencies': []
@@ -231,8 +310,13 @@ $(document).on('click', '.checkout-btn', function() {
 
                 element += '</div></div><div class="invoice-btn"><button class="color-text close-payment">Continue</button><button class="color-font print-inv"><ion-icon name="print-outline"></ion-icon></button></div>'
                 $('.payment-total').html(element)
+
+                // Bind click when checked out
+                $('.product-btn').attr('disabled', true)
+                $('.transaction-item').find('.remove-btn').addClass('hide')
+                
             } else {
-                $('.payment-total').html('<div class="checkout-btn"><span class="color-font">Check Out: '+amount+'</span><span class="currency-format color-text" id="paymentAmount"></span></div>')
+                $('.payment-total').html('<div class="checkout-btn"><span class="color-font">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+amount+'</span></div>')
             }
         }
     })
@@ -247,10 +331,18 @@ $(document).on('click', '.close-payment', function() {
     $('#paymentModel').modal('hide')
     $('#list-payment').empty()
     $('#sumTotal').text(accounting.formatMoney(0))
-    $('.order-btn').attr('id', '')
+    $('.order-btn').attr({
+        'id': '',
+        'data-change': true
+    })
+    // Unbind Click event when close payment
+    $('.product-btn').attr('disabled', false)
+    $('.sum-order').text(0)
 })
 
 $(document).on('click', '.print-inv', function() {
-    $('.payment-invoice').printThis()
+    $('.payment-invoice').printThis({
+        loadCSS: '/static/css/dist/style.css'
+    })
 })
 

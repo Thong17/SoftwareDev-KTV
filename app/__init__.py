@@ -178,6 +178,8 @@ class tblStock(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
+    soq = db.relationship('tblQuantity', backref='soq', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+
 
 class tblAppearance(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -230,6 +232,7 @@ class tblActivity(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     activity = db.Column(db.String(50), nullable=False)
     type = db.Column(db.String(50), nullable=False)
+    activityOn = db.Column(db.String(50), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 

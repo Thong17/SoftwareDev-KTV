@@ -140,6 +140,17 @@
         transform: scale(1) !important;
         border-radius: none;
         border-radius: 0;
+        transition: 0;
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .product-item:hover .product-btn,
+    .product-item.active .product-btn {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
     }
 
     .drawer-dropdown {
@@ -441,9 +452,9 @@
                 <div class="item-wrapper">
                     <div class="item-img">
                         <img src="/static/uploads/{{product.photo}}">
-                        <div class="product-btn color-text" title="Add product to list">
+                        <button class="product-btn color-text" title="Add product to list">
                             <ion-icon name="add-circle-outline"></ion-icon>
-                        </div>
+                        </button>
                     </div>
                     <div class="item-details">
                         <div class="details">
@@ -514,7 +525,7 @@
                 </tbody>
             </table>
             <div class="order-wrapper flex-between-center">
-                <button class="btn color-text order-btn" id="">
+                <button class="btn color-text order-btn" id="" data-change="true">
                     <span class="mr-2 order-icon">
                         <span class="sum-order notranslate">0</span>
                         <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
@@ -606,7 +617,7 @@
                                 <p class="color-text">Invoice: <span id="invoiceNo"></span></p>
                                 <p class="color-text">Cashier: <span>{{ current_user.username }}</span></p>
                             </div>
-                            <div class="item-payment mt-2">
+                            <div class="item-payment">
                                 <table class="table invoice-table">
                                     <thead>
                                         <tr class="color-font">
@@ -664,7 +675,7 @@
                     <ion-icon name="time-outline" class="time-btn"></ion-icon>
                 </div>
                 {% else %}
-                <div class="drawer-time active" title="Drawer is on">
+                <div class="drawer-time active notranslate" title="Drawer is on">
                     {% for drawer in current_user.drawers %}
                     {% if drawer.id == current_user.drawer %}
                     <span class="color-text" id="drawerTime">{{ drawer.startedOn.strftime("%b %d %Y %H:%M:%S") }}</span>
@@ -748,7 +759,6 @@
             url: '/drawer/'+id,
             type: 'POST',
             success: function(data) {
-                console.log(data)
                 $('#drawerModal').find('.modal-body').html(drawerForm(data.counter, data.rate, data.data))
                 $('#drawerModal').modal('show')
             }
@@ -763,12 +773,12 @@
         var quantity = $('#input-quantity').val()
         var id = $('#input-product').val()
         var details = $('#input-details').val()
+        var orderId = $('.order-btn').attr('id')
 
         if (quantity < 1) {
             $('#input-quantity').focus()
             alert('Value must be atleast 1')
         } else {
-
             var orderList = {}
 
             orderLists.forEach(o => {
@@ -786,12 +796,15 @@
                 url: '/order/product/' + orderList.productId,
                 type: 'POST',
                 data: {
-                    data: jsonObj
+                    data: jsonObj,
+                    id: orderId
                 },
                 dataType: 'json',
                 success: function (data) {
                     if (data.result == 'success') {
-                        $('#list-orders tr:last').before(showOrder(data.data.id, details, data.data.price, data.data.discount, data.data.quantity, data.data.amount))
+                        console.log(orderLists)
+                        $('.order-btn').attr('data-change', true)
+                        $('#list-orders tr:last').before(showOrder(data.data.id, details, data.data.price, data.data.discount, data.data.quantity, data.data.amount, orderList.orderId, orderList.productId))
                         $('.order-form').empty()
                         if (data.data.isStock != false) {
                             if (data.data.stock == 0) {
@@ -802,6 +815,7 @@
                             $('#' + orderList.productId).find('.stock-tag').text(data.data.stock)
                         }
                         var total = accounting.unformat($('#sumTotal').text())
+                        console.log(total, data.data.amount)
                         total += data.data.amount
                         $('#sumTotal').text(accounting.formatMoney(total))
 
@@ -888,9 +902,13 @@
     })
 
     $(document).on('click', '.cancel-btn', function () {
-        $(this).closest('tr').fadeOut('slow', function () {
-            $(this).remove()
-        })
+        if ($(this).closest('tr').hasClass('order-form')) {
+            $('.order-form').empty()
+        } else {
+            $(this).closest('tr').fadeOut('slow', function () {
+                $(this).remove()
+            })
+        }
     })
 
     $(document).on('input', '#input-quantity', function () {
@@ -1106,9 +1124,9 @@
                 if (evnt.attributeName == "class") {
                     if (evnt.newValue.search(/open/i) == -1) {
                         if ($('#list-cates').hasClass('show')) {
-                            $('.menu-icon').addClass('active')
+                            $('#list-cates').find('.menu-icon').addClass('active')
                         } else {
-                            $('.menu-icon').removeClass('active')
+                            $('#list-cates').find('.menu-icon').removeClass('active')
                         }
                     }
                 }
@@ -1173,9 +1191,9 @@
         })
     })
 
-    function showOrder(id, description, price, discount, quantity, amount) {
-        return `<tr class="color-text transaction-item" id="` + id + `">
-                    <td class="description" id="order-description">`+ description + `</td>
+    function showOrder(id, description, price, discount, quantity, amount, oid, pid) {
+        return `<tr class="color-text transaction-item" id="` + id + `" data-id="`+oid+`">
+                    <td class="description" id="order-description" data-id="`+ pid +`">`+ description + `</td>
                     <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
             precision: 2,
             format: {
@@ -1461,11 +1479,35 @@
 
     $(document).on('click', '.remove-btn', function() {
         var id = $(this).closest('.transaction-item')
+        var pid = $(this).closest('.transaction-item').find('#order-description').attr('data-id')
+        var oid = $('.order-btn').attr('id')
+        var total = 0
+        Array.from($('.transaction-item')).forEach(t => {
+            total += accounting.unformat($(t).find('#order-amount').text())
+        })
+        var amount = accounting.unformat($(this).closest('tr').find('#order-amount').text())
         $.ajax({
             url: '/transaction/delete/'+id.attr('id'),
+            data: {
+                data: oid
+            },
             type: 'POST',
             success: function(data) {
                 if (data.result == 'Success') {
+                    console.log(data)
+                    $('.order-btn').attr('data-change', true)
+                    var quantity = $('#'+pid).find('.stock-tag').text()
+                    var order = $('.sum-order').text()
+                    var sum_o = parseFloat(order) - data.quantity
+                    $('.sum-order').text(sum_o)
+                    var sum_q = parseFloat(quantity) + data.quantity
+                    $('#'+pid).find('.stock-tag').text(sum_q + ' Available')
+                    $('#sumTotal').text(accounting.formatMoney(total - amount))
+                    orderLists.forEach((o, i) => {
+                        if (o.orderId == id.attr('data-id')) {
+                            orderLists.splice(i, 1)
+                        }
+                    })
                     $(id).fadeOut('slow', function() {
                         $(this).remove()
                     })
