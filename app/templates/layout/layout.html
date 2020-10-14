@@ -1262,9 +1262,13 @@
                         var isSeleted = false
                         var propertyObj = {}
                         values.forEach(value => {
+                            var precision = 0
+                            if (value.price % 1 != 0) {
+                                precision = 2
+                            }
                             var selected = ''
                             var option = accounting.formatMoney(value.price, {
-                                                precision: 0,
+                                                precision: precision,
                                                 format: {
                                                     pos : "+%s%v",
                                                     neg : "-%s%v",
@@ -1277,10 +1281,7 @@
                                 value.currency = '$'
                             }
                             if (value.property == property.id) {
-                                console.log(isSeleted)
                                 if (accounting.unformat(value.price) == 0 && isSeleted == false) {
-
-                                    console.log('meet')
                                     isSeleted = true
                                     selected = 'checked'
                                     propertyObj['id'] = property.id
@@ -1301,10 +1302,10 @@
                                                             <p style="font-size: 11px" class="color-text" id="value-description">` + value.description + `</p>
                                                         </div>
                                                     </div>
+                                                    <input type="radio" class="input-radio" name="`+ property.property.toLowerCase().split(' ').join('-') +`" id="` + property.id + `" `+ selected +` value="` + value.id + `">
                                                     <div class="flex-end notranslate color-text" style="font-size: 18px;" id="value-price">
                                                         ` + option + `
                                                     </div>
-                                                    <input type="radio" class="input-radio" name="`+ property.property.toLowerCase().split(' ').join('-') +`" id="` + property.id + `" `+ selected +` value="` + value.id + `">
                                                     <span class="hide checkbox"></span>
                                                 </label>`
                             }

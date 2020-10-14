@@ -258,7 +258,7 @@
     }
 
     .value-active {
-        color: dodgerblue;
+        color: var(--color-hr);
     }
 
     .span-border.active {
@@ -710,6 +710,7 @@
 <script src="{{url_for('static', filename='js/cashing.js')}}"></script>
 <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
+
     $(document).on('click', '.type-btn', function() {
         var types = $('.payment-type').children()
         Array.from(types).forEach(t => {
@@ -995,6 +996,14 @@
                     id: data.id,
                     stocks: data.stocks
                 }))
+                
+                // var labels = document.querySelectorAll('.input-radio')
+                // Array.from(labels).forEach(t => {
+                //     if(!$(t).is(':checked')) {
+                //         console.log($(t).prev().find('ion-icon').css('color', 'red'))
+                //     }
+                // })
+                
             }
         })
     })
@@ -1038,9 +1047,15 @@
 
             var values = $(this).closest('.property-values').children()
             Array.from(values).forEach(v => {
+                var precision = 0
                 var v_price = $(v).find('#value-price').text()
-                var n_price = accounting.formatMoney(accounting.unformat(v_price) - accounting.unformat(price), {
-                    precision: 0,
+                var c_price = accounting.unformat(v_price) - accounting.unformat(price)
+                if (c_price % 1 != 0) {
+                    precision = 2
+                }
+                
+                var n_price = accounting.formatMoney(c_price, {
+                    precision: precision,
                     format: {
                         pos: "+%s%v",
                         neg: "-%s%v",

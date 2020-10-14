@@ -913,6 +913,8 @@ def order(id):
             resultObj['result'] = 'failed'
             resultObj['data'] = {'message': 'This color is not available'} 
     else:
+        transaction.quantity = quantity
+        db.session.commit()
         amount *= quantity
         resultObj['result'] = 'success'
         resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity, 'price': price, 'isStock': False, 'discount': discount}
