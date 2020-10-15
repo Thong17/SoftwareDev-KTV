@@ -1,10 +1,48 @@
 {% extends 'views/financial.html' %}
 
+{% block style %}
+<style>
+    .item-container {
+        height: 72vh;
+        overflow-y: auto;
+        user-select: none;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+
+    .item-container::-webkit-scrollbar {
+        display: block;
+    }
+
+    .item {
+        font-size: 13px;
+    }
+
+    .item:hover {
+        background-color: var(--color-menu);
+    }
+
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="wrap-container">
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 350px; box-sizing: border-box; overflow: hidden;">
-            
+            <div class="flex-between-end mt-0">
+                <h5 class="color-font">Invoices</h5>
+            </div>
+            <hr class="mt-2">
+            <div class="item-container">
+                {% if payments %}
+                {% for payment in payments %}
+                <div class="flex-between item color-font" id="{{ payment.id }}">
+                    <p class="notranslate" contenteditable="true">{{ payment.invoice }}</p>
+                    <p class="notranslate"><i class="fa fa-caret-right" aria-hidden="true"></i></p>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
         </div>
         <div class="border-right"></div>
         <div class="column-wrapper" style="width: 100%;">
@@ -24,26 +62,24 @@
                     </thead>
                     <tbody>
                         {% for transaction in transactions %}
-                            {% if transaction.isComplete == False %}
-                                <tr style="font-size: 13px;" id="{{ transaction.id }}">
-                                    <td class="color-text">
-                                        {% if transaction.transactions %}
-                                            {% for i in transaction.transactions %}
-                                                {{ i.invoice }}
-                                            {% endfor %}
-                                        {% else %}
-                                            ...
-                                        {% endif %}
-                                    </td>
-                                    <td class="color-text">{{ transaction.description }}</td>
-                                    <td class="color-text">{{ transaction.price }}</td>
-                                    <td class="color-text">{{ transaction.quantity }}</td>
-                                    <td class="color-text">{{ transaction.discount }}</td>
-                                    <td class="color-text">{{ transaction.createdOn }}</td>
-                                    <td class="color-text">{{ transaction.isComplete }}</td>
-                                    <td class="color-text"><i class="fa fa-undo undo-transaction" aria-hidden="true"></i></td>
-                                </tr>
-                            {% endif %}
+                            <tr style="font-size: 13px;" id="{{ transaction.id }}">
+                                <td class="color-text">
+                                    {% if transaction.transactions %}
+                                        {% for i in transaction.transactions %}
+                                            {{ i.invoice }}
+                                        {% endfor %}
+                                    {% else %}
+                                        ...
+                                    {% endif %}
+                                </td>
+                                <td class="color-text">{{ transaction.description }}</td>
+                                <td class="color-text">{{ transaction.price }}</td>
+                                <td class="color-text">{{ transaction.quantity }}</td>
+                                <td class="color-text">{{ transaction.discount }}</td>
+                                <td class="color-text">{{ transaction.createdOn }}</td>
+                                <td class="color-text">{{ transaction.isComplete }}</td>
+                                <td class="color-text"><i class="fa fa-undo undo-transaction" aria-hidden="true"></i></td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -56,6 +92,14 @@
 
 {% block script %}
 <script>
+    $(document).ready(function() {
+        $('.item-container').on('click', '.item', function() {
+            id = $(this).attr('id')
+            console.log(id)
+        })
+    })
+
+
     $('.undo-transaction').on('click', function() {
         var id = $(this).closest('tr').attr('id')
         $.ajax({

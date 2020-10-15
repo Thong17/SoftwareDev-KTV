@@ -1081,8 +1081,9 @@ def checkout(id):
 
 @app.route('/transaction')
 def transaction():
-    Transactions = tblTransaction.query.all()
-    return render_template('views/transaction.html', transactions=Transactions)
+    Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
+    Payments = tblPayment.query.order_by(tblPayment.invoice).all()
+    return render_template('views/transaction.html', transactions=Transactions, payments=Payments)
 
 @app.route('/transaction/reverse', methods=['POST'])
 def undo_transaction():
