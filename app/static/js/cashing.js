@@ -284,7 +284,7 @@ $(document).on('click', '.checkout-btn', function() {
                 }))
 
                 $('#totalChange').text(accounting.formatMoney(change, {
-                    precision: 0,
+                    precision: 2,
                     format: {
                         pos: "%v%s("+change * data.rate+"\u17DB)",
                         neg: "%v%s",
@@ -292,7 +292,7 @@ $(document).on('click', '.checkout-btn', function() {
                     }
                 }))
 
-                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+paid+' USD</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+' USD</span></div></div><div class="change-container"><div class="change-left color-font"><span>Change: </span><span>'+change.toFixed(2)+' USD</span></div><div class="list-changes">'
+                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+paid+' USD</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+' USD</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+change.toFixed(2)+' USD</span></div><div class="list-changes">'
 
                 changeArr.forEach(m => {
                     if (m.money != 0) {

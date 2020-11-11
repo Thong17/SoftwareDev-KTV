@@ -37,7 +37,7 @@
         </li>
         <li class="side-menu">
             <span>Reports</span>
-            <a href="">
+            <a href="/financial_report">
                 <i class="fa fa-bar-chart" aria-hidden="true"></i>
             </a>
         </li>
@@ -135,11 +135,13 @@
     <script src="{{url_for('static', filename='js/accounting.js')}}"></script>
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
     <script>
-        $('a').on('click', function () {
-            if ($(this).attr('class').trim() == 'cashing') {
-                event.preventDefault()
-                $('#loginModal').modal('show')
-            }
+        $(document).ready(function() {
+            $('a').on('click', function () {
+                if ($(this).attr('class').trim() == 'cashing') {
+                    event.preventDefault()
+                    $('#loginModal').modal('show')
+                }
+            })
         })
 
         if ("onhashchange" in window) {
@@ -653,16 +655,20 @@
                     </a>`)
         }
 
+        // function convertUTCDateToLocalDate(date) {
+
+        //     var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+
+        //     var offset = date.getTimezoneOffset() / 60;
+        //     var hours = date.getHours();
+
+        //     newDate.setHours(hours - offset);
+
+        //     return newDate;
+        // }
+
         function convertUTCDateToLocalDate(date) {
-
-            var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
-
-            var offset = date.getTimezoneOffset() / 60;
-            var hours = date.getHours();
-
-            newDate.setHours(hours - offset);
-
-            return newDate;
+            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(),  date.getHours(), date.getMinutes(), date.getSeconds()));
         }
 
 

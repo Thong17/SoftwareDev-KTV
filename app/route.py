@@ -1,4 +1,4 @@
-from app import app, bcrypt, db, login_manager, c, upload, delete_photo
+from app import app, bcrypt, db, login_manager, c, upload, delete_photo, utc2local
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema
@@ -868,7 +868,7 @@ def order(id):
     amount = price * (1 - discount / 100)
 
     tid = str(uuid4())
-    transaction = tblTransaction(id=tid, discount=discount, price=amount, description=description)
+    transaction = tblTransaction(id=tid, discount=discount, price=amount, description=description, createdBy=current_user.id)
     db.session.add(transaction)
 
     if product.isStock:
@@ -896,7 +896,7 @@ def order(id):
                                 transaction.quantity += stock_quantity
                                 sum_quantity -= stock_quantity
                             else:
-                                Quantity = tblQuantity(id=qid, stock=stock.quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                Quantity = tblQuantity(id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
                                 db.session.add(Quantity)
                                 transaction.quantity += sum_quantity
                                 stock.quantity -= sum_quantity
@@ -1074,6 +1074,12 @@ def checkout(id):
         moneys.append(moneyObj)
         for transaction in payment.transactions:
             transaction.isComplete = True
+            transaction.profit = transaction.price * transaction.quantity
+            if transaction.quantities:
+                for quantity in transaction.quantities:
+                    transaction.profit -= quantity.soq.cost * quantity.quantity
+
+        payment.isComplete = True
         db.session.commit()
         return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
     else:
@@ -1091,7 +1097,7 @@ def undo_transaction():
     transaction = tblTransaction.query.get(id)
     if transaction.quantities:
         for q in transaction.quantities:
-            q.soq.quantity += transaction.quantity
+            q.soq.quantity += q.stock
     try:
         db.session.delete(transaction)
         db.session.commit()   
@@ -1099,3 +1105,236 @@ def undo_transaction():
     except:
         return jsonify({'data': 'Could not find the selected transaction'})
     
+@app.route('/invoice/search', methods=['POST'])
+def search_invoice():
+    input = request.form['data']
+    return jsonify({'data': 'Success'})
+
+@app.route('/report')
+def report():
+    return render_template('views/report.html')
+
+@app.route('/income', methods=['POST'])
+def income():
+    Payments = None
+    f = request.form['filter']
+    s = request.form['start']
+    e = request.form['end']
+
+    if s != '' and e != '':
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        Payments = tblPayment.query.order_by(tblPayment.createdOn).filter(tblPayment.createdOn.between(s, e))
+    else:
+        Payments = tblPayment.query.order_by(tblPayment.createdOn).all()
+
+
+    data = []
+    labels = []
+
+    if Payments:
+        for payment in Payments:
+            createdOn = None
+            if f == 'daily':
+                createdOn = utc2local(payment.createdOn).strftime("%Y-%m-%d")
+            elif f == 'monthly':
+                createdOn = utc2local(payment.createdOn).strftime("%Y-%m")
+            elif f =='yearly':
+                createdOn = utc2local(payment.createdOn).strftime("%Y")
+            obj = {
+                'label': createdOn,
+                'data': 0
+            }
+
+            if createdOn in labels:
+                for d in data:
+                    if d['label'] == createdOn:
+                        d['data'] += payment.amount
+            else:
+                obj['data'] = payment.amount
+                data.append(obj)
+                labels.append(createdOn)
+
+    if s == '' and e == '':
+        s = min(labels)
+        e = max(labels)
+    return jsonify({'data': data, 'oldest': s, 'latest': e})
+
+@app.route('/outcome', methods=['POST'])
+def outcome():
+    Stocks = None
+    f = request.form['filter']
+    s = request.form['start']
+    e = request.form['end']
+
+    if s != '' and e != '':
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        Stocks = tblStock.query.order_by(tblStock.createdOn).filter(tblStock.createdOn.between(s, e))
+    else:
+        Stocks = tblStock.query.order_by(tblStock.createdOn).all()
+
+
+    data = []
+    labels = []
+
+    if Stocks:
+        for stock in Stocks:
+            createdOn = None
+            if f == 'daily':
+                createdOn = utc2local(stock.createdOn).strftime("%Y-%m-%d")
+            elif f == 'monthly':
+                createdOn = utc2local(stock.createdOn).strftime("%Y-%m")
+            elif f =='yearly':
+                createdOn = utc2local(stock.createdOn).strftime("%Y")
+            obj = {
+                'label': createdOn,
+                'data': 0
+            }
+
+            if createdOn in labels:
+                for d in data:
+                    if d['label'] == createdOn:
+                        d['data'] += stock.cost * stock.quantity
+            else:
+                obj['data'] = stock.cost * stock.quantity
+                data.append(obj)
+                labels.append(createdOn)
+
+    if s == '' and e == '':
+        s = min(labels)
+        e = max(labels)
+    return jsonify({'data': data, 'oldest': s, 'latest': e})
+
+@app.route('/profit', methods=['POST'])
+def profit():
+    Transactions = None
+    f = request.form['filter']
+    s = request.form['start']
+    e = request.form['end']
+
+    if s != '' and e != '':
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
+    else:
+        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
+
+
+    data = []
+    labels = []
+
+    if Transactions:
+        for transaction in Transactions:
+            createdOn = None
+            if f == 'daily':
+                createdOn = utc2local(transaction.createdOn).strftime("%Y-%m-%d")
+            elif f == 'monthly':
+                createdOn = utc2local(transaction.createdOn).strftime("%Y-%m")
+            elif f =='yearly':
+                createdOn = utc2local(transaction.createdOn).strftime("%Y")
+            obj = {
+                'label': createdOn,
+                'data': 0
+            }
+
+            if createdOn in labels:
+                for d in data:
+                    if d['label'] == createdOn:
+                        d['data'] += transaction.profit
+            else:
+                obj['data'] = transaction.profit
+                data.append(obj)
+                labels.append(createdOn)
+
+    if s == '' and e == '':
+        s = min(labels)
+        e = max(labels)
+    return jsonify({'data': data, 'oldest': s, 'latest': e})
+
+@app.route('/sale', methods=['POST'])
+def sale():
+    Users = None
+    f = request.form['filter']
+    s = request.form['start']
+    e = request.form['end']
+
+    if s != '' and e != '':
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e))
+    else:
+        Transactions = tblTransaction.query.all()
+
+
+    data = []
+    labels = []
+    dates = []
+
+    if Transactions:
+        for transaction in Transactions:
+            dates.append(datetime.strftime(transaction.createdOn, '%Y-%m-%d'))
+            obj = {
+                'label': transaction.sale.username,
+                'data': 0
+            }
+            if transaction.sale.username in labels:
+                for d in data:
+                    if transaction.sale.username == d['label']:
+                        d['data'] += transaction.profit
+            else:
+                obj['data'] = transaction.profit
+                data.append(obj)
+                labels.append(transaction.sale.username)
+
+    if s == '' and e == '':
+        s = min(dates)
+        e = max(dates)
+    return jsonify({'data': data, 'oldest': s, 'latest': e})
+
+
+@app.route('/financial_report')
+def financial_report():
+    return render_template('views/financial_report.html')
+
+@app.route('/performance_report')
+def performance_report():
+    return render_template('views/performance_report.html')
+
+@app.route('/account_report')
+def account_report():
+    return render_template('views/account_report.html')
+
+
+@app.route('/financial', methods=['POST'])
+def get_financial():
+    transactions = tblTransaction.query.all()
+    payments = tblPayment.query.all()
+
+    transactionObj = {
+        'complete': [],
+        'pending': []
+    }
+
+    paymentObj = {
+        'complete': [],
+        'pending': []
+    }
+
+    if payments:
+        for payment in payments:
+            if payment.isComplete == True:
+                paymentObj['complete'].append(payment.id)
+            else:
+                paymentObj['pending'].append(payment.id)
+
+    if transactions:
+        for transaction in transactions:
+            if transaction.isComplete == True:
+                transactionObj['complete'].append(transaction.id)
+            else:
+                transactionObj['pending'].append(transaction.id)
+    return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj})
+
+
+

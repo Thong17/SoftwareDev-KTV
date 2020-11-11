@@ -24,10 +24,18 @@
 <div class="wrap-container grid-container">
     <div class="grid-item">
         <div class="item-header">
-            In Come
+            Cashing
         </div>
-        <div class="item-body" id="pie">
-            <canvas id="pieChart"></canvas>
+        <div class="item-body" id="pieCashing">
+            <canvas id="chartCashing"></canvas>
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Transaction
+        </div>
+        <div class="item-body" id="pieTransaction">
+            <canvas id="chartTransaction"></canvas>
         </div>
     </div>
 </div>
@@ -39,6 +47,36 @@
         if ($('.authentication').hasClass('require')) {
             $('#loginModal').modal('show')
         }
+
+        $.ajax({
+            url: '/financial',
+            method: 'POST',
+            success: function (data) {
+                console.log(data)
+
+                var transaction = {
+                    labels: ['Completed', 'Pending'],
+                    quantities: [data.transactionObj.complete.length, data.transactionObj.pending.length],
+                    colors: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)']
+                }
+
+                var payment = {
+                    labels: ['Completed', 'Cancelled'],
+                    quantities: [data.paymentObj.complete.length, data.paymentObj.pending.length],
+                    colors: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)']
+                }
+
+
+                var pieCashing = document.getElementById('pieCashing')
+                var chartCashing = document.getElementById('chartCashing')
+
+                var pieTransaction = document.getElementById('pieTransaction')
+                var chartTransaction = document.getElementById('chartTransaction')
+
+                _Chart(pieCashing, chartCashing, 'doughnut', payment)
+                _Chart(pieTransaction, chartTransaction, 'doughnut', transaction)
+            }
+        })
     })
 </script>
 {% endblock %}

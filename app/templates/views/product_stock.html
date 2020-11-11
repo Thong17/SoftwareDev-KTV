@@ -190,11 +190,11 @@
         // start chart
 
         var stocks = $('#list-stocks').children()
+        
         var data = {
             labels: [],
             datasets: []
         }
-
 
         Array.from(stocks).reverse().forEach(s => {
             data.labels.push($(s).children('td').eq(0).text())

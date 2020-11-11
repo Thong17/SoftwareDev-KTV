@@ -940,15 +940,16 @@ main {
   position: relative;
 }
 
-.select-list select {
+.select-list select, .select-list input {
   width: 200px;
-  height: 28px;
+  height: 30px;
   color: var(--color-text);
   border-radius: 5px;
   margin-left: 18px;
   font-weight: 300;
   font-size: 13px;
   outline: none;
+  border-width: 1px;
 }
 
 .grid-container {
@@ -2918,6 +2919,20 @@ button.form-empty:hover {
   content: counter(rowNumber);
   padding-right: 0.3em;
   text-align: right;
+}
+
+.input-inv {
+  height: 33px;
+}
+
+.button-inv {
+  position: absolute;
+  right: 10px;
+  top: 3px;
+}
+
+#export-table_wrapper {
+  display: none;
 }
 
 @-webkit-keyframes spin {

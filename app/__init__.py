@@ -13,6 +13,7 @@ from flask_login import UserMixin, LoginManager
 from flask_uploads import UploadSet, configure_uploads, patch_request_class, IMAGES
 from marshmallow import fields
 from datetime import datetime
+import time
 from http import cookies
 
 connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
@@ -107,6 +108,7 @@ class tblUser(db.Model, UserMixin):
     isConfirm = db.Column(db.Boolean, default=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     profile = db.relationship('tblProfile', backref='profile', lazy=True)
+    sale = db.relationship('tblTransaction', backref='sale', lazy=True)
     drawers = db.relationship('tblDrawer', backref='drawers', lazy=True)
 
 class tblProfile(db.Model):
@@ -228,15 +230,6 @@ class tblPhoto(db.Model):
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
     colorId = db.Column(db.String(36), db.ForeignKey('tbl_color.id'), nullable=False)
 
-class tblActivity(db.Model):
-    id = db.Column(db.String(36), primary_key=True)
-    activity = db.Column(db.String(50), nullable=False)
-    type = db.Column(db.String(50), nullable=False)
-    activityOn = db.Column(db.String(50), nullable=False)
-    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
-    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-
-# Working
 class tblDrawer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     key = db.Column(db.String(36), nullable=True, default='')
@@ -264,8 +257,6 @@ class tblQuantity(db.Model):
     stockId = db.Column(db.String(36), db.ForeignKey('tbl_stock.id'), nullable=False)
     transactionId = db.Column(db.String(36), db.ForeignKey('tbl_transaction.id'), nullable=False)
 
-
-# Pending
 class tblCustomer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     firstname = db.Column(db.String(20), nullable=True)
@@ -288,20 +279,30 @@ class tblTransaction(db.Model):
     discount = db.Column(db.String(3), nullable=True, default='')
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
+    profit = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade='save-update, merge, delete', single_parent=True)
 
-
-# Pending
 class tblPayment(db.Model):
     id = db.Column(db.String(36), primary_key=True)
+    isComplete = db.Column(db.Boolean, default=False)
     invoice = db.Column(db.String(20), nullable=True)
     amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
     transactions = db.relationship('tblTransaction', secondary=payment, backref='transactions', lazy='dynamic')
+
+class tblActivity(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    activity = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    activityOn = db.Column(db.String(50), nullable=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+
 
 
 class BrandSchema(ModelSchema):
@@ -367,5 +368,11 @@ class PaymentSchema(ModelSchema):
     transactions = fields.Nested(TransactionSchema, many=True)
     class Meta:
         model = tblPayment
+
+#Custome datetime
+def utc2local (utc):
+    epoch = time.mktime(utc.timetuple())
+    offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
+    return utc + offset
         
 from app import route

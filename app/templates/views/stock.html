@@ -74,17 +74,21 @@
                         <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 110px;">
                             <span class="symbol"></span><span class="stock-tag">
                                 {% if product.isStock == True %}
-                                {% set total_stock = namespace(value=0) %}
-                                {% if product.stocks %}
+                                    {% set total_stock = namespace(value=0) %}
+                                    {% if product.stocks %}
                                     {% for stock in product.stocks %}
-                                        {% set total_stock.value = total_stock.value + stock.quantity %}
+                                    {% set total_stock.value = total_stock.value + stock.quantity %}
                                     {% endfor %}
+                                    {% if total_stock.value > 0 %}
                                     {{ total_stock.value }} Available
-                                {% else %}
+                                    {% else %}
                                     Out of stock
-                                {% endif %}
-                                {% else %}
-                                    None
+                                    {% endif %}
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Available
                                 {% endif %}
                             </span></p>
                         <p style="font-size: 12px;">
