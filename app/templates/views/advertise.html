@@ -1,0 +1,343 @@
+{% extends 'views/custome.html' %}
+
+{% block style %}
+<style>
+    
+    .advertise-sample {
+        position: relative;
+        width: 100%;
+        height: 68vh;
+        background-color: var(--color-menu);
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    .advertise-sample .right-sample,
+    .advertise-sample .left-sample {
+        position: relative;
+        height: 100%;
+    }
+
+    .left-sample {
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .left-sample::-webkit-scrollbar {
+        display: none;
+    }
+
+    .right-sample {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ad-img {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+    }
+
+    .ad-label {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        width: 50px;
+        height: 30px;
+        cursor: pointer;
+        border-radius: 10px;
+        border: 1px solid var(--color-hr);
+    }
+
+    .ad-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--color-text);
+    }
+
+    .sample-nav {
+        padding: 0 200px;
+        width: 100%;
+        height: 70px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .sample-nav span {
+        display: inline-block;
+        width: 70px;
+        height: 20px;
+        background-color: var(--color-menu);
+    }
+
+    .sample-div {
+        position: relative;
+        padding: 20px 20px 0 20px;
+        height: 300px;
+        width: 100%;
+    }
+
+    .sample-div span {
+        display: inline-block;
+        height: 30px;
+        background-color: rgba(0, 0, 0, 0.1);    }
+
+    .sample-div span:first-child {
+        width: 70%;
+    }
+
+    .sample-div span:nth-child(2) {
+        width: 90%;
+    }
+
+    .sample-div span:nth-child(3) {
+        width: 80%;
+    }
+
+    .sample-div span:nth-child(4) {
+        width: 70%;
+    }
+
+    .sample-div span:nth-child(5) {
+        width: 60%;
+    }
+
+    .img-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid var(--color-hr);
+        border-radius: 10px;
+    }
+
+    .carousel {
+        padding: 0;
+        height: 100%;
+    }
+
+    .carousel-item {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .delete-ad {
+        position: absolute;
+        background: none;
+        border: none;
+        color: var(--color-text);
+        width: 50px;
+        height: 30px;
+        border: 1px solid var(--color-hr);
+        border-radius: 10px;
+        top: 10px;
+        right: 70px;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+    <div class="sample-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="advertise-sample">
+        <div class="left-sample">
+            <div class="sample-div">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="ad-img side">
+                <div class="img-container" style="height: 230px;">
+                    <div id="advertises-side" class="carousel slide" data-ride="carousel">
+                        <ul class="carousel-indicators">
+                            {% if advertises %}
+                            {% set vars = namespace(i=0) %}
+                            {% for advertise in advertises %}
+                            {% if advertise.main is false %}
+                            {% if vars.i == 0 %}
+                            <li data-target="#advertises-side" data-slide-to="{{ vars.i }}" class="active">
+                            </li>
+                            {% else %}
+                            <li data-target="#advertises-side" data-slide-to="{{ vars.i }}">
+                            </li>
+                            {% endif %}
+                            {% set vars.i = vars.i + 1 %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </ul>
+                        <div class="carousel-inner">
+                            {% if advertises %}
+                            {% set vars = namespace(i=0) %}
+                            {% for advertise in advertises %}
+                            {% if advertise.main is false %}
+                            {% if vars.i == 0 %}
+                            <div class="carousel-item active">
+                                <img src="/static/uploads/{{advertise.src}}" alt="" srcset="">
+                                <button class="delete-ad" id="{{ advertise.id }}"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                            </div>
+                            {% else %}
+                            <div class="carousel-item">
+                                <img src="/static/uploads/{{advertise.src}}" alt="" srcset="">
+                                <button class="delete-ad" id="{{ advertise.id }}"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                            </div>
+                            {% endif %}
+                            {% set vars.i = vars.i + 1 %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <label for="ad-side" class="ad-label">
+                    <span>
+                        <input type="file" name="photo" id="ad-side" class="upload-input">
+                        <i class="fa fa-camera ad-icon" aria-hidden="true"></i>
+                    </span>
+                </label>
+            </div>
+            <div class="sample-div">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="right-sample">
+            <div class="ad-img main">
+                <div class="img-container">
+                    <div id="advertises" class="carousel slide" data-ride="carousel">
+                        <ul class="carousel-indicators">
+                            {% if advertises %}
+                            {% set vars = namespace(i=0) %}
+                            {% for advertise in advertises %}
+                            {% if advertise.main %}
+                            {% if vars.i == 0 %}
+                            <li data-target="#advertises" data-slide-to="0" class="active">
+                            </li>
+                            {% else %}
+                            <li data-target="#advertises" data-slide-to="{{ vars.i }}">
+                            </li>
+                            {% endif %}
+                            {% set vars.i = vars.i + 1 %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </ul>
+                        <div class="carousel-inner">
+                            {% if advertises %}
+                            {% set vars = namespace(i=0) %}
+                            {% for advertise in advertises %}
+                            {% if advertise.main %}
+                            {% if vars.i == 0 %}
+                            <div class="carousel-item active">
+                                <img src="/static/uploads/{{advertise.src}}" alt="" srcset="">
+                                <button class="delete-ad" id="{{ advertise.id }}"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+
+                            </div>
+                            {% else %}
+                            <div class="carousel-item">
+                                <img src="/static/uploads/{{advertise.src}}" alt="" srcset="">
+                                <button class="delete-ad" id="{{ advertise.id }}"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                            </div>
+                            {% endif %}
+                            {% set vars.i = vars.i + 1 %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <label for="ad-main" class="ad-label">
+                    <span>
+                        <input type="file" name="photo" id="ad-main" class="upload-input">
+                        <i class="fa fa-camera ad-icon" aria-hidden="true"></i>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.delete-ad').on('click', function() {
+            var id = $(this).attr('id')
+            $.ajax({
+                url: '/advertise/delete/'+id,
+                type: 'POST',
+                success: function(data) {
+                    if (data.data == 'Success') {
+                        window.location.reload()
+                    } else {
+                        alert(data.data)
+                    }
+                }
+            })
+        })
+
+        $('#ad-main').on('change', function () {
+            var files = document.querySelector('#ad-main').files
+            console.log(files)
+
+            uploadFile(files, this, '/advertise/photo/main', function (result, data) {
+                if (result == 'Success') {
+                    window.location.reload()
+                } else {
+                    toggleLoader(data)
+                    if (result != '') {
+                        $(data).addClass('hide')
+                        alert(result)
+                    }
+                }
+            })
+        })
+
+        $('#ad-side').on('change', function () {
+            var files = document.querySelector('#ad-side').files
+            console.log(files)
+
+            uploadFile(files, this, '/advertise/photo/side', function (result, data) {
+                if (result == 'Success') {
+                    window.location.reload()
+                } else {
+                    toggleLoader(data)
+                    if (result != '') {
+                        $(data).addClass('hide')
+                        alert(result)
+                    }
+                }
+            })
+        })
+    })
+</script>
+{% endblock %}

@@ -1,5 +1,5 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo, utc2local
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema
 from flask import render_template, redirect, request, jsonify
@@ -441,7 +441,7 @@ def add_product():
 @login_required
 def products():
     id = request.form['data']
-    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId).filter_by(brandId=id).all()
+    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
     products = []
     for Product in Products:
         price = simplejson.dumps({"price": Product.price})
@@ -453,7 +453,8 @@ def products():
             'product': Product.product,
             'photo': Product.photo,
             'category': Category.category,
-            'arrival': arrival.days
+            'arrival': arrival.days,
+            'discount': Product.discount
         }
         product.update(price)
         products.append(product)
@@ -860,15 +861,20 @@ def order(id):
     quantity = Decimal(data['quantity'])
 
     price = product.price
+
+    values = []
     for v in data['values']:
         value = tblValue.query.get(v['valueId'])
         price += value.price 
         description += '-'+value.value
+        values.append(v['valueId'])
+
+    valuesJson = json.dumps(values)
     
     amount = price * (1 - discount / 100)
 
     tid = str(uuid4())
-    transaction = tblTransaction(id=tid, discount=discount, price=amount, description=description, createdBy=current_user.id)
+    transaction = tblTransaction(id=tid, discount=discount, price=amount, description=description, createdBy=current_user.id, values=valuesJson)
     db.session.add(transaction)
 
     if product.isStock:
@@ -1238,6 +1244,12 @@ def profit():
                 'data': 0
             }
 
+            values = json.loads(transaction.values)
+
+            for value in values:
+                Value = tblValue.query.get(value)
+                transaction.profit -= Value.price
+
             if createdOn in labels:
                 for d in data:
                     if d['label'] == createdOn:
@@ -1278,6 +1290,13 @@ def sale():
                 'label': transaction.sale.username,
                 'data': 0
             }
+
+            values = json.loads(transaction.values)
+
+            for value in values:
+                Value = tblValue.query.get(value)
+                transaction.profit -= Value.price
+
             if transaction.sale.username in labels:
                 for d in data:
                     if transaction.sale.username == d['label']:
@@ -1335,6 +1354,47 @@ def get_financial():
             else:
                 transactionObj['pending'].append(transaction.id)
     return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj})
+
+@app.route('/advertise')
+def advertise():
+    Advertises = tblAdvertise.query.all()
+    return render_template('views/advertise.html', advertises=Advertises)
+
+@app.route('/advertise/photo/<id>', methods=['POST'])
+def add_advertise(id):
+    isMain = False
+    if id == 'main':
+        isMain = True
+    jsons = []
+    for file in request.files:
+        photo = request.files[file]
+        extension = photo.filename.rsplit('.', 1)[1]
+        filename = str(uuid4()) + '.' + extension
+        photo.filename = filename
+        uploaded = upload.save(photo)
+        id = str(uuid4())
+
+        Advertise = tblAdvertise(id=id, src=filename, alt="Advertise", main=isMain, createdBy=current_user.id)
+        db.session.add(Advertise)
+        
+        json = {
+            'photoId': id,
+            'src': filename,
+        }
+        jsons.append(json)
+    db.session.commit()
+    return jsonify(jsons)
+
+@app.route('/advertise/delete/<id>', methods=['POST'])
+def delete_advertise(id):
+    Advertise = tblAdvertise.query.get(id)
+    try:
+        db.session.delete(Advertise)
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Failed'})
+
 
 
 

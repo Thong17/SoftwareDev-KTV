@@ -455,6 +455,11 @@
                         <button class="product-btn color-text" title="Add product to list">
                             <ion-icon name="add-circle-outline"></ion-icon>
                         </button>
+                        {% if product.discount != '' %}
+                            <div class="product-discount">
+                                <p class="color-text">{{ product.discount }}%</p>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="item-details">
                         <div class="details">

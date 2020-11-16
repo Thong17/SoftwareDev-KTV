@@ -230,6 +230,14 @@ class tblPhoto(db.Model):
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
     colorId = db.Column(db.String(36), db.ForeignKey('tbl_color.id'), nullable=False)
 
+class tblAdvertise(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    src = db.Column(db.String(255), nullable=False)
+    alt = db.Column(db.String(50), nullable=True)
+    main = db.Column(db.Boolean, default=True)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+
 class tblDrawer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     key = db.Column(db.String(36), nullable=True, default='')
@@ -281,6 +289,7 @@ class tblTransaction(db.Model):
     quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
     profit = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     description = db.Column(db.Text(), nullable=True, default='')
+    values = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade='save-update, merge, delete', single_parent=True)

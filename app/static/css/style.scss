@@ -2383,6 +2383,22 @@ button.form-empty:hover {
     display: none;
 }
 
+.product-discount {
+    padding: 2px 20px;
+    background-color: #ae423f;
+    width: auto;
+    position: absolute;
+    top: 0;
+    left: -17px;
+    transform: rotate(-45deg);
+    text-align: center;
+}
+
+.product-discount p {
+    color: #f2f2f2 !important;
+    font-size: 13px;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);
