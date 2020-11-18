@@ -16,7 +16,7 @@ from datetime import datetime
 import time
 from http import cookies
 
-connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
+connection = 'mysql+pymysql://root:myroot@localhost/camping_cave'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 

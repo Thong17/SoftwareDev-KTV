@@ -338,6 +338,8 @@
             }
 
             return function (a, b) {
+                var t_first = $(a).find(property).text()
+                var t_second = $(b).find(property).text()
                 var first = accounting.unformat($(a).find(property).text())
                 var second = accounting.unformat($(b).find(property).text())
                 var f_date = new Date($(a).find(property).text())
@@ -350,7 +352,7 @@
                         var result = (parseFloat(first) < parseFloat(second)) ? -1 : (parseFloat(first) > parseFloat(second)) ? 1 : 0;
                         break
                     case 'title-asc':
-                        var result = (first < second) ? -1 : (first > second) ? 1 : 0;
+                        var result = (t_first < t_second) ? -1 : (t_first > t_second) ? 1 : 0;
                         break
                     case 'date-asc':
                         var result = (f_date > s_date) ? -1 : (f_date < s_date) ? 1 : 0;
