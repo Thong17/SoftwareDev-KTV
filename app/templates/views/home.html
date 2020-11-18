@@ -1,0 +1,241 @@
+{% extends 'views/index.html' %}
+
+{% block style %}
+
+<style>
+    .side-container {
+        width: 330px;
+        height: 100%;
+    }
+
+    .categories div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 7px 15px;
+        cursor: pointer;
+    }
+
+    .main-container {
+        width: 100%;
+    }
+    
+    .br-2 {
+        height: 77vh;
+        border-right: 1px solid var(--color-hr);
+        margin: 0 30px;
+    }
+
+    .dropdown-item.active::after {
+        content: '';
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container flex-between-start">
+    <div class="side-container">
+        <h3>Filter</h3>
+        <hr>
+        <div class="categories">
+            {% for category in categories %}
+            <div class="color-text dropdown-item category-item" id="{{category.id}}"><span>{{ category.category }}</span><span>{{ category.products|length }}</span></div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="br-2"></div>
+    <div class="main-container">
+        <div class="content-menu flex-between">
+            <div class="menu-items flex-start-center color-text notranslate">
+                {% if brands %}
+                {% for brand in brands %}
+                <div class="menu-item" id="{{ brand.id }}">{{ brand.brand }}</div>
+                {% endfor %}
+                {% else %}
+                <div class="menu-item">...</div>
+                {% endif %}
+            </div>
+            <div class="menu-btn flex-end-center color-text">
+                <div class="view-btn"><i class="fa fa-list-ul list-btn" aria-hidden="true"></i></i></div>
+                <div class="view-btn active"><i class="fa fa-th grid-btn" aria-hidden="true"></i></div>
+                <div class="dropdown" id="list-filters">
+                    <div class="sort-btn" data-toggle="dropdown"><i class="fa fa-sliders" aria-hidden="true"></i></div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item sort-item" id="title">Title</div>
+                        <div class="dropdown-item sort-item" id="newest">Newest</div>
+                        <div class="dropdown-item sort-item" id="oldest">Oldest</div>
+                        <div class="dropdown-item sort-item" id="most-expensive">Most expensive</div>
+                        <div class="dropdown-item sort-item" id="cheapest">Cheapest</div>
+                    </div>
+                </div>
+                <div class="search-btn flex-between notranslate">
+                    <input type="text" class="search-input input-color" placeholder="Search">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+        <div class="grid-products product-container">
+            <div class="empty-result hide color-text">No product found...</div>
+            {% if products %}
+            {% for product in products %}
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+                <input type="hidden" id="details-brand" value="{{product.brandId}}">
+                <input type="hidden" id="details-categ" value="{{product.categoryId}}">
+                <div class="item-wrapper">
+                    <div class="item-img">
+                        <img src="/static/uploads/{{product.photo}}">
+                        {% if product.discount != '' %}
+                            <div class="product-discount">
+                                <p class="color-text">{{ product.discount }}%</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <div class="details">
+                            <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
+                                title="{{product.product}}">{{product.product}}</p>
+                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            </p>
+                            <p class="color-text" id="details-category" style="font-size: 10px;">
+                                {{product.productOfCategory.category}}</p>
+                            <p class="color-text hide" id="details-description" style="font-size: 10px;">
+                                {{product.description}}</p>
+                            <p class="price-tag currency-format color-text">{{ product.price }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-result color-text">No product found...</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
+<script>
+
+    $(document).ready(function () {
+        currencyFormat()
+        var products = Array.from(document.querySelectorAll('.product-item'))
+
+        var temp_products = products
+
+        $('.search-input').on('input', function () {
+            searchProducts($(this).val(), temp_products, '#details-title')
+        })
+        
+        $('.menu-item, .category-item').on('click', function () {
+            var menus = document.querySelectorAll('.menu-item')
+            var cates = document.querySelectorAll('.category-item')
+            var input = $('.search-input').val()
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active')
+                temp_products = selectMenu(products, menus, cates, input)
+            } else {
+                $(this).addClass('active')
+                temp_products = selectMenu(products, menus, cates, input)
+            }
+            event.stopPropagation()
+        })
+
+        $('.list-btn').on('click', function () {
+            var views = document.querySelectorAll('.view-btn')
+            Array.from(views).forEach(v => {
+                $(v).removeClass('active')
+            })
+            $(this).parent().addClass('active')
+            $('.product-container').removeClass('grid-products')
+            $('.product-container').addClass('list-products')
+        })
+
+        $('.grid-btn').on('click', function () {
+            var views = document.querySelectorAll('.view-btn')
+            Array.from(views).forEach(v => {
+                $(v).removeClass('active')
+            })
+            $(this).parent().addClass('active')
+            $('.product-container').removeClass('list-products')
+            $('.product-container').addClass('grid-products')
+        })
+
+        $('.fa-search').on('click', function () {
+            toggleActive($('.search-input'))
+        })
+
+        $('#list-cates').attrchange({
+            trackValues: true,
+            callback: function (evnt) {
+                if (evnt.attributeName == "class") {
+                    if (evnt.newValue.search(/open/i) == -1) {
+                        if ($('#list-cates').hasClass('show')) {
+                            $('.menu-icon').addClass('active')
+                        } else {
+                            $('.menu-icon').removeClass('active')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('#list-filters').attrchange({
+            trackValues: true,
+            callback: function (evnt) {
+                if (evnt.attributeName == "class") {
+                    if (evnt.newValue.search(/open/i) == -1) {
+                        if ($('#list-filters').hasClass('show')) {
+                            $('.sort-btn').addClass('active')
+                        } else {
+                            $('.sort-btn').removeClass('active')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('.sort-item').on('click', function () {
+            var items = document.querySelectorAll('.sort-item')
+            Array.from(items).forEach(item => {
+                $(item).removeClass('active')
+            })
+            toggleActive($(this))
+
+            var filter = $(this).attr('id')
+
+            switch (filter) {
+                case 'most-expensive':
+                    filterProduct(products, '.price-tag', 'price-desc')
+                    break
+                case 'cheapest':
+                    filterProduct(products, '.price-tag', 'price-asc')
+                    break
+                case 'title':
+                    filterProduct(products, '#details-title', 'title-asc')
+                    break
+                case 'newest':
+                    filterProduct(products, '#details-date', 'date-asc')
+                    break
+                case 'oldest':
+                    filterProduct(products, '#details-date', 'date-desc')
+                    break
+            }
+
+            var i = 1
+            products.forEach(p => {
+                $(p).attr('order', i)
+                i++
+            })
+
+            $('.product-container').append($('.product-container .product-item').sort(function (a, b) {
+                return a.getAttribute('order') - b.getAttribute('order')
+            }))
+        })
+    })
+
+    
+</script>
+{% endblock %}

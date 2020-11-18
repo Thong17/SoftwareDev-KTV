@@ -1,7 +1,21 @@
 {% extends 'layout/layout.html' %}
 
-
-
-{% block content %}
-
-{% endblock %}a
+{% block navbar %}
+<ul class="menu-bar">
+    <li class="menu-home">
+        <a href="/home" class="home">
+            Home
+        </a>
+    </li>
+    <li class="menu-about">
+        <a href="/about" class="about">
+            About
+        </a>
+    </li>
+    <li class="menu-contact">
+        <a href="/contact" class="contact">
+            Contact
+        </a>
+    </li>
+</ul>
+{% endblock %}

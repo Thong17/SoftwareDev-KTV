@@ -130,6 +130,7 @@ def save_user(id):
     return jsonify({'result': 'Success'})
 
 @app.route('/profile')
+@login_required
 def profile():
     form = ProfileForm()
     try:
@@ -862,19 +863,16 @@ def order(id):
 
     price = product.price
 
-    values = []
     for v in data['values']:
         value = tblValue.query.get(v['valueId'])
         price += value.price 
         description += '-'+value.value
-        values.append(v['valueId'])
 
-    valuesJson = json.dumps(values)
-    
     amount = price * (1 - discount / 100)
+    pprice = product.price * (1 - discount / 100)
 
     tid = str(uuid4())
-    transaction = tblTransaction(id=tid, discount=discount, price=amount, description=description, createdBy=current_user.id, values=valuesJson)
+    transaction = tblTransaction(id=tid, discount=discount, price=pprice, amount=amount, description=description, createdBy=current_user.id)
     db.session.add(transaction)
 
     if product.isStock:
@@ -986,7 +984,7 @@ def payment():
         total = 0
         for transaction in transactions:
             Transaction = tblTransaction.query.get(transaction)
-            total += Transaction.price * Transaction.quantity
+            total += Transaction.amount * Transaction.quantity
             Payment.transactions.append(Transaction)
         Payment.amount = total
         db.session.commit()
@@ -1102,6 +1100,8 @@ def undo_transaction():
     id = request.form['id']
     transaction = tblTransaction.query.get(id)
     if transaction.quantities:
+        if transaction.transactions:
+            transaction.transactions[0].isComplete = False
         for q in transaction.quantities:
             q.soq.quantity += q.stock
     try:
@@ -1122,31 +1122,31 @@ def report():
 
 @app.route('/income', methods=['POST'])
 def income():
-    Payments = None
+    Transactions = None
     f = request.form['filter']
     s = request.form['start']
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
-        Payments = tblPayment.query.order_by(tblPayment.createdOn).filter(tblPayment.createdOn.between(s, e))
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
     else:
-        Payments = tblPayment.query.order_by(tblPayment.createdOn).all()
+        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
 
 
     data = []
     labels = []
 
-    if Payments:
-        for payment in Payments:
+    if Transactions:
+        for transaction in Transactions:
             createdOn = None
             if f == 'daily':
-                createdOn = utc2local(payment.createdOn).strftime("%Y-%m-%d")
+                createdOn = utc2local(transaction.createdOn).strftime("%Y-%m-%d")
             elif f == 'monthly':
-                createdOn = utc2local(payment.createdOn).strftime("%Y-%m")
+                createdOn = utc2local(transaction.createdOn).strftime("%Y-%m")
             elif f =='yearly':
-                createdOn = utc2local(payment.createdOn).strftime("%Y")
+                createdOn = utc2local(transaction.createdOn).strftime("%Y")
             obj = {
                 'label': createdOn,
                 'data': 0
@@ -1155,15 +1155,15 @@ def income():
             if createdOn in labels:
                 for d in data:
                     if d['label'] == createdOn:
-                        d['data'] += payment.amount
+                        d['data'] += transaction.amount
             else:
-                obj['data'] = payment.amount
+                obj['data'] = transaction.amount
                 data.append(obj)
                 labels.append(createdOn)
 
     if s == '' and e == '':
-        s = min(labels)
-        e = max(labels)
+        s = current_user.createdOn.strftime("%Y-%m-%d")
+        e = datetime.utcnow().strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 @app.route('/outcome', methods=['POST'])
@@ -1208,8 +1208,8 @@ def outcome():
                 labels.append(createdOn)
 
     if s == '' and e == '':
-        s = min(labels)
-        e = max(labels)
+        s = current_user.createdOn.strftime("%Y-%m-%d")
+        e = datetime.utcnow().strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 @app.route('/profit', methods=['POST'])
@@ -1220,8 +1220,8 @@ def profit():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
         Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
@@ -1244,12 +1244,6 @@ def profit():
                 'data': 0
             }
 
-            values = json.loads(transaction.values)
-
-            for value in values:
-                Value = tblValue.query.get(value)
-                transaction.profit -= Value.price
-
             if createdOn in labels:
                 for d in data:
                     if d['label'] == createdOn:
@@ -1260,8 +1254,8 @@ def profit():
                 labels.append(createdOn)
 
     if s == '' and e == '':
-        s = min(labels)
-        e = max(labels)
+        s = current_user.createdOn.strftime("%Y-%m-%d")
+        e = datetime.utcnow().strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 @app.route('/sale', methods=['POST'])
@@ -1272,8 +1266,8 @@ def sale():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
         Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.all()
@@ -1313,14 +1307,17 @@ def sale():
 
 
 @app.route('/financial_report')
+@login_required
 def financial_report():
     return render_template('views/financial_report.html')
 
 @app.route('/performance_report')
+@login_required
 def performance_report():
     return render_template('views/performance_report.html')
 
 @app.route('/account_report')
+@login_required
 def account_report():
     return render_template('views/account_report.html')
 
@@ -1356,6 +1353,7 @@ def get_financial():
     return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj})
 
 @app.route('/advertise')
+@login_required
 def advertise():
     Advertises = tblAdvertise.query.all()
     return render_template('views/advertise.html', advertises=Advertises)
@@ -1394,6 +1392,24 @@ def delete_advertise(id):
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Failed'})
+
+@app.route('/home')
+@login_required
+def home():
+    categories = tblCategory.query.all()
+    brands = tblBrand.query.all()
+    products = tblProduct.query.all()
+    return render_template('views/home.html', categories=categories, brands=brands, products=products)
+
+@app.route('/about')
+@login_required
+def about():
+    return render_template('views/about.html')
+
+@app.route('/contact')
+@login_required
+def contact():
+    return render_template('views/contact.html')
 
 
 
