@@ -1285,12 +1285,6 @@ def sale():
                 'data': 0
             }
 
-            values = json.loads(transaction.values)
-
-            for value in values:
-                Value = tblValue.query.get(value)
-                transaction.profit -= Value.price
-
             if transaction.sale.username in labels:
                 for d in data:
                     if transaction.sale.username == d['label']:
