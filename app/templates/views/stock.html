@@ -51,7 +51,7 @@
         <div class="empty-result hide color-text">No product found...</div>
         {% if products %}
         {% for product in products %}
-        <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}">
+        <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}" {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %}>
             <input type="hidden" id="details-brand" value="{{product.brandId}}">
             <input type="hidden" id="details-categ" value="{{product.categoryId}}">
             <div class="item-wrapper">

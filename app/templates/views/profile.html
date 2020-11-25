@@ -81,7 +81,7 @@
         cursor: pointer;
         position: absolute;
         top: 10px;
-        right: 10px;
+        right: 60px;
         background-color: var(--color-menu);
         width: 37px;
         height: 27px;
@@ -139,11 +139,60 @@
         border-radius: 10px;
     }
 
+    .password-btn {
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: var(--color-menu);
+        width: 37px;
+        height: 27px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: var(--color-text);
+        transition: 0.3s ease;
+    }
+
+    .form-group {
+        padding-top: 25px;
+    }
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="wrap-container" style="margin-top: -20px;">
+<div class="modal fade" id="passwordModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="width: 370px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title color-font">Change Password</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input class="form-control input-color" type="password" name="current-password" id="current-password">
+                    <label class="label password" for="current-password">Current Password</label>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <input class="form-control input-color" type="password" name="new-password" id="new-password">
+                    <label class="label password" for="new-password">New Password</label>
+                </div>
+                <div class="form-group">
+                    <input class="form-control input-color" type="password" name="confirm-password" id="confirm-password">
+                    <label class="label password" for="confirm-password">Confirm Password</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn color-font" data-dismiss="modal">Cancel</button>
+                <button class="btn border save-pwd color-font">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="wrap-container" style="margin-top: -20px;">    
     <div class="row">
         <div class="col-md-8 px-5">
             <div class="profile-container">
@@ -170,6 +219,9 @@
                     <div class="profile-btn">
                         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                         <ion-icon name="close-outline" class="icon-close hide"></ion-icon>
+                    </div>
+                    <div class="password-btn">
+                        <ion-icon name="key-outline"></ion-icon>
                     </div>
                     <input type="hidden" value="{{ current_user.id }}" id="input-id">
                     <div class="profile-details">
@@ -329,6 +381,17 @@
                 }
             }
         })
+    })
+
+    $('.save-pwd').on('click', function() {
+        var current = $('#current-password').val()
+        var newpwd = $('#new-password').val()
+        var conpwd = $('#confirm-password').val()
+        console.log(current, newpwd, conpwd)
+    })
+
+    $('.password-btn').on('click', function() {
+        $('#passwordModal').modal('show')
     })
 
     $('.profile-btn').on('click', '.fa-pencil-square-o', function() {

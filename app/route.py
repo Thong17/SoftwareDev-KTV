@@ -1,5 +1,5 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo, utc2local
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema
 from flask import render_template, redirect, request, jsonify
@@ -41,6 +41,9 @@ def login():
                     isMatch = bcrypt.check_password_hash(
                         user.password, password)
                     if isMatch is True:
+                        Activity = tblActivity(id=str(uuid4()), activity=user.username+' has logged in', type='Login', createdBy=user.id)
+                        db.session.add(Activity)
+                        db.session.commit()
                         login_user(user)
                         msg['redirect'] = '/'
                         return jsonify(msg)
@@ -115,6 +118,9 @@ def save_user(id):
     firstname = fullname.split(' ')[0]
     lastname = fullname.split(' ')[1]
 
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified info from '+user.username+'/'+user.firstname+'/'+user.lastname+'/'+user.gender+'/'+str(user.birthdate)+'/'+user.email, type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
+
     if birthdate == '':
         birthdate = None
 
@@ -154,6 +160,9 @@ def save_profile(id):
         location = request.form['location']
         bio = request.form['bio']
 
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified profile from '+profile.status+'/'+profile.phone+'/'+profile.company+'/'+profile.hometown+'/'+profile.location+'/'+profile.bio, type='Modify', createdBy=current_user.id)
+        db.session.add(Activity)
+
         profile.status = status
         profile.phone = phone
         profile.company = company
@@ -161,7 +170,7 @@ def save_profile(id):
         profile.location = location
         profile.bio = bio 
 
-        try: 
+        try:
             db.session.commit()
             return redirect('/profile')
         except:
@@ -182,6 +191,8 @@ def save_photo(id):
         photo.filename = filename
         uploaded = upload.save(photo)
         Profile.photo = filename
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has uploaded his profile picture ', type='Modify', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         json = {
             'photoId': Profile.id,
@@ -246,6 +257,8 @@ def categories():
             msg['name'] = category
             msg['id'] = id
             try:
+                Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added category: '+category+' in category', type='Add', createdBy=current_user.id)
+                db.session.add(Activity)
                 db.session.add(Modal)
                 db.session.commit()
                 total += 1
@@ -281,10 +294,13 @@ def add_property():
     _type = request.form['type']
     description = request.form['description']
     id = str(uuid4())
+    Category = tblCategory.query.get(categoryId)
 
     Modal = tblProperty(id=id, property=_property, type=_type,
                         description=description, categoryId=categoryId, createdBy=current_user.id)
 
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added property: '+_property+' in category '+Category.category, type='Add', createdBy=current_user.id)
+    db.session.add(Activity)
     db.session.add(Modal)
     db.session.commit()
     return jsonify({'id': id, 'property': _property, 'type': _type, 'description': description, 'msg': ''})
@@ -296,6 +312,9 @@ def remove_property(id):
         id = request.form['data']
         try:
             _property = tblProperty.query.get(id)
+            Category = tblCategory.query.get(categoryId)
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted property: '+_property.property+' in category '+Category.category, type='Delete', createdBy=current_user.id)
+            db.session.add(Activity)
             db.session.delete(_property)
             db.session.commit()
             return jsonify({'msg': 'Property deleted'})
@@ -309,6 +328,9 @@ def update_property(id):
     new_property = request.form['property']
     new_type = request.form['type']
     new_description = request.form['description']
+
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified property from '+_property.property+'/'+_property.type+'/'+_property.description, type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
 
     _property.property = new_property
     _property.type = new_type
@@ -324,6 +346,8 @@ def update_property(id):
 def remove_category(id):
     category = tblCategory.query.get(id)
     try: 
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted category: '+category.category, type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.delete(category)
         db.session.commit()
         categories = tblCategory.query.all()
@@ -338,7 +362,8 @@ def remove_category(id):
 @app.route('/category/update/<id>', methods=['POST'])
 def udpate_category(id):
     category = tblCategory.query.get(id)
-    
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified category from '+category.category, type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
     try:
         category.category = request.form['data']
         db.session.commit()
@@ -368,6 +393,8 @@ def brands():
             msg['id'] = id
             try:
                 db.session.add(Modal)
+                Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added brand: '+brand+' in brand', type='Add', createdBy=current_user.id)
+                db.session.add(Activity)
                 db.session.commit()
                 msg['redirect'] = '/brand'
                 return jsonify(msg)
@@ -384,6 +411,8 @@ def remove_brand(id):
     brand = tblBrand.query.get(id)
     try: 
         db.session.delete(brand)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted brand: '+brand.brand, type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         return jsonify({'msg': 'Success'})
     except:
@@ -393,6 +422,8 @@ def remove_brand(id):
 def udpate_brand(id):
     brand = tblBrand.query.get(id)
     try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified brand from '+brand.brand, type='Modify', createdBy=current_user.id)
+        db.session.add(Activity)
         brand.brand = request.form['data']
         db.session.commit()
         return jsonify({'brand': request.form['data'], 'msg': 'Success'})
@@ -404,6 +435,8 @@ def udpate_brand(id):
 def theme():
     theme = request.form['data']
     user = tblUser.query.get(current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified theme from '+user.theme, type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
     user.theme = theme
     db.session.commit()
     return jsonify({'theme': theme})
@@ -433,6 +466,8 @@ def add_product():
     Model = tblProduct(id=id, product=product, isStock=isStock, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
     
     db.session.add(Model)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added product '+product, type='Add', createdBy=current_user.id)
+    db.session.add(Activity)
     db.session.commit()
 
     return jsonify({'data': 'Success', 'id': id})
@@ -475,6 +510,8 @@ def product_photo(id):
         photo.filename = filename
         uploaded = upload.save(photo)
         Product.photo = filename
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has upload photo for product: '+Product.product, type='Upload', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         json = {
             'photoId': Product.id,
@@ -490,6 +527,8 @@ def upload_color(id):
     color = request.form['color']
     cid = str(uuid4())
     Color = tblColor(id=cid, color=color, hex=hex, createdBy=current_user.id, productId=id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added color '+color+' in product', type='Add', createdBy=current_user.id)
+    db.session.add(Activity)
     db.session.add(Color)
     db.session.commit()
 
@@ -499,6 +538,7 @@ def upload_color(id):
 def color_photo(id):
     cid = request.form['color']
     alt = request.form['name']
+    color = tblColor.query.get(cid)
     jsons = []
     for file in request.files:
         photo = request.files[file]
@@ -509,6 +549,8 @@ def color_photo(id):
         pid = str(uuid4())
         Photo = tblPhoto(id=pid, src=filename, alt=alt, createdBy=current_user.id, colorId=cid, productId=id)
         db.session.add(Photo)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has upload photo for color: '+color.color, type='Upload', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
     color = tblColor.query.get(cid)
     json = ColorSchema()
@@ -538,9 +580,11 @@ def add_value():
     description = request.form['description']
 
     id = str(uuid4())
-
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added value '+value+' in product', type='Add', createdBy=current_user.id)
+    db.session.add(Activity)
     model = tblValue(id=id, value=value, price=price, currency=currency, description=description, createdBy=current_user.id, productId=product_id, propertyId=property_id)
     db.session.add(model)
+    
     db.session.commit()
     return jsonify({'id': id, 'value': value, 'price': price, 'currency': currency, 'description': description, 'property': property_id})
 
@@ -557,6 +601,8 @@ def save_product(id):
     discount = request.form['discount']
     description = request.form['description']
 
+    Category = tblCategory.query.get(category)
+
     if isStock == 'true':
         isStock = True
     else:
@@ -564,6 +610,9 @@ def save_product(id):
 
     if period == '':
         period = None
+
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified product from '+Product.product+'/'+str(Product.isStock)+'/'+Product.currency+'/'+str(Product.price)+'/'+Product.description+'/'+str(Product.discount)+'/'+str(Product.period)+'/'+Category.category, type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
 
     Product.product = product
     Product.isStock = isStock
@@ -594,6 +643,9 @@ def remove_product(id):
 @app.route('/value/save/<id>', methods=['POST'])
 def save_value(id):
     value = tblValue.query.get(id)
+    Product = tblProduct.query.with_entities(tblProduct.product).get(value.productId)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified value from '+value.value+'/'+value.price+'/'+value.currency+'/'+value.description+' in product: '+Product.product, type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
     value.value = request.form['value']
     value.price = request.form['price']
     value.currency = request.form['currency']
@@ -607,6 +659,8 @@ def save_value(id):
 @app.route('/value/remove/<id>', methods=['POST'])
 def remove_value(id):
     value = tblValue.query.get(id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted value: '+value.value+' in product', type='Delete', createdBy=current_user.id)
+    db.session.add(Activity)
     db.session.delete(value)
     db.session.commit()
     return jsonify({'result': 'Success'})
@@ -621,6 +675,8 @@ def get_color(id):
 @app.route('/color/save/<id>', methods=['POST'])
 def save_color(id):
     color = tblColor.query.get(id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified color from '+color.color+'/'+color.hex+' in product', type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
     color.color = request.form['color']
     color.hex = request.form['hex']
     db.session.commit()
@@ -638,6 +694,8 @@ def remove_color(id):
             delete_photo('uploads', photo.src)
     try:
         db.session.delete(color)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted color: '+color.color+' in product', type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         return jsonify({'result': 'Success', 'photos': []})
     except:
@@ -656,7 +714,6 @@ def _property(id):
     else:
         result_product = ''
     
-
     return jsonify({'property': result_property, 'product': result_product})
 
 @app.route('/stock')
@@ -718,8 +775,13 @@ def add_stock():
     id = str(uuid4())
 
     model = tblStock(id=id, cost=cost, quantity=quantity, currency=currency, rate=rate, adjust=adjust, productId=product, color=color, createdBy=current_user.id)
+    amount = (float(cost) * int(quantity)) - float(adjust)
+    outcome = tblOutcome(id=id, amount=amount, createdBy=current_user.id)
     try:
         db.session.add(model)
+        db.session.add(outcome)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added stock: '+id+' in product', type='Add', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         total_stock = 0
         total_costs = 0
@@ -736,6 +798,7 @@ def add_stock():
 @app.route('/stock/delete/<id>', methods=['POST'])
 def delete_stock(id):
     stock = tblStock.query.get(id)
+    outcome = tblOutcome.query.get(id)
     total_stock = 0
     total_costs = 0
     total_cost = 0
@@ -747,7 +810,10 @@ def delete_stock(id):
         total_cost = s.cost * s.quantity
         total_costs += total_cost
     try:
+        db.session.delete(outcome)
         db.session.delete(stock)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted stock: '+stock.id+' in product', type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         total_stock -= delete_stock
         total_costs -= delete_cost
@@ -758,12 +824,17 @@ def delete_stock(id):
 @app.route('/stock/save/<id>', methods=['POST'])
 def save_stock(id):
     stock = tblStock.query.get(id)
+    outcome = tblOutcome.query.get(id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified stock from '+stock.color+'/'+str(stock.cost)+'/'+stock.currency+'/'+str(stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.adjust)+' in product', type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
+
     stock.color = request.form['color']
     stock.cost = request.form['cost']
     stock.currency = request.form['currency']
     stock.rate = request.form['rate']
     stock.quantity = request.form['quantity']
     stock.adjust = request.form['adjust']
+    outcome.amount = (float(stock.cost) * int(stock.quantity)) - float(stock.adjust)
     try:
         db.session.commit()
         total_stock = 0
@@ -875,6 +946,9 @@ def order(id):
     transaction = tblTransaction(id=tid, discount=discount, price=pprice, amount=amount, description=description, createdBy=current_user.id)
     db.session.add(transaction)
 
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added transaction: '+description, type='Add', createdBy=current_user.id)
+    db.session.add(Activity)
+
     if product.isStock:
         if len(product.stocks) > 0:
             total_stocks = 0
@@ -943,6 +1017,11 @@ def create_drawer():
         db.session.add(Money)
     Drawer.startCost = total
     current_user.drawer = id
+
+    #continue
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has opened drawer', type='Open', createdBy=current_user.id)
+    db.session.add(Activity)
+
     db.session.commit()
     startedOn = Drawer.startedOn.strftime("%b %d %Y %H:%M:%S")
     return jsonify({'data': 'Success', 'startedOn': startedOn, 'id':id})
@@ -952,6 +1031,8 @@ def end_drawer(id):
     Drawer = tblDrawer.query.get(id)
     Drawer.endedOn = datetime.utcnow()
     current_user.drawer = ''
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has closed drawer', type='Close', createdBy=current_user.id)
+    db.session.add(Activity)
     db.session.commit()
     return jsonify({'data': 'Success'})
 
@@ -987,6 +1068,8 @@ def payment():
             total += Transaction.amount * Transaction.quantity
             Payment.transactions.append(Transaction)
         Payment.amount = total
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has ordered invoice: '+invoice, type='Order', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         p = PaymentSchema()
         result = p.dump(Payment)
@@ -1084,6 +1167,8 @@ def checkout(id):
                     transaction.profit -= quantity.soq.cost * quantity.quantity
 
         payment.isComplete = True
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.commit()
         return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
     else:
@@ -1105,6 +1190,8 @@ def undo_transaction():
         for q in transaction.quantities:
             q.soq.quantity += q.stock
     try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted transaction '+transaction.description, type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.delete(transaction)
         db.session.commit()   
         return jsonify({'data': 'Success'})
@@ -1155,20 +1242,20 @@ def income():
             if createdOn in labels:
                 for d in data:
                     if d['label'] == createdOn:
-                        d['data'] += transaction.amount
+                        d['data'] += transaction.amount * transaction.quantity
             else:
-                obj['data'] = transaction.amount
+                obj['data'] = transaction.amount * transaction.quantity
                 data.append(obj)
                 labels.append(createdOn)
 
     if s == '' and e == '':
         s = current_user.createdOn.strftime("%Y-%m-%d")
-        e = datetime.utcnow().strftime("%Y-%m-%d")
+        e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 @app.route('/outcome', methods=['POST'])
 def outcome():
-    Stocks = None
+    Outcome = None
     f = request.form['filter']
     s = request.form['start']
     e = request.form['end']
@@ -1176,23 +1263,23 @@ def outcome():
     if s != '' and e != '':
         s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
         e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
-        Stocks = tblStock.query.order_by(tblStock.createdOn).filter(tblStock.createdOn.between(s, e))
+        Outcome = tblOutcome.query.order_by(tblOutcome.createdOn).filter(tblOutcome.createdOn.between(s, e))
     else:
-        Stocks = tblStock.query.order_by(tblStock.createdOn).all()
+        Outcome = tblOutcome.query.order_by(tblOutcome.createdOn).all()
 
 
     data = []
     labels = []
 
-    if Stocks:
-        for stock in Stocks:
+    if Outcome:
+        for outcome in Outcome:
             createdOn = None
             if f == 'daily':
-                createdOn = utc2local(stock.createdOn).strftime("%Y-%m-%d")
+                createdOn = utc2local(outcome.createdOn).strftime("%Y-%m-%d")
             elif f == 'monthly':
-                createdOn = utc2local(stock.createdOn).strftime("%Y-%m")
+                createdOn = utc2local(outcome.createdOn).strftime("%Y-%m")
             elif f =='yearly':
-                createdOn = utc2local(stock.createdOn).strftime("%Y")
+                createdOn = utc2local(outcome.createdOn).strftime("%Y")
             obj = {
                 'label': createdOn,
                 'data': 0
@@ -1201,15 +1288,15 @@ def outcome():
             if createdOn in labels:
                 for d in data:
                     if d['label'] == createdOn:
-                        d['data'] += stock.cost * stock.quantity
+                        d['data'] += outcome.amount
             else:
-                obj['data'] = stock.cost * stock.quantity
+                obj['data'] = outcome.amount
                 data.append(obj)
                 labels.append(createdOn)
 
     if s == '' and e == '':
         s = current_user.createdOn.strftime("%Y-%m-%d")
-        e = datetime.utcnow().strftime("%Y-%m-%d")
+        e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 @app.route('/profit', methods=['POST'])
@@ -1255,7 +1342,7 @@ def profit():
 
     if s == '' and e == '':
         s = current_user.createdOn.strftime("%Y-%m-%d")
-        e = datetime.utcnow().strftime("%Y-%m-%d")
+        e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 @app.route('/sale', methods=['POST'])
@@ -1374,6 +1461,8 @@ def add_advertise(id):
             'src': filename,
         }
         jsons.append(json)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has uploaded advertise photo: '+Advertise.src, type='Upload', createdBy=current_user.id)
+    db.session.add(Activity)
     db.session.commit()
     return jsonify(jsons)
 
@@ -1381,6 +1470,8 @@ def add_advertise(id):
 def delete_advertise(id):
     Advertise = tblAdvertise.query.get(id)
     try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted advertise photo: '+Advertise.src, type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
         db.session.delete(Advertise)
         db.session.commit()
         return jsonify({'data': 'Success'})
@@ -1404,6 +1495,27 @@ def about():
 @login_required
 def contact():
     return render_template('views/contact.html')
+
+@app.route('/activity')
+@login_required
+def activity():
+    Activities = tblActivity.query.order_by(tblActivity.createdOn.desc()).all()
+    activities = []
+    if Activities:
+        for activity in Activities:
+            actObj = {
+                'activity': activity.activity,
+                'type': activity.type,
+                'createdOn': utc2local(activity.createdOn),
+                'createdBy': '',
+            }
+            Users = tblUser.query.with_entities(tblUser.username, tblUser.id).all()
+            for user in Users:
+                if user.id == activity.createdBy:
+                    actObj['createdBy'] = user.username
+            activities.append(actObj)
+
+    return render_template('views/activity.html', activities=activities)
 
 
 

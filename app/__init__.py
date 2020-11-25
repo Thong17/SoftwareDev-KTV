@@ -16,7 +16,7 @@ from datetime import datetime
 import time
 from http import cookies
 
-connection = 'mysql+pymysql://root:myroot@localhost/camping_cave'
+connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -306,12 +306,16 @@ class tblPayment(db.Model):
 
 class tblActivity(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    activity = db.Column(db.String(50), nullable=False)
+    activity = db.Column(db.Text(), nullable=False)
     type = db.Column(db.String(50), nullable=False)
-    activityOn = db.Column(db.String(50), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
+class tblOutcome(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 
 class BrandSchema(ModelSchema):

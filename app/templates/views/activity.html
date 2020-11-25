@@ -1,0 +1,47 @@
+{% extends 'views/report.html' %}
+
+{% block style %}
+<style>
+    thead {
+        background-color: var(--color-menu);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+
+    <div class="row-wrapper">
+        <div class="column-wrapper" style="width: 100%;">
+            <table class="table">
+                <thead>
+                    <tr class="color-font">
+                        <td class="color-text" style="width: 10%;">Activity</td>
+                        <td class="color-text">Type</td>
+                        <td class="color-text">CreatedOn</td>
+                        <td class="color-text">CreatedBy</td>
+                        <td class="color-text"></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                        <tr class="activity-item" style="font-size: 13px;" id="{{ activity.id }}">
+                            <td class="color-text" style="width: 65%;">{{ activity.activity }}</td>
+                            <td class="color-text">{{ activity.type }}</td>
+                            <td class="color-text">{{ activity.createdOn }}</td>
+                            <td class="color-text">{{ activity.createdBy }}</td>
+                            <td class="color-text"><i class="fa fa-trash-o" aria-hidden="true"></i></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    
+</script>
+{% endblock %}
