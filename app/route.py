@@ -1,7 +1,7 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo, utc2local
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -444,6 +444,7 @@ def theme():
 @app.route('/product/add', methods=['POST'])
 def add_product():
     product = request.form['product']
+    barcode = request.form['barcode']
     price = request.form['price']
     discount = request.form['discount']
     category = request.form['category']
@@ -463,7 +464,7 @@ def add_product():
 
     id = str(uuid4())
 
-    Model = tblProduct(id=id, product=product, isStock=isStock, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
+    Model = tblProduct(id=id, product=product, barcode=barcode, isStock=isStock, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
     
     db.session.add(Model)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added product '+product, type='Add', createdBy=current_user.id)
@@ -594,6 +595,7 @@ def save_product(id):
 
     category = request.form['category']
     product = request.form['product']
+    barcode = request.form['barcode']
     currency = request.form['currency']
     price = request.form['price']
     isStock = request.form['isStock']
@@ -611,10 +613,11 @@ def save_product(id):
     if period == '':
         period = None
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified product from '+Product.product+'/'+str(Product.isStock)+'/'+Product.currency+'/'+str(Product.price)+'/'+Product.description+'/'+str(Product.discount)+'/'+str(Product.period)+'/'+Category.category, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified product from '+Product.product+'/'+Product.barcode+'/'+str(Product.isStock)+'/'+Product.currency+'/'+str(Product.price)+'/'+Product.description+'/'+str(Product.discount)+'/'+str(Product.period)+'/'+Category.category, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
 
     Product.product = product
+    Product.barcode = barcode
     Product.isStock = isStock
     Product.currency = currency
     Product.price = price
@@ -1347,7 +1350,7 @@ def profit():
 
 @app.route('/sale', methods=['POST'])
 def sale():
-    Users = None
+    Transactions = None
     f = request.form['filter']
     s = request.form['start']
     e = request.form['end']
@@ -1382,8 +1385,90 @@ def sale():
                 labels.append(transaction.sale.username)
 
     if s == '' and e == '':
-        s = min(dates)
-        e = max(dates)
+        s = current_user.createdOn.strftime("%Y-%m-%d")
+        e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
+    return jsonify({'data': data, 'oldest': s, 'latest': e})
+
+
+
+@app.route('/product_report', methods=['POST'])
+def product_report():
+    Transactions = None
+    f = request.form['filter']
+    s = request.form['start']
+    e = request.form['end']
+
+    if s != '' and e != '':
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e))
+    else:
+        Transactions = tblTransaction.query.all()
+
+    data = []
+    labels = []
+    dates = []
+
+    if Transactions:
+        for transaction in Transactions:
+            dates.append(datetime.strftime(transaction.createdOn, '%Y-%m-%d'))
+            obj = {
+                'label': transaction.description,
+                'data': 0
+            }
+
+            if transaction.description in labels:
+                for d in data:
+                    if transaction.description == d['label']:
+                        d['data'] += transaction.profit
+            else:
+                obj['data'] = transaction.profit
+                data.append(obj)
+                labels.append(transaction.description)
+
+    if s == '' and e == '':
+        s = current_user.createdOn.strftime("%Y-%m-%d")
+        e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
+    return jsonify({'data': data, 'oldest': s, 'latest': e})
+
+@app.route('/quantity_report', methods=['POST'])
+def quantity_report():
+    Transactions = None
+    f = request.form['filter']
+    s = request.form['start']
+    e = request.form['end']
+
+    if s != '' and e != '':
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e))
+    else:
+        Transactions = tblTransaction.query.all()
+
+    data = []
+    labels = []
+    dates = []
+
+    if Transactions:
+        for transaction in Transactions:
+            dates.append(datetime.strftime(transaction.createdOn, '%Y-%m-%d'))
+            obj = {
+                'label': transaction.description,
+                'data': 0
+            }
+
+            if transaction.description in labels:
+                for d in data:
+                    if transaction.description == d['label']:
+                        d['data'] += transaction.quantity
+            else:
+                obj['data'] = transaction.quantity
+                data.append(obj)
+                labels.append(transaction.description)
+
+    if s == '' and e == '':
+        s = current_user.createdOn.strftime("%Y-%m-%d")
+        e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 
@@ -1392,16 +1477,33 @@ def sale():
 def financial_report():
     return render_template('views/financial_report.html')
 
-@app.route('/performance_report')
+@app.route('/account')
 @login_required
-def performance_report():
-    return render_template('views/performance_report.html')
+def account():
+    users = tblUser.query.all()
+    return render_template('views/account_report.html', users=users)
 
-@app.route('/account_report')
+@app.route('/account/report', methods=['POST'])
 @login_required
 def account_report():
-    return render_template('views/account_report.html')
+    activities = tblActivity.query.order_by(tblActivity.createdOn.desc()).all()
+    result = []
 
+    for a in activities:
+        obj = {
+            'activity': a.activity,
+            'createdBy': a.createdBy,
+            'createdOn': utc2local(a.createdOn).strftime("%Y-%m-%d"),
+            'type': a.type,
+            'id': a.id
+        }
+        result.append(obj)
+
+    return jsonify(result)
+
+@app.route('/sale_report')
+def sale_report():
+    return render_template('views/sale_report.html')
 
 @app.route('/financial', methods=['POST'])
 def get_financial():
@@ -1517,6 +1619,24 @@ def activity():
 
     return render_template('views/activity.html', activities=activities)
 
+@app.route('/password/change', methods=['POST'])
+def change_password():
+    curpwd = request.form['current']
+    newpwd = request.form['newpwd']
+    conpwd = request.form['conpwd']
+    isMatch = bcrypt.check_password_hash(current_user.password, curpwd)
+    data = ''
+    if isMatch:
+        if newpwd == conpwd:  
+            hashed_password = bcrypt.generate_password_hash(newpwd).decode('utf-8')
+            current_user.password = hashed_password
+            db.session.commit()
+            data = 'Success'
+        else:
+            data = 'Confirm password is not matched'
+    else:
+        data = 'Entered password is incorrect'
 
+    return jsonify(data)
 
 

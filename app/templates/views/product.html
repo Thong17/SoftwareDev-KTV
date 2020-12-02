@@ -213,6 +213,7 @@
     $(document).on('click', '.save-product', function () {
         var id = $(this).attr('id')
         var product = $('#product').val()
+        var barcode = $('#barcode').val()
         var isStock = $('#is-stock')
         var price = $('#price').val()
         var currency = $('#currency').val()
@@ -236,7 +237,7 @@
                 $.ajax({
                     url: '/product/save/' + id,
                     type: 'POST',
-                    data: { product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
+                    data: { product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
                     success: function (data) {
                         alert('Done')
                     }
@@ -310,6 +311,7 @@
                         $('#product-nav').html(showProductForm({
                             category: data.productOfCategory,
                             product: data.product,
+                            barcode: data.barcode,
                             stock: data.isStock,
                             price: data.price,
                             discount: data.discount,
@@ -466,6 +468,7 @@
         event.preventDefault();
         var brand = $('#brand-id').val()
         var product = $('#product').val()
+        var barcode = $('#barcode').val()
         var isStock = $('#is-stock')
         var price = $('#price').val()
         var currency = $('#currency').val()
@@ -489,7 +492,7 @@
                 $.ajax({
                     url: '/product/add',
                     type: 'POST',
-                    data: {brand: brand, product: product, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
+                    data: {brand: brand, product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
                     success: function (data) {
                         $('.product-image').removeClass('hide')
                         toggleEdit($('.save-product'), $('.submit-product'))
@@ -650,6 +653,7 @@
                     $('#product-nav').html(showProductForm({
                         category: "Select category",
                         product: "",
+                        barcode: "",
                         stock: true,
                         price: "",
                         discount: "",

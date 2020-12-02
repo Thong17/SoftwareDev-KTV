@@ -387,7 +387,25 @@
         var current = $('#current-password').val()
         var newpwd = $('#new-password').val()
         var conpwd = $('#confirm-password').val()
-        console.log(current, newpwd, conpwd)
+        var validations = []
+        if (newpwd.length < 8) {
+            validations.push('Password must be atleast 8 characters up')
+        }
+        if (validations.length == 0) {
+            $.ajax({
+                url: '/password/change',
+                type: 'POST',
+                data: {current: current, newpwd: newpwd, conpwd: conpwd},
+                success: function(data) {
+                    if (data == 'Success') {
+                        alert('Your password has been changed')
+                        $('#passwordModal').modal('hide')
+                    }
+                }
+            })
+        } else {
+            alert(validations[0])
+        }
     })
 
     $('.password-btn').on('click', function() {

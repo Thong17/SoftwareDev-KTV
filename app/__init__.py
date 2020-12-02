@@ -16,7 +16,7 @@ from datetime import datetime
 import time
 from http import cookies
 
-connection = 'mysql+pymysql://root:myroot@localhost/phone_shop'
+connection = 'mysql+pymysql://root:myroot@localhost/mart_shop'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -152,7 +152,9 @@ class tblProperty(db.Model):
 class tblProduct(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     product = db.Column(db.String(50), nullable=False)
+    barcode = db.Column(db.String(30), nullable=True)
     isStock = db.Column(db.Boolean, default=True)
+    isSaved = db.Column(db.Boolean, default=False)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     currency = db.Column(db.String(20), nullable=False)
     discount = db.Column(db.String(3), nullable=True, default='')
@@ -317,6 +319,9 @@ class tblOutcome(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
+class UserSchema(ModelSchema):
+    class Meta:
+        model = tblUser
 
 class BrandSchema(ModelSchema):
     class Meta:
@@ -381,6 +386,11 @@ class PaymentSchema(ModelSchema):
     transactions = fields.Nested(TransactionSchema, many=True)
     class Meta:
         model = tblPayment
+
+class ActivitySchema(ModelSchema):
+    user = fields.Nested(UserSchema, many=True)
+    class Meta:
+        model = tblActivity
 
 #Custome datetime
 def utc2local (utc):

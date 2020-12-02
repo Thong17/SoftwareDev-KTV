@@ -108,7 +108,7 @@
                     </thead>
                     <tbody>
                         {% for transaction in transactions %}
-                            <tr class="transaction-item" style="font-size: 13px;" id="{{ transaction.id }}">
+                            <tr class="transaction-item notranslate" style="font-size: 13px;" id="{{ transaction.id }}">
                                 <td class="color-text transaction-inv">
                                     {% if transaction.transactions %}
                                         {% for i in transaction.transactions %}

@@ -156,6 +156,32 @@ input[type=date]::-webkit-datetime-edit-date-field {
   right: 30px;
 }
 
+.is-scan input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.is-scan {
+  position: absolute;
+  top: 32px;
+  right: 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: var(--color-hover);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  background: none;
+  outline: none;
+  border: none;
+}
+
 .is-stock {
   display: block;
   position: relative;

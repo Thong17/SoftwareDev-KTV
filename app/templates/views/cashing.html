@@ -471,7 +471,7 @@
                                 {{product.productOfCategory.category}}</p>
                             <p class="color-text hide" id="details-description" style="font-size: 10px;">
                                 {{product.description}}</p>
-                            <p class="price-tag currency-format hide">{{ product.price }}</p>
+                            <p class="price-tag color-text currency-format notranslate hide">{{ product.price }}</p>
                         </div>
                         <div class="notranslate flex-between-end color-text" style="width: 100%;">
                             <p class="color-font text-wrapper" id="details-price"
@@ -589,7 +589,7 @@
                             <div class="money-container mt-3" style="height: 100%; overflow: auto">
                                 <table class="table money-table">
                                     <thead>
-                                        <tr class="color-font">
+                                        <tr class="color-font notranslate">
                                             <td style="width: 40%;">Paid</td>
                                             <td style="width: 15%; text-align:center;">Currency</td>
                                             <td style="width: 10%; text-align:center;">Unit</td>
@@ -597,11 +597,11 @@
                                             <td style="width: 10%;"></td>
                                         </tr>
                                     </thead>
-                                    <tbody id="list-payment" class="color-text"></tbody>
+                                    <tbody id="list-payment" class="color-text notranslate"></tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="payment-total color-text">
+                        <div class="payment-total color-text notranslate">
                             
                         </div>
                     </div>
@@ -615,17 +615,17 @@
                                 <p class="color-text">Contact: {{ current_user.profile[0].phone }}</p>
                             </div>
                             <div class="flex-between-center pb-1">
-                                <p class="color-text">Date: <span id="invoiceDate"></span></p>
-                                <p class="color-text"><span id="invoiceTime"></span></p>
+                                <p class="color-text">Date: <span id="invoiceDate notranslate"></span></p>
+                                <p class="color-text notranslate"><span id="invoiceTime"></span></p>
                             </div>
                             <div class="flex-between-center border-dashed py-1">
-                                <p class="color-text">Invoice: <span id="invoiceNo"></span></p>
-                                <p class="color-text">Cashier: <span>{{ current_user.username }}</span></p>
+                                <p class="color-text">Invoice: <span class="notranslate" id="invoiceNo"></span></p>
+                                <p class="color-text">Cashier: <span class="notranslate">{{ current_user.username }}</span></p>
                             </div>
                             <div class="item-payment">
                                 <table class="table invoice-table">
                                     <thead>
-                                        <tr class="color-font">
+                                        <tr class="color-font notranslate">
                                             <td style="width: 40%;">Item Name</td>
                                             <td style="width: 15%; text-align:center;">Price</td>
                                             <td style="width: 10%; text-align:center;">Disc</td>
@@ -633,11 +633,11 @@
                                             <td style="width: 20%; text-align:center;">Total</td>
                                         </tr>
                                     </thead>
-                                    <tbody id="item-invoice" class="color-text"></tbody>
+                                    <tbody id="item-invoice" class="color-text notranslate"></tbody>
                                 </table> 
                             </div>
                         </div>
-                        <div class="invoice-total border-dashed">
+                        <div class="invoice-total border-dashed notranslate">
                             <div class="flex-between-start" style="width: 100%;">
                                 <p class="color-text" style="width: 50%;">Total</p>
                                 <div class="flex-between-center" style="width: 50%;">

@@ -52,8 +52,12 @@
             <h5 class="color-font">Categories</h5>
             <hr>
             <div class="item-container">
-                <div class="flex-between item active color-font" id="sale">
+                <div class="flex-between item active color-font" id="product_report">
                     <p>Sale</p>
+                    <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
+                </div>
+                <div class="flex-between item color-font" id="quantity_report">
+                    <p>Quantity</p>
                     <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
                 </div>
             </div>
@@ -63,6 +67,9 @@
             <div class="flex-between">
                 <div class="select-list color-text">
                     <i class="fa fa-caret-right right" aria-hidden="true"></i>
+                    <select id="filter" class="input-color ml-0 mr-2" name="filter">
+                        <option value="daily">Daily</option>
+                    </select>
                     From: <input type="date" class="input-color mx-1" id="start-date">
                     - <input type="date" class="input-color ml-1" id="end-date">
                 </div>
@@ -130,6 +137,21 @@
             }
         })
     }
+
+    $('#filter').on('change', function () {
+        var value = $(this).val()
+        var label = $('#filter option:selected').text()
+        var start = $('#start-date').val()
+        var end = $('#end-date').val()
+        var id = ''
+        Array.from($('.item-container').children()).forEach(i => {
+            if ($(i).hasClass('active')) {
+                id = $(i).attr('id')
+            }
+        })
+
+        updateChart(value, label, start, end, id)
+    })
 
     $(document).ready(function () {
 
@@ -268,7 +290,7 @@
         })
 
         $.ajax({
-            url: '/sale',
+            url: '/product_report',
             type: 'POST',
             data: { 'filter': 'daily', 'start': null, 'end': null },
             success: function (data) {

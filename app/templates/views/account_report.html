@@ -1,16 +1,185 @@
 {% extends 'views/report.html' %}
 
+{% block style %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css">
+<style>
+    .list-account {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        padding: 0 5px 23px 5px;
+        overflow-x: auto;
+    }
+
+    .account-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 10px;
+    }
+
+    .b-left {
+        border-left: 1px solid var(--color-hr);
+    }
+
+    .b-right {
+        border-right: 1px solid var(--color-hr);
+    }
+
+    .account-container.active .account-img {
+        border: 1px solid rgb(120, 154, 255);
+    }
+
+    .account-img {
+        cursor: pointer;
+        position: relative;
+        height: 58px;
+        width: 58px;
+        border-radius: 50% !important;
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+        transition: 0.3s ease;
+        border: 1px solid var(--color-hr);
+        padding: 2px;
+        z-index: 10;
+    }
+
+    .account-img img {
+        border-radius: 50%;
+        width: 100%;
+        height: 100%;
+        object-position: top;
+        object-fit: cover;
+    }
+
+    .account-container:hover .account-name {
+        opacity: 1;
+        top: 57px;
+    }
+
+    .account-name {
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: 0.3s ease;
+    }
+
+    .dash-board {
+        width: 100%;
+        height: 67vh;
+        padding: 10px;
+        display: flex;
+    }
+
+    .left-container {
+        position: relative;
+        width: 50%;
+        height: 100%;
+        background-color: var(--color-menu);
+        padding: 10px 15px;
+        border-radius: 10px;
+    }
+
+    .right-container {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        width: 50%;
+        height: 100%;
+        padding: 0px 15px 10px 15px;
+    }
+
+    .list-activities {
+        position: relative;
+        width: 100%;
+        height: calc(100% - 30px);
+        overflow: auto;
+    }
+
+    .list-activities::-webkit-scrollbar {
+        display: none;
+    }
+
+    .chart-header {
+        text-align: center;
+    }
+
+    .grid-item {
+        margin-top: 40px;
+        height: 40%;
+        background-color: var(--color-bg);
+    }
+
+    .chart-body {
+        width: 100%;
+        height: 60%;
+    }
+
+    thead {
+        background-color: var(--color-hr);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="wrap-container">
-
-    <div class="row-wrapper">
-        <div class="column-wrapper" style="width: 350px">
-            
-            
+    <div class="list-account">
+        <div class="account-container active b-right" id="{{ current_user.id }}">
+            <div class="account-img">
+                <img src="/static/uploads/{{ current_user.profile[0].photo }}" alt="Profile">
+            </div>
+            <div class="account-name color-text text-wrapper">
+                {{ current_user.username }}
+            </div>
         </div>
-        <div class="border-right"></div>
-        <div class="column-wrapper" style="width: 100%;">
-            <div class="content-header">
+        {% if users %}
+        {% for user in users %}
+        {% if user.id != current_user.id %}
+        <div class="account-container" id="{{ user.id }}">
+            <div class="account-img">
+                <img src="/static/uploads/{{ user.profile[0].photo }}" alt="Profile">
+            </div>
+            <div class="account-name color-text text-wrapper">
+                {{ user.username }}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class="dash-board">
+        <div class="left-container">
+            <h5 class="color-text flex-start mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Done by <p
+                    class="sold-by ml-1 notranslate">{{ current_user.username }}</p>
+            </h5>
+            <div class="list-activities">
+                <table class="table">
+                    <thead>
+                        <tr class="color-font">
+                            <td class="color-text" style="width: 50%;">Activity</td>
+                            <td class="color-text">Type</td>
+                            <td class="color-text">CreatedOn</td>
+                        </tr>
+                    </thead>
+                    <tbody id="list-activities" class="notranslate">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="right-container">
+            <div class="chart-header">
+                <h5 class="color-text">Performance</h5>
+            </div>
+            <div class="grid-item" id="pie">
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="chart-body">
 
             </div>
         </div>
@@ -19,9 +188,102 @@
 {% endblock %}
 
 {% block script %}
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.print.min.js"></script>
 <script>
-    
+    $(document).ready(function () {
+        var temp_data = []
 
-    
+        $('.list-account').on('click', '.account-container', function() {
+            var users = document.querySelectorAll('.account-container')
+            Array.from(users).forEach(a => {
+                $(a).removeClass('active')
+            })
+            $(this).addClass('active')
+            $('.sold-by').text($(this).find('.account-name').text())
+            var element = ''
+            temp_data.forEach(a => {
+                Array.from(users).forEach(u => {
+                    if ($(u).hasClass('active') && a.createdBy == $(u).attr('id')) {
+                        element += `<tr class="activity-item" style="font-size: 13px;" id="` + a.id + `">
+                            <td class="color-text">`+ a.activity + `</td>
+                            <td class="color-text">`+ a.type + `</td>
+                            <td class="color-text">`+ a.createdOn + `</td>
+                        </tr>`
+                    }
+                })
+            })
+            $('#list-activities').html(element)
+        })
+
+        $.ajax({
+            url: '/account/report',
+            method: 'POST',
+            success: function (data) {
+                temp_data = data
+                var activity = {
+                    labels: [],
+                    quantities: [],
+                    colors: []
+                }
+
+                var objActivity = {
+                    'labels': [],
+                    'quantities': []
+                }
+
+                var users = document.querySelectorAll('.account-container')
+
+                data.forEach(a => {
+                    Array.from(users).forEach(u => {
+                        if ($(u).hasClass('active') && a.createdBy == $(u).attr('id')) {
+                            $('#list-activities').append(`<tr class="activity-item" style="font-size: 13px;" id="` + a.id + `">
+                                <td class="color-text">`+ a.activity + `</td>
+                                <td class="color-text">`+ a.type + `</td>
+                                <td class="color-text">`+ a.createdOn + `</td>
+                            </tr>`)
+                        }
+                    })
+
+
+                    if (objActivity.labels.includes(a.createdBy)) {
+                        objActivity.labels.forEach((l, i) => {
+                            if (l == a.createdBy) {
+                                objActivity.quantities[i] += 1
+                            }
+                        })
+                    } else {
+                        objActivity.labels.push(a.createdBy)
+                        objActivity.quantities.push(1)
+                    }
+
+                    activity.colors.push(generateColor())
+
+                });
+
+                objActivity.labels.forEach((l, i) => {
+                    Array.from(users).forEach(u => {
+                        if ($(u).attr('id') == l) {
+                            objActivity.labels[i] = $(u).find('.account-name').text().trim()
+                        }
+                    })
+                })
+
+                activity.quantities = objActivity.quantities
+                activity.labels = objActivity.labels
+
+                var pie = document.getElementById('pie')
+                var pieCanvas = document.getElementById('pieChart')
+
+                _Chart(pie, pieCanvas, 'doughnut', activity)
+            }
+        })
+    })
 </script>
 {% endblock %}

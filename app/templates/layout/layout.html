@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome {% block title %}{% endblock %} </title>
+    <title>Welcome {% block title %}{% endblock %}</title>
 
     <!-- <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}"> -->
     <!-- <link href="{{url_for('static', filename='css/font-awesome.min.css')}}" rel="stylesheet"
@@ -84,7 +84,7 @@
     </header>
     <footer>
         <p class="color-text" style="font-size: 13px;">Copyright &copy; 2020 All Rights Reserved by
-            <a href="#">Team7</a></p>
+            <a href="#" class="notranslate">SoftDev</a></p>
 
     </footer>
 
@@ -104,7 +104,7 @@
                 <!--Body-->
                 <div class="modal-body text-center mb-1">
 
-                    <h5 class="mb-2 color-font">{{ current_user.username }}</h5>
+                    <h5 class="mb-2 color-font notranslate">{{ current_user.username }}</h5>
 
                     <div class="form-group" id="pwd">
                         <form id="authenticateForm" action="{{ url_for('authenticate') }}" style="width: 100%;">
@@ -807,6 +807,7 @@
         function showProductForm(params) {
             var category = params.category
             var product = params.product
+            var barcode = params.barcode
             var price = params.price
             var description = params.description
             var colors = params.colors
@@ -909,6 +910,14 @@
                                         <label for="period" class="label period">Period</label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control input-color" name="barcode" id="barcode" value="` + barcode + `" required>
+                                <label for="barcode" class="label barcode">Barcode</label>
+                                
+                                <button type="button" class="is-scan" title="tick this box to scan barcode" data-toggle="tooltip" data-placement="bottom">
+                                    <ion-icon name="scan-outline"></ion-icon>
+                                </button>
                             </div>
                             <div class="form-group">
                                 <textarea name="details" id="details" class="form-control input-color textarea"

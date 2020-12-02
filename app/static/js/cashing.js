@@ -70,7 +70,7 @@ $(document).on('click', '.order-btn', function() {
                             $('#paymentModel').modal('show')
                             $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
                                                 <span class="color-font">Check Out: </span>
-                                                <span class="currency-format color-text" id="paymentAmount">`+data.data.amount+`</span>
+                                                <span class="currency-format color-text" id="paymentAmount">`+accounting.formatMoney(data.data.amount)+`</span>
                                             </div>`)
                             $('#receive-cash').val('').focus()
                             $('.payment-add').attr('disabled', false)
@@ -131,7 +131,7 @@ $(document).on('click', '.order-btn', function() {
                         $('#paymentModel').modal('show')
                         $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
                                             <span class="color-font">Check Out: </span>
-                                            <span class="currency-format color-text" id="paymentAmount">`+data.data.amount+`</span>
+                                            <span class="currency-format color-text" id="paymentAmount">`+accounting.formatMoney(data.data.amount)+`</span>
                                         </div>`)
                         $('#receive-cash').val('').focus()
                         $('.payment-add').attr('disabled', false)
@@ -192,9 +192,8 @@ $(document).on('click', '.payment-add', function() {
 
 $(document).on('click', '.checkout-btn', function() {
     var payment = $('.payment-total').attr('id')
-    var amount = $(this).find('#paymentAmount').text()
+    var amount = accounting.unformat($(this).find('#paymentAmount').text())
     var json = JSON.stringify(paymentObj)
-    console.log(amount)
     $.ajax({
         url: '/checkout/'+payment,
         type: 'POST',
@@ -274,7 +273,7 @@ $(document).on('click', '.checkout-btn', function() {
                 }
 
                 $('#totalCash').text(accounting.formatMoney(paid, {
-                    precision: 0,
+                    precision: 2,
                     format: {
                         pos: format_money,
                         neg: "%v%s",
@@ -315,7 +314,7 @@ $(document).on('click', '.checkout-btn', function() {
                 $('.transaction-item').find('.remove-btn').addClass('hide')
                 
             } else {
-                $('.payment-total').html('<div class="checkout-btn"><span class="color-font">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+amount+'</span></div>')
+                $('.payment-total').html('<div class="checkout-btn"><span class="color-font">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+accounting.formatMoney(amount)+'</span></div>')
             }
         }
     })
