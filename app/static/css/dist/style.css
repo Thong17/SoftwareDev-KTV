@@ -2978,6 +2978,17 @@ button.form-empty:hover {
   font-size: 13px;
 }
 
+.fa-heart {
+  color: crimson;
+}
+
+.fav-btn {
+  padding: 6px 13px;
+  margin: 0 7px;
+  border: 1px solid var(--color-hr);
+  border-radius: 20px;
+}
+
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);

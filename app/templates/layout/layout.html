@@ -348,6 +348,19 @@
             })
         }
 
+        function favoriteProducts(list, filter) {
+            this.list = list
+            this.filter = filter
+
+            Array.from(this.list).forEach((l, i) => {
+                if ($(l).find(this.filter).hasClass('active')) {
+                    $(l).css('display', 'block')
+                } else {
+                    $(l).css('display', 'none')
+                }
+            })
+        }
+
         function sortElement(property, order) {
             var sortOrder = 1;
             if (property[0] === "-") {
@@ -629,7 +642,7 @@
             }
         }
 
-        function showProduct(element, id, product, category, photo, price, arrival, discount) {
+        function showProduct(element, id, product, category, photo, price, arrival, discount, isSaved) {
             this.element = element
             this.id = id
             this.product = product
@@ -638,8 +651,16 @@
             this.category = category
             this.arrival = arrival
             this.discount = discount
+            this.isSaved = isSaved
+            var favBtn = ''
             var duration = ''
             var disc = ''
+            if (this.isSaved) {
+                favBtn = '<i class="fa fa-heart" aria-hidden="true"></i>'
+            } else {
+                favBtn = '<i class="fa fa-heart-o" aria-hidden="true"></i>'
+            }
+
             if (this.arrival < 1) {
                 duration = '<img src="static/svg/new-{{current_user.theme}}.svg" alt="" srcset="">'
             }
@@ -672,7 +693,7 @@
                                     <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 100px;"><span class="symbol"></span><span class="price-tag currency-format">` +
                 this.price + `</span></p>
                                     <p style="font-size: 12px;">
-                                        <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                        `+favBtn+`
                                     </p>
                                 </div>
                             </div>

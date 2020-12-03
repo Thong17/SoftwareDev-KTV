@@ -90,6 +90,11 @@ class ProfileForm(FlaskForm):
 
 
 #Table
+favorite_product = db.Table('favorite_product',
+    db.Column('user_id', db.String(36), db.ForeignKey('tbl_user.id')),
+    db.Column('product_id', db.String(36), db.ForeignKey('tbl_product.id'))
+)
+
 class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
     firstname = db.Column(db.String(20), nullable=False)
@@ -110,6 +115,8 @@ class tblUser(db.Model, UserMixin):
     profile = db.relationship('tblProfile', backref='profile', lazy=True)
     sale = db.relationship('tblTransaction', backref='sale', lazy=True)
     drawers = db.relationship('tblDrawer', backref='drawers', lazy=True)
+    favorite_products = db.relationship('tblProduct', secondary=favorite_product, backref='favorite_products', lazy='dynamic')
+
 
 class tblProfile(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -170,6 +177,8 @@ class tblProduct(db.Model):
     photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     stocks = db.relationship('tblStock', backref='stocksOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+    favorite_products = db.relationship('tblUser', secondary=favorite_product, backref='favorite_products', lazy='dynamic')
+
 
 class tblStock(db.Model):
     id = db.Column(db.String(36), primary_key=True)

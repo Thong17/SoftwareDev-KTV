@@ -373,11 +373,20 @@
         color: var(--color-font);
     }
 
-    .money-add, .payment-add {
+    .money-add,
+    .payment-add {
         cursor: pointer;
     }
 
     .payment-add {
+        background-color: var(--color-menu);
+    }
+
+    .fav-btn {
+        padding: 5px 10px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 16px;
         background-color: var(--color-menu);
     }
 
@@ -389,6 +398,7 @@
     <div class="col-filter" style="border-right: 1px solid var(--color-hr);">
         <!-- Begin -->
         <div class="content-menu flex-between">
+            <div class="fav-btn"><i class="fa fa-star-o" aria-hidden="true"></i></div>
             <div class="dropdown" id="list-cates">
                 <div class="menu-icon" data-toggle="dropdown">
                     <span></span>
@@ -446,6 +456,7 @@
             <div class="empty-result hide color-text">No product found...</div>
             {% if products %}
             {% for product in products %}
+            {% if product.isSaved %}
             <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
@@ -456,9 +467,9 @@
                             <ion-icon name="add-circle-outline"></ion-icon>
                         </button>
                         {% if product.discount != '' %}
-                            <div class="product-discount">
-                                <p class="color-text">{{ product.discount }}%</p>
-                            </div>
+                        <div class="product-discount">
+                            <p class="color-text">{{ product.discount }}%</p>
+                        </div>
                         {% endif %}
                     </div>
                     <div class="item-details">
@@ -495,13 +506,71 @@
                                     Available
                                     {% endif %}
                                 </span></p>
-                            <p style="font-size: 12px;">
+                            <p style="font-size: 12px;" class="favorite-btn active">
+                                <i class="fa fa-heart" aria-hidden="true"></i>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+                <input type="hidden" id="details-brand" value="{{product.brandId}}">
+                <input type="hidden" id="details-categ" value="{{product.categoryId}}">
+                <div class="item-wrapper">
+                    <div class="item-img">
+                        <img src="/static/uploads/{{product.photo}}">
+                        <button class="product-btn color-text" title="Add product to list">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </button>
+                        {% if product.discount != '' %}
+                        <div class="product-discount">
+                            <p class="color-text">{{ product.discount }}%</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <div class="details">
+                            <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
+                                title="{{product.product}}">{{product.product}}</p>
+                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            </p>
+                            <p class="color-text" id="details-category" style="font-size: 10px;">
+                                {{product.productOfCategory.category}}</p>
+                            <p class="color-text hide" id="details-description" style="font-size: 10px;">
+                                {{product.description}}</p>
+                            <p class="price-tag color-text currency-format notranslate hide">{{ product.price }}</p>
+                        </div>
+                        <div class="notranslate flex-between-end color-text" style="width: 100%;">
+                            <p class="color-font text-wrapper" id="details-price"
+                                style="font-size: 14px; width: 110px;">
+                                <span class="symbol"></span><span class="stock-tag" style="font-size: 12px;">
+                                    {% if product.isStock == True %}
+                                    {% set total_stock = namespace(value=0) %}
+                                    {% if product.stocks %}
+                                    {% for stock in product.stocks %}
+                                    {% set total_stock.value = total_stock.value + stock.quantity %}
+                                    {% endfor %}
+                                    {% if total_stock.value > 0 %}
+                                    {{ total_stock.value }} Available
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Available
+                                    {% endif %}
+                                </span></p>
+                            <p style="font-size: 12px;" class="favorite-btn">
                                 <i class="fa fa-heart-o" aria-hidden="true"></i>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
             {% else %}
             <div class="empty-result color-text">No product found...</div>
@@ -572,9 +641,11 @@
                             <div class="row">
                                 <div class="col-md-10">
                                     <div class="form-group">
-                                        <input type="number" step="any" class="form-control input-color" name="receive-cash" id="receive-cash" required>
+                                        <input type="number" step="any" class="form-control input-color"
+                                            name="receive-cash" id="receive-cash" required>
                                         <label for="receive-cash" class="label receive-cash">Amount</label>
-                                        <select name="receive-currency" id="receive-currency" class="form-control input-color">
+                                        <select name="receive-currency" id="receive-currency"
+                                            class="form-control input-color">
                                             <option value="USD"><span>&#36;</span></option>
                                             <option value="KHR"><span>&#6107;</span></option>
                                         </select>
@@ -582,7 +653,9 @@
                                 </div>
                                 <div class="col-md-2 pl-0">
                                     <div class="form-group">
-                                        <button class="btn color-text payment-add"><ion-icon name="add-outline" style="vertical-align: middle"></ion-icon></button>
+                                        <button class="btn color-text payment-add">
+                                            <ion-icon name="add-outline" style="vertical-align: middle"></ion-icon>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -602,7 +675,7 @@
                             </div>
                         </div>
                         <div class="payment-total color-text notranslate">
-                            
+
                         </div>
                     </div>
                     <div class="payment-invoice">
@@ -620,7 +693,8 @@
                             </div>
                             <div class="flex-between-center border-dashed py-1">
                                 <p class="color-text">Invoice: <span class="notranslate" id="invoiceNo"></span></p>
-                                <p class="color-text">Cashier: <span class="notranslate">{{ current_user.username }}</span></p>
+                                <p class="color-text">Cashier: <span
+                                        class="notranslate">{{ current_user.username }}</span></p>
                             </div>
                             <div class="item-payment">
                                 <table class="table invoice-table">
@@ -634,7 +708,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="item-invoice" class="color-text notranslate"></tbody>
-                                </table> 
+                                </table>
                             </div>
                         </div>
                         <div class="invoice-total border-dashed notranslate">
@@ -643,12 +717,12 @@
                                 <div class="flex-between-center" style="width: 50%;">
                                     <p class="color-text">USD:</p>
                                     <p class="color-text" id="totalUSD"><span>&#36;</span></p>
-                                </div> 
+                                </div>
                             </div>
                             <div class="flex-between-center">
                                 <p class="color-text">KHR:</p>
                                 <p class="color-text" id="totalKHR"><span>&#6107;</span></p>
-                            </div> 
+                            </div>
                             <div class="flex-between-center border-dashed my-1 pt-1">
                                 <p class="color-text">Cash:</p>
                                 <p class="color-text" id="totalCash">...</p>
@@ -662,7 +736,9 @@
                             <p class="color-text">Thank you for coming</p>
                         </div>
                     </div>
-                    <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal"><ion-icon name="close-outline"></ion-icon></button>
+                    <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </button>
                 </div>
             </div>
         </div>
@@ -692,17 +768,17 @@
             </div>
 
             <div class="modal-body">
-                
+
             </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn color-font close-modal" data-dismiss="modal">Cancel</button>
                 {% if current_user.drawer == '' %}
-                    <button class="btn border drawer-save color-font">Create</button>
-                    <button class="btn border drawer-end color-font hide" id="{{ current_user.drawer }}">End</button>
+                <button class="btn border drawer-save color-font">Create</button>
+                <button class="btn border drawer-end color-font hide" id="{{ current_user.drawer }}">End</button>
                 {% else %}
-                    <button class="btn border drawer-save color-font hide">Create</button>
-                    <button class="btn border drawer-end color-font" id="{{ current_user.drawer }}">End</button>
+                <button class="btn border drawer-save color-font hide">Create</button>
+                <button class="btn border drawer-end color-font" id="{{ current_user.drawer }}">End</button>
                 {% endif %}
             </div>
         </div>
@@ -716,7 +792,7 @@
 <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
 
-    $(document).on('click', '.type-btn', function() {
+    $(document).on('click', '.type-btn', function () {
         var types = $('.payment-type').children()
         Array.from(types).forEach(t => {
             $(t).removeClass('active')
@@ -759,12 +835,33 @@
         }
     })
 
+    
+
+    $('.favorite-btn').on('click', function () {
+        var id = $(this).closest('.product-item').attr('id')
+        $.ajax({
+            url: '/product/favorite/' + id,
+            type: 'POST',
+            success: function (data) {
+                if (data.msg == 'Success') {
+                    if (data.data) {
+                        $('#' + id).find('.favorite-btn').addClass('active')
+                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-heart" aria-hidden="true"></i>')
+                    } else {
+                        $('#' + id).find('.favorite-btn').removeClass('active')
+                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-heart-o" aria-hidden="true"></i>')
+                    }
+                }
+            }
+        })
+    })
+
     $('.drawer-btn').on('click', function () {
         var id = $(this).attr('id')
         $.ajax({
-            url: '/drawer/'+id,
+            url: '/drawer/' + id,
             type: 'POST',
-            success: function(data) {
+            success: function (data) {
                 $('#drawerModal').find('.modal-body').html(drawerForm(data.counter, data.rate, data.data))
                 $('#drawerModal').modal('show')
             }
@@ -1001,14 +1098,14 @@
                     id: data.id,
                     stocks: data.stocks
                 }))
-                
+
                 // var labels = document.querySelectorAll('.input-radio')
                 // Array.from(labels).forEach(t => {
                 //     if(!$(t).is(':checked')) {
                 //         console.log($(t).prev().find('ion-icon').css('color', 'red'))
                 //     }
                 // })
-                
+
             }
         })
     })
@@ -1058,7 +1155,7 @@
                 if (c_price % 1 != 0) {
                     precision = 2
                 }
-                
+
                 var n_price = accounting.formatMoney(c_price, {
                     precision: precision,
                     format: {
@@ -1098,6 +1195,19 @@
 
         $('.search-input').on('input', function () {
             searchProducts($(this).val(), temp_products, '#details-title')
+        })
+
+        $('.fav-btn').on('click', function () {
+            toggleActive($(this))
+            if ($(this).hasClass('active')) {
+                $(this).html('<i class="fa fa-star" aria-hidden="true"></i>')
+                favoriteProducts(temp_products, '.favorite-btn')
+            } else {
+                $(this).html('<i class="fa fa-star-o" aria-hidden="true"></i>')
+                temp_products.forEach(l => {
+                    $(l).css('display', 'block')
+                })
+            }
         })
 
         $('.menu-item, .category-item').on('click', function () {
@@ -1212,8 +1322,8 @@
     })
 
     function showOrder(id, description, price, discount, quantity, amount, oid, pid) {
-        return `<tr class="color-text transaction-item" id="` + id + `" data-id="`+oid+`">
-                    <td class="description" id="order-description" data-id="`+ pid +`">`+ description + `</td>
+        return `<tr class="color-text transaction-item" id="` + id + `" data-id="` + oid + `">
+                    <td class="description" id="order-description" data-id="`+ pid + `">` + description + `</td>
                     <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
             precision: 2,
             format: {
@@ -1253,10 +1363,10 @@
         if (moneys.length > 0) {
             moneys.forEach(m => {
                 element += `<tr class="color-font">
-                                <td style="width: 25%;">`+m.money+`</td>
-                                <td style="width: 15%; text-align:center;">`+m.currency+`</td>
-                                <td style="width: 20%; text-align:center;">`+m.unit+`</td>
-                                <td style="width: 25%; text-align:center;">`+m.money * m.unit+`</td>
+                                <td style="width: 25%;">`+ m.money + `</td>
+                                <td style="width: 15%; text-align:center;">`+ m.currency + `</td>
+                                <td style="width: 20%; text-align:center;">`+ m.unit + `</td>
+                                <td style="width: 25%; text-align:center;">`+ m.money * m.unit + `</td>
                                 <td class="color-text flex-between-center"><ion-icon name="remove-outline"></ion-icon><ion-icon name="add-outline"></ion-icon></td>
                             </tr>`
             })
@@ -1266,15 +1376,15 @@
                     <div class="col-md-4 pr-0">
                         <div class="form-group">
                             <input class="form-control input-color" step="any" type="number" name="drawer-rate" id="drawer-rate" value="` +
-                                rate + `">
+            rate + `">
                             <label class="label rate" for="drawer-rate">Rate</label>
                         </div>
                     </div>
                     <div class="col-md-8">
                         <div class="form-group">
                             <input class="form-control input-color" type="text" name="drawer-counter" id="drawer-counter" value="` +
-                        counter +
-                        `">
+            counter +
+            `">
                             <label class="label counter" for="drawer-counter">Counter</label>
                         </div>
                     </div>
@@ -1291,7 +1401,7 @@
                             </tr>
                         </thead>
                         <tbody id="list-money" class="color-text">
-                            `+element+`
+                            `+ element + `
                             <tr class="money-form color-text">
 
                             </tr>
@@ -1319,7 +1429,7 @@
                     placeholder="Money">
                 </td>
                 <td>
-                    `+select+`
+                    `+ select + `
                 </td>
                 <td>
                     <input min="1" type="number" class="form-empty color-text input-color" id="money-unit" value="`+ unit + `"
@@ -1335,9 +1445,9 @@
                 </td>`
     }
 
-    
 
-    $(document).on('click', '.money-delete', function() {
+
+    $(document).on('click', '.money-delete', function () {
         if ($(this).closest('tr').hasClass('money-form')) {
             $(this).closest('tr').empty()
         } else {
@@ -1348,10 +1458,10 @@
                     $(this).closest('tr').remove()
                 }
             })
-        } 
+        }
     })
 
-    $(document).on('click', '.money-add', function() {
+    $(document).on('click', '.money-add', function () {
         $('.money-form').html(moneyForm('', 'dollar', '', ''))
     })
 
@@ -1381,15 +1491,15 @@
         'total': 0
     }
 
-    $(document).on('input', '#drawer-rate', function() {
+    $(document).on('input', '#drawer-rate', function () {
         drawerObj.rate = $(this).val()
     })
 
-    $(document).on('input', '#drawer-counter', function() {
+    $(document).on('input', '#drawer-counter', function () {
         drawerObj.counter = $(this).val()
     })
 
-    $(document).on('input', '#money-money, #money-unit', function() {
+    $(document).on('input', '#money-money, #money-unit', function () {
         var money = $(this).closest('tr').find('#money-money').val()
         var unit = $(this).closest('tr').find('#money-unit').val()
         if (money == '') {
@@ -1410,7 +1520,7 @@
         $(this).closest('tr').find('#money-total').val(total)
     })
 
-    $(document).on('input', '#money-total', function() {
+    $(document).on('input', '#money-total', function () {
         var input = $(this).val()
         if (input == '' || input < 0) {
             input = 0
@@ -1425,7 +1535,7 @@
         $(this).closest('tr').find('#money-money').val(parseInt(input / unit))
     })
 
-    $(document).on('click', '.money-save', function() {
+    $(document).on('click', '.money-save', function () {
         var money = $(this).closest('tr').find('#money-money').val()
         var unit = $(this).closest('tr').find('#money-unit').val()
         var currency = $(this).closest('tr').find('#money-currency').val()
@@ -1439,16 +1549,16 @@
             'total': total
         }
         drawerObj.moneys.push(obj)
-        $('#list-money tr:last').before(`<tr id="`+obj.id+`">
-                                <td style="width: 35%;">`+obj.money+`</td>
-                                <td style="width: 15%; text-align:center;">`+obj.currency+`</td>
-                                <td style="width: 20%; text-align:center;">`+obj.unit+`</td>
-                                <td style="width: 25%; text-align:center;">`+obj.total+`</td>
+        $('#list-money tr:last').before(`<tr id="` + obj.id + `">
+                                <td style="width: 35%;">`+ obj.money + `</td>
+                                <td style="width: 15%; text-align:center;">`+ obj.currency + `</td>
+                                <td style="width: 20%; text-align:center;">`+ obj.unit + `</td>
+                                <td style="width: 25%; text-align:center;">`+ obj.total + `</td>
                                 <td style="width: 5%;"><ion-icon name="close-outline" class="money-delete"></ion-icon></td>
                                 </tr>`)
     })
 
-    $(document).on('click', '.drawer-save', function() {
+    $(document).on('click', '.drawer-save', function () {
         var obj = JSON.stringify(drawerObj)
         $.ajax({
             url: '/drawer/create',
@@ -1457,20 +1567,20 @@
                 data: obj
             },
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 if (data.data == 'Success') {
                     $('.drawer-btn, .drawer-time').addClass('active')
                     $('#drawerTime').html(data.startedOn)
                     $('#list-money').html(`<tr class="money-form color-text"></tr>`)
                     drawerObj.moneys.forEach(m => {
                         $('#list-money tr:last').before(`<tr class="color-font">
-                            <td style="width: 35%;">`+m.money+`</td>
-                            <td style="width: 15%; text-align:center;">`+m.currency+`</td>
-                            <td style="width: 20%; text-align:center;">`+m.unit+`</td>
-                            <td style="width: 25%; text-align:center;">`+m.total+`</td>
+                            <td style="width: 35%;">`+ m.money + `</td>
+                            <td style="width: 15%; text-align:center;">`+ m.currency + `</td>
+                            <td style="width: 20%; text-align:center;">`+ m.unit + `</td>
+                            <td style="width: 25%; text-align:center;">`+ m.total + `</td>
                             <td style="width: 5%;"></td>
                             </tr>`)
-                        
+
                     })
                     toggleEdit($('.drawer-end'), $('.drawer-save'))
                     $('.drawer-end, .drawer-btn').attr('id', data.id)
@@ -1479,12 +1589,12 @@
         })
     })
 
-    $(document).on('click', '.drawer-end', function() {
+    $(document).on('click', '.drawer-end', function () {
         var id = $(this).attr('id')
         $.ajax({
-            url: '/drawer/end/'+id,
+            url: '/drawer/end/' + id,
             type: 'POST',
-            success: function(data) {
+            success: function (data) {
                 if (data.data == 'Success') {
                     $('.drawer-btn, .drawer-time').removeClass('active')
                     $('#drawerTime').empty()
@@ -1497,7 +1607,7 @@
         })
     })
 
-    $(document).on('click', '.remove-btn', function() {
+    $(document).on('click', '.remove-btn', function () {
         var id = $(this).closest('.transaction-item')
         var pid = $(this).closest('.transaction-item').find('#order-description').attr('data-id')
         var oid = $('.order-btn').attr('id')
@@ -1507,28 +1617,28 @@
         })
         var amount = accounting.unformat($(this).closest('tr').find('#order-amount').text())
         $.ajax({
-            url: '/transaction/delete/'+id.attr('id'),
+            url: '/transaction/delete/' + id.attr('id'),
             data: {
                 data: oid
             },
             type: 'POST',
-            success: function(data) {
+            success: function (data) {
                 if (data.result == 'Success') {
                     console.log(data)
                     $('.order-btn').attr('data-change', true)
-                    var quantity = $('#'+pid).find('.stock-tag').text()
+                    var quantity = $('#' + pid).find('.stock-tag').text()
                     var order = $('.sum-order').text()
                     var sum_o = parseFloat(order) - data.quantity
                     $('.sum-order').text(sum_o)
                     var sum_q = parseFloat(quantity) + data.quantity
-                    $('#'+pid).find('.stock-tag').text(sum_q + ' Available')
+                    $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
                     $('#sumTotal').text(accounting.formatMoney(total - amount))
                     orderLists.forEach((o, i) => {
                         if (o.orderId == id.attr('data-id')) {
                             orderLists.splice(i, 1)
                         }
                     })
-                    $(id).fadeOut('slow', function() {
+                    $(id).fadeOut('slow', function () {
                         $(this).remove()
                     })
                 } else {

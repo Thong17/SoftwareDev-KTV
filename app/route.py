@@ -478,7 +478,7 @@ def add_product():
 @login_required
 def products():
     id = request.form['data']
-    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
+    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.isSaved, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
     products = []
     for Product in Products:
         price = simplejson.dumps({"price": Product.price})
@@ -491,7 +491,8 @@ def products():
             'photo': Product.photo,
             'category': Category.category,
             'arrival': arrival.days,
-            'discount': Product.discount
+            'discount': Product.discount,
+            'isSaved': Product.isSaved
         }
         product.update(price)
         products.append(product)
@@ -1638,5 +1639,12 @@ def change_password():
         data = 'Entered password is incorrect'
 
     return jsonify(data)
+
+@app.route('/product/favorite/<id>', methods=['POST'])
+def product_favorite(id):
+    product = tblProduct.query.get(id)
+    product.isSaved ^= True
+    db.session.commit()
+    return jsonify({'msg': 'Success', 'data': product.isSaved})
 
 

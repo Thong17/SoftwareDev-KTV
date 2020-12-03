@@ -720,7 +720,7 @@
                     }, 300)
                     results.forEach(data => {
                         showProduct($('.grid-products'), data.id, data.product, data
-                            .category, data.photo, data.price, data.arrival, data.discount)
+                            .category, data.photo, data.price, data.arrival, data.discount, data.isSaved)
 
                     });
 
@@ -896,10 +896,9 @@
                 data: id
             },
             success: function (results) {
-                console.log(results)
                 results.forEach(data => {
                     showProduct($('.grid-products'), data.id, data.product, data.category,
-                        data.photo, data.price, data.arrival, data.discount)
+                        data.photo, data.price, data.arrival, data.discount, data.isSaved)
 
                 });
 
