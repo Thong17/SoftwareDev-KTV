@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.types import PickleType
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
 from flask_marshmallow import Marshmallow
@@ -90,11 +91,6 @@ class ProfileForm(FlaskForm):
 
 
 #Table
-favorite_product = db.Table('favorite_product',
-    db.Column('user_id', db.String(36), db.ForeignKey('tbl_user.id')),
-    db.Column('product_id', db.String(36), db.ForeignKey('tbl_product.id'))
-)
-
 class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
     firstname = db.Column(db.String(20), nullable=False)
@@ -115,7 +111,6 @@ class tblUser(db.Model, UserMixin):
     profile = db.relationship('tblProfile', backref='profile', lazy=True)
     sale = db.relationship('tblTransaction', backref='sale', lazy=True)
     drawers = db.relationship('tblDrawer', backref='drawers', lazy=True)
-    favorite_products = db.relationship('tblProduct', secondary=favorite_product, backref='favorite_products', lazy='dynamic')
 
 
 class tblProfile(db.Model):
@@ -161,13 +156,13 @@ class tblProduct(db.Model):
     product = db.Column(db.String(50), nullable=False)
     barcode = db.Column(db.String(30), nullable=True)
     isStock = db.Column(db.Boolean, default=True)
-    isSaved = db.Column(db.Boolean, default=False)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     currency = db.Column(db.String(20), nullable=False)
     discount = db.Column(db.String(3), nullable=True, default='')
     period = db.Column(db.Date, nullable=True)
     photo = db.Column(db.String(255), nullable=True, default='default.png')
     description = db.Column(db.Text(), nullable=True, default='')
+    listFavorite = db.Column(db.Text(), nullable=True, default='[]')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     brandId = db.Column(db.String(36), db.ForeignKey('tbl_brand.id'), nullable=False)
@@ -177,7 +172,6 @@ class tblProduct(db.Model):
     photos = db.relationship('tblPhoto', backref='photosOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     colors = db.relationship('tblColor', backref='colorsOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     stocks = db.relationship('tblStock', backref='stocksOfProduct', lazy=True, cascade='save-update, merge, delete', single_parent=True)
-    favorite_products = db.relationship('tblUser', secondary=favorite_product, backref='favorite_products', lazy='dynamic')
 
 
 class tblStock(db.Model):

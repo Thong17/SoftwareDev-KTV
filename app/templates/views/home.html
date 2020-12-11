@@ -80,7 +80,7 @@
             <div class="empty-result hide color-text">No product found...</div>
             {% if products %}
             {% for product in products %}
-            {% if product.isSaved %}
+            {% if current_user.id in product.listFavorite|tojson|safe %}
             <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
@@ -103,8 +103,8 @@
                         </div>
                         <div class="notranslate flex-between-end color-text" style="width: 100%;">
                             <p class="price-tag currency-format color-text">{{ product.price }}</p> 
-                            <p style="font-size: 12px; color: royalblue;">
-                                <i class="fa fa-heart" aria-hidden="true"></i>
+                            <p style="font-size: 12px;">
+                                <i class="fa fa-bookmark" aria-hidden="true"></i>
                             </p>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
                         <div class="notranslate flex-between-end color-text" style="width: 100%;">
                             <p class="price-tag currency-format color-text">{{ product.price }}</p> 
                             <p style="font-size: 12px;">
-                                <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                <i class="fa fa-bookmark-o" aria-hidden="true"></i>
                             </p>
                         </div>
                     </div>

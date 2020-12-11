@@ -478,7 +478,7 @@ def add_product():
 @login_required
 def products():
     id = request.form['data']
-    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.isSaved, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
+    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
     products = []
     for Product in Products:
         price = simplejson.dumps({"price": Product.price})
@@ -491,8 +491,7 @@ def products():
             'photo': Product.photo,
             'category': Category.category,
             'arrival': arrival.days,
-            'discount': Product.discount,
-            'isSaved': Product.isSaved
+            'discount': Product.discount
         }
         product.update(price)
         products.append(product)
@@ -1643,8 +1642,24 @@ def change_password():
 @app.route('/product/favorite/<id>', methods=['POST'])
 def product_favorite(id):
     product = tblProduct.query.get(id)
-    product.isSaved ^= True
+    isSaved = False
+    listJson = json.loads(product.listFavorite)
+    listFavorite = []
+    for obj in listJson:
+        listFavorite.append(obj)
+    
+    if current_user.id in listFavorite:
+        listFavorite.remove(current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has removed '+product.product+' from favorite', type='Remove', createdBy=current_user.id)
+        db.session.add(Activity)
+    else:
+        listFavorite.append(current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added '+product.product+' to favorite', type='Add', createdBy=current_user.id)
+        db.session.add(Activity)
+        isSaved = True
+    
+    product.listFavorite = json.dumps(listFavorite)
     db.session.commit()
-    return jsonify({'msg': 'Success', 'data': product.isSaved})
+    return jsonify({'msg': 'Success', 'data': isSaved})
 
 

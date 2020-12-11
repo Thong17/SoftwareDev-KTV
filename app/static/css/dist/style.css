@@ -2978,8 +2978,8 @@ button.form-empty:hover {
   font-size: 13px;
 }
 
-.fa-heart {
-  color: crimson;
+.fa-bookmark {
+  color: #8142f5;
 }
 
 .fav-btn {

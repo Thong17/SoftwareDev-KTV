@@ -398,7 +398,7 @@
     <div class="col-filter" style="border-right: 1px solid var(--color-hr);">
         <!-- Begin -->
         <div class="content-menu flex-between">
-            <div class="fav-btn"><i class="fa fa-star-o" aria-hidden="true"></i></div>
+            <div class="fav-btn"><i class="fa fa-bookmark-o" aria-hidden="true"></i></div>
             <div class="dropdown" id="list-cates">
                 <div class="menu-icon" data-toggle="dropdown">
                     <span></span>
@@ -456,7 +456,7 @@
             <div class="empty-result hide color-text">No product found...</div>
             {% if products %}
             {% for product in products %}
-            {% if product.isSaved %}
+            {% if current_user.id in product.listFavorite|tojson|safe %}
             <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
@@ -507,7 +507,7 @@
                                     {% endif %}
                                 </span></p>
                             <p style="font-size: 12px;" class="favorite-btn active">
-                                <i class="fa fa-heart" aria-hidden="true"></i>
+                                <i class="fa fa-bookmark" aria-hidden="true"></i>
                             </p>
                         </div>
                     </div>
@@ -564,7 +564,7 @@
                                     {% endif %}
                                 </span></p>
                             <p style="font-size: 12px;" class="favorite-btn">
-                                <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                <i class="fa fa-bookmark-o" aria-hidden="true"></i>
                             </p>
                         </div>
                     </div>
@@ -846,10 +846,10 @@
                 if (data.msg == 'Success') {
                     if (data.data) {
                         $('#' + id).find('.favorite-btn').addClass('active')
-                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-heart" aria-hidden="true"></i>')
+                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-bookmark" aria-hidden="true"></i>')
                     } else {
                         $('#' + id).find('.favorite-btn').removeClass('active')
-                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-heart-o" aria-hidden="true"></i>')
+                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-bookmark-o" aria-hidden="true"></i>')
                     }
                 }
             }
@@ -1198,12 +1198,13 @@
         })
 
         $('.fav-btn').on('click', function () {
+            var value = $('.search-input').val()
             toggleActive($(this))
             if ($(this).hasClass('active')) {
-                $(this).html('<i class="fa fa-star" aria-hidden="true"></i>')
-                favoriteProducts(temp_products, '.favorite-btn')
+                $(this).html('<i class="fa fa-bookmark" aria-hidden="true"></i>')
+                favoriteProducts(value, temp_products, '.favorite-btn')
             } else {
-                $(this).html('<i class="fa fa-star-o" aria-hidden="true"></i>')
+                $(this).html('<i class="fa fa-bookmark-o" aria-hidden="true"></i>')
                 temp_products.forEach(l => {
                     $(l).css('display', 'block')
                 })

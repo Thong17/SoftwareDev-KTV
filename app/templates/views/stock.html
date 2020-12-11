@@ -45,117 +45,117 @@
                 <input type="text" class="search-input input-color" placeholder="Search">
                 <i class="fa fa-search" aria-hidden="true"></i>
             </div>
-            <div class="fav-btn"><i class="fa fa-star-o" aria-hidden="true"></i></div>
+            <div class="fav-btn"><i class="fa fa-bookmark-o" aria-hidden="true"></i></div>
         </div>
     </div>
     <div class="grid-products product-container">
         <div class="empty-result hide color-text">No product found...</div>
         {% if products %}
-        {% for product in products %}
-        {% if product.isSaved %}
-        <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}"
-            {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %}>
-            <input type="hidden" id="details-brand" value="{{product.brandId}}">
-            <input type="hidden" id="details-categ" value="{{product.categoryId}}">
-            <div class="item-wrapper">
-                <div class="item-img">
-                    <img src="/static/uploads/{{product.photo}}">
-                    <div class="product-btn color-text">
-                        <i class="fa fa-inbox" aria-hidden="true"></i>
+            {% for product in products %}
+                {% if current_user.id in product.listFavorite|tojson|safe %}
+                <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}"
+                    {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %}>
+                    <input type="hidden" id="details-brand" value="{{product.brandId}}">
+                    <input type="hidden" id="details-categ" value="{{product.categoryId}}">
+                    <div class="item-wrapper">
+                        <div class="item-img">
+                            <img src="/static/uploads/{{product.photo}}">
+                            <div class="product-btn color-text">
+                                <i class="fa fa-inbox" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <div class="details">
+                                <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
+                                    title="{{product.product}}">{{product.product}}</p>
+                                <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}</p>
+                                <p class="color-text" id="details-category" style="font-size: 12px;">
+                                    {{product.productOfCategory.category}}</p>
+                                <p class="color-text hide" id="details-description" style="font-size: 12px;">
+                                    {{product.description}}</p>
+                                <p class="price-tag currency-format hide">{{ product.price }}</p>
+                            </div>
+                            <div class="notranslate flex-between-end color-text" style="width: 100%;">
+                                <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 110px;">
+                                    <span class="symbol"></span><span class="stock-tag">
+                                        {% if product.isStock == True %}
+                                        {% set total_stock = namespace(value=0) %}
+                                        {% if product.stocks %}
+                                        {% for stock in product.stocks %}
+                                        {% set total_stock.value = total_stock.value + stock.quantity %}
+                                        {% endfor %}
+                                        {% if total_stock.value > 0 %}
+                                        {{ total_stock.value }} Available
+                                        {% else %}
+                                        Out of stock
+                                        {% endif %}
+                                        {% else %}
+                                        Out of stock
+                                        {% endif %}
+                                        {% else %}
+                                        Available
+                                        {% endif %}
+                                    </span></p>
+                                <p style="font-size: 12px;" class="favorite-btn active">
+                                    <i class="fa fa-bookmark" aria-hidden="true"></i>
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="item-details">
-                    <div class="details">
-                        <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
-                            title="{{product.product}}">{{product.product}}</p>
-                        <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}</p>
-                        <p class="color-text" id="details-category" style="font-size: 12px;">
-                            {{product.productOfCategory.category}}</p>
-                        <p class="color-text hide" id="details-description" style="font-size: 12px;">
-                            {{product.description}}</p>
-                        <p class="price-tag currency-format hide">{{ product.price }}</p>
+                </a>
+                {% else %}
+                <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}"
+                    {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %}>
+                    <input type="hidden" id="details-brand" value="{{product.brandId}}">
+                    <input type="hidden" id="details-categ" value="{{product.categoryId}}">
+                    <div class="item-wrapper">
+                        <div class="item-img">
+                            <img src="/static/uploads/{{product.photo}}">
+                            <div class="product-btn color-text">
+                                <i class="fa fa-inbox" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <div class="details">
+                                <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
+                                    title="{{product.product}}">{{product.product}}</p>
+                                <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}</p>
+                                <p class="color-text" id="details-category" style="font-size: 12px;">
+                                    {{product.productOfCategory.category}}</p>
+                                <p class="color-text hide" id="details-description" style="font-size: 12px;">
+                                    {{product.description}}</p>
+                                <p class="price-tag currency-format hide">{{ product.price }}</p>
+                            </div>
+                            <div class="notranslate flex-between-end color-text" style="width: 100%;">
+                                <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 110px;">
+                                    <span class="symbol"></span><span class="stock-tag">
+                                        {% if product.isStock == True %}
+                                        {% set total_stock = namespace(value=0) %}
+                                        {% if product.stocks %}
+                                        {% for stock in product.stocks %}
+                                        {% set total_stock.value = total_stock.value + stock.quantity %}
+                                        {% endfor %}
+                                        {% if total_stock.value > 0 %}
+                                        {{ total_stock.value }} Available
+                                        {% else %}
+                                        Out of stock
+                                        {% endif %}
+                                        {% else %}
+                                        Out of stock
+                                        {% endif %}
+                                        {% else %}
+                                        Available
+                                        {% endif %}
+                                    </span></p>
+                                <p style="font-size: 12px;" class="favorite-btn">
+                                    <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="notranslate flex-between-end color-text" style="width: 100%;">
-                        <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 110px;">
-                            <span class="symbol"></span><span class="stock-tag">
-                                {% if product.isStock == True %}
-                                {% set total_stock = namespace(value=0) %}
-                                {% if product.stocks %}
-                                {% for stock in product.stocks %}
-                                {% set total_stock.value = total_stock.value + stock.quantity %}
-                                {% endfor %}
-                                {% if total_stock.value > 0 %}
-                                {{ total_stock.value }} Available
-                                {% else %}
-                                Out of stock
-                                {% endif %}
-                                {% else %}
-                                Out of stock
-                                {% endif %}
-                                {% else %}
-                                Available
-                                {% endif %}
-                            </span></p>
-                        <p style="font-size: 12px;" class="favorite-btn active">
-                            <i class="fa fa-heart" aria-hidden="true"></i>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </a>
-        {% else %}
-        <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}"
-            {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %}>
-            <input type="hidden" id="details-brand" value="{{product.brandId}}">
-            <input type="hidden" id="details-categ" value="{{product.categoryId}}">
-            <div class="item-wrapper">
-                <div class="item-img">
-                    <img src="/static/uploads/{{product.photo}}">
-                    <div class="product-btn color-text">
-                        <i class="fa fa-inbox" aria-hidden="true"></i>
-                    </div>
-                </div>
-                <div class="item-details">
-                    <div class="details">
-                        <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
-                            title="{{product.product}}">{{product.product}}</p>
-                        <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}</p>
-                        <p class="color-text" id="details-category" style="font-size: 12px;">
-                            {{product.productOfCategory.category}}</p>
-                        <p class="color-text hide" id="details-description" style="font-size: 12px;">
-                            {{product.description}}</p>
-                        <p class="price-tag currency-format hide">{{ product.price }}</p>
-                    </div>
-                    <div class="notranslate flex-between-end color-text" style="width: 100%;">
-                        <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 110px;">
-                            <span class="symbol"></span><span class="stock-tag">
-                                {% if product.isStock == True %}
-                                {% set total_stock = namespace(value=0) %}
-                                {% if product.stocks %}
-                                {% for stock in product.stocks %}
-                                {% set total_stock.value = total_stock.value + stock.quantity %}
-                                {% endfor %}
-                                {% if total_stock.value > 0 %}
-                                {{ total_stock.value }} Available
-                                {% else %}
-                                Out of stock
-                                {% endif %}
-                                {% else %}
-                                Out of stock
-                                {% endif %}
-                                {% else %}
-                                Available
-                                {% endif %}
-                            </span></p>
-                        <p style="font-size: 12px;" class="favorite-btn">
-                            <i class="fa fa-heart-o" aria-hidden="true"></i>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </a>
-        {% endif %}
-        {% endfor %}
+                </a>
+                {% endif %}
+            {% endfor %}
         {% else %}
         <div class="empty-result color-text">No product found...</div>
         {% endif %}
@@ -178,12 +178,13 @@
         })
 
         $('.fav-btn').on('click', function () {
+            var value = $('.search-input').val()
             toggleActive($(this))
             if ($(this).hasClass('active')) {
-                $(this).html('<i class="fa fa-star" aria-hidden="true"></i>')
-                favoriteProducts(temp_products, '.favorite-btn')
+                $(this).html('<i class="fa fa-bookmark" aria-hidden="true"></i>')
+                favoriteProducts(value, temp_products, '.favorite-btn')
             } else {
-                $(this).html('<i class="fa fa-star-o" aria-hidden="true"></i>')
+                $(this).html('<i class="fa fa-bookmark-o" aria-hidden="true"></i>')
                 temp_products.forEach(l => {
                     $(l).css('display', 'block')
                 })
@@ -200,10 +201,10 @@
                     if (data.msg == 'Success') {
                         if (data.data) {
                             $('#' + id).find('.favorite-btn').addClass('active')
-                            $('#' + id).find('.favorite-btn').html('<i class="fa fa-heart" aria-hidden="true"></i>')
+                            $('#' + id).find('.favorite-btn').html('<i class="fa fa-bookmark" aria-hidden="true"></i>')
                         } else {
                             $('#' + id).find('.favorite-btn').removeClass('active')
-                            $('#' + id).find('.favorite-btn').html('<i class="fa fa-heart-o" aria-hidden="true"></i>')
+                            $('#' + id).find('.favorite-btn').html('<i class="fa fa-bookmark-o" aria-hidden="true"></i>')
                         }
                     }
                 }
