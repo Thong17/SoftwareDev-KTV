@@ -17,7 +17,7 @@ from datetime import datetime
 import time
 from http import cookies
 
-connection = 'mysql+pymysql://root:myroot@localhost/mart_shop'
+connection = 'mysql+pymysql://root:myroot@localhost/camping_cave'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -79,6 +79,11 @@ class BrandForm(FlaskForm):
     description = TextAreaField('Description')
     submit = SubmitField('Save')
 
+class RoleForm(FlaskForm):
+    role = StringField('Role', validators=[DataRequired(), Length(max=20)])
+    description = TextAreaField('Description')
+    submit = SubmitField('Add Role')
+
 class ProfileForm(FlaskForm):
     status = SelectField('Status', choices=[('Single', 'Single'), ('In Relationship', 'In Relationship'), ('Married', 'Married')])
     phone = StringField('Phone', validators=[Optional(), Length(min=6, max=13)])
@@ -91,6 +96,11 @@ class ProfileForm(FlaskForm):
 
 
 #Table
+user_role = db.Table('user_role',
+    db.Column('user_id', db.String(36), db.ForeignKey('tbl_user.id')),
+    db.Column('role_id', db.String(36), db.ForeignKey('tbl_role.id'))
+)
+
 class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
     firstname = db.Column(db.String(20), nullable=False)
@@ -105,13 +115,20 @@ class tblUser(db.Model, UserMixin):
     publicId = db.Column(db.String(50), nullable=False)
     token = db.Column(db.String(36), nullable=True, default='')
     drawer = db.Column(db.String(36), nullable=True, default='')
-    isAdmin = db.Column(db.Boolean, default=False)
-    isConfirm = db.Column(db.Boolean, default=False)
+    isConfirm = db.Column(db.Boolean, default=True)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     profile = db.relationship('tblProfile', backref='profile', lazy=True)
     sale = db.relationship('tblTransaction', backref='sale', lazy=True)
     drawers = db.relationship('tblDrawer', backref='drawers', lazy=True)
 
+
+class tblRole(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    role = db.Column(db.String(20), nullable=False, unique=True)
+    description = db.Column(db.Text(), nullable=True, default='')
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    roles = db.relationship('tblUser', secondary=user_role, backref='roles', lazy='dynamic')
 
 class tblProfile(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -322,7 +339,12 @@ class tblOutcome(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
+class ProfileSchema(ModelSchema):
+    class Meta:
+        model = tblProfile
+
 class UserSchema(ModelSchema):
+    profile = fields.Nested(ProfileSchema(many=True), many=True)
     class Meta:
         model = tblUser
 
@@ -394,6 +416,10 @@ class ActivitySchema(ModelSchema):
     user = fields.Nested(UserSchema, many=True)
     class Meta:
         model = tblActivity
+
+class RoleSchema(ModelSchema):
+    class Meta:
+        model = tblRole
 
 #Custome datetime
 def utc2local (utc):

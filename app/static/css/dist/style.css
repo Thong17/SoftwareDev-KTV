@@ -1332,6 +1332,10 @@ hr {
   transition: 0.3s ease;
 }
 
+.bg-menu {
+  background-color: var(--color-menu);
+}
+
 .btn-clear {
   border-radius: 50%;
   width: 20px;

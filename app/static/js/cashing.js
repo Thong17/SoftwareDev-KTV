@@ -340,7 +340,8 @@ $(document).on('click', '.close-payment', function() {
 
 $(document).on('click', '.print-inv', function() {
     $('.payment-invoice').printThis({
-        loadCSS: '/static/css/dist/style.css'
+        loadCSS: '/static/css/print.css',
+        canvas: true
     })
 })
 

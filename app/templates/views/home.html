@@ -172,8 +172,13 @@
             var input = $('.search-input').val()
             if ($(this).hasClass('active')) {
                 $(this).removeClass('active')
+
                 temp_products = selectMenu(products, menus, cates, input)
             } else {
+                Array.from(cates).forEach(c => {
+                    $(c).removeClass('active')
+                })
+
                 $(this).addClass('active')
                 temp_products = selectMenu(products, menus, cates, input)
             }

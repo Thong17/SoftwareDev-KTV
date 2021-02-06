@@ -388,6 +388,7 @@
         border: none;
         border-radius: 16px;
         background-color: var(--color-menu);
+        color: var(--color-text);
     }
 
 </style>
@@ -680,15 +681,15 @@
                     </div>
                     <div class="payment-invoice">
                         <div class="invoice-header">
-                            <h5 class="color-text" style="text-align: center; font-size: 23px;">SHOP</h5>
+                            <h5 class="color-text" style="text-align: center; font-size: 23px; font-weight: 700;">{{ current_user.profile[0].company }}</h5>
                         </div>
                         <div class="invoice-body">
                             <div class="shop-details flex-column-start-center mb-1">
-                                <p class="color-text">103AEo Street 108, Sangkat Wat Phnom, Khan Daun Penh</p>
                                 <p class="color-text">Contact: {{ current_user.profile[0].phone }}</p>
+                                <p class="color-text">ABA: 077 777 377 (CHHAN Bunthong)</p>
                             </div>
                             <div class="flex-between-center pb-1">
-                                <p class="color-text">Date: <span id="invoiceDate notranslate"></span></p>
+                                <p class="color-text">Date: <span id="invoiceDate" class="notranslate"></span></p>
                                 <p class="color-text notranslate"><span id="invoiceTime"></span></p>
                             </div>
                             <div class="flex-between-center border-dashed py-1">
@@ -733,7 +734,7 @@
                             </div>
                         </div>
                         <div class="invoice-footer">
-                            <p class="color-text">Thank you for coming</p>
+                            <p class="color-text">Thank you for purchasing</p>
                         </div>
                     </div>
                     <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal">
@@ -1166,7 +1167,6 @@
                 })
 
                 $(v).find('#value-price').html(n_price)
-
             })
 
             var details_price = accounting.unformat($('.details-price').text()) + accounting.unformat(price)

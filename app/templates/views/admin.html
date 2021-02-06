@@ -1,0 +1,383 @@
+{% extends 'views/custome.html' %}
+
+{% block style %}
+<style>
+    .list-users {
+        height: 50px;
+        width: 100%;
+        display: flex;
+        position: relative;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    .user, .user-btn {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .user-img {
+        padding: 0 10px;
+    }
+
+    .user-img img {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .b-right {
+        border-right: 1px solid var(--color-hr);
+    }
+
+    .add-user {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        background: none;
+        border: 1px solid var(--color-hr);
+        font-size: 20px;
+    }
+
+    .profile-container {
+        width: 100%;
+        position: relative;
+        padding: 0 25px 0 0;
+    }
+
+    .lbl {
+        position: absolute;
+        top: 13px !important;
+        left: 8px !important;
+        background-color: var(--color-bg);
+        width: auto !important;
+        padding: 0 3px;
+        color: var(--color-hover) !important;
+        font-size: 12px;
+    }
+
+    .user-container {
+        height: calc(100vh - 300px);
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-right: 1px solid var(--color-hr);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+    <div class="container-header">
+        <div class="list-users">
+            <div class="user" id="{{ current_user.id }}">
+                <div class="user-img b-right">
+                    <img src="/static/uploads/{{current_user.profile[0].photo}}" alt="">
+                </div>
+                <div class="user-username">
+                    <p class="color-text">{{current_user.username}}</p>
+                </div>
+            </div>
+            {% if users %}
+            {% for user in users %}
+            {% if user.id != current_user.id %}
+            <div class="user" id="{{ user.id }}">
+                <div class="user-img">
+                    <img src="/static/uploads/{{user.profile[0].photo}}" alt="">
+                </div>
+                <div class="user-username">
+                    <p class="color-text">{{user.username}}</p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            <div class="user-btn">
+                <div class="user-img">
+                    <button class="add-user color-text">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <hr>
+    <div class="flex-between-start">
+        <div class="user-container">
+
+            <!-- Profile -->
+            <div class="profile-container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="input-color form-control" id="username"
+                                value="">
+                            <label for="username" class="lbl">Username</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="input-color form-control" id="fullname"
+                                value="">
+                            <label for="fullname" class="lbl">Fullname</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <select name="gender" class="form-control input-color pl-2 pr-0" id="gender">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                            <label for="gender" class="lbl">Gender</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <input type="date" name="birthdate" class="input-color form-control" id="birthdate"
+                                value="">
+                            <label for="birthdate" class="lbl">Birthdate</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="input-color form-control" value="" id="email">
+                    <label for="email" class="lbl">Email</label>
+                </div>
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <input type="text" class="input-color form-control" id="phone"
+                                value="">
+                            <label for="phone" class="lbl">Phone</label>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <input type="text" class="input-color form-control" id="status"
+                                value="">
+                            <label for="status" class="lbl">Status</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="input-color form-control" id="company"
+                                value="">
+                            <label for="company" class="lbl">Company</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="input-color form-control" id="hometown"
+                                value="">
+                            <label for="hometown" class="lbl">Hometown</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="input-color form-control" id="location"
+                        value="">
+                    <label for="location" class="lbl">Location</label>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <select name="role" class="form-control input-color pl-2 pr-0" id="role">
+                                <option value="">...</option>
+                                {% if roles %}
+                                {% for role in roles %}
+                                <option value="{{ role.id }}">{{ role.role }}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                            <label for="role" class="lbl">Role</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <input type="password" name="password" class="input-color form-control" id="password">
+                            <label for="password" class="lbl pw">Password</label>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="btn-container flex-end-center p-1">
+                    <button class="btn btn-block btn-success" id="create-user">Create</button>
+                </div>
+            </div>
+            <!-- Profile -->
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.list-users').on('click', '.user', function() {
+            id = $(this).attr('id')
+            $.ajax({
+                url: '/admin/'+id,
+                type: 'POST',
+                success: function(data) {
+                    userForm(data.username, data.firstname +' '+ data.lastname, data.gender, data.birthdate, data.email, data.profile[0].phone, data.profile[0].status, data.profile[0].company, data.profile[0].hometown, data.profile[0].location, data.roles, id, data.isConfirm)
+                }
+            })
+        })
+
+        $('.list-users').on('click', '.user-btn', function() {
+            userForm('', '', '', '', '', '', '', '', '', '', '', '', '')
+            $('.username').focus()
+        })
+
+        $('.btn-container').on('click', '#create-user', function() {
+            event.preventDefault()
+            validations = [$('#username'), $('#fullname'), $('#email'), $('#password')]
+            invalid = []
+            Array.from(validations).reverse().forEach(v => {
+                if (v.val() == '') {
+                    v.focus()
+                    invalid.push(v)
+                }
+            })
+
+            if (invalid.length == 0) {
+                username = $('#username').val().trim()
+                fullname = $('#fullname').val()
+                gender = $('#gender').val()
+                birthdate = $('#birthdate').val()
+                email = $('#email').val()
+                password = $('#password').val()
+                status = $('#status').val()
+                phone = $('#phone').val()
+                hometown = $('#hometown').val()
+                company = $('#company').val()
+                _location = $('#location').val()
+                role = $('#role').val()
+                $.ajax({
+                    url: '/admin/create',
+                    type: 'POST',
+                    data: {
+                        username: username,
+                        fullname: fullname,
+                        gender: gender,
+                        birthdate: birthdate,
+                        email: email,
+                        password: password,
+                        status: status,
+                        phone: phone,
+                        hometown: hometown,
+                        company: company,
+                        location: _location,
+                        role: role
+                    },
+                    success: function(data) {
+                        if (data.data == 'Success') {
+                            alert(data.data)
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+            }
+        })
+
+        $('.btn-container').on('click', '#save-user', function() {
+            id = $('.btn-container').attr('id')
+            event.preventDefault()
+            validations = [$('#username'), $('#fullname'), $('#email')]
+            invalid = []
+            Array.from(validations).reverse().forEach(v => {
+                if (v.val() == '') {
+                    v.focus()
+                    invalid.push(v)
+                }
+            })
+
+            if (invalid.length == 0) {
+                username = $('#username').val().trim()
+                fullname = $('#fullname').val()
+                gender = $('#gender').val()
+                birthdate = $('#birthdate').val()
+                email = $('#email').val()
+                password = $('#password').val()
+                status = $('#status').val()
+                phone = $('#phone').val()
+                hometown = $('#hometown').val()
+                company = $('#company').val()
+                _location = $('#location').val()
+                role = $('#role').val()
+                $.ajax({
+                    url: '/admin/change/'+id,
+                    type: 'POST',
+                    data: {
+                        username: username,
+                        fullname: fullname,
+                        gender: gender,
+                        birthdate: birthdate,
+                        email: email,
+                        password: password,
+                        status: status,
+                        phone: phone,
+                        hometown: hometown,
+                        company: company,
+                        location: _location,
+                        role: role
+                    },
+                    success: function(data) {
+                        if (data.data == 'Success') {
+                            alert(data.data)
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+            }
+        })
+    })
+    function userForm(username, fullname, gender, birthdate, email, phone, status, company, hometown, location, role, id, enabled) {
+        $('#username').val(username)
+        $('#fullname').val(fullname)
+        if (gender != '') {
+            $('.gender option[value='+gender+']').attr('selected', 'selected')
+        }
+        $('#birthdate').val(birthdate)
+        $('#email').val(email)
+        $('#phone').val(phone)
+        $('#status').val(status)
+        $('#company').val(company)
+        $('#hometown').val(hometown)
+        $('#location').val(location)
+        Array.from($('#role').children()).forEach(e => {
+            $(e).removeAttr('selected')
+        })
+        if (role.length > 0) {
+            $('#role option[value="'+role[0]+'"]').attr('selected', 'selected')
+        } else {
+            $('#role option[value=""]').attr('selected', 'selected')
+        }
+        if (id != '') {
+            if (enabled) {
+                $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-danger" id="disable-user">Disable</button>')
+            } else {
+                $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-primary" id="enable-user">Enable</button>')
+            }
+            $('.pw').text('Reset Password')
+        } else {
+            $('.btn-container').attr('id', '').html('<button class="btn btn-block btn-success" id="create-user">Create</button>')
+            $('.pw').text('Password')
+        }
+    }
+</script>
+{% endblock %}

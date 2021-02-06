@@ -123,7 +123,13 @@
                                 <td class="color-text">{{ transaction.quantity }}</td>
                                 <td class="color-text">{{ transaction.discount }}</td>
                                 <td class="color-text">{{ transaction.createdOn }}</td>
-                                <td class="color-text">{{ transaction.isComplete }}</td>
+                                <td class="color-text">
+                                    {% if transaction.isComplete %}
+                                        Completed
+                                    {% else %}
+                                        Pending
+                                    {% endif %}
+                                </td>
                                 <td class="color-text"><i class="fa fa-undo undo-transaction" aria-hidden="true"></i></td>
                             </tr>
                         {% endfor %}

@@ -1,0 +1,380 @@
+{% extends 'views/custome.html' %}
+
+{% block style %}
+<style>
+    .role-header {
+        display: flex;
+        align-items: flex-start;
+        padding: 0 10px 0 0;
+        width: 100%;
+        justify-content: start;
+    }
+
+    .role {
+        padding: 3px 15px;
+        border-radius: 7px;
+        margin-right: 10px;
+    }
+
+    .role-btn {
+        padding: 2px 7px;
+        border-radius: 7px;
+    }
+
+    .role.active {
+        background-color: var(--color-menu);
+    }
+
+    .role-title {
+        position: relative;
+        display: flex;
+        width: auto;
+        padding: 3px 13px 3px 0;
+        border-right: 1px solid var(--color-hr);
+    }
+
+    .role-users {
+        width: 100%;
+        height: calc(100% - 56px);
+        padding: 0 20px;
+    }
+
+    .role-inp {
+        width: 100px;
+        height: 23px;
+        border: none !important;
+        outline: none;
+        box-shadow: none;
+
+    }
+
+    .verticle-list {
+        width: 25%;
+        height: 100%;
+        padding-right: 15px;
+        border-right: 1px solid var(--color-hr);
+    }
+
+    .role-container {
+        width: 100%;
+        margin: 10px 0 0 0;
+    }
+
+    .form {
+        display: block;
+    }
+
+    .list-roles {
+        display: flex;
+        align-items: flex-start;
+        justify-content: start;
+        width: 50%;
+        height: 41px;
+    }
+
+    .role-header .item {
+        padding: 3px 5px 3px 10px;
+        border-radius: 7px;
+        margin-left: 10px;
+        background-color: var(--color-menu);
+    }
+
+    .edit-content {
+        margin: 0 5px 0 0 !important;
+    }
+
+    .role-body {
+        display: flex;
+    }
+
+    .container-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .body-right {
+        padding-left: 25px;
+        width: 75%;
+    }
+
+    thead {
+        background-color: var(--color-hr);
+    }
+
+    .select-roles {
+        width: 100%;
+        padding: 5px 10px;
+        border-radius: 7px;
+        outline: none;
+        box-shadow: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+    <div class="flex-between-start">
+        <div class="role-container">
+            <div class="role-header color-text">
+                <div class="role-title">
+                    <span>
+                        <i class="fa fa-caret-right mx-2" aria-hidden="true"></i>
+                    </span>
+                    <h5 class="color-text title-text">List Role</h5>
+                </div>
+                <div class="list-roles">
+                    {% if roles %}
+                    {% for role in roles %}
+                    <div class="flex-between item color-font" id="{{ role.id }}">
+                        <p class="edit-content notranslate" contenteditable="true">{{ role.role }}</p>
+                        <p class="btn-clear notranslate" onclick="return removeRole(this)">+</p>
+                        <p class="checkmark hide notranslate">L</p>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="role-body">
+                <div class="verticle-list">
+                    <form action="/role/add" method="post" class="form pr-3">
+                        {{ form.csrf_token }}
+                        <div class="form-group m-0" id="rle">
+                            {{ form.role(class='form-control input-color', placeholder='Role', autocomplete='off') }}
+                        </div>
+                        <div class="form-group m-0">
+                            {{ form.description(class='form-control input-color', placeholder='Description') }}
+                        </div>
+                        <div class="form-group flex-end m-0">
+                            {{form.submit(class='btn btn-shadow bg-menu color-font')}}
+                        </div>
+                    </form>
+                </div>
+                <div class="body-right">
+                    <table class="table">
+                        <thead>
+                            <tr class="color-font">
+                                <td style="width: 30%;">Username</td>
+                                <td style="width: 20%;">Role</td>
+                                <td style="width: 50%;">Description</td>
+                            </tr>
+                        </thead>
+                        <tbody id="list-user">
+                            {% if users %}
+                            {% for user in users %}
+                            {% if user.roles %}
+                            <tr class="color-text" id="{{ user.id }}">
+                                <td>{{ user.username }}</td>
+                                <td class="role-td">
+                                    <span class="selected-role">{{ user.roles[0].role }}</span>
+                                </td>
+                                <td class="flex-between-center">
+                                    <span>
+                                        {% if user.roles[0].description == '' %}
+                                        ...
+                                        {% else %}
+                                        {{ user.roles[0].description }}
+                                        {% endif %}
+                                    </span>
+                                    <div class="flex-between-center action-btn">
+                                        <i class="fa fa-pencil-square-o" id="" aria-hidden="true"></i>
+                                        <i class="fa fa-trash-o" aria-hidden="true" id=""></i>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                        <div class="loader hide">
+                            <div class="loading"></div>
+                        </div>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.action-btn').on('click', '.fa-pencil-square-o', function() {
+            selectRole(this)
+        })
+
+        $('.action-btn').on('click', '.fa-trash-o', function() {
+            var id = $(this).closest('tr').attr('id')
+            if (confirm('Are you sure you want to remove role from this user?')) {
+                $.ajax({
+                    url: '/role/clear/'+id,
+                    type: 'POST',
+                    success: function(data) {
+                        if (data.data == 'Success') {
+                            $('#'+id).fadeOut('slow', function() {
+                                $(this).remove()
+                            })
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+            }
+        })
+
+        $(document).on('submit', '.form', function () {
+            event.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                dataType: 'json',
+                data: $(this).serialize(),
+                success: function (data) {
+                    if (data['redirect'] == 'Success') {
+                        var element = `<div class="flex-between item color-font" id="` + data['id'] + `">
+                        <p class="notranslate edit-content" contenteditable="true">`+ data['name'] + `</p>
+                        <p class="notranslate btn-clear" onclick="return removeRole(this)">+</p>
+                        <p class="notranslate checkmark hide">L</p>
+                    </div>`
+                        $('.list-roles').append(element)
+                        $('#role').val('')
+                        $('#description').val('')
+                    }
+                    if (data['role'].length > 0) {
+                        for (let index = 0; index < data['role'].length; index++) {
+                            const element = data['role'][index];
+                            $('#role').addClass('invalid')
+                            $('#rle').append('<div title="' + element +
+                                '" class="errors-msg" id="err-rle"><i class="fa fa-exclamation" aria-hidden="true"></i></div>'
+                            )
+                        }
+                        gsap.from('#err-rle', {
+                            opacity: 0,
+                            scale: 0.5,
+                            duration: 1,
+                            ease: 'elastic.out'
+                        })
+                    } else {
+                        $('#role').removeClass('invalid')
+                        $('#err-rle').remove()
+                    }
+                }
+            });
+            return false;
+        })
+
+        $(document).on('click', '.edit-content', function () {
+            var id = $(this).parent().attr('id')
+
+            var old_content = $(this).parent().find('.edit-content').text()
+
+            clear = $('#' + id).find('.btn-clear')
+            check = $('#' + id).find('.checkmark')
+
+            toggleEdit($(check), $(clear))
+
+            var isContented = false
+
+            $(check).on('mousedown', function () {
+                var new_content = $(this).parent().find('.edit-content').text()
+                isContented = true
+                if (new_content != '') {
+                    $.ajax({
+                        url: '/role/update/' + id,
+                        method: 'POST',
+                        data: { data: new_content },
+                        success: function (data) {
+                            if (data.msg == 'Success') {
+                                $('#' + id).find('.edit-content').text(new_content)
+                                toggleEdit($(clear), $(check))
+                            } else {
+                                alert(data.msg)
+                            }
+                        }
+                    })
+                } else {
+                    alert('Please fill the text')
+                    $('#' + id).find('.edit-content').text(old_content)
+                }
+            })
+
+            $(this).on('focusout', function () {
+                if (!isContented) {
+                    $('#' + id).find('.edit-content').text(old_content)
+                }
+                toggleEdit($(clear), $(check))
+
+            })
+            event.stopPropagation()
+        })
+    })
+
+    function selectRole(arg) {
+        var role = $(arg).closest('tr').find('.selected-role').text()
+        $.ajax({
+            url: '/role',
+            type: 'POST',
+            success: function(data) {
+                var element = '<select class="select-roles input-color">'
+                data.forEach(r => {
+                    if (r.role == role) {
+                        element += '<option selected class="is-selected" value="'+r.id+'">'+r.role+'</option>'
+                    } else {
+                        element += '<option value="'+r.id+'">'+r.role+'</option>'
+                    }
+                });
+                element += '</select>'
+                $(arg).closest('tr').find('.role-td').html(element)
+                $(arg).closest('tr').find('.action-btn').html('<span class="btn-cancel pointer" onclick="return cancel(this)"><ion-icon name="close-outline"></ion-icon></span><span class="pointer" onclick="return submit(this)"><ion-icon name="checkmark-outline"></ion-icon></span>')
+            }
+        })
+    }
+
+    function cancel(arg) {
+        var role = $(arg).closest('tr').find('.is-selected').text()
+        var id = $(arg).closest('tr').find('.is-selected').val()
+        $(arg).closest('tr').find('.role-td').html('<span class="selected-role">'+role+'</span>')
+        $(arg).closest('tr').find('.action-btn').html('<i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i>')
+    }
+
+    function submit(arg) {
+        var id = $(arg).closest('tr').find('.select-roles').val()
+        var user = $(arg).closest('tr').attr('id')
+        $.ajax({
+            url: '/role/change/'+id,
+            type: 'POST',
+            data: {'data': user},
+            success: function(data) {
+                if (data.data == 'Success') {
+                    $(arg).closest('tr').find('.role-td').html('<span class="selected-role">'+data.role+'</span>')
+                    $(arg).closest('tr').find('.action-btn').html('<i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i>')
+                } else {
+                    alert(data.data)
+                }
+            }
+        })
+    }
+
+    function removeRole(arg) {
+        event.stopPropagation()
+        var id = $(arg).parent().attr('id')
+        if (confirm('Are you sure you want to delete this role?')) {
+            $.ajax({
+                url: '/role/remove/' + id,
+                method: 'POST',
+                success: function (data) {
+                    if (data['msg'] == 'Success') {
+                        $('#' + id).fadeOut('slow', function () {
+                            $(this).remove()
+                        })
+                    }
+                }
+            })
+        } else {
+            return
+        }
+    }
+</script>
+{% endblock %}

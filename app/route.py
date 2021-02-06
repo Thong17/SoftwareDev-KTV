@@ -1,7 +1,7 @@
 from app import app, bcrypt, db, login_manager, c, upload, delete_photo, utc2local
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity
-from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole
+from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -37,19 +37,22 @@ def login():
             password = request.form['password']
             try:
                 user = tblUser.query.filter_by(username=username).first()
-                while user is not None:
-                    isMatch = bcrypt.check_password_hash(
-                        user.password, password)
-                    if isMatch is True:
-                        Activity = tblActivity(id=str(uuid4()), activity=user.username+' has logged in', type='Login', createdBy=user.id)
-                        db.session.add(Activity)
-                        db.session.commit()
-                        login_user(user)
-                        msg['redirect'] = '/'
+                if user.isConfirm:
+                    while user is not None:
+                        isMatch = bcrypt.check_password_hash(
+                            user.password, password)
+                        if isMatch is True:
+                            Activity = tblActivity(id=str(uuid4()), activity=user.username+' has logged in', type='Login', createdBy=user.id)
+                            db.session.add(Activity)
+                            db.session.commit()
+                            login_user(user)
+                            msg['redirect'] = '/'
+                            return jsonify(msg)
+                        msg['password'].append('Password does not match')
                         return jsonify(msg)
-                    msg['password'].append('Password does not match')
-                    return jsonify(msg)
-                msg['username'].append('Username does not exist')
+                    msg['username'].append('Username does not exist')
+                else:
+                    msg['username'].append('User may have been disabled! Contact your admin for more details')
                 return jsonify(msg)
             except:
                 msg['username'].append('Connection is not available')
@@ -1661,5 +1664,181 @@ def product_favorite(id):
     product.listFavorite = json.dumps(listFavorite)
     db.session.commit()
     return jsonify({'msg': 'Success', 'data': isSaved})
+
+@app.route('/role')
+@login_required
+def role():
+    form = RoleForm() 
+    roles = tblRole.query.all()
+    users = tblUser.query.all()
+    return render_template('views/role.html', roles=roles, form=form, users=users)
+
+@app.route('/role', methods=['POST'])
+def get_roles():
+    roles = tblRole.query.all()
+    r = RoleSchema(many=True)
+    Roles = r.dump(roles)
+    return jsonify(Roles)
+
+@app.route('/role/add', methods=['POST'])
+def add_role():
+    msg = {
+            'role': [],
+            'redirect': '',
+            'name': '',
+            'id': '',
+        }
+    role = request.form['role']
+    description = request.form['description']
+    id = str(uuid4())
+    Modal = tblRole(id=id, role=role,
+                        description=description, createdBy=current_user.id)
+    msg['name'] = role
+    msg['id'] = id
+    try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added role: '+role+' in category', type='Add', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.add(Modal)
+        db.session.commit()
+        msg['redirect'] = 'Success'
+        return jsonify(msg)
+    except:
+        return 'Failed'
+    for fieldName, errorMessages in form.errors.items():
+        for err in errorMessages:
+            msg[fieldName].append(err)
+    return jsonify(msg)
+
+@app.route('/role/change/<id>', methods=['POST'])
+def change_role(id):
+    role = tblRole.query.get(id)
+    user = tblUser.query.get(request.form['data'])
+    user.roles.clear()
+    user.roles.append(role)
+    try:
+        db.session.commit()
+        return jsonify({'data': 'Success', 'role': role.role})
+    except:
+        return jsonify({'data': 'Faild'})
+
+@app.route('/role/update/<id>', methods=['POST'])
+def update_role(id):
+    Role = tblRole.query.get(id)
+    old = Role.role
+    data = request.form['data']
+    Role.role = data
+    try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified theme from '+old, type='Modify', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Faild'})
+    
+@app.route('/role/remove/<id>', methods=['POST'])
+@login_required
+def remove_role(id):
+    try:
+        role = tblRole.query.get(id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted role: '+role.role+' in role', type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.delete(role)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Role cannot be deleted. Contact our support team for more details'})
+
+@app.route('/role/clear/<id>', methods=['POST'])
+@login_required
+def clear_role(id):
+    user = tblUser.query.get(id)
+    user.roles.clear()
+    try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has cleared role from user:' + user.username, type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Faild'})
+
+@app.route('/admin')
+@login_required
+def admin():
+    users = tblUser.query.all()
+    roles = tblRole.query.all()
+    return render_template('views/admin.html', users=users, roles=roles)
+
+@app.route('/admin/<id>', methods=['POST'])
+def get_admin(id):
+    User = tblUser.query.get(id)
+    json = UserSchema()
+    user = json.dump(User)
+    return jsonify(user)
+
+@app.route('/admin/create', methods=['POST'])
+def create_admin():
+    username = request.form['username']
+    fullname = request.form['fullname']
+    gender = request.form['gender']
+    email = request.form['email']
+    phone = request.form['phone']
+    hometown = request.form['hometown']
+    company = request.form['company']
+    location = request.form['location']
+    status = request.form['status']
+    password = request.form['password']
+    role = request.form['role']
+    if request.form['birthdate'] != '':
+        birthdate = datetime.strptime(request.form['birthdate'], '%m/%d/%y')
+    else:
+        birthdate = None
+    user_id = str(uuid4())
+    User = tblUser(id=user_id, username=username, firstname=fullname.split(' ')[0], lastname=fullname.split(' ')[1], gender=gender, email=email, birthdate=birthdate, password=bcrypt.generate_password_hash(password).decode('utf-8'), publicId=str(uuid4()))
+    try: 
+        db.session.add(User)
+        db.session.commit()
+        if role != '':
+            Role = tblRole.query.get(role)
+            User.roles.append(Role)
+        Profile = tblProfile(id=str(uuid4()), phone=phone, status=status, company=company, location=location, hometown=hometown, createdBy=user_id)
+        db.session.add(Profile)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has created user: '+User.username, type='Created', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Faild'})
+
+@app.route('/admin/change/<id>', methods=['POST'])
+def change_admin(id):
+    user = tblUser.query.get(id)
+    user.username = request.form['username']
+    user.firstname = request.form['fullname'].split(' ')[0]
+    user.lastname = request.form['fullname'].split(' ')[1]
+    user.gender = request.form['gender']
+    if request.form['birthdate'] != '':
+        user.birthdate = datetime.strptime(request.form['birthdate'], '%Y-%m-%d')
+
+    user.email = request.form['email']
+    user.profile[0].status = request.form['status']
+    user.profile[0].phone = request.form['phone']
+    user.profile[0].hometown = request.form['hometown']
+    user.profile[0].company = request.form['company']
+    user.profile[0].location = request.form['location']
+    if request.form['role'] != '':
+        if user.roles:
+            user.roles[0] = tblRole.query.get(request.form['role'])
+        else:
+            user.roles.append(tblRole.query.get(request.form['role']))
+
+    if request.form['password'] != '':
+        user.password = bcrypt.generate_password_hash(request.form['password']).decode('utf-8')
+    try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified user: '+user.username, type='Modify', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Faild'})
 
 
