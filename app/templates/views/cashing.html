@@ -873,6 +873,7 @@
 
     $(document).on('submit', '#orderForm', function () {
         event.preventDefault()
+        var price = $('#input-price').val()
         var discount = $('#input-discount').val()
         var quantity = $('#input-quantity').val()
         var id = $('#input-product').val()
@@ -893,6 +894,7 @@
 
             orderList.discount = discount
             orderList.quantity = quantity
+            orderList.price = price
 
             var jsonObj = JSON.stringify(orderList)
 
@@ -906,7 +908,6 @@
                 dataType: 'json',
                 success: function (data) {
                     if (data.result == 'success') {
-                        console.log(orderLists)
                         $('.order-btn').attr('data-change', true)
                         $('#list-orders tr:last').before(showOrder(data.data.id, details, data.data.price, data.data.discount, data.data.quantity, data.data.amount, orderList.orderId, orderList.productId))
                         $('.order-form').empty()
@@ -919,7 +920,6 @@
                             $('#' + orderList.productId).find('.stock-tag').text(data.data.stock)
                         }
                         var total = accounting.unformat($('#sumTotal').text())
-                        console.log(total, data.data.amount)
                         total += data.data.amount
                         $('#sumTotal').text(accounting.formatMoney(total))
 
@@ -948,6 +948,7 @@
             'colorId': '',
             'discount': 0,
             'quantity': 0,
+            'price': 0,
             'productId': '',
             'values': []
         }
@@ -1044,6 +1045,19 @@
 
     })
 
+    $(document).on('input', '#input-price', function () {
+        if ($(this).val() < 0) {
+            $(this).val(0)
+        }
+
+        var discount = $(this).closest('tr').find('#input-discount').val()
+        var quantity = $(this).closest('tr').find('#input-quantity').val()
+        var price = $(this).val()
+        var total = (price - (price * discount / 100)) * quantity
+        $('#calculated-result').text(accounting.formatMoney(total))
+
+    })
+
     $(document).on('keypress', '#input-discount', function (e) {
         if (e.which == 13) {
             $('#input-quantity').focus()
@@ -1121,7 +1135,7 @@
             <td><input type="text" class="form-empty color-text input-color" title="`+ details + `" id="input-details" value="` + details + `"
                     placeholder="Details" disabled></td>
             <td><input type="number" class="form-empty color-text input-color" id="input-price" value="`+ cost + `"
-                    placeholder="Price" disabled></td>
+                    placeholder="Price"></td>
             <td><input min="1" max="100" type="number" class="form-empty color-text input-color" id="input-discount" value="`+ discount + `"
                     placeholder="Disc"></td>
             <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
@@ -1625,13 +1639,16 @@
             type: 'POST',
             success: function (data) {
                 if (data.result == 'Success') {
-                    console.log(data)
+                    
                     $('.order-btn').attr('data-change', true)
                     var quantity = $('#' + pid).find('.stock-tag').text()
+                    if (quantity == 'Out of stock') {
+                        quantity = 0
+                    }
                     var order = $('.sum-order').text()
                     var sum_o = parseFloat(order) - data.quantity
                     $('.sum-order').text(sum_o)
-                    var sum_q = parseFloat(quantity) + data.quantity
+                    var sum_q = parseInt(quantity) + data.quantity
                     $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
                     $('#sumTotal').text(accounting.formatMoney(total - amount))
                     orderLists.forEach((o, i) => {

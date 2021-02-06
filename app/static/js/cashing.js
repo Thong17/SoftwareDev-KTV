@@ -54,9 +54,10 @@ $(document).on('click', '.order-btn', function() {
         
                             data.data.transactions.forEach(t => {
                                 var price_before = parseFloat(t.amount) / (1 - (parseFloat(t.discount) / 100))
+                                console.log(price_before)
                                 invoice_item += `<tr id="`+t.id+`">
                                                         <td>`+t.description+`</td>
-                                                        <td style="text-align: center">`+Math.round(price_before, 2)+`</td>
+                                                        <td style="text-align: center">`+price_before+`</td>
                                                         <td style="text-align: center">`+t.discount+`</td>
                                                         <td style="text-align: center">`+t.quantity+`</td>
                                                         <td style="text-align: center">`+t.amount * t.quantity+`</td>
@@ -117,7 +118,7 @@ $(document).on('click', '.order-btn', function() {
                             var price_before = parseFloat(t.price) / (1 - (parseFloat(t.discount) / 100))
                             invoice_item += `<tr id="`+t.id+`">
                                                     <td>`+t.description+`</td>
-                                                    <td style="text-align: center">`+Math.round(price_before, 2)+`</td>
+                                                    <td style="text-align: center">`+price_before+`</td>
                                                     <td style="text-align: center">`+t.discount+`</td>
                                                     <td style="text-align: center">`+t.quantity+`</td>
                                                     <td style="text-align: center">`+t.price * t.quantity+`</td>

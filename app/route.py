@@ -649,8 +649,7 @@ def remove_product(id):
 @app.route('/value/save/<id>', methods=['POST'])
 def save_value(id):
     value = tblValue.query.get(id)
-    Product = tblProduct.query.with_entities(tblProduct.product).get(value.productId)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified value from '+value.value+'/'+value.price+'/'+value.currency+'/'+value.description+' in product: '+Product.product, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified value from '+value.value+'/'+str(value.price)+'/'+value.currency+'/'+value.description+' in product: '+value.productId, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
     value.value = request.form['value']
     value.price = request.form['price']
@@ -936,17 +935,18 @@ def order(id):
         data['discount'] = 0
 
     discount = Decimal(data['discount'])
+    price = Decimal(data['price'])
     quantity = Decimal(data['quantity'])
 
-    price = product.price
+    # Check
+
+    amount = price * (1 - discount / 100)
+    pprice = price * (1 - discount / 100)
 
     for v in data['values']:
         value = tblValue.query.get(v['valueId'])
-        price += value.price 
+        pprice -= value.price
         description += '-'+value.value
-
-    amount = price * (1 - discount / 100)
-    pprice = product.price * (1 - discount / 100)
 
     tid = str(uuid4())
     transaction = tblTransaction(id=tid, discount=discount, price=pprice, amount=amount, description=description, createdBy=current_user.id)
