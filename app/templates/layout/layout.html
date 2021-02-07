@@ -107,7 +107,7 @@
                     <h5 class="mb-2 color-font notranslate">{{ current_user.username }}</h5>
 
                     <div class="form-group" id="pwd">
-                        <form id="authenticateForm" action="{{ url_for('authenticate') }}" style="width: 100%;">
+                        <form id="authenticateForm" action="{{ url_for('route.authenticate') }}" style="width: 100%;">
                             <input type="hidden" value="{{ current_user.id }}">
                             <input type="password" id="userPassword"
                                 class="form-control input-color input-modal" required>

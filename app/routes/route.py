@@ -1,8 +1,8 @@
-from app import app, bcrypt, db, login_manager, c, upload, delete_photo, utc2local
+from app import bcrypt, db, login_manager, upload, delete_photo, utc2local
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema
-from flask import render_template, redirect, request, jsonify
+from flask import render_template, redirect, request, jsonify, Blueprint
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
 import json, simplejson, operator
@@ -11,19 +11,19 @@ from sqlalchemy import func
 from decimal import Decimal
 from functools import wraps
 
+route = Blueprint('route', __name__)
 
 @login_manager.user_loader
 def load_user(id):
     return tblUser.query.get(id)
 
-
-@app.route('/')
+@route.route('/')
 @login_required
 def index():
     return render_template('views/index.html')
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@route.route('/login', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
     if request.method == 'POST':
@@ -64,7 +64,7 @@ def login():
     return render_template('views/login.html', form=form)
 
 
-@app.route('/register', methods=['POST', 'GET'])
+@route.route('/register', methods=['POST', 'GET'])
 def register():
     form = RegisterForm()
     if request.method == 'POST':
@@ -104,12 +104,12 @@ def register():
                 return 'Register failed'
     return render_template('views/register.html', form=form)
 
-@app.route('/logout', methods=['POST'])
+@route.route('/logout', methods=['POST'])
 def logout():
     logout_user()
     return redirect('/login')
 
-@app.route('/user/save/<id>', methods=['POST'])
+@route.route('/user/save/<id>', methods=['POST'])
 def save_user(id):
     user = tblUser.query.get(id)
     username = request.form['username']
@@ -138,7 +138,7 @@ def save_user(id):
 
     return jsonify({'result': 'Success'})
 
-@app.route('/profile')
+@route.route('/profile')
 @login_required
 def profile():
     form = ProfileForm()
@@ -151,7 +151,7 @@ def profile():
         db.session.commit()
     return render_template('views/profile.html', form=form, profile=profile)
 
-@app.route('/profile/save/<id>', methods=['POST'])
+@route.route('/profile/save/<id>', methods=['POST'])
 def save_profile(id):
     form = ProfileForm()
     profile = tblProfile.query.get(id)
@@ -181,7 +181,7 @@ def save_profile(id):
 
     return render_template('views/profile.html', form=form)
 
-@app.route('/profile/photo/<id>', methods=['POST'])
+@route.route('/profile/photo/<id>', methods=['POST'])
 def save_photo(id):
     Profile = tblProfile.query.get(id)
     if Profile.photo != 'default.png':
@@ -205,13 +205,13 @@ def save_photo(id):
     return jsonify(jsons)
 
     
-@app.route('/setting')
+@route.route('/setting')
 @login_required
 def setting():
     return render_template('views/setting.html')
 
 
-@app.route('/custome', methods=['POST', 'GET'])
+@route.route('/custome', methods=['POST', 'GET'])
 @login_required
 def custome():
     if request.method == 'POST':
@@ -231,7 +231,7 @@ def custome():
     return render_template('views/custome.html')
 
 
-@app.route('/category', methods=['POST', 'GET'])
+@route.route('/category', methods=['POST', 'GET'])
 @login_required
 def categories():
     form = CategoryForm()
@@ -279,7 +279,7 @@ def categories():
     return render_template('views/category.html', form=form, categories=categories, today=today, total=total)
 
 
-@app.route('/category/<id>', methods=['POST'])
+@route.route('/category/<id>', methods=['POST'])
 def category(id):
     if request.form['data']:
         id = request.form['data']
@@ -289,7 +289,7 @@ def category(id):
     return jsonify(result)
 
 
-@app.route('/category/property', methods=['POST'])
+@route.route('/category/property', methods=['POST'])
 @login_required
 def add_property():
     categoryId = request.form['categoryId']
@@ -308,7 +308,7 @@ def add_property():
     db.session.commit()
     return jsonify({'id': id, 'property': _property, 'type': _type, 'description': description, 'msg': ''})
 
-@app.route('/property/remove/<id>', methods=['POST'])
+@route.route('/property/remove/<id>', methods=['POST'])
 @login_required
 def remove_property(id):
     if request.form['data']:
@@ -324,7 +324,7 @@ def remove_property(id):
         except:
             return 'Failded'
 
-@app.route('/property/update/<id>', methods=['POST'])
+@route.route('/property/update/<id>', methods=['POST'])
 def update_property(id):
     _property = tblProperty.query.get(id)
 
@@ -345,7 +345,7 @@ def update_property(id):
     except:
         return jsonify({'msg': 'Failed'})
 
-@app.route('/category/remove/<id>', methods=['POST'])
+@route.route('/category/remove/<id>', methods=['POST'])
 def remove_category(id):
     category = tblCategory.query.get(id)
     try: 
@@ -362,7 +362,7 @@ def remove_category(id):
     except:
         return jsonify({'msg': 'Failed'})
 
-@app.route('/category/update/<id>', methods=['POST'])
+@route.route('/category/update/<id>', methods=['POST'])
 def udpate_category(id):
     category = tblCategory.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified category from '+category.category, type='Modify', createdBy=current_user.id)
@@ -374,7 +374,7 @@ def udpate_category(id):
     except: 
         return jsonify({'msg': 'Failed'})
 
-@app.route('/brand', methods=['POST', 'GET'])
+@route.route('/brand', methods=['POST', 'GET'])
 @login_required
 def brands():
     brands = tblBrand.query.all()
@@ -409,7 +409,7 @@ def brands():
         return jsonify(msg)
     return render_template('views/product.html', brands=brands, form=form, categories=categories)
 
-@app.route('/brand/remove/<id>', methods=['POST'])
+@route.route('/brand/remove/<id>', methods=['POST'])
 def remove_brand(id):
     brand = tblBrand.query.get(id)
     try: 
@@ -421,7 +421,7 @@ def remove_brand(id):
     except:
         return jsonify({'msg': 'Failed'})
 
-@app.route('/brand/update/<id>', methods=['POST'])
+@route.route('/brand/update/<id>', methods=['POST'])
 def udpate_brand(id):
     brand = tblBrand.query.get(id)
     try:
@@ -433,7 +433,7 @@ def udpate_brand(id):
     except: 
         return jsonify({'msg': 'Failed'})
 
-@app.route('/theme/change', methods=['POST'])
+@route.route('/theme/change', methods=['POST'])
 @login_required
 def theme():
     theme = request.form['data']
@@ -444,7 +444,7 @@ def theme():
     db.session.commit()
     return jsonify({'theme': theme})
 
-@app.route('/product/add', methods=['POST'])
+@route.route('/product/add', methods=['POST'])
 def add_product():
     product = request.form['product']
     barcode = request.form['barcode']
@@ -477,7 +477,7 @@ def add_product():
     return jsonify({'data': 'Success', 'id': id})
 
 
-@app.route('/product', methods=['POST'])
+@route.route('/product', methods=['POST'])
 @login_required
 def products():
     id = request.form['data']
@@ -500,7 +500,7 @@ def products():
         products.append(product)
     return jsonify(products)
 
-@app.route('/product/photo/<id>', methods=['POST'])
+@route.route('/product/photo/<id>', methods=['POST'])
 def product_photo(id):
     alt = request.form['name']
     Product = tblProduct.query.get(id)
@@ -525,7 +525,7 @@ def product_photo(id):
         jsons.append(json)
     return jsonify(jsons)
 
-@app.route('/product/color/<id>', methods=['POST'])
+@route.route('/product/color/<id>', methods=['POST'])
 def upload_color(id):
     hex = request.form['hex']
     color = request.form['color']
@@ -538,7 +538,7 @@ def upload_color(id):
 
     return jsonify({'id': cid, 'hex': hex, 'color': color})
 
-@app.route('/color/photo/<id>', methods=['POST'])
+@route.route('/color/photo/<id>', methods=['POST'])
 def color_photo(id):
     cid = request.form['color']
     alt = request.form['name']
@@ -561,7 +561,7 @@ def color_photo(id):
     result = json.dump(color)
     return jsonify(result)
 
-@app.route('/product/<id>', methods=['POST', 'GET'])
+@route.route('/product/<id>', methods=['POST', 'GET'])
 @login_required
 def product(id):
     product = tblProduct.query.get(id)
@@ -574,7 +574,7 @@ def product(id):
         return jsonify(result)
     return render_template('views/product_details.html', product=product)
 
-@app.route('/value/add', methods=['POST'])
+@route.route('/value/add', methods=['POST'])
 def add_value():
     product_id = request.form['product']
     property_id = request.form['property']
@@ -592,7 +592,7 @@ def add_value():
     db.session.commit()
     return jsonify({'id': id, 'value': value, 'price': price, 'currency': currency, 'description': description, 'property': property_id})
 
-@app.route('/product/save/<id>', methods=['POST'])
+@route.route('/product/save/<id>', methods=['POST'])
 def save_product(id):
     Product = tblProduct.query.get(id)
 
@@ -632,7 +632,7 @@ def save_product(id):
     db.session.commit()
     return jsonify({'data': 'success'})
 
-@app.route('/product/remove/<id>', methods=['POST'])
+@route.route('/product/remove/<id>', methods=['POST'])
 def remove_product(id):
     product = tblProduct.query.get(id)
     if product.colors:
@@ -646,7 +646,7 @@ def remove_product(id):
     db.session.commit()
     return jsonify({'result': 'Success'})
 
-@app.route('/value/save/<id>', methods=['POST'])
+@route.route('/value/save/<id>', methods=['POST'])
 def save_value(id):
     value = tblValue.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified value from '+value.value+'/'+str(value.price)+'/'+value.currency+'/'+value.description+' in product: '+value.productId, type='Modify', createdBy=current_user.id)
@@ -661,7 +661,7 @@ def save_value(id):
     except:
         return jsonify({'resutl': 'failed'})
 
-@app.route('/value/remove/<id>', methods=['POST'])
+@route.route('/value/remove/<id>', methods=['POST'])
 def remove_value(id):
     value = tblValue.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted value: '+value.value+' in product', type='Delete', createdBy=current_user.id)
@@ -670,14 +670,14 @@ def remove_value(id):
     db.session.commit()
     return jsonify({'result': 'Success'})
 
-@app.route('/color/<id>', methods=['POST'])
+@route.route('/color/<id>', methods=['POST'])
 def get_color(id):
     color = tblColor.query.get(id)
     json = ColorSchema()
     result = json.dump(color)
     return jsonify(result)
 
-@app.route('/color/save/<id>', methods=['POST'])
+@route.route('/color/save/<id>', methods=['POST'])
 def save_color(id):
     color = tblColor.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified color from '+color.color+'/'+color.hex+' in product', type='Modify', createdBy=current_user.id)
@@ -687,7 +687,7 @@ def save_color(id):
     db.session.commit()
     return jsonify({'color': color.color, 'hex': color.hex})
 
-@app.route('/color/remove/<id>', methods=['POST'])
+@route.route('/color/remove/<id>', methods=['POST'])
 def remove_color(id):
     color = tblColor.query.get(id)
     if color.colorsOfProduct.stocks:
@@ -706,7 +706,7 @@ def remove_color(id):
     except:
         return jsonify({'result': 'Failed'})
 
-@app.route('/property/<id>', methods=['POST'])
+@route.route('/property/<id>', methods=['POST'])
 def _property(id):
     category = tblCategory.query.get(id)
     c = CategorySchema()
@@ -721,7 +721,7 @@ def _property(id):
     
     return jsonify({'property': result_property, 'product': result_product})
 
-@app.route('/stock')
+@route.route('/stock')
 @login_required
 def stocks():
     products = tblProduct.query.all()
@@ -729,7 +729,7 @@ def stocks():
     categories = tblCategory.query.all()
     return render_template('views/stock.html', products=products, brands=brands, categories=categories)
 
-@app.route('/stock/product/<id>')
+@route.route('/stock/product/<id>')
 @login_required
 def stock(id):
     product = tblProduct.query.get(id)
@@ -761,7 +761,7 @@ def stock(id):
 
     return render_template('views/product_stock.html', product=product, total_stock=total_stock, total_cost=total_cost, stocks=stocks)
 
-@app.route('/stock/add', methods=['POST'])
+@route.route('/stock/add', methods=['POST'])
 def add_stock():
     color = request.form['color']
     cost = request.form['cost']
@@ -800,7 +800,7 @@ def add_stock():
         return jsonify({'data': 'failed'})
 
 
-@app.route('/stock/delete/<id>', methods=['POST'])
+@route.route('/stock/delete/<id>', methods=['POST'])
 def delete_stock(id):
     stock = tblStock.query.get(id)
     outcome = tblOutcome.query.get(id)
@@ -826,7 +826,7 @@ def delete_stock(id):
     except:
         return jsonify({'data': 'failed'}) 
     
-@app.route('/stock/save/<id>', methods=['POST'])
+@route.route('/stock/save/<id>', methods=['POST'])
 def save_stock(id):
     stock = tblStock.query.get(id)
     outcome = tblOutcome.query.get(id)
@@ -869,8 +869,8 @@ def save_stock(id):
     except:
         return jsonify({'data': 'failed'})
 
-@app.route('/financial', defaults={'arg': None})
-@app.route('/financial/<arg>')
+@route.route('/financial', defaults={'arg': None})
+@route.route('/financial/<arg>')
 @login_required
 def financial(arg):
     if arg is not None:
@@ -879,7 +879,7 @@ def financial(arg):
         return render_template('views/financial.html', authentication='')
 
 
-@app.route('/authenticate', methods=['POST'])
+@route.route('/authenticate', methods=['POST'])
 @login_required
 def authenticate():
     msg = {
@@ -905,7 +905,7 @@ def authenticate():
         msg['password'].append('Connection is not available')
         return jsonify(msg)
 
-@app.route('/cashing/<token>')
+@route.route('/cashing/<token>')
 @login_required
 def cashing(token):
     if token == current_user.token:   
@@ -916,7 +916,7 @@ def cashing(token):
     else:
         return redirect('/financial/authentication')
 
-@app.route('/order/product/<id>', methods=['POST'])
+@route.route('/order/product/<id>', methods=['POST'])
 def order(id):
     product = tblProduct.query.get(id)
     data = json.loads(request.form['data'])
@@ -1004,7 +1004,7 @@ def order(id):
         resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity, 'price': price, 'isStock': False, 'discount': discount}
     return jsonify(resultObj)
 
-@app.route('/drawer/create', methods=['POST'])
+@route.route('/drawer/create', methods=['POST'])
 def create_drawer():
     data = json.loads(request.form['data'])
     id = str(uuid4())
@@ -1032,7 +1032,7 @@ def create_drawer():
     startedOn = Drawer.startedOn.strftime("%b %d %Y %H:%M:%S")
     return jsonify({'data': 'Success', 'startedOn': startedOn, 'id':id})
 
-@app.route('/drawer/end/<id>', methods=['POST'])
+@route.route('/drawer/end/<id>', methods=['POST'])
 def end_drawer(id):
     Drawer = tblDrawer.query.get(id)
     Drawer.endedOn = datetime.utcnow()
@@ -1042,7 +1042,7 @@ def end_drawer(id):
     db.session.commit()
     return jsonify({'data': 'Success'})
 
-@app.route('/drawer/<id>', methods=['POST'])
+@route.route('/drawer/<id>', methods=['POST'])
 def get_drawer(id):
     try:
         Drawer = tblDrawer.query.get(id)
@@ -1058,7 +1058,7 @@ def get_drawer(id):
     except:
         return jsonify({'data': []})
 
-@app.route('/payment', methods=['POST'])
+@route.route('/payment', methods=['POST'])
 def payment():
     Payments = tblPayment.query.with_entities(tblPayment.id).all()
     Drawer = tblDrawer.query.get(current_user.drawer)
@@ -1084,7 +1084,7 @@ def payment():
     else:
         return jsonify({'result': 'No transaction added'})
 
-@app.route('/payment/<id>', methods=['POST'])
+@route.route('/payment/<id>', methods=['POST'])
 def get_payment(id):
     Drawer = tblDrawer.query.get(current_user.drawer)
     Payment = tblPayment.query.get(id)
@@ -1109,7 +1109,7 @@ def get_payment(id):
     payment = p.dump(Payment)
     return jsonify({'data': payment, 'rate': Drawer.rate})
 
-@app.route('/transaction/delete/<id>', methods=['POST'])
+@route.route('/transaction/delete/<id>', methods=['POST'])
 def delete_transaction(id):
     Transaction = tblTransaction.query.get(id)
     pid = request.form['data']
@@ -1129,7 +1129,7 @@ def delete_transaction(id):
     #     return jsonify({'result': 'Transaction could not found'})
 
 
-@app.route('/checkout/<id>', methods=['POST'])
+@route.route('/checkout/<id>', methods=['POST'])
 def checkout(id):
     payment = tblPayment.query.get(id)
     drawer = tblDrawer.query.get(current_user.drawer)
@@ -1180,13 +1180,13 @@ def checkout(id):
     else:
         return jsonify({'result': 'Not enough money'})
 
-@app.route('/transaction')
+@route.route('/transaction')
 def transaction():
     Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
     Payments = tblPayment.query.order_by(tblPayment.invoice).all()
     return render_template('views/transaction.html', transactions=Transactions, payments=Payments)
 
-@app.route('/transaction/reverse', methods=['POST'])
+@route.route('/transaction/reverse', methods=['POST'])
 def undo_transaction():
     id = request.form['id']
     transaction = tblTransaction.query.get(id)
@@ -1204,16 +1204,16 @@ def undo_transaction():
     except:
         return jsonify({'data': 'Could not find the selected transaction'})
     
-@app.route('/invoice/search', methods=['POST'])
+@route.route('/invoice/search', methods=['POST'])
 def search_invoice():
     input = request.form['data']
     return jsonify({'data': 'Success'})
 
-@app.route('/report')
+@route.route('/report')
 def report():
     return render_template('views/report.html')
 
-@app.route('/income', methods=['POST'])
+@route.route('/income', methods=['POST'])
 def income():
     Transactions = None
     f = request.form['filter']
@@ -1259,7 +1259,7 @@ def income():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
-@app.route('/outcome', methods=['POST'])
+@route.route('/outcome', methods=['POST'])
 def outcome():
     Outcome = None
     f = request.form['filter']
@@ -1305,7 +1305,7 @@ def outcome():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
-@app.route('/profit', methods=['POST'])
+@route.route('/profit', methods=['POST'])
 def profit():
     Transactions = None
     f = request.form['filter']
@@ -1351,7 +1351,7 @@ def profit():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
-@app.route('/sale', methods=['POST'])
+@route.route('/sale', methods=['POST'])
 def sale():
     Transactions = None
     f = request.form['filter']
@@ -1394,7 +1394,7 @@ def sale():
 
 
 
-@app.route('/product_report', methods=['POST'])
+@route.route('/product_report', methods=['POST'])
 def product_report():
     Transactions = None
     f = request.form['filter']
@@ -1434,7 +1434,7 @@ def product_report():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
-@app.route('/quantity_report', methods=['POST'])
+@route.route('/quantity_report', methods=['POST'])
 def quantity_report():
     Transactions = None
     f = request.form['filter']
@@ -1475,18 +1475,18 @@ def quantity_report():
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 
-@app.route('/financial_report')
+@route.route('/financial_report')
 @login_required
 def financial_report():
     return render_template('views/financial_report.html')
 
-@app.route('/account')
+@route.route('/account')
 @login_required
 def account():
     users = tblUser.query.all()
     return render_template('views/account_report.html', users=users)
 
-@app.route('/account/report', methods=['POST'])
+@route.route('/account/report', methods=['POST'])
 @login_required
 def account_report():
     activities = tblActivity.query.order_by(tblActivity.createdOn.desc()).all()
@@ -1504,11 +1504,11 @@ def account_report():
 
     return jsonify(result)
 
-@app.route('/sale_report')
+@route.route('/sale_report')
 def sale_report():
     return render_template('views/sale_report.html')
 
-@app.route('/financial', methods=['POST'])
+@route.route('/financial', methods=['POST'])
 def get_financial():
     transactions = tblTransaction.query.all()
     payments = tblPayment.query.all()
@@ -1538,13 +1538,13 @@ def get_financial():
                 transactionObj['pending'].append(transaction.id)
     return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj})
 
-@app.route('/advertise')
+@route.route('/advertise')
 @login_required
 def advertise():
     Advertises = tblAdvertise.query.all()
     return render_template('views/advertise.html', advertises=Advertises)
 
-@app.route('/advertise/photo/<id>', methods=['POST'])
+@route.route('/advertise/photo/<id>', methods=['POST'])
 def add_advertise(id):
     isMain = False
     if id == 'main':
@@ -1571,7 +1571,7 @@ def add_advertise(id):
     db.session.commit()
     return jsonify(jsons)
 
-@app.route('/advertise/delete/<id>', methods=['POST'])
+@route.route('/advertise/delete/<id>', methods=['POST'])
 def delete_advertise(id):
     Advertise = tblAdvertise.query.get(id)
     try:
@@ -1583,7 +1583,7 @@ def delete_advertise(id):
     except:
         return jsonify({'data': 'Failed'})
 
-@app.route('/home')
+@route.route('/home')
 @login_required
 def home():
     categories = tblCategory.query.all()
@@ -1591,17 +1591,17 @@ def home():
     products = tblProduct.query.all()
     return render_template('views/home.html', categories=categories, brands=brands, products=products)
 
-@app.route('/about')
+@route.route('/about')
 @login_required
 def about():
     return render_template('views/about.html')
 
-@app.route('/contact')
+@route.route('/contact')
 @login_required
 def contact():
     return render_template('views/contact.html')
 
-@app.route('/activity')
+@route.route('/activity')
 @login_required
 def activity():
     Activities = tblActivity.query.order_by(tblActivity.createdOn.desc()).all()
@@ -1622,7 +1622,7 @@ def activity():
 
     return render_template('views/activity.html', activities=activities)
 
-@app.route('/password/change', methods=['POST'])
+@route.route('/password/change', methods=['POST'])
 def change_password():
     curpwd = request.form['current']
     newpwd = request.form['newpwd']
@@ -1642,7 +1642,7 @@ def change_password():
 
     return jsonify(data)
 
-@app.route('/product/favorite/<id>', methods=['POST'])
+@route.route('/product/favorite/<id>', methods=['POST'])
 def product_favorite(id):
     product = tblProduct.query.get(id)
     isSaved = False
@@ -1665,7 +1665,7 @@ def product_favorite(id):
     db.session.commit()
     return jsonify({'msg': 'Success', 'data': isSaved})
 
-@app.route('/role')
+@route.route('/role')
 @login_required
 def role():
     form = RoleForm() 
@@ -1673,14 +1673,14 @@ def role():
     users = tblUser.query.all()
     return render_template('views/role.html', roles=roles, form=form, users=users)
 
-@app.route('/role', methods=['POST'])
+@route.route('/role', methods=['POST'])
 def get_roles():
     roles = tblRole.query.all()
     r = RoleSchema(many=True)
     Roles = r.dump(roles)
     return jsonify(Roles)
 
-@app.route('/role/add', methods=['POST'])
+@route.route('/role/add', methods=['POST'])
 def add_role():
     msg = {
             'role': [],
@@ -1709,7 +1709,7 @@ def add_role():
             msg[fieldName].append(err)
     return jsonify(msg)
 
-@app.route('/role/change/<id>', methods=['POST'])
+@route.route('/role/change/<id>', methods=['POST'])
 def change_role(id):
     role = tblRole.query.get(id)
     user = tblUser.query.get(request.form['data'])
@@ -1721,7 +1721,7 @@ def change_role(id):
     except:
         return jsonify({'data': 'Faild'})
 
-@app.route('/role/update/<id>', methods=['POST'])
+@route.route('/role/update/<id>', methods=['POST'])
 def update_role(id):
     Role = tblRole.query.get(id)
     old = Role.role
@@ -1735,7 +1735,7 @@ def update_role(id):
     except:
         return jsonify({'msg': 'Faild'})
     
-@app.route('/role/remove/<id>', methods=['POST'])
+@route.route('/role/remove/<id>', methods=['POST'])
 @login_required
 def remove_role(id):
     try:
@@ -1748,7 +1748,7 @@ def remove_role(id):
     except:
         return jsonify({'msg': 'Role cannot be deleted. Contact our support team for more details'})
 
-@app.route('/role/clear/<id>', methods=['POST'])
+@route.route('/role/clear/<id>', methods=['POST'])
 @login_required
 def clear_role(id):
     user = tblUser.query.get(id)
@@ -1761,21 +1761,21 @@ def clear_role(id):
     except:
         return jsonify({'data': 'Faild'})
 
-@app.route('/admin')
+@route.route('/admin')
 @login_required
 def admin():
     users = tblUser.query.all()
     roles = tblRole.query.all()
     return render_template('views/admin.html', users=users, roles=roles)
 
-@app.route('/admin/<id>', methods=['POST'])
+@route.route('/admin/<id>', methods=['POST'])
 def get_admin(id):
     User = tblUser.query.get(id)
     json = UserSchema()
     user = json.dump(User)
     return jsonify(user)
 
-@app.route('/admin/create', methods=['POST'])
+@route.route('/admin/create', methods=['POST'])
 def create_admin():
     username = request.form['username']
     fullname = request.form['fullname']
@@ -1809,7 +1809,7 @@ def create_admin():
     except:
         return jsonify({'data': 'Faild'})
 
-@app.route('/admin/change/<id>', methods=['POST'])
+@route.route('/admin/change/<id>', methods=['POST'])
 def change_admin(id):
     user = tblUser.query.get(id)
     user.username = request.form['username']
@@ -1840,5 +1840,3 @@ def change_admin(id):
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Faild'})
-
-

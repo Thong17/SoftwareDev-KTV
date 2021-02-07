@@ -1,4 +1,5 @@
 import os
+from app.config import Config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.types import PickleType
@@ -17,30 +18,35 @@ from datetime import datetime
 import time
 from http import cookies
 
-connection = 'mysql+pymysql://root:myroot@localhost/camping_cave'
+db = SQLAlchemy()
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+bcrypt = Bcrypt()
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = '098c75537d0816443c'
-app.config['SQLALCHEMY_DATABASE_URI'] = connection
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static/uploads')
+ma = Marshmallow()
 
-db = SQLAlchemy(app)
+# c = cookies.SimpleCookie(app)
 
-bcrypt = Bcrypt(app)
-
-ma = Marshmallow(app)
-
-c = cookies.SimpleCookie()
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+login_manager = LoginManager()
+login_manager.login_view = 'route.login'
 
 upload = UploadSet('photos', IMAGES)
-configure_uploads(app, upload)
-patch_request_class(app)
+
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    db.init_app(app)
+    bcrypt.init_app(app)
+    ma.init_app(app)
+    login_manager.init_app(app)
+    
+    configure_uploads(app, upload)
+    patch_request_class(app)
+
+    from app.routes.route import route
+    app.register_blueprint(route)
+
+    return app
 
 #Custome function
 def delete_photo(folder, photo):
@@ -427,4 +433,3 @@ def utc2local (utc):
     offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
     return utc + offset
         
-from app import route
