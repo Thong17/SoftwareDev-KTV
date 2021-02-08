@@ -90,7 +90,7 @@
         flex-direction: column;
         position: relative;
         width: 50%;
-        height: 100%;
+        height: 300px;
         padding: 0px 15px 10px 15px;
     }
 
@@ -123,6 +123,14 @@
     thead {
         background-color: var(--color-hr);
     }
+    @media only screen and (max-width: 450px) {
+        .dash-board {
+            flex-wrap: wrap;
+        }
+        .left-container, .right-container {
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -153,6 +161,14 @@
         {% endif %}
     </div>
     <div class="dash-board">
+        <div class="right-container">
+            <div class="chart-header">
+                <h5 class="color-text">Performance</h5>
+            </div>
+            <div class="grid-item" id="pie">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
         <div class="left-container">
             <h5 class="color-text flex-start mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Done by <p
                     class="sold-by ml-1 notranslate">{{ current_user.username }}</p>
@@ -170,17 +186,6 @@
 
                     </tbody>
                 </table>
-            </div>
-        </div>
-        <div class="right-container">
-            <div class="chart-header">
-                <h5 class="color-text">Performance</h5>
-            </div>
-            <div class="grid-item" id="pie">
-                <canvas id="pieChart"></canvas>
-            </div>
-            <div class="chart-body">
-
             </div>
         </div>
     </div>

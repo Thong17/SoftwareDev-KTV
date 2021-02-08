@@ -4,24 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop - Login</title>
+    <title>Camping Cave - Login</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
         integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="{{url_for('static', filename='css/dist/style.css')}}">
+    <style>
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+        }
+        footer {
+            margin: 0;
+            width: 100%;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .container-right {
+            padding: 0 30px;
+        }
+
+        form {
+            max-width: 350px;
+        }
+
+        @media only screen and (max-width: 1100px) {
+            canvas {
+                display: none;
+            }
+        }
+
+        @media only screen and (max-width: 750px) {
+            .container-left {
+                display: none;
+            }
+            .logo {
+                width: 100% !important;
+                justify-content: center !important;
+                color: #111111;
+                left: 0;
+            }
+        }
+
+        @media only screen and (max-width: 450px) {
+            form {
+                transform: scale(0.9);
+            }
+            .container-right {
+                padding: 0 10px;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <div class="form-container">
+        <div class="logo">
+            <p>CAMPING CAVE</p>
+        </div>
         <div class="container-left">
-            <nav>
-                <div class="logo">
-                    <i class="fa fa-mobile" aria-hidden="true"></i>
-                    <p>Shop</p>
-                </div>
-            </nav>
             <div class="hero">
                 <h3>WELCOME TO OUR SHOP</h3>
+                <hr>
                 <p>We bring the best experience to our customer</p>
             </div>
 
@@ -41,13 +89,13 @@
                         {{form.password.label(class='password label')}}
                     </div>
                     <div class="form-group flex-end">
-                        <a href="/register" class="btn">Register</a>
                         {{form.submit(class='btn border', style="border: 1px solid #dee2e6!important")}}
                     </div>
                 </form>
             </header>
             <footer>
-                <p>Developed by thong</p>
+                <p class="color-text" style="font-size: 13px;">Developed by
+                    <a href="#" class="notranslate">SoftDev</a></p>
             </footer>
         </div>
     </div>
@@ -64,7 +112,6 @@
             dataType: 'json',
             data: $(this).serialize(),
             success: function (data) {
-                console.log(data)
                 if (data['redirect'] == '/') {
                     window.location.href = data['redirect']
                 }

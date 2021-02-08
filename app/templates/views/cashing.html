@@ -76,12 +76,12 @@
     }
 
     .col-filter {
-        width: 100%;
+        width: calc(100% - 350px);
         padding-right: 20px;
     }
 
     .col-order {
-        width: 530px;
+        width: 350px;
         position: relative;
     }
 
@@ -98,7 +98,7 @@
         background-color: var(--color-menu);
         height: 34px;
         border: none;
-        padding: 0 6px 0 16px !important;
+        padding: 4px 3px 0 16px !important;
     }
 
     .search-input {
@@ -391,6 +391,71 @@
         color: var(--color-text);
     }
 
+    @media only screen and (max-width: 1100px) {
+        .view-btn, .sort-btn {
+            display: none !important;
+        }
+        .menu-btn {
+            width: 100px;
+        }
+    }
+
+    @media only screen and (max-width: 991px) {
+        .product-details {
+            flex-direction: column;
+        }
+    }
+
+    @media only screen and (max-width: 950px) {
+        .col-order {
+            display: none;
+        }
+        .col-filter {
+            width: 100%;
+        }
+        .details-left, .details-right {
+            width: 100%;
+        }
+    }
+
+    @media only screen and (max-width: 550px) {
+        .menu-btn {
+            display: none;
+        }
+        .grid-products .product-item .item-wrapper .item-details {
+            height: calc(100% - 80px);
+        }
+        .grid-products .product-item .item-wrapper .item-img {
+            height: 80px;
+        }
+        .product-item {
+            height: 150px !important;
+        }
+        .grid-products {
+            grid-column-gap: 10px;
+            grid-row-gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(150px, 150px));
+            padding: 5px 5px 0 5px;
+        }
+
+        .color-font {
+            font-size: 10px !important;
+        }
+
+        .color-text {
+            font-size: 8px !important;
+        }
+
+        .stock-tag {
+            font-size: 8px;
+        }
+
+        .fav-btn, .menu-icon {
+            font-size: 10px;
+        }
+    }
+
 </style>
 {% endblock %}
 
@@ -399,31 +464,33 @@
     <div class="col-filter" style="border-right: 1px solid var(--color-hr);">
         <!-- Begin -->
         <div class="content-menu flex-between">
-            <div class="fav-btn"><i class="fa fa-bookmark-o" aria-hidden="true"></i></div>
-            <div class="dropdown" id="list-cates">
-                <div class="menu-icon" data-toggle="dropdown">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+            <div class="flex-start-center">
+                <div class="fav-btn"><i class="fa fa-bookmark-o" aria-hidden="true"></i></div>
+                <div class="dropdown" id="list-cates">
+                    <div class="menu-icon" data-toggle="dropdown">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="dropdown-menu">
+                        {% if categories %}
+                        {% for category in categories %}
+                        <div class="dropdown-item category-item" id="{{category.id}}">{{category.category}}</div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="dropdown-item">No categories</div>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="dropdown-menu">
-                    {% if categories %}
-                    {% for category in categories %}
-                    <div class="dropdown-item category-item" id="{{category.id}}">{{category.category}}</div>
+                <div class="menu-items flex-start-center color-text notranslate">
+                    {% if brands %}
+                    {% for brand in brands %}
+                    <div class="menu-item" id="{{ brand.id }}">{{ brand.brand }}</div>
                     {% endfor %}
                     {% else %}
-                    <div class="dropdown-item">No categories</div>
+                    <div class="menu-item">...</div>
                     {% endif %}
                 </div>
-            </div>
-            <div class="menu-items flex-start-center color-text notranslate">
-                {% if brands %}
-                {% for brand in brands %}
-                <div class="menu-item" id="{{ brand.id }}">{{ brand.brand }}</div>
-                {% endfor %}
-                {% else %}
-                <div class="menu-item">...</div>
-                {% endif %}
             </div>
             <div class="menu-btn flex-end-center color-text">
                 <div class="view-btn"><i class="fa fa-list-ul list-btn" aria-hidden="true"></i></i></div>
@@ -1303,7 +1370,7 @@
             var filter = $(this).attr('id')
 
             if (filter == 'selected') {
-                console.log(filter)
+                return
             } else {
                 switch (filter) {
                     case 'most-expensive':

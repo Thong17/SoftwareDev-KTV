@@ -157,6 +157,21 @@
         top: 10px;
         right: 70px;
     }
+
+    @media only screen and (max-width: 750px) {
+        .advertise-sample {
+            flex-direction: column;
+        }
+        .left-sample {
+            flex-direction: row;
+        }
+        .left-sample .ad-img {
+            width: 100%;
+        }
+        .sample-div {
+            width: 350px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -319,7 +334,6 @@
 
         $('#ad-main').on('change', function () {
             var files = document.querySelector('#ad-main').files
-            console.log(files)
 
             uploadFile(files, this, '/advertise/photo/main', function (result, data) {
                 if (result == 'Success') {
@@ -336,7 +350,6 @@
 
         $('#ad-side').on('change', function () {
             var files = document.querySelector('#ad-side').files
-            console.log(files)
 
             uploadFile(files, this, '/advertise/photo/side', function (result, data) {
                 if (result == 'Success') {

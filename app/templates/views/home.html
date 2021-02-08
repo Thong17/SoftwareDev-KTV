@@ -26,8 +26,74 @@
         margin: 0 30px;
     }
 
+    .category-item {
+        padding-left: 5px !important;
+    }
+
     .dropdown-item.active::after {
         content: '';
+    }
+
+    @media only screen and (max-width: 1100px) {
+        .wrap-container {
+            padding: 0 20px;
+        }
+    }
+
+    @media only screen and (max-width: 750px) {
+        .wrap-container {
+            flex-wrap: wrap;
+        }
+        .side-container {
+            width: 100%;
+            padding-bottom: 20px;
+        }
+    }
+
+    @media only screen and (max-width: 550px) {
+        .menu-btn {
+            display: none;
+        }
+        .grid-products .product-item .item-wrapper .item-details {
+            height: calc(100% - 80px);
+        }
+        .grid-products .product-item .item-wrapper .item-img {
+            height: 80px;
+        }
+        .product-item {
+            height: 150px !important;
+        }
+        .grid-products {
+            grid-column-gap: 10px;
+            grid-row-gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(150px, 150px));
+            padding: 5px 5px 0 5px;
+        }
+
+        h3 {
+            font-size: 13px;
+        }
+
+        .color-font {
+            font-size: 10px !important;
+        }
+
+        .color-text {
+            font-size: 8px !important;
+        }
+
+        .stock-tag {
+            font-size: 8px;
+        }
+    }
+
+    @media only screen and (max-width: 750px) {
+        
+        /* Check */
+        .menu-btn {
+            width: auto;
+        }
     }
 
 </style>
@@ -38,14 +104,13 @@
 <div class="wrap-container flex-between-start">
     <div class="side-container">
         <h3>Filter</h3>
-        <hr>
+        <br>
         <div class="categories">
             {% for category in categories %}
             <div class="color-text dropdown-item category-item" id="{{category.id}}"><span>{{ category.category }}</span><span>{{ category.products|length }}</span></div>
             {% endfor %}
         </div>
     </div>
-    <div class="br-2"></div>
     <div class="main-container">
         <div class="content-menu flex-between">
             <div class="menu-items flex-start-center color-text notranslate">

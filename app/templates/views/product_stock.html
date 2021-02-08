@@ -514,8 +514,6 @@
                 type: 'POST',
                 data: { color: color.val(), cost: cost.val(), currency: currency.val(), rate: rate.val(), quantity: quantity.val(), adjust: adjust.val() },
                 success: function (data) {
-
-                    console.log(data)
                     if (data.data == 'success') {
                         $('#list-stocks').find('#' + id).html(`<td id="` + color.val() + `" class="notranslate">` + color_name + `</td>
                                                             <td class="notranslate">`+ cost.val() + `</td>
@@ -553,7 +551,6 @@
                 url: '/stock/delete/' + id,
                 type: 'POST',
                 success: function (data) {
-                    console.log(data)
                     if (data.data == 'success') {
                         $('#list-stocks').find('#' + id).fadeOut('slow', function () {
                             $(this).remove()

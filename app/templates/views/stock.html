@@ -1,5 +1,58 @@
 {% extends 'views/financial.html' %}
 
+{% block style %}
+<style>
+    @media only screen and (max-width: 1100px) {
+        .wrap-container {
+            padding: 0 20px;
+        }
+    }
+
+    @media only screen and (max-width: 550px) {
+        .menu-btn {
+            display: none;
+        }
+        .grid-products .product-item .item-wrapper .item-details {
+            height: calc(100% - 80px);
+        }
+        .grid-products .product-item .item-wrapper .item-img {
+            height: 80px;
+        }
+        .product-item {
+            height: 150px !important;
+        }
+        .grid-products {
+            
+            grid-column-gap: 10px;
+            grid-row-gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(150px, 150px));
+            padding: 5px 5px 0 5px;
+        }
+
+        .color-font {
+            font-size: 10px !important;
+        }
+
+        .color-text {
+            font-size: 8px !important;
+        }
+
+        .stock-tag {
+            font-size: 8px;
+        }
+    }
+
+    @media only screen and (max-width: 750px) {
+        
+        /* Check */
+        .menu-btn {
+            width: auto;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="wrap-container">
     <div class="content-menu flex-between">

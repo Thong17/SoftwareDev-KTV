@@ -5,6 +5,9 @@
     thead {
         background-color: var(--color-menu);
     }
+    .row-wrapper {
+        overflow: scroll;
+    }
 </style>
 {% endblock %}
 
@@ -30,7 +33,7 @@
                             <td class="color-text">{{ activity.type }}</td>
                             <td class="color-text">{{ activity.createdOn }}</td>
                             <td class="color-text">{{ activity.createdBy }}</td>
-                            <td class="color-text"><i class="fa fa-trash-o" aria-hidden="true"></i></td>
+                            <td class="color-text"></td>
                         </tr>
                     {% endfor %}
                 </tbody>

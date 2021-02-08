@@ -54,7 +54,6 @@ $(document).on('click', '.order-btn', function() {
         
                             data.data.transactions.forEach(t => {
                                 var price_before = parseFloat(t.amount) / (1 - (parseFloat(t.discount) / 100))
-                                console.log(price_before)
                                 invoice_item += `<tr id="`+t.id+`">
                                                         <td>`+t.description+`</td>
                                                         <td style="text-align: center">`+price_before+`</td>
@@ -222,7 +221,6 @@ $(document).on('click', '.checkout-btn', function() {
                     if (moneyArr.includes(c.money+c.currency)) {
                         changeArr.forEach(a => {
                             if (a.money == c.money && a.currency == c.currency) {
-                                console.log(a)
                                 a.unit += 1
                             }
                         })
@@ -254,8 +252,6 @@ $(document).on('click', '.checkout-btn', function() {
 
                 var paid = 0
                 var khr = 0
-
-                console.log(paymentObj)
 
                 paymentObj.amounts.forEach(p => {
                     if (p.currency != 'USD') {

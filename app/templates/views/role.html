@@ -28,7 +28,7 @@
     .role-title {
         position: relative;
         display: flex;
-        width: auto;
+        width: 130px;
         padding: 3px 13px 3px 0;
         border-right: 1px solid var(--color-hr);
     }
@@ -49,9 +49,10 @@
     }
 
     .verticle-list {
-        width: 25%;
+        width: 250px;
         height: 100%;
         padding-right: 15px;
+        padding-bottom: 20px;
         border-right: 1px solid var(--color-hr);
     }
 
@@ -68,8 +69,9 @@
         display: flex;
         align-items: flex-start;
         justify-content: start;
-        width: 50%;
+        width: calc(100% - 130px);
         height: 41px;
+        overflow-x: scroll;
     }
 
     .role-header .item {
@@ -109,6 +111,37 @@
         outline: none;
         box-shadow: none;
     }
+
+    @media only screen and (max-width: 750px) {
+        .role-body {
+            flex-wrap: wrap;
+        }
+
+        .body-right {
+            padding-left: 0;
+            width: 100%;
+        }
+        
+        .verticle-list {
+            width: 100%;
+        }
+    }
+
+    @media only screen and (max-width: 550px) {
+        .title-text {
+            font-size: 12px !important;
+        }
+
+        .role-title {
+            width: 80px;
+        }
+
+        .list-roles {
+            width: calc(100% - 80px);
+            height: 30px;
+        }
+    }
+
 </style>
 {% endblock %}
 

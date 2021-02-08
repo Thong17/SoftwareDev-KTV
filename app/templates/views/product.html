@@ -864,11 +864,9 @@
                 method: 'POST',
                 success: function (data) {
                     if (data['msg'] == 'Success') {
-                        console.log('success')
                         window.location.reload()
-
                     } else {
-                        console.log('failed')
+                        alert('failed')
                     }
                 }
             })
@@ -917,7 +915,7 @@
     })
 
     $('.carousel-item').on('click', function () {
-        console.log(this)
+        return
     })
 </script>
 {% endblock %}

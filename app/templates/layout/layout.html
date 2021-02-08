@@ -23,9 +23,13 @@
 
 <body>
     <ul class="side-nav">
+        <div class="side-header">
+            <h4 class="color-text">{{ current_user.profile[0].company }}</h4>
+            <p class="color-text">{{ current_user.profile[0].location }}</p>
+        </div>
         <li class="side-menu">
             <span>Home</span>
-            <a href="/home">
+            <a href="/">
                 <i class="fa fa-home" aria-hidden="true"></i>
             </a>
         </li>
@@ -53,11 +57,13 @@
                 <i class="fa fa-cog" aria-hidden="true"></i>
             </a>
         </li>
+        <span class="close-sidenav hide"><ion-icon name="close-outline"></ion-icon></span>
     </ul>
     <header>
         <nav class="menu-nav">
             <div class="nav-logo">
-                <i class="fa fa-terminal" aria-hidden="true"></i>
+                <i class="fa fa-terminal logo-btn" aria-hidden="true"></i>
+                <ion-icon name="menu-outline" class="sidenav-btn hide"></ion-icon>
             </div>
             {% block navbar %}{% endblock %}
             <div class="dropdown">
@@ -68,8 +74,8 @@
                     <span>{{current_user.username}}</span>
                 </button>
                 <div class="dropdown-menu">
+                    <p class="dropdown-item profile-name hide">{{current_user.username}}</p>
                     <a class="dropdown-item" href="/profile">Profile</a>
-                    <a class="dropdown-item" href="#">About</a>
                     <div class="dropdown-divider"></div>
                     <form action="/logout" method="post" style="width: 100%;">
                         <input type="submit" class="btn btn-block color-text" style="border: none; width: 100%;"
@@ -155,9 +161,11 @@
     <script>
         $(document).ready(function() {
             $('a').on('click', function () {
-                if ($(this).attr('class').trim() == 'cashing') {
-                    event.preventDefault()
-                    $('#loginModal').modal('show')
+                if($(this).attr('class') != undefined) {
+                    if ($(this).attr('class').trim() == 'cashing') {
+                        event.preventDefault()
+                        $('#loginModal').modal('show')
+                    }
                 }
             })
         })
@@ -181,7 +189,6 @@
                     if (data.redirect != '') {
                         window.location.href = data.redirect
                     } else {
-                        console.log(data)
                         if (data.password != '') {
                             const element = data.password;
                             $('#userPassword').addClass('invalid')
@@ -1431,6 +1438,14 @@
             precision = Math.pow(10, precision)
             return Math.ceil(num * precision) / precision
         }
+
+        $('.sidenav-btn').on('click', function() {
+            $('.side-nav').addClass('active')
+        })
+
+        $('.close-sidenav').on('click', function() {
+            $('.side-nav').removeClass('active')
+        })
 
     </script>
     {% block script %} {% endblock %}

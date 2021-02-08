@@ -50,7 +50,7 @@ def create_app(config_class=Config):
 
 #Custome function
 def delete_photo(folder, photo):
-    photo = basedir + '/static/' + folder + "/" + photo
+    photo = os.path.abspath(os.path.dirname(__file__)) + '/static/' + folder + "/" + photo
     try:
         os.remove(photo)
     except:

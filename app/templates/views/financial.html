@@ -52,8 +52,6 @@
             url: '/financial',
             method: 'POST',
             success: function (data) {
-                console.log(data)
-
                 var transaction = {
                     labels: ['Completed', 'Pending'],
                     quantities: [data.transactionObj.complete.length, data.transactionObj.pending.length],

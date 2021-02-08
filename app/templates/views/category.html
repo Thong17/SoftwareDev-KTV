@@ -410,8 +410,6 @@
                 description: data.description
             },
             success: function (data) {
-                console.log(data)
-
                 Array.from(tds).forEach(function (td, i) {
                     if (i == 0) {
                         $(tds[i]).find('span').text(data.property)
