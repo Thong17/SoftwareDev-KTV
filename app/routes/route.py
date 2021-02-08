@@ -2,7 +2,7 @@ from app import bcrypt, db, login_manager, upload, delete_photo, utc2local
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema
-from flask import render_template, redirect, request, jsonify, Blueprint
+from flask import render_template, redirect, request, jsonify, Blueprint, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
 import json, simplejson, operator
@@ -13,12 +13,34 @@ from functools import wraps
 
 route = Blueprint('route', __name__)
 
+def parametrized(dec):
+    def layer(*args, **kwargs):
+        def repl(f):
+            return dec(f, *args, **kwargs)
+        return repl
+    return layer
+
+@parametrized
+def is_authorized(f, r):
+    def wrap(*args, **kwargs):
+        roles = []
+        # permissions = json.loads(current_user.roles[0].description)
+        if current_user.is_authenticated:
+            for role in current_user.roles:
+                roles.append(role.role)
+            if r in roles:
+                return f(*args, **kwargs)
+            else:
+                return redirect(url_for('route.login'))
+        else:
+            return redirect(url_for('route.login'))
+    return wrap
+
 @login_manager.user_loader
 def load_user(id):
     return tblUser.query.get(id)
 
 @route.route('/')
-@login_required
 def index():
     return render_template('views/index.html')
 
@@ -139,6 +161,7 @@ def save_user(id):
     return jsonify({'result': 'Success'})
 
 @route.route('/profile')
+@is_authorized('Administrator')
 @login_required
 def profile():
     form = ProfileForm()
@@ -1577,6 +1600,7 @@ def delete_advertise(id):
     try:
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted advertise photo: '+Advertise.src, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
+        delete_photo('uploads', Advertise.src)
         db.session.delete(Advertise)
         db.session.commit()
         return jsonify({'data': 'Success'})
@@ -1584,20 +1608,18 @@ def delete_advertise(id):
         return jsonify({'data': 'Failed'})
 
 @route.route('/home')
-@login_required
 def home():
     categories = tblCategory.query.all()
     brands = tblBrand.query.all()
     products = tblProduct.query.all()
-    return render_template('views/home.html', categories=categories, brands=brands, products=products)
+    advertises = tblAdvertise.query.all()
+    return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises)
 
 @route.route('/about')
-@login_required
 def about():
     return render_template('views/about.html')
 
 @route.route('/contact')
-@login_required
 def contact():
     return render_template('views/contact.html')
 

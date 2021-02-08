@@ -654,7 +654,7 @@ textarea:valid+label {
     font-size: 18px;
     top: 0;
     padding: 10px 20px 10px 53px;
-    // background-color: var(--color-menu-bg);
+    background-color: var(--color-menu-bg);
     transform: translateX(-50px) scale(0.5);
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -664,7 +664,7 @@ textarea:valid+label {
     // border: 1px solid var(--color-hr);
     white-space: nowrap;
 
-    background-color: rgba(0, 0, 0, 0) !important;
+    // background-color: rgba(0, 0, 0, 0) !important;
     border: none;
 }
 
@@ -839,8 +839,8 @@ main {
 
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    padding: 50px 100px;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    padding: 50px;
     grid-gap: 30px;
 }
 
@@ -850,6 +850,7 @@ main {
     height: 330px;
     border-radius: 5px;
     position: relative;
+    padding: 20px;
 }
 
 .item-header {
@@ -864,7 +865,11 @@ main {
 .item-body {
     overflow: hidden;
     position: relative;
-    height: 250px;
+}
+
+.item-body canvas {
+    width: 100%;
+    height: 100%;
 }
 
 .input-color,
@@ -2560,6 +2565,13 @@ button.form-empty:hover {
 
     .menu-icon span {
         height: 1px;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        padding: 50px 20px;
+        grid-gap: 20px;
     }
 }
 

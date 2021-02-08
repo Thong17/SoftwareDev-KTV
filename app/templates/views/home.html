@@ -19,7 +19,7 @@
     .main-container {
         width: 100%;
     }
-    
+
     .br-2 {
         height: 77vh;
         border-right: 1px solid var(--color-hr);
@@ -44,6 +44,7 @@
         .wrap-container {
             flex-wrap: wrap;
         }
+
         .side-container {
             width: 100%;
             padding-bottom: 20px;
@@ -54,15 +55,19 @@
         .menu-btn {
             display: none;
         }
+
         .grid-products .product-item .item-wrapper .item-details {
             height: calc(100% - 80px);
         }
+
         .grid-products .product-item .item-wrapper .item-img {
             height: 80px;
         }
+
         .product-item {
             height: 150px !important;
         }
+
         .grid-products {
             grid-column-gap: 10px;
             grid-row-gap: 10px;
@@ -89,25 +94,75 @@
     }
 
     @media only screen and (max-width: 750px) {
-        
+
         /* Check */
         .menu-btn {
             width: auto;
         }
     }
 
+    .advertise-container {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .carousel-item {
+        height: 500px;
+        width: 100%;
+    }
+
+    .carousel-inner img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain !important;
+        object-position: center;
+        box-sizing: border-box;
+    }
 </style>
 
 {% endblock %}
 
 {% block content %}
+<div class="advertise-container">
+    <div id="advertise" class="carousel slide" data-ride="carousel">
+        <ul class="carousel-indicators">
+            {% for advertise in advertises %}
+            {% if loop.first %}
+            <li data-target="#advertise" data-slide-to="{{ loop.counter }}" class="active"></li>
+            {% else %}
+            <li data-target="#advertise" data-slide-to="{{ loop.counter }}"></li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    
+        <div class="carousel-inner">
+            {% for advertise in advertises %}
+            {% if loop.first %}
+            <div class="carousel-item active">
+                <img src="/static/uploads/{{ advertise.src }}" alt="{{ advertise.alt }}">
+            </div>
+            {% else %}
+            <div class="carousel-item">
+                <img src="/static/uploads/{{ advertise.src }}" alt="{{ advertise.alt }}">
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<br>
 <div class="wrap-container flex-between-start">
     <div class="side-container">
         <h3>Filter</h3>
         <br>
         <div class="categories">
             {% for category in categories %}
-            <div class="color-text dropdown-item category-item" id="{{category.id}}"><span>{{ category.category }}</span><span>{{ category.products|length }}</span></div>
+            <div class="color-text dropdown-item category-item" id="{{category.id}}"><span>{{ category.category
+                    }}</span><span>{{ category.products|length }}</span></div>
             {% endfor %}
         </div>
     </div>
@@ -145,7 +200,7 @@
             <div class="empty-result hide color-text">No product found...</div>
             {% if products %}
             {% for product in products %}
-            {% if current_user.id in product.listFavorite|tojson|safe %}
+            {% if current_user.is_authenticated and current_user.id in product.listFavorite|tojson|safe %}
             <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
@@ -153,24 +208,27 @@
                     <div class="item-img">
                         <img src="/static/uploads/{{product.photo}}">
                         {% if product.discount != '' %}
-                            <div class="product-discount">
-                                <p class="color-text">{{ product.discount }}%</p>
-                            </div>
+                        <div class="product-discount">
+                            <p class="color-text">{{ product.discount }}%</p>
+                        </div>
                         {% endif %}
                     </div>
                     <div class="item-details">
                         <div class="details">
                             <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
                                 title="{{product.product}}">{{product.product}}</p>
-                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}</p>
-                            <p class="color-text" id="details-category" style="font-size: 12px;">{{product.productOfCategory.category}}</p>
-                            <p class="color-text hide" id="details-description" style="font-size: 12px;">{{product.description}}</p>
+                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            </p>
+                            <p class="color-text" id="details-category" style="font-size: 12px;">
+                                {{product.productOfCategory.category}}</p>
+                            <p class="color-text hide" id="details-description" style="font-size: 12px;">
+                                {{product.description}}</p>
                         </div>
                         <div class="notranslate flex-between-end color-text" style="width: 100%;">
-                            <p class="price-tag currency-format color-text">{{ product.price }}</p> 
-                            <p style="font-size: 12px;">
+                            <p class="price-tag currency-format color-text">{{ product.price }}</p>
+                            <!-- <p style="font-size: 12px;">
                                 <i class="fa fa-bookmark" aria-hidden="true"></i>
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                 </div>
@@ -183,24 +241,24 @@
                     <div class="item-img">
                         <img src="/static/uploads/{{product.photo}}">
                         {% if product.discount != '' %}
-                            <div class="product-discount">
-                                <p class="color-text">{{ product.discount }}%</p>
-                            </div>
+                        <div class="product-discount">
+                            <p class="color-text">{{ product.discount }}%</p>
+                        </div>
                         {% endif %}
                     </div>
                     <div class="item-details">
                         <div class="details">
                             <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
                                 title="{{product.product}}">{{product.product}}</p>
-                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}</p>
-                            <p class="color-text" id="details-category" style="font-size: 12px;">{{product.productOfCategory.category}}</p>
-                            <p class="color-text hide" id="details-description" style="font-size: 12px;">{{product.description}}</p>
+                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            </p>
+                            <p class="color-text" id="details-category" style="font-size: 12px;">
+                                {{product.productOfCategory.category}}</p>
+                            <p class="color-text hide" id="details-description" style="font-size: 12px;">
+                                {{product.description}}</p>
                         </div>
                         <div class="notranslate flex-between-end color-text" style="width: 100%;">
-                            <p class="price-tag currency-format color-text">{{ product.price }}</p> 
-                            <p style="font-size: 12px;">
-                                <i class="fa fa-bookmark-o" aria-hidden="true"></i>
-                            </p>
+                            <p class="price-tag currency-format color-text">{{ product.price }}</p>
                         </div>
                     </div>
                 </div>
@@ -229,8 +287,8 @@
             searchProducts($(this).val(), temp_products, '#details-title')
         })
 
-        
-        
+
+
         $('.menu-item, .category-item').on('click', function () {
             var menus = document.querySelectorAll('.menu-item')
             var cates = document.querySelectorAll('.category-item')
@@ -343,6 +401,6 @@
         })
     })
 
-    
+
 </script>
 {% endblock %}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="{{current_user.theme}}">
+<html lang="en" data-theme="{% if current_user.is_authenticated %}{{ current_user.theme }}{% else %}light{% endif %}">
 
 <head>
     <meta charset="UTF-8">
@@ -24,8 +24,14 @@
 <body>
     <ul class="side-nav">
         <div class="side-header">
-            <h4 class="color-text">{{ current_user.profile[0].company }}</h4>
-            <p class="color-text">{{ current_user.profile[0].location }}</p>
+            {% if current_user.is_authenticated %}
+            <h4 class="color-text">
+                {{ current_user.profile[0].company }}
+            </h4>
+            <p class="color-text">
+                {{ current_user.profile[0].location }}
+            </p>
+            {% endif %}
         </div>
         <li class="side-menu">
             <span>Home</span>
@@ -33,6 +39,7 @@
                 <i class="fa fa-home" aria-hidden="true"></i>
             </a>
         </li>
+        {% if current_user.is_authenticated %}
         <li class="side-menu">
             <span>Sale</span>
             <a href="/financial">
@@ -57,6 +64,7 @@
                 <i class="fa fa-cog" aria-hidden="true"></i>
             </a>
         </li>
+        {% endif %} 
         <span class="close-sidenav hide"><ion-icon name="close-outline"></ion-icon></span>
     </ul>
     <header>
@@ -66,15 +74,20 @@
                 <ion-icon name="menu-outline" class="sidenav-btn hide"></ion-icon>
             </div>
             {% block navbar %}{% endblock %}
+            {% if current_user.is_authenticated %}
             <div class="dropdown">
                 <button type="button" class="btn color-font menu-profile" data-toggle="dropdown">
                     <div class="profile-img">
-                        <img src="/static/uploads/{{ current_user.profile[0].photo }}" alt="Profile">
+                            <img src="/static/uploads/{{ current_user.profile[0].photo }}" alt="Profile">
                     </div>
-                    <span>{{current_user.username}}</span>
+                    <span>
+                        {{current_user.username}}
+                    </span>
                 </button>
                 <div class="dropdown-menu">
-                    <p class="dropdown-item profile-name hide">{{current_user.username}}</p>
+                    <p class="dropdown-item profile-name hide">
+                        {{current_user.username}}
+                    </p>
                     <a class="dropdown-item" href="/profile">Profile</a>
                     <div class="dropdown-divider"></div>
                     <form action="/logout" method="post" style="width: 100%;">
@@ -83,6 +96,13 @@
                     </form>
                 </div>
             </div>
+            {% else %}
+            <div class="user-btn">
+                <a href="/login" class="color-text mr-3">Login</a>
+                <a href="/register" class="color-text btn border">Register</a>
+            </div>
+            {% endif %}
+            
         </nav>
         <main>
             {% block content %}{% endblock %}
@@ -100,10 +120,12 @@
         aria-hidden="true">
         <div class="modal-dialog cascading-modal modal-avatar modal-sm" role="document">
             <!--Content-->
+            {% if current_user.is_authenticated %}
             <div class="modal-content">
 
                 <!--Header-->
                 <div class="modal-header">
+
                     <img src="/static/uploads/{{ current_user.profile[0].photo }}" alt="avatar"
                         class="rounded-circle img-responsive">
                 </div>
@@ -128,6 +150,7 @@
                 </div>
 
             </div>
+            {% endif %}
             <!--/.Content-->
         </div>
     </div>

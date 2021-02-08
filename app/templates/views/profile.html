@@ -159,6 +159,57 @@
         padding-top: 25px;
     }
 
+    @media only screen and (max-width: 950px) {
+        .details {
+            width: 100% !important;
+        }
+
+        .profile-data {
+            padding: 0 10px !important;
+        }
+    }
+
+    @media only screen and (max-width: 768px) {
+        .profile .profile-img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .content-title {
+            margin-top: 50px;
+        }
+
+        .profile-data {
+            padding: 0 30px !important;
+            border-left: none !important;
+        }
+    }
+
+    @media only screen and (max-width: 550px) {
+        .profile .profile-img {
+            width: 50px;
+            height: 50px;
+        }
+        .content-title {
+            font-size: 13px !important;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            padding-top: 0;
+        }
+    }
+
+    @media only screen and (max-width: 450px) {
+        .user-data {
+            padding: 0 20px !important;
+        }
+
+        .profile-details {
+            margin-bottom: 10px;
+        }
+    }
+
 </style>
 {% endblock %}
 
@@ -194,7 +245,7 @@
 
 <div class="wrap-container" style="margin-top: -20px;">    
     <div class="row">
-        <div class="col-md-8 px-5">
+        <div class="col-md-8 px-5 user-data">
             <div class="profile-container">
                 <div class="profile">
                     <div class="profile-img" id="{{ profile.id }}">
@@ -283,8 +334,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 px-5" style="border-left: 1px solid var(--color-hr);">
-            <h5 class="color-text">Description</h5>
+        <div class="col-md-4 px-5 profile-data" style="border-left: 1px solid var(--color-hr);">
+            <h5 class="color-text content-title">Description</h5>
             <hr>
             <form action="/profile/save/{{ profile.id }}" method="post" style="width: 100%;">
                 {{ form.hidden_tag() }}
