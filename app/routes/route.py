@@ -2,7 +2,7 @@ from app import bcrypt, db, login_manager, upload, delete_photo, utc2local
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema
-from flask import render_template, redirect, request, jsonify, Blueprint, url_for
+from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
 import json, simplejson, operator
@@ -23,26 +23,22 @@ def parametrized(dec):
 @parametrized
 def is_authorized(f, r):
     def wrap(*args, **kwargs):
-        roles = []
-        # permissions = json.loads(current_user.roles[0].description)
-        if current_user.is_authenticated:
-            for role in current_user.roles:
-                roles.append(role.role)
-            if r in roles:
+        if current_user.is_authenticated and current_user.roles:
+            permissions = current_user.roles[0].description.split(', ')
+            if r in permissions:
                 return f(*args, **kwargs)
             else:
+                flash('You may not have permission to enter this page', 'warning')
                 return redirect(url_for('route.login'))
         else:
+            flash('Restricted Area!', 'warning')
             return redirect(url_for('route.login'))
+    wrap.__name__ = f.__name__
     return wrap
 
 @login_manager.user_loader
 def load_user(id):
     return tblUser.query.get(id)
-
-@route.route('/')
-def index():
-    return render_template('views/index.html')
 
 
 @route.route('/login', methods=['POST', 'GET'])
@@ -127,11 +123,13 @@ def register():
     return render_template('views/register.html', form=form)
 
 @route.route('/logout', methods=['POST'])
+@login_required
 def logout():
     logout_user()
     return redirect('/login')
 
 @route.route('/user/save/<id>', methods=['POST'])
+@login_required
 def save_user(id):
     user = tblUser.query.get(id)
     username = request.form['username']
@@ -161,7 +159,6 @@ def save_user(id):
     return jsonify({'result': 'Success'})
 
 @route.route('/profile')
-@is_authorized('Administrator')
 @login_required
 def profile():
     form = ProfileForm()
@@ -255,6 +252,7 @@ def custome():
 
 
 @route.route('/category', methods=['POST', 'GET'])
+@is_authorized('Admin')
 @login_required
 def categories():
     form = CategoryForm()
@@ -491,13 +489,14 @@ def add_product():
     id = str(uuid4())
 
     Model = tblProduct(id=id, product=product, barcode=barcode, isStock=isStock, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
-    
-    db.session.add(Model)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added product '+product, type='Add', createdBy=current_user.id)
-    db.session.add(Activity)
-    db.session.commit()
-
-    return jsonify({'data': 'Success', 'id': id})
+    try:
+        db.session.add(Model)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added product '+product, type='Add', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success', 'id': id})
+    except:
+        return jsonify({'data': 'Faild', 'id': id})
 
 
 @route.route('/product', methods=['POST'])
@@ -585,7 +584,6 @@ def color_photo(id):
     return jsonify(result)
 
 @route.route('/product/<id>', methods=['POST', 'GET'])
-@login_required
 def product(id):
     product = tblProduct.query.get(id)
     if request.method == 'POST':
@@ -745,6 +743,7 @@ def _property(id):
     return jsonify({'property': result_property, 'product': result_product})
 
 @route.route('/stock')
+@is_authorized('Stock')
 @login_required
 def stocks():
     products = tblProduct.query.all()
@@ -753,6 +752,7 @@ def stocks():
     return render_template('views/stock.html', products=products, brands=brands, categories=categories)
 
 @route.route('/stock/product/<id>')
+@is_authorized('Stock')
 @login_required
 def stock(id):
     product = tblProduct.query.get(id)
@@ -894,6 +894,7 @@ def save_stock(id):
 
 @route.route('/financial', defaults={'arg': None})
 @route.route('/financial/<arg>')
+@is_authorized('Report')
 @login_required
 def financial(arg):
     if arg is not None:
@@ -929,6 +930,7 @@ def authenticate():
         return jsonify(msg)
 
 @route.route('/cashing/<token>')
+@is_authorized('Cashier')
 @login_required
 def cashing(token):
     if token == current_user.token:   
@@ -1204,6 +1206,7 @@ def checkout(id):
         return jsonify({'result': 'Not enough money'})
 
 @route.route('/transaction')
+@is_authorized('Cashier')
 def transaction():
     Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
     Payments = tblPayment.query.order_by(tblPayment.invoice).all()
@@ -1233,6 +1236,7 @@ def search_invoice():
     return jsonify({'data': 'Success'})
 
 @route.route('/report')
+@is_authorized('Report')
 def report():
     return render_template('views/report.html')
 
@@ -1499,11 +1503,13 @@ def quantity_report():
 
 
 @route.route('/financial_report')
+@is_authorized('Report')
 @login_required
 def financial_report():
     return render_template('views/financial_report.html')
 
 @route.route('/account')
+@is_authorized('Report')
 @login_required
 def account():
     users = tblUser.query.all()
@@ -1528,6 +1534,7 @@ def account_report():
     return jsonify(result)
 
 @route.route('/sale_report')
+@is_authorized('Report')
 def sale_report():
     return render_template('views/sale_report.html')
 
@@ -1562,6 +1569,7 @@ def get_financial():
     return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj})
 
 @route.route('/advertise')
+@is_authorized('Editor')
 @login_required
 def advertise():
     Advertises = tblAdvertise.query.all()
@@ -1607,8 +1615,13 @@ def delete_advertise(id):
     except:
         return jsonify({'data': 'Failed'})
 
+# @route.route('/')
+# def index():
+#     return render_template('views/index.html')
+
+@route.route('/')
 @route.route('/home')
-def home():
+def index():
     categories = tblCategory.query.all()
     brands = tblBrand.query.all()
     products = tblProduct.query.all()
@@ -1689,6 +1702,7 @@ def product_favorite(id):
 
 @route.route('/role')
 @login_required
+@is_authorized('Admin')
 def role():
     form = RoleForm() 
     roles = tblRole.query.all()
@@ -1711,10 +1725,10 @@ def add_role():
             'id': '',
         }
     role = request.form['role']
-    description = request.form['description']
+    tags = request.form['tags']
     id = str(uuid4())
     Modal = tblRole(id=id, role=role,
-                        description=description, createdBy=current_user.id)
+                        description=tags, createdBy=current_user.id)
     msg['name'] = role
     msg['id'] = id
     try:
@@ -1739,7 +1753,7 @@ def change_role(id):
     user.roles.append(role)
     try:
         db.session.commit()
-        return jsonify({'data': 'Success', 'role': role.role})
+        return jsonify({'data': 'Success', 'role': role.role, 'tags': role.description})
     except:
         return jsonify({'data': 'Faild'})
 
@@ -1762,10 +1776,12 @@ def update_role(id):
 def remove_role(id):
     try:
         role = tblRole.query.get(id)
+        name = role.role
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted role: '+role.role+' in role', type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.delete(role)
         db.session.commit()
+        flash('You have deleted role '+name, 'success')
         return jsonify({'msg': 'Success'})
     except:
         return jsonify({'msg': 'Role cannot be deleted. Contact our support team for more details'})
@@ -1779,11 +1795,13 @@ def clear_role(id):
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has cleared role from user:' + user.username, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
+        flash('You have removed role for user '+user.username, 'success')
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Faild'})
 
 @route.route('/admin')
+@is_authorized('Admin')
 @login_required
 def admin():
     users = tblUser.query.all()
@@ -1796,6 +1814,16 @@ def get_admin(id):
     json = UserSchema()
     user = json.dump(User)
     return jsonify(user)
+
+@route.route('/user/disable/<id>', methods=['POST'])
+def disable_user(id):
+    user = tblUser.query.get(id)
+    user.isConfirm = not user.isConfirm
+    try:
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Faild'})
 
 @route.route('/admin/create', methods=['POST'])
 def create_admin():

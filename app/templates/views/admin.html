@@ -320,7 +320,7 @@
                     },
                     success: function(data) {
                         if (data.data == 'Success') {
-                            alert(data.data)
+                            window.location.reload()
                         } else {
                             alert(data.data)
                         }
@@ -415,5 +415,20 @@
             $('.pw').text('Password')
         }
     }
+
+    $('.btn-container').on('click', '#disable-user, #enable-user', function() {
+        id = $('.btn-container').attr('id')
+        $.ajax({
+            url: '/user/disable/'+id,
+            type: 'POST',
+            success: function(data) {
+                if (data.data == 'Success') {
+                    window.location.reload()
+                } else {
+
+                }
+            }
+        })
+    })
 </script>
 {% endblock %}

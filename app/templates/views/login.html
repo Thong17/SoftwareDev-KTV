@@ -32,6 +32,10 @@
             max-width: 350px;
         }
 
+        .alert {
+            margin-bottom: 0;
+        }
+
         @media only screen and (max-width: 1100px) {
             canvas {
                 display: none;
@@ -62,6 +66,16 @@
 </head>
 
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="alert alert-{{ messages.0.0 }} alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {% for category, message in messages %}
+            {{ message }} </br>
+        {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
     <div class="form-container">
         <div class="logo">
             <p>CAMPING CAVE</p>
@@ -100,7 +114,9 @@
         </div>
     </div>
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
 <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
 <script src="{{url_for('static', filename='js/animate.js')}}"></script>

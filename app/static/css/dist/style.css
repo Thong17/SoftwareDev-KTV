@@ -742,9 +742,9 @@ textarea:valid + label {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
   padding: 20px 0px;
   -webkit-transition: 0.3s ease-in-out;
   transition: 0.3s ease-in-out;
@@ -1575,8 +1575,8 @@ table tbody tr {
 [contenteditable="true"]:focus {
   border: none;
   outline: none;
-  -webkit-transform: scale(1.2);
-          transform: scale(1.2);
+  -webkit-transform: scale(1.1);
+          transform: scale(1.1);
 }
 
 .edit-content {
@@ -3110,13 +3110,13 @@ button.form-empty:hover {
     padding: 5px 5px 0 5px;
   }
   .color-font {
-    font-size: 10px !important;
+    font-size: 13px !important;
   }
   .color-text {
-    font-size: 8px !important;
+    font-size: 11px !important;
   }
   .stock-tag {
-    font-size: 8px;
+    font-size: 11px;
   }
   .fav-btn, .menu-icon {
     font-size: 8px;
@@ -3175,7 +3175,7 @@ button.form-empty:hover {
             transform: translateX(0);
   }
   .side-nav {
-    padding-top: 40vh;
+    padding-top: 15vh;
     width: 80%;
     background-color: var(--color-btn-hover);
     -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
@@ -3214,7 +3214,7 @@ button.form-empty:hover {
     position: absolute;
     top: 0;
     left: 0;
-    height: 35vh;
+    height: 20vh;
     width: 100%;
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.1);

@@ -633,7 +633,7 @@ textarea:valid+label {
     position: fixed;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-evenly;
     padding: 20px 0px;
     transition: 0.3s ease-in-out;
     z-index: 101;
@@ -1303,7 +1303,7 @@ table tbody tr {
 [contenteditable="true"]:focus {
     border: none;
     outline: none;
-    transform: scale(1.2);
+    transform: scale(1.1);
 }
 
 .edit-content {
@@ -2537,15 +2537,15 @@ button.form-empty:hover {
     }
 
     .color-font {
-        font-size: 10px !important;
+        font-size: 13px !important;
     }
 
     .color-text {
-        font-size: 8px !important;
+        font-size: 11px !important;
     }
 
     .stock-tag {
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .fav-btn, .menu-icon {
@@ -2607,7 +2607,7 @@ button.form-empty:hover {
     }
 
     .side-nav {
-        padding-top: 40vh;
+        padding-top: 15vh;
         width: 80%;
         background-color: var(--color-btn-hover);
         box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
@@ -2640,7 +2640,7 @@ button.form-empty:hover {
         position: absolute;
         top: 0;
         left: 0;
-        height: 35vh;
+        height: 20vh;
         width: 100%;
         padding: 20px;
         background-color: rgba(0, 0, 0, 0.1);

@@ -1,6 +1,7 @@
 {% extends 'views/custome.html' %}
 
 {% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
 <style>
     .role-header {
         display: flex;
@@ -112,6 +113,24 @@
         box-shadow: none;
     }
 
+    .btn-light {
+        background-color: var(--color-bg);
+        border: 1px solid var(--color-hr);
+        color: var(--color-hover) !important;
+        font-weight: 300;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
+    }
+
+    .btn-light:hover {
+        background-color: var(--color-menu);
+    }
+
+    .dropdown-item {
+        font-weight: 300;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
+        color: var(--color-text);
+    }
+
     @media only screen and (max-width: 750px) {
         .role-body {
             flex-wrap: wrap;
@@ -176,7 +195,13 @@
                             {{ form.role(class='form-control input-color', placeholder='Role', autocomplete='off') }}
                         </div>
                         <div class="form-group m-0">
-                            {{ form.description(class='form-control input-color', placeholder='Description') }}
+                            <select class="selectpicker" id="tags" multiple data-live-search="true">
+                                <option>Admin</option>
+                                <option>Cashier</option>
+                                <option>Stock</option>
+                                <option>Editor</option>
+                                <option>Report</option>
+                            </select>
                         </div>
                         <div class="form-group flex-end m-0">
                             {{form.submit(class='btn btn-shadow bg-menu color-font')}}
@@ -187,9 +212,9 @@
                     <table class="table">
                         <thead>
                             <tr class="color-font">
-                                <td style="width: 30%;">Username</td>
+                                <td style="width: 20%;">Username</td>
                                 <td style="width: 20%;">Role</td>
-                                <td style="width: 50%;">Description</td>
+                                <td style="width: 60%;">Description</td>
                             </tr>
                         </thead>
                         <tbody id="list-user">
@@ -202,7 +227,7 @@
                                     <span class="selected-role">{{ user.roles[0].role }}</span>
                                 </td>
                                 <td class="flex-between-center">
-                                    <span>
+                                    <span class="tags-td">
                                         {% if user.roles[0].description == '' %}
                                         ...
                                         {% else %}
@@ -232,6 +257,7 @@
 {% endblock %}
 
 {% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
 <script>
     $(document).ready(function () {
         $('.action-btn').on('click', '.fa-pencil-square-o', function() {
@@ -258,12 +284,14 @@
         })
 
         $(document).on('submit', '.form', function () {
+            role = $('#role').val()
+            tags = $('.filter-option-inner-inner').text()
             event.preventDefault()
             $.ajax({
                 url: $(this).attr('action'),
                 type: $(this).attr('method'),
                 dataType: 'json',
-                data: $(this).serialize(),
+                data: {'role': role, 'tags': tags},
                 success: function (data) {
                     if (data['redirect'] == 'Success') {
                         var element = `<div class="flex-between item color-font" id="` + data['id'] + `">
@@ -381,7 +409,11 @@
             data: {'data': user},
             success: function(data) {
                 if (data.data == 'Success') {
+                    if (data.tags == '') {
+                        data.tags = '...'
+                    }
                     $(arg).closest('tr').find('.role-td').html('<span class="selected-role">'+data.role+'</span>')
+                    $(arg).closest('tr').find('.tags-td').text(data.tags)
                     $(arg).closest('tr').find('.action-btn').html('<i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i>')
                 } else {
                     alert(data.data)
