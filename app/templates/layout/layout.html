@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camping Cave Management System {% block title %}{% endblock %}</title>
+    <link rel="icon" href="{{url_for('static', filename='icons/favicon.svg')}}">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
@@ -61,12 +62,13 @@
             </a>
         </li>
         {% endif %} 
-        <span class="close-sidenav hide"><ion-icon name="close-outline"></ion-icon></span>
+        <span class="close-sidenav hide color-text"><ion-icon name="close-outline"></ion-icon></span>
     </ul>
     <header>
         <nav class="menu-nav">
             <div class="nav-logo">
-                <i class="fa fa-terminal logo-btn" aria-hidden="true"></i>
+                <!-- <i class="fa fa-terminal logo-btn" aria-hidden="true"></i> -->
+                <img class="logo-btn" src="/static/icons/favicon-{{current_user.theme}}.svg" alt="" srcset="">
                 <ion-icon name="menu-outline" class="sidenav-btn hide"></ion-icon>
             </div>
             {% block navbar %}{% endblock %}
@@ -338,6 +340,7 @@
                 },
                 success: function (data) {
                     $('html').attr('data-theme', data['theme'])
+                    $('.nav-logo img').attr('src', '/static/icons/favicon-'+data['theme']+'.svg')
                 }
             })
         })
@@ -830,6 +833,7 @@
         }
 
         function showProductForm(params) {
+            var brand = params.brand
             var category = params.category
             var product = params.product
             var barcode = params.barcode
@@ -874,7 +878,7 @@
                         <form action="/product/add" method="post" enctype="multipart/form-data" style="width: 100%;" id="product-form">
                             <h5 class="color-font sub-content"><i class="fa fa-caret-right right" aria-hidden="true"></i>Select Category</h5>
                             <input type="hidden" name="brand" id="brand-id">
-                            <div class="form-group selector">
+                            <div class="form-group selector mt-1">
                                 <p class="detail-content">Use category for specific products</p>
                                 <select name="category" id="category" class="form-control input-color notranslate" required>
                                     <option disabled="disabled" selected="selected" value="">Select category</option>
@@ -887,6 +891,20 @@
                                     {% endif %}
                                 </select>
                             </div>
+                            <div class="form-group selector pt-2">
+                                <p class="detail-content">Select brand for specific products</p>
+                                <select name="brand" id="select-brands" class="form-control input-color notranslate" required>
+                                    <option disabled="disabled" selected="selected" value="">Select brand</option>
+                                    {% if brands %}
+                                    {% for brand in brands %}
+                                    <option value="{{brand.id}}">{{brand.brand}}</option>
+                                    {% endfor %}
+                                    {% else %}
+                                    <option value="" disabled="disabled">No brand</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+
                             <h5 class="color-font sub-content mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Product
                                 Informations</h5>
                            

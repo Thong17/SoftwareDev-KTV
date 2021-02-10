@@ -592,6 +592,9 @@ def product(id):
         category = tblCategory.query.get(product.categoryId)
         c = CategorySchema()
         result['category'] = c.dump(category)
+        brand = tblBrand.query.get(product.brandId)
+        b = BrandSchema()
+        result['brand'] = c.dump(brand)
         return jsonify(result)
     return render_template('views/product_details.html', product=product)
 
@@ -618,6 +621,7 @@ def save_product(id):
     Product = tblProduct.query.get(id)
 
     category = request.form['category']
+    brand = request.form['brand']
     product = request.form['product']
     barcode = request.form['barcode']
     currency = request.form['currency']
@@ -628,6 +632,7 @@ def save_product(id):
     description = request.form['description']
 
     Category = tblCategory.query.get(category)
+    Brand = tblBrand.query.get(brand)
 
     if isStock == 'true':
         isStock = True
@@ -647,11 +652,14 @@ def save_product(id):
     Product.price = price
     Product.description = description
     Product.categoryId = category
+    Product.brandId = brand
     Product.discount = discount
     Product.period = period
-
-    db.session.commit()
-    return jsonify({'data': 'success'})
+    try:
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Faild'})
 
 @route.route('/product/remove/<id>', methods=['POST'])
 def remove_product(id):

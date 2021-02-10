@@ -617,6 +617,11 @@ textarea:valid + label {
   z-index: 100000 !important;
 }
 
+.nav-logo img {
+  width: 23px;
+  height: 23px;
+}
+
 .title {
   margin-bottom: 30px;
   text-align: center;
@@ -853,7 +858,7 @@ header {
           align-items: center;
   position: fixed;
   width: calc(100% - 58px);
-  padding: 20px 50px;
+  padding: 20px 100px;
   z-index: 100;
   background-color: var(--color-bg);
   -webkit-transition: 0.3s ease-in-out;
@@ -933,7 +938,7 @@ main {
 }
 
 .wrap-container {
-  padding: 0 50px;
+  padding: 0 100px;
   position: relative;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
@@ -3043,6 +3048,12 @@ button.form-empty:hover {
 @media only screen and (max-width: 1100px) {
   .menu-bar {
     width: 60%;
+  }
+  .wrap-container {
+    padding: 0 50px;
+  }
+  .menu-nav {
+    padding: 20px 50px;
   }
 }
 

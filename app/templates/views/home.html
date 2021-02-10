@@ -49,6 +49,14 @@
             width: 100%;
             padding-bottom: 20px;
         }
+
+        .menu-btn {
+            width: auto;
+        }
+
+        .advertise-container {
+            height: 300px !important;
+        }
     }
 
     @media only screen and (max-width: 550px) {
@@ -91,13 +99,9 @@
         .stock-tag {
             font-size: 8px;
         }
-    }
 
-    @media only screen and (max-width: 750px) {
-
-        /* Check */
-        .menu-btn {
-            width: auto;
+        .advertise-container {
+            height: 200px !important;
         }
     }
 
@@ -105,22 +109,17 @@
         position: relative;
         width: 100%;
         height: 500px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
 
-    .carousel-item {
-        height: 500px;
+    .carousel-inner, .carousel-item {
         width: 100%;
+        height: 100%;
     }
 
     .carousel-inner img {
-        width: 100%;
         height: 100%;
         object-fit: contain !important;
         object-position: center;
-        box-sizing: border-box;
     }
 </style>
 
@@ -132,9 +131,9 @@
         <ul class="carousel-indicators">
             {% for advertise in advertises %}
             {% if loop.first %}
-            <li data-target="#advertise" data-slide-to="{{ loop.counter }}" class="active"></li>
+            <li data-target="#advertise" data-slide-to="{{ loop.index - 1 }}" class="active"></li>
             {% else %}
-            <li data-target="#advertise" data-slide-to="{{ loop.counter }}"></li>
+            <li data-target="#advertise" data-slide-to="{{ loop.index - 1 }}"></li>
             {% endif %}
             {% endfor %}
         </ul>
