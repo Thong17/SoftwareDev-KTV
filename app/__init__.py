@@ -24,8 +24,6 @@ bcrypt = Bcrypt()
 
 ma = Marshmallow()
 
-# c = cookies.SimpleCookie(app)
-
 login_manager = LoginManager()
 login_manager.login_view = 'route.login'
 
@@ -36,6 +34,10 @@ def create_app(config_class=Config):
     app.config.from_object(Config)
 
     db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
     bcrypt.init_app(app)
     ma.init_app(app)
     login_manager.init_app(app)
@@ -121,12 +123,11 @@ class tblUser(db.Model, UserMixin):
     publicId = db.Column(db.String(50), nullable=False)
     token = db.Column(db.String(36), nullable=True, default='')
     drawer = db.Column(db.String(36), nullable=True, default='')
-    isConfirm = db.Column(db.Boolean, default=True)
+    isConfirm = db.Column(db.Boolean, default=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     profile = db.relationship('tblProfile', backref='profile', lazy=True)
     sale = db.relationship('tblTransaction', backref='sale', lazy=True)
     drawers = db.relationship('tblDrawer', backref='drawers', lazy=True)
-
 
 class tblRole(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -217,6 +218,7 @@ class tblAppearance(db.Model):
     height = db.Column(db.String(50), nullable=True)
     weight = db.Column(db.String(50), nullable=True)
     depth = db.Column(db.String(50), nullable=True)
+    material = db.Column(db.String(50), nullable=True)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
 
 class tblValue(db.Model):
@@ -349,6 +351,10 @@ class ProfileSchema(ModelSchema):
     class Meta:
         model = tblProfile
 
+class AppearanceSchema(ModelSchema):
+    class Meta:
+        model = tblAppearance
+
 class UserSchema(ModelSchema):
     profile = fields.Nested(ProfileSchema(many=True), many=True)
     class Meta:
@@ -405,6 +411,7 @@ class StockSchema(ModelSchema):
         model = tblStock
 
 class ProductSchema(ModelSchema):
+    appearance = fields.Nested(AppearanceSchema, many=True)
     stocks = fields.Nested(StockSchema, many=True)
     photos = fields.Nested(PhotoSchema, many=True)
     values = fields.Nested(ValueSchema(many=True), many=True)

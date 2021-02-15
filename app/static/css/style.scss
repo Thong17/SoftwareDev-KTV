@@ -13,6 +13,57 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
 }
 
+html[data-theme='light'] {
+    --color-tooltip: rgb(29, 29, 29);
+    --color-bg: #ffffff;
+    --color-menu-bg: rgba(255, 255, 255, 0.9);
+    --color-menu: rgb(240, 240, 240);
+    --color-font: #111;
+    --color-logo: #111;
+    --color-text: #555;
+    --color-hr: rgba(0, 0, 0, 0.1);
+    --color-hover: rgba(0, 0, 0, 0.3);
+    --color-btn-hover: rgba(240, 240, 240, 0.9);
+    --color-shadow: rgba(1, 1, 1, 0.1);
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+    --color-label: #696969;
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+}
+
+html[data-theme='green'] {
+    --color-tooltip: rgb(15, 73, 7);
+    --color-bg: #051f10;
+    --color-menu-bg: rgba(13, 56, 29, 0.9);
+    --color-menu: rgb(11, 54, 21);
+    --color-font: rgb(255, 255, 255);
+    --color-logo: rgb(223, 223, 223);
+    --color-text: rgb(201, 201, 201);
+    --color-hr: rgba(243, 243, 243, 0.1);
+    --color-hover: rgba(255, 255, 255, 0.3);
+    --color-btn-hover: rgba(255, 255, 255, 0.9);
+    --color-shadow: rgba(1, 1, 1, 0.1);
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+    --color-label: #696969;
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+}
+
+html[data-theme='dark'] {
+    --color-tooltip: rgb(29, 29, 29);
+    --color-bg: rgb(37, 37, 37);
+    --color-menu-bg: rgba(37, 37, 37, 0.9);
+    --color-menu: rgb(51, 51, 51);
+    --color-font: #e9e9e9;
+    --color-logo: #e9e9e9;
+    --color-text: #c5c5c5;
+    --color-hr: rgba(255, 255, 255, .1);
+    --color-hover: rgba(255, 255, 255, 0.3);
+    --color-btn-hover: rgba(37, 37, 37, 0.5);
+    --color-shadow: rgba(1, 1, 1, 0.5);
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+    --color-label: #e6e6e6;
+    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+}
+
 tbody tr,
 tbody tr td,
 tbody tr td ion-icon,
@@ -48,6 +99,16 @@ tbody tr td i {
 
 .dropdown-divider {
     border-top: 1px solid var(--color-hr);
+}
+
+.config-list {
+    width: 80%;
+}
+
+.appearance-value {
+    width: 50%;
+    text-align: start;
+    font-size: 13px;
 }
 
 .container-input {
@@ -346,41 +407,6 @@ select option[value=""] {
     cursor: pointer;
 }
 
-html[data-theme='light'] {
-    --color-tooltip: rgb(29, 29, 29);
-    --color-bg: #ffffff;
-    --color-menu-bg: rgba(255, 255, 255, 0.9);
-    --color-menu: rgb(240, 240, 240);
-    --color-font: #111;
-    --color-logo: #111;
-    --color-text: #555;
-    --color-hr: rgba(0, 0, 0, 0.1);
-    --color-hover: rgba(0, 0, 0, 0.3);
-    --color-btn-hover: rgba(240, 240, 240, 0.9);
-    --color-shadow: rgba(1, 1, 1, 0.1);
-    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
-    --color-label: #696969;
-    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
-}
-
-html[data-theme='dark'] {
-    --color-tooltip: rgb(29, 29, 29);
-    --color-bg: rgb(37, 37, 37);
-    --color-menu-bg: rgba(37, 37, 37, 0.9);
-    --color-menu: rgb(51, 51, 51);
-    --color-font: #e9e9e9;
-    --color-logo: #e9e9e9;
-    --color-text: #c5c5c5;
-    --color-hr: rgba(255, 255, 255, .1);
-    --color-hover: rgba(255, 255, 255, 0.3);
-    --color-btn-hover: rgba(37, 37, 37, 0.5);
-    --color-shadow: rgba(1, 1, 1, 0.5);
-    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
-    --color-label: #e6e6e6;
-    --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
-
-}
-
 html,
 body {
     height: 100%;
@@ -639,7 +665,7 @@ textarea:valid+label {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    padding: 20px 0px;
+    padding: 50px 0px;
     transition: 0.3s ease-in-out;
     z-index: 101;
 }
@@ -1651,6 +1677,7 @@ table tbody tr {
     flex-direction: column;
     justify-content: start;
     align-items: flex-start;
+    border-top: 1px dashed var(--color-hr);
 }
 
 .product-btn {
@@ -1751,7 +1778,8 @@ table tbody tr {
     position: relative;
     width: 100%;
     height: 30px;
-    margin-top: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1841,6 +1869,7 @@ table tbody tr {
     grid-template-rows: repeat(auto-fill, minmax(100px, 100px));
     width: 100%;
     cursor: default;
+    padding: 10px;
 }
 
 .property-values .value {
@@ -2468,6 +2497,11 @@ button.form-empty:hover {
     display: none;
 }
 
+.navbar-hide {
+    transform: translateY(-100%);
+    transition: 0.5s ease;
+}
+
 
 @keyframes spin {
     0% {
@@ -2484,7 +2518,7 @@ button.form-empty:hover {
         width: 60%;
     }
     .wrap-container {
-        padding: 0 50px;
+        padding: 0 50px !important;
     }
     .menu-nav {
         padding: 20px 50px;
@@ -2498,8 +2532,8 @@ button.form-empty:hover {
     .menu-nav {
         padding: 20px;
     }
-    .wrap-container {
-        padding: 0 20px;
+    .wrap-container, .product-details {
+        padding: 0 20px !important;
     }
     .row-wrapper {
         flex-wrap: wrap;
@@ -2584,12 +2618,15 @@ button.form-empty:hover {
         padding: 50px 20px;
         grid-gap: 20px;
     }
+    .lb-data .lb-close {
+        top: -40px !important;
+        right: 10px !important;
+    }
 }
 
 @media only screen and (max-width: 450px) {
-    .side-nav {
-        position: fixed;
-        transform: translateX(-100%);
+    .navbar-hide {
+        transform: translateY(0);
     }
     header, footer {
         margin-left: 0;
@@ -2618,9 +2655,11 @@ button.form-empty:hover {
     }
 
     .side-nav {
+        position: fixed;
+        transform: translateX(-100%);
         padding-top: 15vh;
         width: 80%;
-        background-color: var(--color-btn-hover);
+        background-color: var(--color-menu-bg);
         box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
     }
 

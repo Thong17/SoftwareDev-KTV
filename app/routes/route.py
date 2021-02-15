@@ -1,5 +1,5 @@
 from app import bcrypt, db, login_manager, upload, delete_photo, utc2local
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema
 from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
@@ -397,7 +397,7 @@ def udpate_category(id):
 
 @route.route('/brand', methods=['POST', 'GET'])
 @login_required
-def brands():
+def brand():
     brands = tblBrand.query.all()
     categories = tblCategory.query.with_entities(tblCategory.id, tblCategory.category).all()
     form = BrandForm()
@@ -430,17 +430,27 @@ def brands():
         return jsonify(msg)
     return render_template('views/product.html', brands=brands, form=form, categories=categories)
 
+@route.route('/brands', methods=['POST'])
+def brands():
+    brands = tblBrand.query.all()
+    b = BrandSchema(many=True)
+    Brands = b.dump(brands)
+    return jsonify(Brands)
+
 @route.route('/brand/remove/<id>', methods=['POST'])
 def remove_brand(id):
     brand = tblBrand.query.get(id)
-    try: 
-        db.session.delete(brand)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted brand: '+brand.brand, type='Delete', createdBy=current_user.id)
-        db.session.add(Activity)
-        db.session.commit()
-        return jsonify({'msg': 'Success'})
-    except:
-        return jsonify({'msg': 'Failed'})
+    if brand.products:
+        return jsonify({'msg': 'Please remove all the existing product before deleting.'})
+    else:
+        try: 
+            db.session.delete(brand)
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted brand: '+brand.brand, type='Delete', createdBy=current_user.id)
+            db.session.add(Activity)
+            db.session.commit()
+            return jsonify({'msg': 'Success'})
+        except:
+            return jsonify({'msg': 'Failed'})
 
 @route.route('/brand/update/<id>', methods=['POST'])
 def udpate_brand(id):
@@ -493,6 +503,8 @@ def add_product():
         db.session.add(Model)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added product '+product, type='Add', createdBy=current_user.id)
         db.session.add(Activity)
+        Appearance = tblAppearance(id=str(uuid4()), width='', height='', weight='', depth='', material='', productId=id)
+        db.session.add(Appearance)
         db.session.commit()
         return jsonify({'data': 'Success', 'id': id})
     except:
@@ -593,8 +605,11 @@ def product(id):
         c = CategorySchema()
         result['category'] = c.dump(category)
         brand = tblBrand.query.get(product.brandId)
-        b = BrandSchema()
-        result['brand'] = c.dump(brand)
+        result['brand'] = brand.brand
+        brands = tblBrand.query.all()
+        b = BrandSchema(many=True)
+        Brands = b.dump(brands)
+        result['brands'] = Brands
         return jsonify(result)
     return render_template('views/product_details.html', product=product)
 
@@ -631,6 +646,12 @@ def save_product(id):
     discount = request.form['discount']
     description = request.form['description']
 
+    width = request.form['width']
+    height = request.form['height']
+    weight = request.form['weight']
+    depth = request.form['depth']
+    material = request.form['material']
+
     Category = tblCategory.query.get(category)
     Brand = tblBrand.query.get(brand)
 
@@ -655,6 +676,12 @@ def save_product(id):
     Product.brandId = brand
     Product.discount = discount
     Product.period = period
+
+    Product.appearance[0].width = width
+    Product.appearance[0].height = height
+    Product.appearance[0].weight = weight
+    Product.appearance[0].depth = depth
+    Product.appearance[0].material = material
     try:
         db.session.commit()
         return jsonify({'data': 'Success'})
@@ -671,7 +698,9 @@ def remove_product(id):
                     delete_photo('uploads', photo.src)
     if product.photo != 'default.png':
         delete_photo('uploads', product.photo)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted product '+product.product, type='Delete', createdBy=current_user.id)
     db.session.delete(product)
+    db.session.add(Activity)
     db.session.commit()
     return jsonify({'result': 'Success'})
 
@@ -971,8 +1000,6 @@ def order(id):
     price = Decimal(data['price'])
     quantity = Decimal(data['quantity'])
 
-    # Check
-
     amount = price * (1 - discount / 100)
     pprice = price * (1 - discount / 100)
 
@@ -1056,8 +1083,6 @@ def create_drawer():
         db.session.add(Money)
     Drawer.startCost = total
     current_user.drawer = id
-
-    #continue
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has opened drawer', type='Open', createdBy=current_user.id)
     db.session.add(Activity)
 
@@ -1154,12 +1179,12 @@ def delete_transaction(id):
     if pid != '':
         Payment = tblPayment.query.get(pid)
         Payment.amount -= Transaction.price
-    # try:
-    db.session.delete(Transaction)
-    db.session.commit()
-    return jsonify({'result': 'Success', 'quantity': quantity})
-    # except:
-    #     return jsonify({'result': 'Transaction could not found'})
+    try:
+        db.session.delete(Transaction)
+        db.session.commit()
+        return jsonify({'result': 'Success', 'quantity': quantity})
+    except:
+        return jsonify({'result': 'Transaction could not found'})
 
 
 @route.route('/checkout/<id>', methods=['POST'])

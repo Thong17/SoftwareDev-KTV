@@ -2,6 +2,7 @@
 
 {% block style %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/lightbox.min.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -80,12 +81,13 @@
 
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+<script src="{{ url_for('static', filename='js/lightbox.min.js') }}"></script>
 <script>
-    $(document).on('focus', '#discount', function() {
+    $(document).on('focus', '#discount', function () {
         $('.percentage').removeClass('hide')
     })
 
-    $(document).on('focusout', '#discount', function() {
+    $(document).on('focusout', '#discount', function () {
         if ($(this).val() == '') {
             $('.percentage').addClass('hide')
         }
@@ -122,7 +124,7 @@
         self.bind('click', function () {
             return false;
         });
-        
+
         Array.from($('.details-colors').children()).forEach(color => {
             $(color).removeClass('active')
         })
@@ -135,7 +137,7 @@
                 gsap.from('.details-img', {
                     opacity: 0,
                     duration: 0.8,
-                    onComplete: function() {
+                    onComplete: function () {
                         self.unbind('click')
                     }
                 })
@@ -149,18 +151,12 @@
 
         var name = $(label).find('#value-value').text()
         var price = $(label).find('#value-price').text()
-        var currency = $(label).find('#value-currency').text()
         var description = $(label).find('#value-description').text()
 
-        if (currency == '$') {
-            currency = 'dollar'
-        } else {
-            currency = 'riel'
-        }
         $('#addValue').modal('show')
         $('.edit-btn').attr('id', id)
         toggleEdit($('.edit-btn'), $('.save-btn'))
-        $('.modal-body').html(valueForm(name, price, currency, description))
+        $('.modal-body').html(valueForm(name, price, description))
         return false
     })
 
@@ -223,12 +219,18 @@
         var category = $('#category').val()
         var brand = $('#select-brands').val()
 
+        var width = $('#width').val()
+        var height = $('#height').val()
+        var weight = $('#weight').val()
+        var depth = $('#depth').val()
+        var material = $('#material').val()
+
         if ($(isStock).prop('checked') == true) {
             isStock = true
         } else {
             isStock = false
         }
-        
+
         if (category != null) {
             if (product == '') {
                 $('#product').focus()
@@ -238,7 +240,7 @@
                 $.ajax({
                     url: '/product/save/' + id,
                     type: 'POST',
-                    data: { product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock, brand: brand },
+                    data: { product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock, brand: brand, width: width, height: height, weight: weight, depth: depth, material: material },
                     success: function (data) {
                         alert(data.data)
                     }
@@ -287,7 +289,13 @@
                     price: data.price,
                     properties: data.category.properties,
                     values: data.values,
-                    id: data.id
+                    id: data.id,
+                    width: data.appearance[0].width,
+                    height: data.appearance[0].height,
+                    weight: data.appearance[0].weight,
+                    depth: data.appearance[0].depth,
+                    material: data.appearance[0].material,
+                    brand: data.brand
                 }))
 
                 gsap.from('.details-title, #details-category, .details-colors, .details-details, .details-appearance, .details-property, .details-img', {
@@ -320,7 +328,12 @@
                             period: data.period,
                             description: data.description,
                             colors: data.colors,
-                            image: photo
+                            image: photo,
+                            width: data.appearance[0].width,
+                            height: data.appearance[0].height,
+                            weight: data.appearance[0].weight,
+                            depth: data.appearance[0].depth,
+                            material: data.appearance[0].material
                         }))
 
                         var options = $('#category').children()
@@ -331,18 +344,18 @@
                             }
                         })
 
+                        var brand_element = ''
 
-
-                        var options_brand = $('#select-brands').children()
-
-                        Array.from(options_brand).forEach(option => {
-                            console.log(data.productOfBrand, $(option).val())
-                            if (data.productOfBrand == $(option).val()) {
-                                $(option).prop('selected', true)
+                        data.brands.forEach(option => {
+                            if (data.productOfBrand == option.id) {
+                                brand_element += '<option value="' + option.id + '" selected="selected">' + option.brand + '</option>'
+                            } else {
+                                brand_element += '<option value="' + option.id + '">' + option.brand + '</option>'
                             }
                         })
 
 
+                        $('#select-brands').append(brand_element)
 
                         $('.pickr').attr('id', id)
 
@@ -497,7 +510,7 @@
         } else {
             isStock = false
         }
-        
+
         if (category != null) {
             if (product == '') {
                 $('#product').focus()
@@ -507,7 +520,7 @@
                 $.ajax({
                     url: '/product/add',
                     type: 'POST',
-                    data: {brand: brand, product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
+                    data: { brand: brand, product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
                     success: function (data) {
                         $('.product-image').removeClass('hide')
                         toggleEdit($('.save-product'), $('.submit-product'))
@@ -676,43 +689,72 @@
                         period: "",
                         description: "",
                         colors: "",
-                        image: '/static/uploads/default.png'
+                        image: '/static/uploads/default.png',
+                        width: "",
+                        height: "",
+                        weight: "",
+                        depth: "",
+                        material: ""
                     }))
 
-                    uploadColor('.pickr', 'color-name')
+                    $.ajax({
+                        url: '/brands',
+                        type: 'POST',
+                        success: function (data) {
+                            var brand_element = ''
 
-                    $('#brand-id').val(id)
-                    gsap.to('#product-nav', {
-                        x: 0,
-                        onComplete: function () {
+                            data.forEach(option => {
+                                if (data.productOfBrand == option.id) {
+                                    brand_element += '<option value="' + option.id + '" selected="selected">' + option.brand + '</option>'
+                                } else {
+                                    brand_element += '<option value="' + option.id + '">' + option.brand + '</option>'
+                                }
+                            })
 
+                            $('#select-brands').append(brand_element)
+
+                            uploadColor('.pickr', 'color-name')
+
+                            $('#brand-id').val(id)
+                            gsap.to('#product-nav', {
+                                x: 0,
+                                onComplete: function () {
+
+                                }
+                            })
+
+                            $('.grid-products').html(showProductDetails({
+                                image: 'static/svg/camera-{{current_user.theme}}.svg',
+                                colors: "",
+                                product: "Product Name",
+                                category: "category",
+                                description: "description",
+                                currency: "$",
+                                price: "0.00",
+                                properties: "",
+                                values: "",
+                                id: "",
+                                width: "...",
+                                height: "...",
+                                weight: "...",
+                                depth: "...",
+                                material: "...",
+                                brand: '...'
+                            }))
+
+                            gsap.from('.details-title, #details-category, .details-details, .details-appearance, .details-property, .details-img', {
+                                opacity: 0,
+                                duration: 1,
+                                delay: 0.3
+                            })
+                            gsap.from('.description-container span, .description-container p', {
+                                opacity: 0,
+                                x: 70,
+                                duration: 0.7,
+                                delay: 0.2,
+                                stagger: 0.1
+                            })
                         }
-                    })
-
-                    $('.grid-products').html(showProductDetails({
-                        image: 'static/svg/camera-{{current_user.theme}}.svg',
-                        colors: "",
-                        product: "Product Name",
-                        category: "category",
-                        description: "description",
-                        currency: "$",
-                        price: "0.00",
-                        properties: "",
-                        values: "",
-                        id: ""
-                    }))
-
-                    gsap.from('.details-title, #details-category, .details-details, .details-appearance, .details-property, .details-img', {
-                        opacity: 0,
-                        duration: 1,
-                        delay: 0.3
-                    })
-                    gsap.from('.description-container span, .description-container p', {
-                        opacity: 0,
-                        x: 70,
-                        duration: 0.7,
-                        delay: 0.2,
-                        stagger: 0.1
                     })
                 }
             })
@@ -874,21 +916,17 @@
     function removeBrand(arg) {
         event.stopPropagation()
         var id = $(arg).parent().attr('id')
-        if (confirm('Brand may contain many products and properties! Are you sure you want to delete it?')) {
-            $.ajax({
-                url: '/brand/remove/' + id,
-                method: 'POST',
-                success: function (data) {
-                    if (data['msg'] == 'Success') {
-                        window.location.reload()
-                    } else {
-                        alert('failed')
-                    }
+        $.ajax({
+            url: '/brand/remove/' + id,
+            method: 'POST',
+            success: function (data) {
+                if (data['msg'] == 'Success') {
+                    window.location.reload()
+                } else {
+                    alert(data.msg)
                 }
-            })
-        } else {
-            return
-        }
+            }
+        })
     }
     $('.item-container').on('click', '.item', function () {
         $('.item').bind('click', function () {
