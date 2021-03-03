@@ -435,38 +435,34 @@
     function removeCategory(arg) {
         event.stopPropagation()
         var id = $(arg).parent().attr('id')
-        if (confirm('Category may contain many products and properties! Are you sure you want to delete it?')) {
-            $.ajax({
-                url: '/category/remove/' + id,
-                method: 'POST',
-                success: function (data) {
-                    if (data['msg'] == 'Success') {
-                        $('#prop-header').html('<h3 class="color-font">Category</h3>')
-                        gsap.to('#list-properties tr', {
-                            x: -10,
-                            opacity: 0,
-                            stagger: {
-                                each: 0.1,
-                                from: 'end'
-                            },
-                            onComplete: function () {
-                                $('#' + id).fadeOut('slow', function () {
-                                    $(this).remove()
-                                    $('#list-properties').empty()
-                                })
-                            }
-                        })
+        $.ajax({
+            url: '/category/remove/' + id,
+            method: 'POST',
+            success: function (data) {
+                if (data['msg'] == 'Success') {
+                    $('#prop-header').html('<h3 class="color-font">Category</h3>')
+                    gsap.to('#list-properties tr', {
+                        x: -10,
+                        opacity: 0,
+                        stagger: {
+                            each: 0.1,
+                            from: 'end'
+                        },
+                        onComplete: function () {
+                            $('#' + id).fadeOut('slow', function () {
+                                $(this).remove()
+                                $('#list-properties').empty()
+                            })
+                        }
+                    })
 
-                        $('.today .box-result p').text(data['today'])
-                        $('.total .box-result p').text(data['total'])
-
-
-                    }
+                    $('.today .box-result p').text(data['today'])
+                    $('.total .box-result p').text(data['total'])
+                } else {
+                    alert(data['msg'])
                 }
-            })
-        } else {
-            return
-        }
+            }
+        })
     }
     $(document).on('click', '.edit-content', function () {
         var id = $(this).parent().attr('id')

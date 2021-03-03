@@ -28,10 +28,10 @@
                 </thead>
                 <tbody>
                     {% for activity in activities %}
-                        <tr class="activity-item notranslate" style="font-size: 13px;" id="{{ activity.id }}">
+                        <tr class="activity-item" style="font-size: 13px;" id="{{ activity.id }}">
                             <td class="color-text" style="width: 65%;">{{ activity.activity }}</td>
                             <td class="color-text">{{ activity.type }}</td>
-                            <td class="color-text">{{ activity.createdOn }}</td>
+                            <td class="color-text notranslate">{{ activity.createdOn }}</td>
                             <td class="color-text">{{ activity.createdBy }}</td>
                             <td class="color-text"></td>
                         </tr>

@@ -1,0 +1,608 @@
+{% extends 'views/financial.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<style>
+    .room-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px 10px 10px 15px;
+        background-color: var(--color-menu);
+        border-radius: 7px;
+        box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+        height: 90px;
+    }
+
+    .room-container.active {
+        border: 1px solid #2e6da4;
+    }
+
+    .grid-products {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        grid-template-rows: repeat(auto-fill, minmax(90px, 90px));
+        padding: 15px 15px 15px 15px;
+        grid-row-gap: 30px;
+    }
+
+    .room-bottom {
+        width: 100%;
+    }
+
+    #list-orders {
+        width: 750px;
+        height: 100vh;
+    }
+
+
+    .fc-view-harness {
+        height: 70vh !important;
+    }
+
+    .fc-toolbar-title,
+    .fc-col-header-cell-cushion,
+    .fc-scrollgrid-shrink-cushion {
+        font-size: 13px !important;
+        color: var(--color-text) !important;
+        font-weight: 300;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
+    }
+
+    .fc-col-header-cell-cushion {
+        font-size: 15px !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 17px !important;
+        align-self: center;
+    }
+
+    .fc-today-button {
+        background-color: var(--color-menu) !important;
+        border: 1px solid var(--color-hr) !important;
+        padding: 3px 10px !important;
+    }
+
+    .fc-next-button,
+    .fc-prev-button {
+        background-color: var(--color-bg) !important;
+        border: 1px solid var(--color-bg) !important;
+        padding: 3px 0 !important;
+    }
+
+    .fc-icon {
+        font-size: 15px !important;
+        color: var(--color-text) !important;
+    }
+
+    .fc-button,
+    .dataTables_empty,
+    .dropdown-item,
+    .no-results,
+    .btn-light {
+        color: var(--color-text) !important;
+        border-radius: 7px !important;
+        font-weight: 300 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif !important;
+
+    }
+
+    .fc-add-button {
+        background-color: var(--color-menu) !important;
+        border: 1px solid var(--color-hr) !important;
+        padding: 3px 10px !important;
+    }
+
+    .fc-toolbar-chunk {
+        display: flex !important;
+    }
+
+    .search-btn {
+        padding: 0px 14px 0 12px !important;
+        color: var(--color-text);
+    }
+
+    .modal-dialog .modal-content {
+        border-radius: 9px;
+    }
+
+    .modal-height {
+        height: 50vh;
+        overflow-y: scroll;
+    }
+
+    .dataTable {
+        width: 100% !important;
+        border: none !important;
+    }
+
+    #new-customer {
+        border-radius: 17px !important;
+    }
+
+    .dataTables_info {
+        display: none;
+    }
+
+    .action-btn {
+        width: 50px;
+        margin-left: 10px;
+    }
+
+    .modal-header {
+        border: none !important;
+        padding-bottom: 0 !important;
+    }
+
+    #list-customers {
+        height: 100%;
+        overflow-y: scroll;
+    }
+
+    .form-control,
+    .btn-light {
+        border-radius: 9px !important;
+    }
+
+    #list-customers .customer-tr:hover {
+        background-color: var(--color-menu);
+    }
+
+    .bootstrap-select>.dropdown-toggle.bs-placeholder,
+    .btn-light:not(:disabled):not(.disabled).active,
+    .btn-light:not(:disabled):not(.disabled):active,
+    .show>.btn-light.dropdown-toggle {
+        border: 1px solid var(--color-hr) !important;
+        background-color: var(--color-bg) !important;
+        outline: none !important;
+    }
+
+    thead tr {
+        background-color: var(--color-menu);
+    }
+
+    .dash {
+        position: absolute;
+        top: 33px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .clock-container {
+        padding: 7px 8px 7px 15px;
+        width: 170px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 18px;
+        border: 1px solid var(--color-hr);
+    }
+
+    #new-customer:hover {
+        background-color: var(--color-menu);
+    }
+
+    #show-order {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .date-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-date {
+        padding: 5px 20px;
+        cursor: pointer;
+    }
+
+    .dropdown-item {
+        border-radius: 0 !important;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container flex-between-start">
+    <div class="row-wrapper">
+        <div class="column-wrapper" style="width: 100%;">
+            {% for floor in floors %}
+            <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ floor.floor }}</h5>
+            <div class="grid-products" id="grid-{{ floor.id }}">
+                {% if floor.rooms %}
+                {% for room in floor.rooms %}
+                <div class="room-container" id="{{ room.id }}">
+                    <div class="product-btn color-text">
+                        <i class="fa fa-pencil-square-o edit-room" aria-hidden="true"></i>
+                        <i class="fa fa-trash-o delete-room" aria-hidden="true"></i>
+                    </div>
+                    <div class="flex-between-center room-bottom">
+                        <h5 class="color-font room-no notranslate">{{ room.room }}</h5>
+                        <div class="room-price color-text"><span class="currency-format notranslate">{{ room.price
+                                }}</span></div>
+                    </div>
+                    <div class="color-text room-bottom flex-between-center">
+                        {% if room.status == 'Open' %}
+                        <div class="room-status text-success">Open</div>
+                        {% else %}
+                        <div class="room-status text-danger">Close</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="border-right"></div>
+        <div class="column-wrapper" id="list-orders">
+            <div class="column-title flex-center-center mb-3" style="text-align: center;"><h4 class="color-font m-0">Order</h4></div>
+            <!-- <div id='external-events'>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
+                  <div class='fc-event-main'>My Event 1</div>
+                </div>
+            </div> -->
+            <div class="calendar-container notranslate">
+                <div class="date-header">
+                    <span class="btn-date prev-date"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
+                    <h2 class="fc-toolbar-title m-0" id="date">{{ date | datetimefilter('%B %d, %Y') }}</h2>
+                    <span class="btn-date next-date"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <table id="order-table" class="table">
+                    <thead>
+                        <tr class="color-font">
+                            <td class="color-text">Customer</td>
+                            <td class="color-text">Phone</td>
+                            <td class="color-text">Room</td>
+                            <td class="color-text">Order</td>
+                        </tr>
+                    </thead>
+                    <tbody id="order-list">
+                        {% for order in orders %}
+                        <tr class="order-item" id="{{ order.id }}">
+                            <td class="color-text">{% if order.customer.name != '' %}{{ order.customer.name }}{%
+                                else %}...{% endif %}</td>
+                            <td class="color-text notranslate">{% if order.customer.phone != '' %}{{
+                                order.customer.phone }}{%
+                                else %}...{% endif %}</td>
+                            <td class="color-text notranslate">{{ order.order.room }}</td>
+                            <td class="color-text flex-between-center"><span>{{ order.orderOn | datetimefilter }}-{{ order.orderTo | datetimefilter }}</span><span class="remove-order"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header flex-column-start-start">
+                <div class="flex-between" style="width: 100%;">
+                    <div class="flex-center-center" style="width: calc(100% - 170px);">
+                        <h4 class="modal-title color-font"></h4>
+                    </div>
+                    <div class="clock-container">
+                        <div id="clock-timer" class="color-font notranslate"></div>
+                        <ion-icon name="time-outline" class="text-success" style="font-size: 21px;"></ion-icon>
+                    </div>
+                </div>
+                <input type="hidden" id="input-room" value="">
+                <div class="row m-0" style="width: 100%;">
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <label for="input-customer" class="label">Customer Name</label>
+                            <select class="selectpicker" id="select-customer" data-live-search="true">
+                                {% if customers %}
+                                {% for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option value="" disabled>No customer</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <button class="btn border px-3 color-text" id="new-customer">New Customer</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-0" style="width: 100%; position: relative;">
+                    <span class="dash color-text">-</span>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="time" class="form-control input-color" id="order-from">
+                            <label for="order-from" class="label">From</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="time" class="form-control input-color" id="order-to">
+                            <label for="order-to" class="label">To</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body modal-height">
+                <table id="list-customers" class="table">
+                    <thead>
+                        <tr class="color-font">
+                            <td class="color-text">Customer</td>
+                            <td class="color-text">Phone</td>
+                            <td class="color-text">Birthdate</td>
+                        </tr>
+                    </thead>
+                    <tbody class="customer-container">
+                        {% for customer in customers %}
+                        <tr class="customer-tr" id="{{ customer.id }}">
+                            <td class="color-text" id="cus-firstname">{% if customer.name != '' %}{{ customer.name }}{%
+                                else %}...{% endif %}</td>
+                            <td class="color-text notranslate" id="cus-lastname">{% if customer.phone != '' %}{{
+                                customer.phone }}{%
+                                else %}...{% endif %}</td>
+                            <td class="color-text" id="cus-phone">{% if customer.birthdate != '' %}{{ customer.birthdate
+                                }}{% else %}...{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr id="customer-form" style="display: none;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn color-text" data-dismiss="modal">Close</button>
+                <button type="button" class="btn bg-menu color-text" id="save-order">Save Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(document).on('click', '#show-order', function() {
+            $.ajax({
+                url: '/order',
+                type: 'POST',
+                success: function(data) {
+                    console.log(data)
+                    $('.column-title').html('<h4 class="color-font m-0">Order</h4>')
+                    $('.calendar-container').html(``)
+                }
+            })
+        })
+
+        $(document).on('click', '.remove-order', function() {
+            id = $(this).closest('.order-item').attr('id')
+            if (confirm('Are you sure you want to remove this order?')) {
+                $.ajax({
+                    url: '/order/remove/'+id,
+                    type: 'POST',
+                    success: function(data) {
+                        if (data.msg == 'Success') {
+                            $('#'+id).fadeOut('slow', function() {
+                                $(this).remove()
+                            })
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+        })
+
+        $('#save-order').on('click', function () {
+            customer = $('#select-customer')
+            room = $('#input-room')
+            from = $('#order-from')
+            to = $('#order-to')
+            date = $('.fc-toolbar-title').text()
+            if (customer.val() == '' || room.val() == '' || from.val() == '' || to.val() == '') {
+                msg = 'Please fill the requirement to submit order.'
+                alert(msg)
+            } else {
+                $.ajax({
+                    url: '/order/add',
+                    type: 'POST',
+                    data: { customer: customer.val(), room: room.val(), from: from.val(), to: to.val(), date: date },
+                    success: function (data) {
+                        if (data.msg == 'Success') {
+                            $('#customerModal').modal('hide')
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+
+        })
+
+        $('#select-customer').selectpicker({
+            title: 'Select Customer'
+        })
+
+        $('#list-customers').on('click', '.customer-tr', function () {
+            console.log($(this).attr('id'))
+        })
+
+        $('#new-customer').on('click', function () {
+            $('#list-customers').find('#customer-form').html(createCustomerForm('', '', '')).css('display', 'table-row')
+        })
+
+        $(document).on('click', '.customer-close', function () {
+            $('#customer-form').empty()
+        })
+
+        $(document).on('click', '.customer-add', function () {
+            fname = $('#name').val()
+            phone = $('#phone').val()
+            birthdate = $('#birthdate').val()
+            if (fname != '' || phone != '' || birthdate != '') {
+                $.ajax({
+                    url: '/customer/add',
+                    type: 'POST',
+                    data: { fname: fname, phone: phone, birthdate: birthdate },
+                    success: function (data) {
+                        if (data.msg == 'Success') {
+                            validation = [data.username, data.phone]
+                            if (data.username == '') data.username = '...'
+                            if (data.phone == '') data.phone = '...'
+                            if (data.birthdate == null) data.birthdate = 'None'
+                            $('#list-customers tr#customer-form').after(`<tr id="` + data.id + `">
+                                <td class="color-text" id="cus-firstname">`+ data.username + `</td>
+                                <td class="color-text" id="cus-lastname">`+ data.phone + `</td>
+                                <td class="color-text" id="cus-phone">`+ data.birthdate + `</td>
+                            </tr>`)
+                            $('#name').val('').focus()
+                            $('#phone').val('')
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            } else {
+                $('#name').focus()
+            }
+        })
+
+        $('#list-customers').DataTable({
+            paging: false,
+            searching: false,
+            "drawCallback": function (settings) {
+
+            }
+        })
+
+        $('#order-table').DataTable({
+            paging: false,
+            searching: false,
+            "drawCallback": function (settings) {
+
+            }
+        })
+
+        currencyFormat()
+
+        $(document).on('click', '.room-container', function () {
+            Array.from($('.grid-products').children()).forEach(r => {
+                $(r).removeClass('active')
+            })
+            $(this).addClass('active')
+            $('.column-title').html('<button class="btn border" id="show-order"><i class="fa fa-angle-left" aria-hidden="true"></i></button><h4 class="color-font m-0">'+$(this).find('.room-no').text()+'</h4>')
+            $('#input-room').val($(this).attr('id'))
+            $('.modal-title').text($(this).find('.room-no').text())
+            $('.calendar-container').html('<div id="calendar"></div>')
+            Calendar = FullCalendar.Calendar
+            Draggable = FullCalendar.Draggable
+
+            // containerEl = document.getElementById('external-events')
+            calendarEl = document.getElementById('calendar')
+
+            // new Draggable(containerEl, {
+            //     itemSelector: '.fc-event',
+            //     eventData: function (eventEl) {
+            //         return {
+            //             title: eventEl.innerText
+            //         };
+            //     }
+            // });
+
+            calendar = new Calendar(calendarEl, {
+                customButtons: {
+                    add: {
+                        text: '+',
+                        click: function () {
+                            $('#customerModal').modal('show')
+                        }
+                    }
+                },
+                headerToolbar: {
+                    left: 'today',
+                    center: 'prev title next',
+                    right: 'add'
+                },
+                initialView: 'timeGridDay',
+                editable: true,
+                droppable: true,
+                drop: function (info) {
+                    console.log(info)
+                }
+            })
+
+            calendar.render()
+        })
+    })
+
+    function createCustomerForm(name, phone, birthdate) {
+        return `<td><input type="text" id="name" class="form-empty input-color color-text" value="` + name + `" placeholder="Name"></td>
+                <td><input type="text" id="phone" class="form-empty input-color color-text" value="`+ phone + `" placeholder="Phone"></td>
+                <td class="flex-between">
+                    <input type="date" id="birthdate" class="form-empty input-color color-text" value="`+ birthdate + `" placeholder="Birthdate">
+                    <div class="flex-between-center action-btn">
+                        <span class="customer-close pointer">
+                            <ion-icon name="close-outline"></ion-icon>
+                        </span>
+                        <span class="pointer customer-add">
+                            <ion-icon name="checkmark-outline"></ion-icon>
+                        </span>
+                    </div>
+                </td>`
+    }
+
+    function date_time() {
+        var date = new Date();
+        var am_pm = "AM";
+        var hour = date.getHours();
+        if (hour >= 12) {
+            am_pm = "PM";
+        }
+        if (hour == 0) {
+            hour = 12;
+        }
+        if (hour > 12) {
+            hour = hour - 12;
+        }
+        if (hour < 10) {
+            hour = "0" + hour;
+        }
+
+        var minute = date.getMinutes();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        var sec = date.getSeconds();
+        if (sec < 10) {
+            sec = "0" + sec;
+        }
+
+        document.getElementById("clock-timer").innerHTML = hour + ":" + minute + ":" + sec + " " + am_pm;
+    }
+
+    setInterval(date_time, 500)
+</script>
+{% endblock %}

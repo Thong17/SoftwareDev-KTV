@@ -287,7 +287,7 @@ $(document).on('click', '.checkout-btn', function() {
                     }
                 }))
 
-                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+paid+' USD</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+' USD</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+change.toFixed(2)+' USD</span></div><div class="list-changes">'
+                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+paid.toFixed(2)+' USD</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+' USD</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+change.toFixed(2)+' USD</span></div><div class="list-changes">'
 
                 changeArr.forEach(m => {
                     if (m.money != 0) {
@@ -297,7 +297,7 @@ $(document).on('click', '.checkout-btn', function() {
                         } else {
                             money_currency = 'x'+m.unit
                         }
-                        element += '<div class="change-row"><span>'+m.currency+' '+m.money+'</span><span>'+money_currency+'</span></div>'
+                        element += '<div class="change-row"><span>'+m.currency+' '+m.money.toFixed(2)+'</span><span>'+money_currency+'</span></div>'
                     }
                 })
 

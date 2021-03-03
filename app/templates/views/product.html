@@ -505,6 +505,10 @@
         var description = $('#details').val()
         var category = $('#category').val()
 
+        if ($('#select-brands').val() != null) {
+            brand = $('#select-brands').val()
+        }
+
         if ($(isStock).prop('checked') == true) {
             isStock = true
         } else {
@@ -634,17 +638,16 @@
                                         ` + element + value_element + `
                                     </div>`
                     })
+                    $('.details-property').html(properties)
+                    gsap.from('.property-title', {
+                        opacity: 0,
+                        duration: 0.5
+                    })
+                    gsap.from('.value, .btn-value', {
+                        opacity: 0,
+                        scale: 0.7
+                    })
                 }
-
-                $('.details-property').html(properties)
-                gsap.from('.property-title', {
-                    opacity: 0,
-                    duration: 0.5
-                })
-                gsap.from('.value, .btn-value', {
-                    opacity: 0,
-                    scale: 0.7
-                })
             }
         })
     })

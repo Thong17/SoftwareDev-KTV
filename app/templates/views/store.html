@@ -1,0 +1,375 @@
+{% extends 'views/custome.html' %}
+
+{% block style %}
+<style>
+    form {
+        width: 270px;
+    }
+    .column-header {
+        grid-template-rows: 100%;
+        height: 65px;
+    }
+    .percentage {
+        top: 30px;
+        right: 13px;
+    }
+    #floor {
+        width: 36px;
+        transition: 0.5s ease !important;
+    }
+    #addFloor {
+        position: absolute;
+        top: 48px;
+        right: 1px;
+        border: none;
+        z-index: 100;
+        background-color: none;
+    }
+    .animate-inp {
+        width: 130px !important;
+    }
+    .item-container {
+        height: 100%;
+        padding-left: 5px;
+    }
+    #select-floor {
+        width: 100% !important;
+    }
+    .dropdown-menu {
+        width: 100%;
+    }
+    .dropdown-icon {
+        position: absolute;
+        top: 6px;
+        right: 10px;
+    }
+    .dropdown-item.active::after {
+        content: '';
+    }
+    .per {
+        position: absolute;
+        top: 33px;
+        right: 35%;
+        z-index: 10000;
+    }
+    .room-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px 10px 10px 15px;
+        background-color: var(--color-menu);
+        border-radius: 7px;
+        box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+        height: 90px;
+    }
+    .grid-products {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-rows: repeat(auto-fill, minmax(90px, 90px));
+        padding: 15px 15px 15px 15px;
+        grid-row-gap: 30px;
+    }
+    .room-bottom {
+        width: 100%;
+        text-align: end;
+    }
+    .room-container:hover .product-btn {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+    <div class="row-wrapper">
+        <div class="column-wrapper">
+            <div class="item-container">
+                <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Customize Store</h5>
+                <div class="form-group">
+                    <input type="text" name="store" id="store" class="form-control input-color" autocomplete="off" value="{{ store.store }}">
+                    <label for="store" class="label">Store</label>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <input type="text" name="phone" id="phone" class="form-control input-color" autocomplete="off" value="{{ store.phone }}" title="{{ store.phone }}">
+                            <label for="phone" class="label">Phone</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 pl-0">
+                        <div class="form-group">
+                            <input type="text" name="location" id="location" class="form-control input-color" autocomplete="off" value="{{ store.location }}" title="{{ store.location }}">
+                            <label for="location" class="label">Location</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-shadow btn-block color-font bg-menu" id="saveStore">Save Store Info</button>
+                </div>
+                <hr>
+                <div class="form-group selector">
+                    <p class="detail-content ml-1">Select floor for specific property</p>
+                    <div class="flex-between-center">
+
+                        <div class="dropdown" id="select-floor">
+                            <button class="btn btn-block border color-text flex-between-center btn-floor" data-toggle="dropdown"><span class="select-text">Select Floor</span><span class="dropdown-icon"><i class="fa fa-caret-down" aria-hidden="true"></i></span></button>
+                            <div class="dropdown-menu" id="list-floors">
+                                {% if floors %}
+                                {% for floor in floors %}
+                                {% if loop.first %}
+                                <div class="dropdown-item category-item flex-between-center color-text pr-3 active" id="{{ floor.id }}"><span class="dropdown-text">{{ floor.floor }}</span><p class="btn-clear notranslate" onclick="return removeFloor(this)">+</p></div>
+                                {% else %}
+                                <div class="dropdown-item category-item flex-between-center color-text pr-3" id="{{ floor.id }}"><span class="dropdown-text">{{ floor.floor }}</span><p class="btn-clear notranslate" onclick="return removeFloor(this)">+</p></div>
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <form id="floorForm" action="/floor/add" method="POST" style="width: auto;">
+                            {{ floorForm.csrf_token }}
+                            {{ floorForm.floor(class='form-control input-color ml-3', autocomplete='off', placeholder='Floor') }}
+                            {{ floorForm.submit(class='hide') }}
+                        </form>
+                        <button class="btn input-color" id="addFloor">+</button>
+                    </div>
+                </div>
+                <hr>
+                <div class="form-group" id="str">
+                    <input type="text" name="room" id="room" class="form-control input-color" autocomplete="off" required>
+                    <label for="room" class="label">Room No</label>
+                </div>
+                <div class="row" style="position: relative;">
+                    <span class="per color-text">/</span>
+                    <div class="col-md-8">
+                        <div class="form-group" id="amt">
+                            <input type="text" name="price" id="price" class="form-control input-color" autocomplete="off" required>
+                            <label for="price" class="label">Price</label>
+                            <span class="percentage hide">$</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 selector pl-0">
+                        <div class="form-group">
+                            <select name="hour" id="hour" class="form-control input-color">
+                                <option value="1h" selected="seleceted">1h</option>
+                            </select>
+                            <label for="hour" class="label hour"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group flex-end m-0">
+                    <button class="btn btn-shadow bg-menu color-font" id="addRoom">Add Room</button>
+                </div>
+            </div>
+        </div>
+        <div class="border-right"></div>
+        <div class="column-wrapper" style="width: 100%;">
+            {% for floor in floors %}
+            <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ floor.floor }}</h5>
+            <div class="grid-products" id="grid-{{ floor.id }}">
+            {% if floor.rooms %}
+            {% for room in floor.rooms %}
+                <div class="room-container" id="{{ room.id }}">
+                    <div class="product-btn color-text">
+                        <i class="fa fa-pencil-square-o edit-room" aria-hidden="true"></i>
+                        <i class="fa fa-trash-o delete-room" aria-hidden="true"></i>
+                    </div>
+                    <h5 class="color-font room-no">{{ room.room }}</h5>
+                    <div class="color-text room-bottom flex-between-center">
+                        <div class="room-price"><span class="currency-format">{{ room.price }}</span>/ {{ room.hour }}</div>
+                        {% if room.status == 'Open' %}
+                        <div class="room-status text-success">Open</div>
+                        {% else %}
+                        <div class="room-status text-danger">Close</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).on('click', '.delete-room', function() {
+        id = $(this).closest('.room-container').attr('id')
+        if (confirm('Are you sure you want to delete this room?')) {
+            $.ajax({
+                url: '/room/delete/'+id,
+                type: 'POST',
+                success: function(data) {
+                    if (data.msg == 'Success') {
+                        $('#'+id).fadeOut('slow', function() {
+                            $(this).remove()
+                        })
+                    } else {
+                        alert(data.msg)
+                    }
+                }
+            })
+        }
+    })
+    $(document).on('click', '#addRoom', function() {
+        room = $('#room')
+        price = $('#price')
+        hour = $('#hour')
+        floor = ''
+        isSelected = false
+        Array.from($('#list-floors').children()).forEach(f => {
+            if ($(f).hasClass('active')) {
+                floor = $(f).attr('id')
+                isSelected = true
+            }
+        })
+        if (isSelected) {
+            isError = false
+            validations = [room, price, hour]
+            validations.reverse().forEach(v => {
+                if (v.val() == '') {
+                    $(v).focus()
+                    isError = true
+                }
+            })
+            if (isError == false) {
+                $.ajax({
+                    url: '/room/add',
+                    type: 'POST',
+                    data: {room: room.val(), price: price.val(), hour: hour.val(), floor: floor},
+                    success: function(data) {
+                        if (data.msg == 'Success') {
+                            $(document).find('#grid-'+data.floor).append(`<div class="room-container" id="`+ data.id +`">
+                                <div class="product-btn color-text">
+                                    <i class="fa fa-pencil-square-o edit-room" aria-hidden="true"></i>
+                                    <i class="fa fa-trash-o delete-room" aria-hidden="true"></i>
+                                </div>
+                                <h5 class="color-font room-no">`+ data.room +`</h5>
+                                <div class="color-text room-bottom flex-between-center">
+                                    <div class="room-price">
+                                    <span>`+ accounting.formatMoney(data.price) +`</span>/ `+ data.hour +`
+                                    </div>
+                                    <div class="room-status text-success">Open</div>
+                                </div>
+                            </div>`)
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+        } else {
+            $('.detail-content').addClass('text-danger')
+            $('.btn-floor').addClass('invalid')
+            gsap.from('.detail-content', {
+                opacity: 0,
+                scale: 0.8,
+                duration: 1,
+                ease: 'elastic.out'
+            })
+        }
+    })
+    $(document).ready(function() {
+        currencyFormat()
+
+        Array.from($('#list-floors').children()).forEach(item => {
+            if ($(item).hasClass('active')) {
+                $('.select-text').text($(item).find('.dropdown-text').text())
+            }
+        })
+        $(document).on('click', '.dropdown-item', function() {
+            Array.from($('#list-floors').children()).forEach(item => {
+                $(item).removeClass('active')
+            })
+            $(this).addClass('active')
+            $('.select-text').text($(this).find('.dropdown-text').text())
+            $('.detail-content').removeClass('text-danger')
+            $('.btn-floor').removeClass('invalid')
+        })
+    })
+    function removeFloor(attr) {
+        event.stopPropagation()
+        id = $(attr).closest('.dropdown-item').attr('id')
+        if(confirm('This floor may contain alot of properties. Are you sure you want to delete it?')) {
+            $.ajax({
+            url: '/floor/delete/'+id,
+            type: 'POST',
+            success: function(data) {
+                if (data.msg == 'Success') {
+                    window.location.reload()
+                    // $('#list-floors').find('#'+id).fadeOut('slow', function() {
+                    //     $(this).remove()
+                    // })
+                } else {
+                    alert(data.msg)
+                }
+                }
+            })
+        }
+    }
+    $(document).on('click', '#saveStore', function() {
+        store = $('#store').val()
+        phone = $('#phone').val()
+        place = $('#location').val()
+        $.ajax({
+            url: '/store/save',
+            type: 'POST',
+            data: {store: store, phone: phone, place: place},
+            success: function(data) {
+                alert(data.msg)
+            }
+        })
+    })
+    $(document).on('focus', '#price', function () {
+        $('.percentage').removeClass('hide')
+    })
+
+    $(document).on('focusout', '#price', function () {
+        if ($(this).val() == '') {
+            $('.percentage').addClass('hide')
+        }
+    })
+    $(document).on('click', '#addFloor', function() {
+        if ($('#floor').val() != '') {
+            $('#floorForm').submit()
+        } else {
+            $('#floor').toggleClass('animate-inp')
+            if ($('#floor').hasClass('animate-inp')) {
+                $('#floor').focus()
+            }
+        }
+        
+    })
+    $(document).on('submit', '#floorForm', function() {
+        event.preventDefault()
+        value = $('#floor').val()
+        if (value != '') {
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                dataType: 'json',
+                data: $(this).serialize(),
+                success: function(data) {
+                    if (data.msg == 'Success') {
+                        window.location.reload()
+                        // $('#floor').val('')
+                        // $('.dropdown-menu').append('<div class="dropdown-item category-item flex-between-center color-text pr-3" id="'+data.id+'"><span class="dropdown-text">'+data.floor+'</span><p class="btn-clear notranslate" onclick="return removeFloor(this)">+</p></div>')
+                        // $('.column-wrapper').append(`
+                        //     <h5 class="color-font">
+                        //         <i class="fa fa-caret-right right" aria-hidden="true"></i>
+                        //         `+data.floor+`</h5>
+                        //     <div class="grid-products" id="grid-`+data.id+`"></div>`)
+                    } else {
+                        $('#floor').focus()
+                        alert(data.msg)
+                    }
+                }
+            })
+        }
+    })
+    
+</script>
+{% endblock %}

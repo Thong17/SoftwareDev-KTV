@@ -16,7 +16,18 @@ from flask_uploads import UploadSet, configure_uploads, patch_request_class, IMA
 from marshmallow import fields
 from datetime import datetime
 import time
+from uuid import uuid4
 from http import cookies
+import pytz
+from pytz import timezone
+import tzlocal 
+
+def datetimefilter(value, format="%I:%M %p"):
+    tz = pytz.timezone('Asia/Phnom_Penh') # timezone you want to convert to from UTC
+    utc = pytz.timezone('UTC')  
+    value = utc.localize(value, is_dst=None).astimezone(pytz.utc)
+    local_dt = value.astimezone(tz)
+    return local_dt.strftime(format)
 
 db = SQLAlchemy()
 
@@ -32,11 +43,20 @@ upload = UploadSet('photos', IMAGES)
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.jinja_env.filters['datetimefilter'] = datetimefilter
 
     db.init_app(app)
 
     with app.app_context():
         db.create_all()
+        stores = tblStore.query.all()
+        if not stores:
+            id = str(uuid4())
+            store = tblStore(id=id)
+            db.session.add(store)
+            floor = tblFloor(id=str(uuid4()), floor='Ground Floor', storeId=id)
+            db.session.add(floor)
+            db.session.commit()
 
     bcrypt.init_app(app)
     ma.init_app(app)
@@ -92,6 +112,20 @@ class RoleForm(FlaskForm):
     description = TextAreaField('Description')
     submit = SubmitField('Add Role')
 
+class ExpenseForm(FlaskForm):
+    expense = StringField('Expense', validators=[DataRequired(), Length(max=50)])
+    amount = DecimalField('Amount', validators=[DataRequired()])
+    submit = SubmitField('Add Expense')
+
+class StoreForm(FlaskForm):
+    store = StringField('Store Property', validators=[DataRequired(), Length(max=50)])
+    price = DecimalField('Price', validators=[DataRequired()])
+    submit = SubmitField('Add Room')
+
+class FloorForm(FlaskForm):
+    floor = StringField('Floor', validators=[DataRequired(), Length(max=50)])
+    submit = SubmitField('')
+
 class ProfileForm(FlaskForm):
     status = SelectField('Status', choices=[('Single', 'Single'), ('In Relationship', 'In Relationship'), ('Married', 'Married')])
     phone = StringField('Phone', validators=[Optional(), Length(min=6, max=13)])
@@ -108,6 +142,90 @@ user_role = db.Table('user_role',
     db.Column('user_id', db.String(36), db.ForeignKey('tbl_user.id')),
     db.Column('role_id', db.String(36), db.ForeignKey('tbl_role.id'))
 )
+
+class tblStore(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    store = db.Column(db.String(20), nullable=True, default='Store Name')
+    phone = db.Column(db.String(50), nullable=True, default='')
+    location = db.Column(db.Text(), nullable=True, default='')
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    floors = db.relationship('tblFloor', backref='floors', lazy=True)
+
+class tblFloor(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    floor = db.Column(db.String(20), nullable=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    storeId = db.Column(db.String(36), db.ForeignKey('tbl_store.id'), nullable=False)
+    rooms = db.relationship('tblRoom', backref='rooms', lazy=True)
+
+class tblRoom(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    room = db.Column(db.String(20), nullable=False, unique=True)
+    price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    hour = db.Column(db.String(20), nullable=True, default='1h')
+    status = db.Column(db.String(20), nullable=True, default='Open')
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    floorId = db.Column(db.String(36), db.ForeignKey('tbl_floor.id'), nullable=False)
+    order = db.relationship('tblOrder', backref='order', lazy=True)
+
+# Working on Order room and invoice
+class tblOrder(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    isComplete = db.Column(db.Boolean, default=False)
+    orderOn = db.Column(db.DateTime, default=datetime.utcnow)
+    orderTo = db.Column(db.DateTime, default=datetime.utcnow)
+    roomId = db.Column(db.String(36), db.ForeignKey('tbl_room.id'), nullable=False)
+    orderedBy = db.Column(db.String(36), db.ForeignKey('tbl_customer.id'), nullable=False)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    checkin = db.relationship('tblCheckin', backref='checkin', lazy=True, uselist=False)
+    checkout = db.relationship('tblCheckout', backref='checkout', lazy=True, uselist=False)
+
+class tblCheckin(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    startedOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    orderId = db.Column(db.String(36), db.ForeignKey('tbl_order.id'), nullable=False)
+
+class tblCheckout(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    endedOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    orderId = db.Column(db.String(36), db.ForeignKey('tbl_order.id'), nullable=False)
+    paymentId = db.Column(db.String(36), db.ForeignKey('tbl_payment.id'), nullable=False)
+
+# Endwork
+
+payment = db.Table('payment',
+    db.Column('payment_id', db.String(36), db.ForeignKey('tbl_payment.id')),
+    db.Column('transaction_id', db.String(36), db.ForeignKey('tbl_transaction.id'))
+)
+
+class tblTransaction(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    isComplete = db.Column(db.Boolean, default=False)
+    discount = db.Column(db.String(3), nullable=True, default='')
+    price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
+    profit = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    description = db.Column(db.Text(), nullable=True, default='')
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade='save-update, merge, delete', single_parent=True)
+
+class tblPayment(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    isComplete = db.Column(db.Boolean, default=False)
+    invoice = db.Column(db.String(20), nullable=True)
+    amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
+    transactions = db.relationship('tblTransaction', secondary=payment, backref='transactions', lazy='dynamic')
 
 class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
@@ -297,42 +415,12 @@ class tblQuantity(db.Model):
 
 class tblCustomer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    firstname = db.Column(db.String(20), nullable=True)
-    lastname = db.Column(db.String(20), nullable=True)
-    gender = db.Column(db.String(1), nullable=True)
+    name = db.Column(db.String(20), nullable=True, default='')
     birthdate = db.Column(db.Date, nullable=True)
-    email = db.Column(db.String(100), nullable=True)
-    phone = db.Column(db.String(20), nullable=True)
+    phone = db.Column(db.String(20), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-
-payment = db.Table('payment',
-    db.Column('payment_id', db.String(36), db.ForeignKey('tbl_payment.id')),
-    db.Column('transaction_id', db.String(36), db.ForeignKey('tbl_transaction.id'))
-)
-
-class tblTransaction(db.Model):
-    id = db.Column(db.String(36), primary_key=True)
-    isComplete = db.Column(db.Boolean, default=False)
-    discount = db.Column(db.String(3), nullable=True, default='')
-    price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
-    profit = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    description = db.Column(db.Text(), nullable=True, default='')
-    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
-    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade='save-update, merge, delete', single_parent=True)
-
-class tblPayment(db.Model):
-    id = db.Column(db.String(36), primary_key=True)
-    isComplete = db.Column(db.Boolean, default=False)
-    invoice = db.Column(db.String(20), nullable=True)
-    amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
-    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
-    transactions = db.relationship('tblTransaction', secondary=payment, backref='transactions', lazy='dynamic')
+    customer = db.relationship('tblOrder', backref='customer', lazy=True)
 
 class tblActivity(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -343,6 +431,8 @@ class tblActivity(db.Model):
 
 class tblOutcome(db.Model):
     id = db.Column(db.String(36), primary_key=True)
+    isStock = db.Column(db.Boolean, default=True)
+    description = db.Column(db.Text(), nullable=True, default='')
     amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
@@ -393,7 +483,15 @@ class PhotoSchema(ModelSchema):
 
 class QuantitySchema(ModelSchema):
     class Meta:
-        quantity = tblQuantity
+        model = tblQuantity
+
+class StoreSchema(ModelSchema):
+    class Meta:
+        model = tblStore
+
+class FloorSchema(ModelSchema):
+    class Meta:
+        model = tblFloor
 
 class ColorSchema(ModelSchema):
     photos = fields.Nested(PhotoSchema, many=True)
@@ -433,6 +531,24 @@ class ActivitySchema(ModelSchema):
 class RoleSchema(ModelSchema):
     class Meta:
         model = tblRole
+
+class RoomSchema(ModelSchema):
+    class Meta:
+        model = tblRoom
+
+class CustomerSchema(ModelSchema):
+    class Meta:
+        model = tblCustomer
+
+class OrderSchema(ModelSchema):
+    customer = fields.Nested(CustomerSchema)
+    order = fields.Nested(RoomSchema)
+    class Meta:
+        model = tblOrder
+
+class CheckoutSchema(ModelSchema):
+    class Meta:
+        model = tblCheckout
 
 #Custome datetime
 def utc2local (utc):

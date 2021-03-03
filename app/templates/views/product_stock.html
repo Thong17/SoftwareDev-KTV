@@ -445,7 +445,7 @@
 
     $(document).on('click', '.stock-edit', function () {
         $('#refresh-chart').attr('disabled', true)
-        var tr = $(this).parent().parent().parent()
+        var tr = $(this).closest('tr')
         var tds = $(tr).children()
         var tmp = tds
         var id = $(tr).attr('id')
@@ -484,7 +484,7 @@
     })
 
     $(document).on('click', '.stock-save', function () {
-        var id = $(this).parent().parent().parent().attr('id')
+        var id = $(this).closest('tr').attr('id')
         var color = $('#'+id).find('#select-color')
         var cost = $('#'+id).find('#input-cost')
         var currency = $('#'+id).find('#select-currency')

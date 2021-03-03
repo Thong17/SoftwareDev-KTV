@@ -1,7 +1,7 @@
 from app import bcrypt, db, login_manager, upload, delete_photo, utc2local
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance
-from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout
+from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm, ExpenseForm, StoreForm, FloorForm
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema, FloorSchema, StoreSchema, RoomSchema, OrderSchema, CheckoutSchema
 from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -23,16 +23,20 @@ def parametrized(dec):
 @parametrized
 def is_authorized(f, r):
     def wrap(*args, **kwargs):
+        if not request.referrer:
+            referrer = '/'
+        else:
+            referrer = request.referrer
         if current_user.is_authenticated and current_user.roles:
             permissions = current_user.roles[0].description.split(', ')
             if r in permissions:
                 return f(*args, **kwargs)
             else:
                 flash('You may not have permission to enter this page', 'warning')
-                return redirect(url_for('route.login'))
+                return redirect(referrer)
         else:
-            flash('Restricted Area!', 'warning')
-            return redirect(url_for('route.login'))
+            flash('You are not allowed to enter this route!', 'warning')
+            return redirect(referrer)
     wrap.__name__ = f.__name__
     return wrap
 
@@ -369,19 +373,22 @@ def update_property(id):
 @route.route('/category/remove/<id>', methods=['POST'])
 def remove_category(id):
     category = tblCategory.query.get(id)
-    try: 
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted category: '+category.category, type='Delete', createdBy=current_user.id)
-        db.session.add(Activity)
-        db.session.delete(category)
-        db.session.commit()
-        categories = tblCategory.query.all()
-        today = []
-        for item in categories:
-            if datetime.now().date() == item.createdOn.date():
-                today.append(item)
-        return jsonify({'msg': 'Success', 'today': len(today), 'total': len(categories)})
-    except:
-        return jsonify({'msg': 'Failed'})
+    if category.products:
+        return jsonify({'msg': 'Please remove all the existing product before deleting.'})
+    else:
+        try: 
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted category: '+category.category, type='Delete', createdBy=current_user.id)
+            db.session.add(Activity)
+            db.session.delete(category)
+            db.session.commit()
+            categories = tblCategory.query.all()
+            today = []
+            for item in categories:
+                if datetime.now().date() == item.createdOn.date():
+                    today.append(item)
+            return jsonify({'msg': 'Success', 'today': len(today), 'total': len(categories)})
+        except:
+            return jsonify({'msg': 'Failed'})
 
 @route.route('/category/update/<id>', methods=['POST'])
 def udpate_category(id):
@@ -396,6 +403,7 @@ def udpate_category(id):
         return jsonify({'msg': 'Failed'})
 
 @route.route('/brand', methods=['POST', 'GET'])
+@is_authorized('Admin')
 @login_required
 def brand():
     brands = tblBrand.query.all()
@@ -831,6 +839,8 @@ def add_stock():
     adjust = request.form['adjust']
     product = request.form['product']
 
+    Product = tblProduct.query.get(product)
+
     if adjust == '':
         adjust = 0.00
 
@@ -841,11 +851,11 @@ def add_stock():
 
     model = tblStock(id=id, cost=cost, quantity=quantity, currency=currency, rate=rate, adjust=adjust, productId=product, color=color, createdBy=current_user.id)
     amount = (float(cost) * int(quantity)) - float(adjust)
-    outcome = tblOutcome(id=id, amount=amount, createdBy=current_user.id)
+    outcome = tblOutcome(id=id, description=Product.product+' x'+quantity, amount=amount, createdBy=current_user.id)
     try:
         db.session.add(model)
         db.session.add(outcome)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added stock: '+id+' in product', type='Add', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added stock: '+str(cost)+'/'+currency+'/'+str(quantity)+'/'+str(rate)+'/'+str(adjust)+' in product '+Product.product, type='Add', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock = 0
@@ -877,7 +887,7 @@ def delete_stock(id):
     try:
         db.session.delete(outcome)
         db.session.delete(stock)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted stock: '+stock.id+' in product', type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted stock: '+str(stock.cost)+'/'+stock.currency+'/'+str(stock.quantity)+'/'+str(stock.rate)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock -= delete_stock
@@ -890,7 +900,7 @@ def delete_stock(id):
 def save_stock(id):
     stock = tblStock.query.get(id)
     outcome = tblOutcome.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified stock from '+stock.color+'/'+str(stock.cost)+'/'+stock.currency+'/'+str(stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.adjust)+' in product', type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified stock from: '+str(stock.cost)+'/'+stock.currency+'/'+str(stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
 
     stock.color = request.form['color']
@@ -979,7 +989,7 @@ def cashing(token):
         return redirect('/financial/authentication')
 
 @route.route('/order/product/<id>', methods=['POST'])
-def order(id):
+def order_product(id):
     product = tblProduct.query.get(id)
     data = json.loads(request.form['data'])
     description = product.product
@@ -1052,10 +1062,10 @@ def order(id):
                 resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks, 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
             else:
                 resultObj['result'] = 'failed'
-                resultObj['data'] = {'message': 'This color has only '+str(sum_stocks)+' left'}
+                resultObj['data'] = {'message': 'The selected product has only '+str(sum_stocks)+' left'}
         else:
             resultObj['result'] = 'failed'
-            resultObj['data'] = {'message': 'This color is not available'} 
+            resultObj['data'] = {'message': 'The selected product is not available'} 
     else:
         transaction.quantity = quantity
         db.session.commit()
@@ -1333,7 +1343,6 @@ def outcome():
     else:
         Outcome = tblOutcome.query.order_by(tblOutcome.createdOn).all()
 
-
     data = []
     labels = []
 
@@ -1368,6 +1377,7 @@ def outcome():
 @route.route('/profit', methods=['POST'])
 def profit():
     Transactions = None
+    Outcomes = None
     f = request.form['filter']
     s = request.form['start']
     e = request.form['end']
@@ -1376,8 +1386,10 @@ def profit():
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
         Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
+        Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).filter(tblOutcome.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
+        Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).all()
 
 
     data = []
@@ -1405,6 +1417,30 @@ def profit():
                 obj['data'] = transaction.profit
                 data.append(obj)
                 labels.append(createdOn)
+    
+    if Outcomes:
+        for transaction in Outcomes:
+            if not transaction.isStock:
+                createdOn = None
+                if f == 'daily':
+                    createdOn = utc2local(transaction.createdOn).strftime("%Y-%m-%d")
+                elif f == 'monthly':
+                    createdOn = utc2local(transaction.createdOn).strftime("%Y-%m")
+                elif f =='yearly':
+                    createdOn = utc2local(transaction.createdOn).strftime("%Y")
+                obj = {
+                    'label': createdOn,
+                    'data': 0
+                }
+
+                if createdOn in labels:
+                    for d in data:
+                        if d['label'] == createdOn:
+                            d['data'] -= transaction.amount
+                else:
+                    obj['data'] = transaction.amount
+                    data.append(obj)
+                    labels.append(createdOn)
 
     if s == '' and e == '':
         s = current_user.createdOn.strftime("%Y-%m-%d")
@@ -1735,7 +1771,6 @@ def product_favorite(id):
 
 @route.route('/role')
 @login_required
-@is_authorized('Admin')
 def role():
     form = RoleForm() 
     roles = tblRole.query.all()
@@ -1834,7 +1869,6 @@ def clear_role(id):
         return jsonify({'data': 'Faild'})
 
 @route.route('/admin')
-@is_authorized('Admin')
 @login_required
 def admin():
     users = tblUser.query.all()
@@ -1923,3 +1957,194 @@ def change_admin(id):
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Faild'})
+
+@route.route('/expense', methods=['POST', 'GET'])
+@is_authorized('Admin')
+@login_required
+def expense():
+    form = ExpenseForm()
+    expenses = tblOutcome.query.all()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            details = request.form['expense']
+            amount = request.form['amount']
+            id = str(uuid4())
+            Outcome = tblOutcome(id=id, isStock=False, description=details, amount=amount, createdBy=current_user.id)
+            db.session.add(Outcome)
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added expense: '+Outcome.description, type='Create', createdBy=current_user.id)
+            db.session.add(Activity)
+            db.session.commit()
+            return redirect(url_for('route.expense'))
+    return render_template('views/expense.html', expenses=expenses, form=form)
+
+@route.route('/expense/delete/<id>', methods=['POST'])
+def delete_expense(id):
+    Outcome = tblOutcome.query.get(id)
+    try:
+        db.session.delete(Outcome)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted expense: '+Outcome.description, type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Failed'})
+
+@route.route('/expense/save/<id>', methods=['POST'])
+def save_expense(id):
+    Outcome = tblOutcome.query.get(id)
+    Outcome.description = request.form['details']
+    Outcome.amount = request.form['amount']
+    try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified expense from: '+Outcome.description+'/'+Outcome.amount, type='Modify', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success', 'details': Outcome.description, 'amount': Outcome.amount})
+    except:
+        return jsonify({'data': 'Failed'})
+
+@route.route('/store')
+def store():
+    floorForm = FloorForm()
+    storeForm = StoreForm()
+    store = tblStore.query.first()
+    floors = tblFloor.query.order_by(tblFloor.createdOn).all()
+    for floor in floors:
+        floor.rooms.sort(key=lambda x: x.createdOn, reverse=False)
+
+    return render_template('views/store.html', storeForm=storeForm, floors=floors, floorForm=floorForm, store=store)
+
+@route.route('/floor/add', methods=['POST'])
+def add_floor():
+    floor = request.form['floor']
+    store = tblStore.query.first()
+    id = str(uuid4())
+    Floor = tblFloor(id=id, floor=floor, storeId=store.id)
+    try:
+        db.session.add(Floor)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added floor: '+floor, type='Create', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'msg': 'Success', 'id': id, 'floor': floor})
+    except:
+        return jsonify({'msg': 'Failed'})
+
+@route.route('/floor/delete/<id>', methods=['POST'])
+def delete_floor(id):
+    floor = tblFloor.query.get(id)
+    try:
+        db.session.delete(floor)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted floor: '+floor.floor, type='Deleted', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Failed'})
+
+@route.route('/store/save', methods=['POST'])
+def save_store():
+    Store = tblStore.query.first()
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified store from: '+Store.store+'/'+Store.phone+'/'+Store.location, type='Deleted', createdBy=current_user.id)
+
+    Store.store = request.form['store']
+    Store.phone = request.form['phone']
+    Store.location = request.form['place']
+    try:
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Failed'})
+
+@route.route('/room/add', methods=['POST'])
+def add_room():
+    room = request.form['room']
+    price = request.form['price']
+    hour = request.form['hour']
+    floor = request.form['floor']
+    id = str(uuid4())
+    Room = tblRoom(id=id, room=room, price=price, hour=hour, floorId=floor, createdBy=current_user.id)
+    try:
+        db.session.add(Room)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added room: '+Room.room, type='Create', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'msg': 'Success', 'id': id, 'price': price, 'room': room, 'hour': hour, 'floor': floor})
+    except:
+        return jsonify({'msg': 'Failed to add room! Please make sure that the name is unique.'})
+
+@route.route('/room/delete/<id>', methods=['POST'])
+def delete_room(id):
+    Room = tblRoom.query.get(id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted room: '+Room.room, type='Deleted', createdBy=current_user.id)
+
+    db.session.delete(Room)
+    db.session.add(Activity)
+    db.session.commit()
+    return jsonify({'msg': 'Success'})
+
+@route.route('/customer/add', methods=['POST'])
+def add_customer():
+    username = request.form['fname']
+    phone = request.form['phone']
+    birthdate = request.form['birthdate']
+    if birthdate == '':
+        birthdate = None
+    id = str(uuid4())
+    Customer = tblCustomer(id=id, name=username, phone=phone, birthdate=birthdate, createdBy=current_user.id)
+    try:
+        db.session.add(Customer)
+        db.session.commit()
+        return jsonify({'msg': 'Success', 'username':username, 'phone': phone, 'birthdate': birthdate, 'id': id})
+    except:
+        return jsonify({'msg': 'Failed to create new user'})
+
+@route.route('/order', methods=['POST', 'GET'])
+def order():
+    floors = tblFloor.query.order_by(tblFloor.createdOn).all()
+    customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
+    orders = tblOrder.query.order_by(tblOrder.createdOn).filter(func.DATE(tblOrder.orderOn) == datetime.utcnow().date()).all()
+    date = datetime.utcnow()
+    for floor in floors:
+        floor.rooms.sort(key=lambda x: x.createdOn, reverse=False)
+        if request.method == 'POST':
+            orderSchema = OrderSchema(many=True)
+            Orders = orderSchema.dump(orders)
+            return jsonify(Orders)
+    return render_template('views/order.html', floors=floors, customers=customers, orders=orders, date=date)
+
+@route.route('/order/add', methods=['POST'])
+def add_order():
+    customer = request.form['customer']
+    room = request.form['room']
+    _from = request.form['from']
+    _to = request.form['to']
+    date = request.form['date']
+
+    UTC_OFFSET_TIMEDELTA = datetime.utcnow() - datetime.now()
+
+    dateFrom = datetime.strptime(date + ' ' + _from, '%B %d, %Y %H:%M')
+    dateTo = datetime.strptime(date + ' ' + _to, '%B %d, %Y %H:%M')
+
+    utcFrom = dateFrom + UTC_OFFSET_TIMEDELTA
+    utcTo = dateTo + UTC_OFFSET_TIMEDELTA
+
+    id = str(uuid4())
+
+    Order = tblOrder(id=id, orderOn=utcFrom, orderTo=utcTo, roomId=room, orderedBy=customer, createdBy=current_user.id)
+    try:
+        db.session.add(Order)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Failed'})
+
+@route.route('/order/remove/<id>', methods=['POST'])
+def remove_order(id):
+    Order = tblOrder.query.get(id)
+    try:
+        db.session.delete(Order)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Failed to delete order'})
+

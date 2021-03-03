@@ -800,6 +800,7 @@ main {
     padding-top: 100px;
     position: relative;
     box-sizing: border-box;
+    transition: 0.3s ease;
 }
 
 .color-font {
@@ -836,6 +837,7 @@ main {
 }
 
 .column-wrapper {
+    position: relative;
     padding: 0;
     background-color: var(--color-bg);
     z-index: 1;
@@ -1060,6 +1062,12 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+}
+
+.flex-center-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .flex-between h5,

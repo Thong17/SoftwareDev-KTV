@@ -1,0 +1,190 @@
+{% extends 'views/financial.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css">
+<style>
+    thead tr {
+        background-color: var(--color-menu) !important;
+    }
+    form {
+        width: 250px;
+        border-right: 1px solid var(--color-hr);
+    }
+    .dataTables_wrapper {
+        width: calc(100% - 250px);
+    }
+    .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_empty, select, input, .dataTables_paginate a {
+        color: var(--color-text) !important;
+        font-weight: 300;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
+    }
+    .dataTables_info {
+        display: none;
+    }
+    select, input {
+        border-radius: 10px !important;
+        border: 1px solid var(--color-hr) !important;
+    }
+    select:focus, input:focus {
+        outline: none;
+    }
+    tbody tr td {
+        background-color: var(--color-bg) !important;
+        height: 30px;
+    }
+    table {
+        border-bottom: none !important;
+    }
+    .paginate_button, .paginate_button.current {
+        background-color: var(--color-menu) !important;
+        background: var(--color-menu) !important;
+        border: var(--color-menu) !important;
+    }
+    span .paginate_button, span .paginate_button.current {
+        color: var(--color-text) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container flex-between-start">
+    <form action="/expense" method="post" class="pr-4 mr-4">
+        {{ form.csrf_token }}
+        <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Expense</h5>
+        <p class="paragraph mt-3">Add expense details and amount</p>
+        <div class="form-group pt-2 m-0" id="exp">
+            {{ form.expense(class='form-control input-color', placeholder='Details', autocomplete='off') }}
+        </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="form-group m-0" id="amt">
+                    {{ form.amount(class='form-control input-color', placeholder='Amount', autocomplete='off') }}
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group m-0">
+                    <select name="currency" id="currency" class="form-control input-color">
+                        <option value="dollar" selected="seleceted">$</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group flex-end m-0">
+            {{form.submit(class='btn btn-shadow bg-menu color-font')}}
+        </div>
+    </form>
+    <table id="list-expenses" class="table">
+        <thead>
+            <tr class="color-font">
+                <td class="color-text">Details</td>
+                <td class="color-text">Price</td>
+                <td class="color-text">Created On</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr id="{{ expense.id }}">
+                <td class="color-text" id="description">{{ expense.description }}</td>
+                <td class="color-text currency-format" id="amount">{{ expense.amount }}</td>
+                <td class="color-text flex-between-center notranslate"><span class="notranslate color-text" id="createdOn">{{ expense.createdOn }}</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
+<script>
+    function expenseForm(description, amount, date) {
+        return `
+            <td><input type="text" class="form-empty color-text input-color" id="input-description" value="`+ description + `"
+                    placeholder="Description"></td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-amount" value="`+ amount + `"
+                    placeholder="Amount"></td>
+            <td class="flex-between">
+                <span class="notranslate color-text" id="createdOn">`+ date +`</span>
+                <div class="flex-between-center action-btn"><span class="form-cancel pointer">
+                    <ion-icon name="close-outline"></ion-icon>
+                </span>
+                <span class="pointer form-save">
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                </span></div>
+            </td>`
+    }
+    $(document).ready(function () {
+        currencyFormat()
+        $('#list-expenses').DataTable({
+            "drawCallback": function( settings ) {
+                
+            }
+        })
+        $('.fa-trash-o').on('click', function() {
+            id = $(this).closest('tr').attr('id')
+            if (confirm('Deleting an expense may cause an unaccurate data. Are you sure you want to delete it? ')) {
+                $.ajax({
+                    url: '/expense/delete/'+id,
+                    type: 'POST',
+                    success: function(data) {
+                        if (data.data == 'Success') {
+                            window.location.reload()
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+            }
+        })
+        $(document).on('click', '.fa-pencil-square-o', function() {
+            details = $(this).closest('tr').find('#description').text()
+            amount = accounting.unformat($(this).closest('tr').find('#amount').text())
+            date = $(this).closest('tr').find('#createdOn').text()
+            
+            $(this).closest('tr').html(expenseForm(details, amount, date))
+
+            $(document).on('click', '.form-cancel', function() {
+                $(this).closest('tr').html(`<td class="color-text" id="description">`+details+`</td>
+                <td class="color-text currency-format" id="amount">`+accounting.formatMoney(amount)+`</td>
+                <td class="color-text flex-between-center notranslate" id="createdOn"><span>`+date+`</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>`)
+            })
+        })
+
+        $(document).on('click', '.form-save', function() {
+            details = $(this).closest('tr').find('#input-description')
+            amount = $(this).closest('tr').find('#input-amount')
+            date = $(this).closest('tr').find('#createdOn').text()
+            tr = $(this).closest('tr')
+
+            var validated = [details, amount]
+            var isError = false
+
+            validated.reverse().forEach(field => {
+                if (field.val() == '' || field.val() < 0) {
+                    field.focus()
+                    isError = true
+                }
+            })
+
+            if (isError == false) {
+                $.ajax({
+                    url: '/expense/save/'+tr.attr('id'),
+                    type: 'POST',
+                    data: {details: details.val(), amount: amount.val()},
+                    success: function(data) {
+                        if (data.data == 'Success') {
+                            tr.html(`<td class="color-text" id="description">`+data.details+`</td>
+                                <td class="color-text currency-format" id="amount">`+accounting.formatMoney(data.amount)+`</td>
+                                <td class="color-text flex-between-center notranslate"><span class="notranslate color-text" id="createdOn">`+date+`</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>`)
+                        } else {
+                            alert('We are unable to submit your request. Please try again')
+                        }
+                    }
+                })
+            }
+        })
+    })
+</script>
+{% endblock %}
