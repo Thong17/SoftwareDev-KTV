@@ -1,11 +1,13 @@
-from app import bcrypt, db, login_manager, upload, delete_photo, utc2local
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout
+from app import bcrypt, db, login_manager, upload, delete_photo, utc2local, datetimefilter
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout, tblCheckin
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm, ExpenseForm, StoreForm, FloorForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema, FloorSchema, StoreSchema, RoomSchema, OrderSchema, CheckoutSchema
 from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
-import json, simplejson, operator
+import json
+import simplejson
+import operator
 from datetime import datetime, timedelta, date
 from sqlalchemy import func
 from decimal import Decimal
@@ -13,12 +15,14 @@ from functools import wraps
 
 route = Blueprint('route', __name__)
 
+
 def parametrized(dec):
     def layer(*args, **kwargs):
         def repl(f):
             return dec(f, *args, **kwargs)
         return repl
     return layer
+
 
 @parametrized
 def is_authorized(f, r):
@@ -39,6 +43,7 @@ def is_authorized(f, r):
             return redirect(referrer)
     wrap.__name__ = f.__name__
     return wrap
+
 
 @login_manager.user_loader
 def load_user(id):
@@ -64,7 +69,8 @@ def login():
                         isMatch = bcrypt.check_password_hash(
                             user.password, password)
                         if isMatch is True:
-                            Activity = tblActivity(id=str(uuid4()), activity=user.username+' has logged in', type='Login', createdBy=user.id)
+                            Activity = tblActivity(id=str(
+                                uuid4()), activity=user.username+' has logged in', type='Login', createdBy=user.id)
                             db.session.add(Activity)
                             db.session.commit()
                             login_user(user)
@@ -74,7 +80,8 @@ def login():
                         return jsonify(msg)
                     msg['username'].append('Username does not exist')
                 else:
-                    msg['username'].append('User may have been disabled! Contact your admin for more details')
+                    msg['username'].append(
+                        'User may have been disabled! Contact your admin for more details')
                 return jsonify(msg)
             except:
                 msg['username'].append('Connection is not available')
@@ -126,11 +133,13 @@ def register():
                 return 'Register failed'
     return render_template('views/register.html', form=form)
 
+
 @route.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
     return redirect('/login')
+
 
 @route.route('/user/save/<id>', methods=['POST'])
 @login_required
@@ -145,7 +154,8 @@ def save_user(id):
     firstname = fullname.split(' ')[0]
     lastname = fullname.split(' ')[1]
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified info from '+user.username+'/'+user.firstname+'/'+user.lastname+'/'+user.gender+'/'+str(user.birthdate)+'/'+user.email, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified info from '+user.username+'/'+user.firstname +
+                           '/'+user.lastname+'/'+user.gender+'/'+str(user.birthdate)+'/'+user.email, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
 
     if birthdate == '':
@@ -162,6 +172,7 @@ def save_user(id):
 
     return jsonify({'result': 'Success'})
 
+
 @route.route('/profile')
 @login_required
 def profile():
@@ -175,6 +186,7 @@ def profile():
         db.session.commit()
     return render_template('views/profile.html', form=form, profile=profile)
 
+
 @route.route('/profile/save/<id>', methods=['POST'])
 def save_profile(id):
     form = ProfileForm()
@@ -187,7 +199,8 @@ def save_profile(id):
         location = request.form['location']
         bio = request.form['bio']
 
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified profile from '+profile.status+'/'+profile.phone+'/'+profile.company+'/'+profile.hometown+'/'+profile.location+'/'+profile.bio, type='Modify', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified profile from '+profile.status+'/'+profile.phone +
+                               '/'+profile.company+'/'+profile.hometown+'/'+profile.location+'/'+profile.bio, type='Modify', createdBy=current_user.id)
         db.session.add(Activity)
 
         profile.status = status
@@ -195,7 +208,7 @@ def save_profile(id):
         profile.company = company
         profile.hometown = hometown
         profile.location = location
-        profile.bio = bio 
+        profile.bio = bio
 
         try:
             db.session.commit()
@@ -204,6 +217,7 @@ def save_profile(id):
             return render_template('views/profile.html', form=form)
 
     return render_template('views/profile.html', form=form)
+
 
 @route.route('/profile/photo/<id>', methods=['POST'])
 def save_photo(id):
@@ -218,7 +232,8 @@ def save_photo(id):
         photo.filename = filename
         uploaded = upload.save(photo)
         Profile.photo = filename
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has uploaded his profile picture ', type='Modify', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has uploaded his profile picture ', type='Modify', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         json = {
@@ -228,7 +243,7 @@ def save_photo(id):
         jsons.append(json)
     return jsonify(jsons)
 
-    
+
 @route.route('/setting')
 @login_required
 def setting():
@@ -285,7 +300,8 @@ def categories():
             msg['name'] = category
             msg['id'] = id
             try:
-                Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added category: '+category+' in category', type='Add', createdBy=current_user.id)
+                Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                       ' has added category: '+category+' in category', type='Add', createdBy=current_user.id)
                 db.session.add(Activity)
                 db.session.add(Modal)
                 db.session.commit()
@@ -327,11 +343,13 @@ def add_property():
     Modal = tblProperty(id=id, property=_property, type=_type,
                         description=description, categoryId=categoryId, createdBy=current_user.id)
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added property: '+_property+' in category '+Category.category, type='Add', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added property: ' +
+                           _property+' in category '+Category.category, type='Add', createdBy=current_user.id)
     db.session.add(Activity)
     db.session.add(Modal)
     db.session.commit()
     return jsonify({'id': id, 'property': _property, 'type': _type, 'description': description, 'msg': ''})
+
 
 @route.route('/property/remove/<id>', methods=['POST'])
 @login_required
@@ -341,13 +359,15 @@ def remove_property(id):
         try:
             _property = tblProperty.query.get(id)
             Category = tblCategory.query.get(categoryId)
-            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted property: '+_property.property+' in category '+Category.category, type='Delete', createdBy=current_user.id)
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted property: ' +
+                                   _property.property+' in category '+Category.category, type='Delete', createdBy=current_user.id)
             db.session.add(Activity)
             db.session.delete(_property)
             db.session.commit()
             return jsonify({'msg': 'Property deleted'})
         except:
             return 'Failded'
+
 
 @route.route('/property/update/<id>', methods=['POST'])
 def update_property(id):
@@ -357,7 +377,8 @@ def update_property(id):
     new_type = request.form['type']
     new_description = request.form['description']
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified property from '+_property.property+'/'+_property.type+'/'+_property.description, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified property from ' +
+                           _property.property+'/'+_property.type+'/'+_property.description, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
 
     _property.property = new_property
@@ -370,14 +391,16 @@ def update_property(id):
     except:
         return jsonify({'msg': 'Failed'})
 
+
 @route.route('/category/remove/<id>', methods=['POST'])
 def remove_category(id):
     category = tblCategory.query.get(id)
     if category.products:
         return jsonify({'msg': 'Please remove all the existing product before deleting.'})
     else:
-        try: 
-            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted category: '+category.category, type='Delete', createdBy=current_user.id)
+        try:
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                   ' has deleted category: '+category.category, type='Delete', createdBy=current_user.id)
             db.session.add(Activity)
             db.session.delete(category)
             db.session.commit()
@@ -390,24 +413,28 @@ def remove_category(id):
         except:
             return jsonify({'msg': 'Failed'})
 
+
 @route.route('/category/update/<id>', methods=['POST'])
 def udpate_category(id):
     category = tblCategory.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified category from '+category.category, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has modified category from '+category.category, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
     try:
         category.category = request.form['data']
         db.session.commit()
         return jsonify({'category': request.form['data'], 'msg': 'Success'})
-    except: 
+    except:
         return jsonify({'msg': 'Failed'})
+
 
 @route.route('/brand', methods=['POST', 'GET'])
 @is_authorized('Admin')
 @login_required
 def brand():
     brands = tblBrand.query.all()
-    categories = tblCategory.query.with_entities(tblCategory.id, tblCategory.category).all()
+    categories = tblCategory.query.with_entities(
+        tblCategory.id, tblCategory.category).all()
     form = BrandForm()
     if request.method == 'POST':
         msg = {
@@ -420,12 +447,14 @@ def brand():
             brand = request.form['brand']
             description = request.form['description']
             id = str(uuid4())
-            Modal = tblBrand(id=id, brand=brand, description=description, createdBy=current_user.id)
+            Modal = tblBrand(id=id, brand=brand,
+                             description=description, createdBy=current_user.id)
             msg['name'] = brand
             msg['id'] = id
             try:
                 db.session.add(Modal)
-                Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added brand: '+brand+' in brand', type='Add', createdBy=current_user.id)
+                Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                       ' has added brand: '+brand+' in brand', type='Add', createdBy=current_user.id)
                 db.session.add(Activity)
                 db.session.commit()
                 msg['redirect'] = '/brand'
@@ -438,6 +467,7 @@ def brand():
         return jsonify(msg)
     return render_template('views/product.html', brands=brands, form=form, categories=categories)
 
+
 @route.route('/brands', methods=['POST'])
 def brands():
     brands = tblBrand.query.all()
@@ -445,43 +475,50 @@ def brands():
     Brands = b.dump(brands)
     return jsonify(Brands)
 
+
 @route.route('/brand/remove/<id>', methods=['POST'])
 def remove_brand(id):
     brand = tblBrand.query.get(id)
     if brand.products:
         return jsonify({'msg': 'Please remove all the existing product before deleting.'})
     else:
-        try: 
+        try:
             db.session.delete(brand)
-            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted brand: '+brand.brand, type='Delete', createdBy=current_user.id)
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                   ' has deleted brand: '+brand.brand, type='Delete', createdBy=current_user.id)
             db.session.add(Activity)
             db.session.commit()
             return jsonify({'msg': 'Success'})
         except:
             return jsonify({'msg': 'Failed'})
 
+
 @route.route('/brand/update/<id>', methods=['POST'])
 def udpate_brand(id):
     brand = tblBrand.query.get(id)
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified brand from '+brand.brand, type='Modify', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has modified brand from '+brand.brand, type='Modify', createdBy=current_user.id)
         db.session.add(Activity)
         brand.brand = request.form['data']
         db.session.commit()
         return jsonify({'brand': request.form['data'], 'msg': 'Success'})
-    except: 
+    except:
         return jsonify({'msg': 'Failed'})
+
 
 @route.route('/theme/change', methods=['POST'])
 @login_required
 def theme():
     theme = request.form['data']
     user = tblUser.query.get(current_user.id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified theme from '+user.theme, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has modified theme from '+user.theme, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
     user.theme = theme
     db.session.commit()
     return jsonify({'theme': theme})
+
 
 @route.route('/product/add', methods=['POST'])
 def add_product():
@@ -500,18 +537,21 @@ def add_product():
         isStock = True
     else:
         isStock = False
-    
+
     if period == '':
         period = None
 
     id = str(uuid4())
 
-    Model = tblProduct(id=id, product=product, barcode=barcode, isStock=isStock, price=price, discount=discount, period=period, currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
+    Model = tblProduct(id=id, product=product, barcode=barcode, isStock=isStock, price=price, discount=discount, period=period,
+                       currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
     try:
         db.session.add(Model)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added product '+product, type='Add', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has added product '+product, type='Add', createdBy=current_user.id)
         db.session.add(Activity)
-        Appearance = tblAppearance(id=str(uuid4()), width='', height='', weight='', depth='', material='', productId=id)
+        Appearance = tblAppearance(id=str(
+            uuid4()), width='', height='', weight='', depth='', material='', productId=id)
         db.session.add(Appearance)
         db.session.commit()
         return jsonify({'data': 'Success', 'id': id})
@@ -523,7 +563,8 @@ def add_product():
 @login_required
 def products():
     id = request.form['data']
-    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn, tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
+    Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn,
+                                              tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
     products = []
     for Product in Products:
         price = simplejson.dumps({"price": Product.price})
@@ -542,6 +583,7 @@ def products():
         products.append(product)
     return jsonify(products)
 
+
 @route.route('/product/photo/<id>', methods=['POST'])
 def product_photo(id):
     alt = request.form['name']
@@ -556,7 +598,8 @@ def product_photo(id):
         photo.filename = filename
         uploaded = upload.save(photo)
         Product.photo = filename
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has upload photo for product: '+Product.product, type='Upload', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has upload photo for product: '+Product.product, type='Upload', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         json = {
@@ -567,18 +610,22 @@ def product_photo(id):
         jsons.append(json)
     return jsonify(jsons)
 
+
 @route.route('/product/color/<id>', methods=['POST'])
 def upload_color(id):
     hex = request.form['hex']
     color = request.form['color']
     cid = str(uuid4())
-    Color = tblColor(id=cid, color=color, hex=hex, createdBy=current_user.id, productId=id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added color '+color+' in product', type='Add', createdBy=current_user.id)
+    Color = tblColor(id=cid, color=color, hex=hex,
+                     createdBy=current_user.id, productId=id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has added color '+color+' in product', type='Add', createdBy=current_user.id)
     db.session.add(Activity)
     db.session.add(Color)
     db.session.commit()
 
     return jsonify({'id': cid, 'hex': hex, 'color': color})
+
 
 @route.route('/color/photo/<id>', methods=['POST'])
 def color_photo(id):
@@ -593,15 +640,18 @@ def color_photo(id):
         photo.filename = filename
         uploaded = upload.save(photo)
         pid = str(uuid4())
-        Photo = tblPhoto(id=pid, src=filename, alt=alt, createdBy=current_user.id, colorId=cid, productId=id)
+        Photo = tblPhoto(id=pid, src=filename, alt=alt,
+                         createdBy=current_user.id, colorId=cid, productId=id)
         db.session.add(Photo)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has upload photo for color: '+color.color, type='Upload', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has upload photo for color: '+color.color, type='Upload', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
     color = tblColor.query.get(cid)
     json = ColorSchema()
     result = json.dump(color)
     return jsonify(result)
+
 
 @route.route('/product/<id>', methods=['POST', 'GET'])
 def product(id):
@@ -621,6 +671,7 @@ def product(id):
         return jsonify(result)
     return render_template('views/product_details.html', product=product)
 
+
 @route.route('/value/add', methods=['POST'])
 def add_value():
     product_id = request.form['product']
@@ -631,13 +682,16 @@ def add_value():
     description = request.form['description']
 
     id = str(uuid4())
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added value '+value+' in product', type='Add', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has added value '+value+' in product', type='Add', createdBy=current_user.id)
     db.session.add(Activity)
-    model = tblValue(id=id, value=value, price=price, currency=currency, description=description, createdBy=current_user.id, productId=product_id, propertyId=property_id)
+    model = tblValue(id=id, value=value, price=price, currency=currency, description=description,
+                     createdBy=current_user.id, productId=product_id, propertyId=property_id)
     db.session.add(model)
-    
+
     db.session.commit()
     return jsonify({'id': id, 'value': value, 'price': price, 'currency': currency, 'description': description, 'property': property_id})
+
 
 @route.route('/product/save/<id>', methods=['POST'])
 def save_product(id):
@@ -671,7 +725,8 @@ def save_product(id):
     if period == '':
         period = None
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified product from '+Product.product+'/'+Product.barcode+'/'+str(Product.isStock)+'/'+Product.currency+'/'+str(Product.price)+'/'+Product.description+'/'+str(Product.discount)+'/'+str(Product.period)+'/'+Category.category, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified product from '+Product.product+'/'+Product.barcode+'/'+str(Product.isStock)+'/'+Product.currency +
+                           '/'+str(Product.price)+'/'+Product.description+'/'+str(Product.discount)+'/'+str(Product.period)+'/'+Category.category, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
 
     Product.product = product
@@ -696,6 +751,7 @@ def save_product(id):
     except:
         return jsonify({'data': 'Faild'})
 
+
 @route.route('/product/remove/<id>', methods=['POST'])
 def remove_product(id):
     product = tblProduct.query.get(id)
@@ -706,16 +762,19 @@ def remove_product(id):
                     delete_photo('uploads', photo.src)
     if product.photo != 'default.png':
         delete_photo('uploads', product.photo)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted product '+product.product, type='Delete', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has deleted product '+product.product, type='Delete', createdBy=current_user.id)
     db.session.delete(product)
     db.session.add(Activity)
     db.session.commit()
     return jsonify({'result': 'Success'})
 
+
 @route.route('/value/save/<id>', methods=['POST'])
 def save_value(id):
     value = tblValue.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified value from '+value.value+'/'+str(value.price)+'/'+value.currency+'/'+value.description+' in product: '+value.productId, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified value from '+value.value+'/'+str(
+        value.price)+'/'+value.currency+'/'+value.description+' in product: '+value.productId, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
     value.value = request.form['value']
     value.price = request.form['price']
@@ -727,14 +786,17 @@ def save_value(id):
     except:
         return jsonify({'resutl': 'failed'})
 
+
 @route.route('/value/remove/<id>', methods=['POST'])
 def remove_value(id):
     value = tblValue.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted value: '+value.value+' in product', type='Delete', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted value: ' +
+                           value.value+' in product', type='Delete', createdBy=current_user.id)
     db.session.add(Activity)
     db.session.delete(value)
     db.session.commit()
     return jsonify({'result': 'Success'})
+
 
 @route.route('/color/<id>', methods=['POST'])
 def get_color(id):
@@ -743,15 +805,18 @@ def get_color(id):
     result = json.dump(color)
     return jsonify(result)
 
+
 @route.route('/color/save/<id>', methods=['POST'])
 def save_color(id):
     color = tblColor.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified color from '+color.color+'/'+color.hex+' in product', type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified color from ' +
+                           color.color+'/'+color.hex+' in product', type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
     color.color = request.form['color']
     color.hex = request.form['hex']
     db.session.commit()
     return jsonify({'color': color.color, 'hex': color.hex})
+
 
 @route.route('/color/remove/<id>', methods=['POST'])
 def remove_color(id):
@@ -765,27 +830,30 @@ def remove_color(id):
             delete_photo('uploads', photo.src)
     try:
         db.session.delete(color)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted color: '+color.color+' in product', type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted color: ' +
+                               color.color+' in product', type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'result': 'Success', 'photos': []})
     except:
         return jsonify({'result': 'Failed'})
 
+
 @route.route('/property/<id>', methods=['POST'])
 def _property(id):
     category = tblCategory.query.get(id)
     c = CategorySchema()
     result_property = c.dump(category)
-    
+
     product = tblProduct.query.get(request.form['product'])
     p = ProductSchema()
     if product:
         result_product = p.dump(product)
     else:
         result_product = ''
-    
+
     return jsonify({'property': result_property, 'product': result_product})
+
 
 @route.route('/stock')
 @is_authorized('Stock')
@@ -795,6 +863,7 @@ def stocks():
     brands = tblBrand.query.all()
     categories = tblCategory.query.all()
     return render_template('views/stock.html', products=products, brands=brands, categories=categories)
+
 
 @route.route('/stock/product/<id>')
 @is_authorized('Stock')
@@ -819,7 +888,7 @@ def stock(id):
                 for stock in product.stocks:
                     if stock.color == color.id:
                         total_quantity += stock.quantity
-            
+
             stock = {
                 'color': color.color,
                 'quantity': total_quantity
@@ -828,6 +897,7 @@ def stock(id):
             stocks.append(stock)
 
     return render_template('views/product_stock.html', product=product, total_stock=total_stock, total_cost=total_cost, stocks=stocks)
+
 
 @route.route('/stock/add', methods=['POST'])
 def add_stock():
@@ -849,13 +919,16 @@ def add_stock():
 
     id = str(uuid4())
 
-    model = tblStock(id=id, cost=cost, quantity=quantity, currency=currency, rate=rate, adjust=adjust, productId=product, color=color, createdBy=current_user.id)
+    model = tblStock(id=id, cost=cost, quantity=quantity, currency=currency, rate=rate,
+                     adjust=adjust, productId=product, color=color, createdBy=current_user.id)
     amount = (float(cost) * int(quantity)) - float(adjust)
-    outcome = tblOutcome(id=id, description=Product.product+' x'+quantity, amount=amount, createdBy=current_user.id)
+    outcome = tblOutcome(id=id, description=Product.product +
+                         ' x'+quantity, amount=amount, createdBy=current_user.id)
     try:
         db.session.add(model)
         db.session.add(outcome)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added stock: '+str(cost)+'/'+currency+'/'+str(quantity)+'/'+str(rate)+'/'+str(adjust)+' in product '+Product.product, type='Add', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added stock: '+str(cost)+'/'+currency+'/'+str(
+            quantity)+'/'+str(rate)+'/'+str(adjust)+' in product '+Product.product, type='Add', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock = 0
@@ -864,7 +937,7 @@ def add_stock():
         for stock in model.stocksOfProduct.stocks:
             total_stock += stock.quantity
             total_cost = stock.cost * stock.quantity
-            total_costs += total_cost 
+            total_costs += total_cost
         return jsonify({'data': 'success', 'id': id, 'cost': cost, 'quantity': quantity, 'currency': currency, 'rate': rate, 'adjust': adjust, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S'), 'total_cost': total_costs})
     except:
         return jsonify({'data': 'failed'})
@@ -887,20 +960,23 @@ def delete_stock(id):
     try:
         db.session.delete(outcome)
         db.session.delete(stock)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted stock: '+str(stock.cost)+'/'+stock.currency+'/'+str(stock.quantity)+'/'+str(stock.rate)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted stock: '+str(stock.cost)+'/'+stock.currency+'/'+str(
+            stock.quantity)+'/'+str(stock.rate)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock -= delete_stock
         total_costs -= delete_cost
         return jsonify({'data': 'success', 'total_stock': total_stock, 'total_cost': total_costs})
     except:
-        return jsonify({'data': 'failed'}) 
-    
+        return jsonify({'data': 'failed'})
+
+
 @route.route('/stock/save/<id>', methods=['POST'])
 def save_stock(id):
     stock = tblStock.query.get(id)
     outcome = tblOutcome.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified stock from: '+str(stock.cost)+'/'+stock.currency+'/'+str(stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Modify', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified stock from: '+str(stock.cost)+'/'+stock.currency+'/'+str(
+        stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
 
     stock.color = request.form['color']
@@ -909,7 +985,8 @@ def save_stock(id):
     stock.rate = request.form['rate']
     stock.quantity = request.form['quantity']
     stock.adjust = request.form['adjust']
-    outcome.amount = (float(stock.cost) * int(stock.quantity)) - float(stock.adjust)
+    outcome.amount = (float(stock.cost) * int(stock.quantity)
+                      ) - float(stock.adjust)
     try:
         db.session.commit()
         total_stock = 0
@@ -939,6 +1016,7 @@ def save_stock(id):
     except:
         return jsonify({'data': 'failed'})
 
+
 @route.route('/financial', defaults={'arg': None})
 @route.route('/financial/<arg>')
 @is_authorized('Report')
@@ -963,7 +1041,8 @@ def authenticate():
             msg['password'].append('Password cannot be empty')
             return jsonify(msg)
         else:
-            isMatch = bcrypt.check_password_hash(current_user.password, password)
+            isMatch = bcrypt.check_password_hash(
+                current_user.password, password)
             if isMatch is True:
                 token = str(uuid4())
                 current_user.token = token
@@ -976,17 +1055,77 @@ def authenticate():
         msg['password'].append('Connection is not available')
         return jsonify(msg)
 
+
 @route.route('/cashing/<token>')
 @is_authorized('Cashier')
 @login_required
 def cashing(token):
-    if token == current_user.token:   
+    if token == current_user.token:
         products = tblProduct.query.all()
         brands = tblBrand.query.all()
         categories = tblCategory.query.all()
         return render_template('views/cashing.html', products=products, brands=brands, categories=categories)
     else:
         return redirect('/financial/authentication')
+
+
+@route.route('/drawer/create', methods=['POST'])
+def create_drawer():
+    data = json.loads(request.form['data'])
+    id = str(uuid4())
+    Drawer = tblDrawer(id=id, key=current_user.token,
+                       rate=data['rate'], counter=data['counter'], createdBy=current_user.id)
+    db.session.add(Drawer)
+    total = 0
+
+    for money in data['moneys']:
+        if money['currency'] == 'KHR':
+            value = float(money['money']) / float(data['rate'])
+        else:
+            value = money['money']
+        mid = str(uuid4())
+        Money = tblMoney(
+            id=mid, money=money['money'], currency=money['currency'], unit=money['unit'], drawerId=id, value=value)
+        total += float(money['total'])
+        db.session.add(Money)
+    Drawer.startCost = total
+    current_user.drawer = id
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has opened drawer', type='Open', createdBy=current_user.id)
+    db.session.add(Activity)
+
+    db.session.commit()
+    startedOn = Drawer.startedOn.strftime("%b %d %Y %H:%M:%S")
+    return jsonify({'data': 'Success', 'startedOn': startedOn, 'id': id})
+
+
+@route.route('/drawer/end/<id>', methods=['POST'])
+def end_drawer(id):
+    Drawer = tblDrawer.query.get(id)
+    Drawer.endedOn = datetime.utcnow()
+    current_user.drawer = ''
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has closed drawer', type='Close', createdBy=current_user.id)
+    db.session.add(Activity)
+    db.session.commit()
+    return jsonify({'data': 'Success'})
+
+
+@route.route('/drawer/<id>', methods=['POST'])
+def get_drawer(id):
+    try:
+        Drawer = tblDrawer.query.get(id)
+        if Drawer is None:
+            moneys = []
+            rate = 4000
+            counter = 'Default'
+            return jsonify({'data': moneys, 'rate': rate, 'counter': counter})
+        else:
+            jsonObj = DrawerSchema()
+            drawer = jsonObj.dump(Drawer)
+            return jsonify({'data': drawer['moneys'], 'rate': drawer['rate'], 'counter': drawer['counter']})
+    except:
+        return jsonify({'data': []})
 
 @route.route('/order/product/<id>', methods=['POST'])
 def order_product(id):
@@ -1019,10 +1158,12 @@ def order_product(id):
         description += '-'+value.value
 
     tid = str(uuid4())
-    transaction = tblTransaction(id=tid, discount=discount, price=pprice, amount=amount, description=description, createdBy=current_user.id)
+    transaction = tblTransaction(id=tid, discount=discount, price=pprice,
+                                 amount=amount, description=description, createdBy=current_user.id, product=id)
     db.session.add(transaction)
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added transaction: '+description, type='Add', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has added transaction: '+description, type='Add', createdBy=current_user.id)
     db.session.add(Activity)
 
     if product.isStock:
@@ -1045,12 +1186,14 @@ def order_product(id):
                             if stock.quantity < sum_quantity:
                                 stock_quantity = stock.quantity
                                 stock.quantity = 0
-                                Quantity = tblQuantity(id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                Quantity = tblQuantity(
+                                    id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
                                 db.session.add(Quantity)
                                 transaction.quantity += stock_quantity
                                 sum_quantity -= stock_quantity
                             else:
-                                Quantity = tblQuantity(id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                Quantity = tblQuantity(
+                                    id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
                                 db.session.add(Quantity)
                                 transaction.quantity += sum_quantity
                                 stock.quantity -= sum_quantity
@@ -1059,123 +1202,24 @@ def order_product(id):
                 total_stocks -= quantity
                 db.session.commit()
                 resultObj['result'] = 'success'
-                resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks, 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+                resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
+                                     'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
             else:
                 resultObj['result'] = 'failed'
-                resultObj['data'] = {'message': 'The selected product has only '+str(sum_stocks)+' left'}
+                resultObj['data'] = {
+                    'message': 'The selected product has only '+str(sum_stocks)+' left'}
         else:
             resultObj['result'] = 'failed'
-            resultObj['data'] = {'message': 'The selected product is not available'} 
+            resultObj['data'] = {
+                'message': 'The selected product is not available'}
     else:
         transaction.quantity = quantity
         db.session.commit()
         amount *= quantity
         resultObj['result'] = 'success'
-        resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity, 'price': price, 'isStock': False, 'discount': discount}
+        resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity,
+                             'price': price, 'isStock': False, 'discount': discount}
     return jsonify(resultObj)
-
-@route.route('/drawer/create', methods=['POST'])
-def create_drawer():
-    data = json.loads(request.form['data'])
-    id = str(uuid4())
-    Drawer = tblDrawer(id=id, key=current_user.token, rate=data['rate'], counter=data['counter'], createdBy=current_user.id)
-    db.session.add(Drawer)
-    total = 0
-    
-    for money in data['moneys']:
-        if money['currency'] == 'KHR':
-            value = float(money['money']) / float(data['rate'])
-        else:
-            value = money['money']
-        mid = str(uuid4())
-        Money = tblMoney(id=mid, money=money['money'], currency=money['currency'], unit=money['unit'], drawerId=id, value=value)
-        total += float(money['total'])
-        db.session.add(Money)
-    Drawer.startCost = total
-    current_user.drawer = id
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has opened drawer', type='Open', createdBy=current_user.id)
-    db.session.add(Activity)
-
-    db.session.commit()
-    startedOn = Drawer.startedOn.strftime("%b %d %Y %H:%M:%S")
-    return jsonify({'data': 'Success', 'startedOn': startedOn, 'id':id})
-
-@route.route('/drawer/end/<id>', methods=['POST'])
-def end_drawer(id):
-    Drawer = tblDrawer.query.get(id)
-    Drawer.endedOn = datetime.utcnow()
-    current_user.drawer = ''
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has closed drawer', type='Close', createdBy=current_user.id)
-    db.session.add(Activity)
-    db.session.commit()
-    return jsonify({'data': 'Success'})
-
-@route.route('/drawer/<id>', methods=['POST'])
-def get_drawer(id):
-    try:
-        Drawer = tblDrawer.query.get(id)
-        if Drawer is None:
-            moneys = []
-            rate = 4000
-            counter = 'Default'
-            return jsonify({'data': moneys, 'rate': rate, 'counter': counter})
-        else:
-            jsonObj = DrawerSchema()
-            drawer = jsonObj.dump(Drawer)
-            return jsonify({'data': drawer['moneys'], 'rate': drawer['rate'], 'counter': drawer['counter']})
-    except:
-        return jsonify({'data': []})
-
-@route.route('/payment', methods=['POST'])
-def payment():
-    Payments = tblPayment.query.with_entities(tblPayment.id).all()
-    Drawer = tblDrawer.query.get(current_user.drawer)
-    transactions = json.loads(request.form['data'])
-    if transactions:
-        id = str(uuid4())
-        invoice = 'INV'+ str(len(Payments) + 1).zfill(7)
-        Payment = tblPayment(id=id, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
-        db.session.add(Payment)
-        total = 0
-        for transaction in transactions:
-            Transaction = tblTransaction.query.get(transaction)
-            total += Transaction.amount * Transaction.quantity
-            Payment.transactions.append(Transaction)
-        Payment.amount = total
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has ordered invoice: '+invoice, type='Order', createdBy=current_user.id)
-        db.session.add(Activity)
-        db.session.commit()
-        p = PaymentSchema()
-        result = p.dump(Payment)
-        
-        return jsonify({'result': 'Success', 'data': result, 'rate': Drawer.rate})
-    else:
-        return jsonify({'result': 'No transaction added'})
-
-@route.route('/payment/<id>', methods=['POST'])
-def get_payment(id):
-    Drawer = tblDrawer.query.get(current_user.drawer)
-    Payment = tblPayment.query.get(id)
-    transactions = json.loads(request.form['data'])
-
-    if transactions:
-        total = 0
-        for transaction in transactions:
-            Transaction = tblTransaction.query.get(transaction)
-            if Transaction.quantities:
-                quantity = 0
-                for q in Transaction.quantities:
-                    quantity += q.quantity
-                Transaction.quantity = quantity
-            total += Transaction.price * quantity
-            if Transaction not in Payment.transactions:
-                Payment.transactions.append(Transaction)
-        Payment.amount = total
-        db.session.commit()
-
-    p = PaymentSchema()
-    payment = p.dump(Payment)
-    return jsonify({'data': payment, 'rate': Drawer.rate})
 
 @route.route('/transaction/delete/<id>', methods=['POST'])
 def delete_transaction(id):
@@ -1208,7 +1252,7 @@ def checkout(id):
         if a['currency'] != 'USD':
             a['amount'] = Decimal(a['amount']) / drawer.rate
         amount += Decimal(a['amount'])
-    
+
     if amount >= payment.amount:
         moneys = []
         change = Decimal(amount) - payment.amount
@@ -1241,19 +1285,25 @@ def checkout(id):
                     transaction.profit -= quantity.soq.cost * quantity.quantity
 
         payment.isComplete = True
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
     else:
         return jsonify({'result': 'Not enough money'})
 
+
 @route.route('/transaction')
 @is_authorized('Cashier')
 def transaction():
-    Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
+    Transactions = tblTransaction.query.order_by(
+        tblTransaction.createdOn).all()
+    for t in Transactions:
+        t.createdOn = datetimefilter(t.createdOn, '%Y/%m/%d %H:%M:%S')
     Payments = tblPayment.query.order_by(tblPayment.invoice).all()
     return render_template('views/transaction.html', transactions=Transactions, payments=Payments)
+
 
 @route.route('/transaction/reverse', methods=['POST'])
 def undo_transaction():
@@ -1265,23 +1315,27 @@ def undo_transaction():
         for q in transaction.quantities:
             q.soq.quantity += q.stock
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted transaction '+transaction.description, type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has reversed transaction ' +
+                               transaction.description, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.delete(transaction)
-        db.session.commit()   
+        db.session.commit()
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Could not find the selected transaction'})
-    
+
+
 @route.route('/invoice/search', methods=['POST'])
 def search_invoice():
     input = request.form['data']
     return jsonify({'data': 'Success'})
 
+
 @route.route('/report')
 @is_authorized('Report')
 def report():
     return render_template('views/report.html')
+
 
 @route.route('/income', methods=['POST'])
 def income():
@@ -1293,10 +1347,11 @@ def income():
     if s != '' and e != '':
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
-        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
+        Transactions = tblTransaction.query.order_by(
+            tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
     else:
-        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
-
+        Transactions = tblTransaction.query.order_by(
+            tblTransaction.createdOn).all()
 
     data = []
     labels = []
@@ -1305,10 +1360,11 @@ def income():
         for transaction in Transactions:
             createdOn = None
             if f == 'daily':
-                createdOn = utc2local(transaction.createdOn).strftime("%Y-%m-%d")
+                createdOn = utc2local(
+                    transaction.createdOn).strftime("%Y-%m-%d")
             elif f == 'monthly':
                 createdOn = utc2local(transaction.createdOn).strftime("%Y-%m")
-            elif f =='yearly':
+            elif f == 'yearly':
                 createdOn = utc2local(transaction.createdOn).strftime("%Y")
             obj = {
                 'label': createdOn,
@@ -1329,6 +1385,7 @@ def income():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
+
 @route.route('/outcome', methods=['POST'])
 def outcome():
     Outcome = None
@@ -1337,9 +1394,12 @@ def outcome():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d') - timedelta(days=1)
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + timedelta(days=1)
-        Outcome = tblOutcome.query.order_by(tblOutcome.createdOn).filter(tblOutcome.createdOn.between(s, e))
+        s = datetime.strptime(
+            request.form['start'], '%Y-%m-%d') - timedelta(days=1)
+        e = datetime.strptime(
+            request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        Outcome = tblOutcome.query.order_by(tblOutcome.createdOn).filter(
+            tblOutcome.createdOn.between(s, e))
     else:
         Outcome = tblOutcome.query.order_by(tblOutcome.createdOn).all()
 
@@ -1353,7 +1413,7 @@ def outcome():
                 createdOn = utc2local(outcome.createdOn).strftime("%Y-%m-%d")
             elif f == 'monthly':
                 createdOn = utc2local(outcome.createdOn).strftime("%Y-%m")
-            elif f =='yearly':
+            elif f == 'yearly':
                 createdOn = utc2local(outcome.createdOn).strftime("%Y")
             obj = {
                 'label': createdOn,
@@ -1374,6 +1434,7 @@ def outcome():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
+
 @route.route('/profit', methods=['POST'])
 def profit():
     Transactions = None
@@ -1385,12 +1446,14 @@ def profit():
     if s != '' and e != '':
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
-        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
-        Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).filter(tblOutcome.createdOn.between(s, e))
+        Transactions = tblTransaction.query.order_by(
+            tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
+        Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).filter(
+            tblOutcome.createdOn.between(s, e))
     else:
-        Transactions = tblTransaction.query.order_by(tblTransaction.createdOn).all()
+        Transactions = tblTransaction.query.order_by(
+            tblTransaction.createdOn).all()
         Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).all()
-
 
     data = []
     labels = []
@@ -1399,10 +1462,11 @@ def profit():
         for transaction in Transactions:
             createdOn = None
             if f == 'daily':
-                createdOn = utc2local(transaction.createdOn).strftime("%Y-%m-%d")
+                createdOn = utc2local(
+                    transaction.createdOn).strftime("%Y-%m-%d")
             elif f == 'monthly':
                 createdOn = utc2local(transaction.createdOn).strftime("%Y-%m")
-            elif f =='yearly':
+            elif f == 'yearly':
                 createdOn = utc2local(transaction.createdOn).strftime("%Y")
             obj = {
                 'label': createdOn,
@@ -1417,16 +1481,18 @@ def profit():
                 obj['data'] = transaction.profit
                 data.append(obj)
                 labels.append(createdOn)
-    
+
     if Outcomes:
         for transaction in Outcomes:
             if not transaction.isStock:
                 createdOn = None
                 if f == 'daily':
-                    createdOn = utc2local(transaction.createdOn).strftime("%Y-%m-%d")
+                    createdOn = utc2local(
+                        transaction.createdOn).strftime("%Y-%m-%d")
                 elif f == 'monthly':
-                    createdOn = utc2local(transaction.createdOn).strftime("%Y-%m")
-                elif f =='yearly':
+                    createdOn = utc2local(
+                        transaction.createdOn).strftime("%Y-%m")
+                elif f == 'yearly':
                     createdOn = utc2local(transaction.createdOn).strftime("%Y")
                 obj = {
                     'label': createdOn,
@@ -1447,6 +1513,7 @@ def profit():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
+
 @route.route('/sale', methods=['POST'])
 def sale():
     Transactions = None
@@ -1457,10 +1524,10 @@ def sale():
     if s != '' and e != '':
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
-        Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e))
+        Transactions = tblTransaction.query.filter(
+            tblTransaction.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.all()
-
 
     data = []
     labels = []
@@ -1489,7 +1556,6 @@ def sale():
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
 
-
 @route.route('/product_report', methods=['POST'])
 def product_report():
     Transactions = None
@@ -1500,7 +1566,8 @@ def product_report():
     if s != '' and e != '':
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
-        Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e))
+        Transactions = tblTransaction.query.filter(
+            tblTransaction.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.all()
 
@@ -1530,6 +1597,7 @@ def product_report():
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
 
+
 @route.route('/quantity_report', methods=['POST'])
 def quantity_report():
     Transactions = None
@@ -1540,7 +1608,8 @@ def quantity_report():
     if s != '' and e != '':
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
-        Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e))
+        Transactions = tblTransaction.query.filter(
+            tblTransaction.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.all()
 
@@ -1577,12 +1646,14 @@ def quantity_report():
 def financial_report():
     return render_template('views/financial_report.html')
 
+
 @route.route('/account')
 @is_authorized('Report')
 @login_required
 def account():
     users = tblUser.query.all()
     return render_template('views/account_report.html', users=users)
+
 
 @route.route('/account/report', methods=['POST'])
 @login_required
@@ -1602,10 +1673,12 @@ def account_report():
 
     return jsonify(result)
 
+
 @route.route('/sale_report')
 @is_authorized('Report')
 def sale_report():
     return render_template('views/sale_report.html')
+
 
 @route.route('/financial', methods=['POST'])
 def get_financial():
@@ -1637,12 +1710,14 @@ def get_financial():
                 transactionObj['pending'].append(transaction.id)
     return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj})
 
+
 @route.route('/advertise')
 @is_authorized('Editor')
 @login_required
 def advertise():
     Advertises = tblAdvertise.query.all()
     return render_template('views/advertise.html', advertises=Advertises)
+
 
 @route.route('/advertise/photo/<id>', methods=['POST'])
 def add_advertise(id):
@@ -1658,24 +1733,28 @@ def add_advertise(id):
         uploaded = upload.save(photo)
         id = str(uuid4())
 
-        Advertise = tblAdvertise(id=id, src=filename, alt="Advertise", main=isMain, createdBy=current_user.id)
+        Advertise = tblAdvertise(
+            id=id, src=filename, alt="Advertise", main=isMain, createdBy=current_user.id)
         db.session.add(Advertise)
-        
+
         json = {
             'photoId': id,
             'src': filename,
         }
         jsons.append(json)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has uploaded advertise photo: '+Advertise.src, type='Upload', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has uploaded advertise photo: '+Advertise.src, type='Upload', createdBy=current_user.id)
     db.session.add(Activity)
     db.session.commit()
     return jsonify(jsons)
+
 
 @route.route('/advertise/delete/<id>', methods=['POST'])
 def delete_advertise(id):
     Advertise = tblAdvertise.query.get(id)
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted advertise photo: '+Advertise.src, type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has deleted advertise photo: '+Advertise.src, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         delete_photo('uploads', Advertise.src)
         db.session.delete(Advertise)
@@ -1688,6 +1767,7 @@ def delete_advertise(id):
 # def index():
 #     return render_template('views/index.html')
 
+
 @route.route('/')
 @route.route('/home')
 def index():
@@ -1697,13 +1777,16 @@ def index():
     advertises = tblAdvertise.query.all()
     return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises)
 
+
 @route.route('/about')
 def about():
     return render_template('views/about.html')
 
+
 @route.route('/contact')
 def contact():
     return render_template('views/contact.html')
+
 
 @route.route('/activity')
 @login_required
@@ -1718,13 +1801,15 @@ def activity():
                 'createdOn': utc2local(activity.createdOn),
                 'createdBy': '',
             }
-            Users = tblUser.query.with_entities(tblUser.username, tblUser.id).all()
+            Users = tblUser.query.with_entities(
+                tblUser.username, tblUser.id).all()
             for user in Users:
                 if user.id == activity.createdBy:
                     actObj['createdBy'] = user.username
             activities.append(actObj)
 
     return render_template('views/activity.html', activities=activities)
+
 
 @route.route('/password/change', methods=['POST'])
 def change_password():
@@ -1734,8 +1819,9 @@ def change_password():
     isMatch = bcrypt.check_password_hash(current_user.password, curpwd)
     data = ''
     if isMatch:
-        if newpwd == conpwd:  
-            hashed_password = bcrypt.generate_password_hash(newpwd).decode('utf-8')
+        if newpwd == conpwd:
+            hashed_password = bcrypt.generate_password_hash(
+                newpwd).decode('utf-8')
             current_user.password = hashed_password
             db.session.commit()
             data = 'Success'
@@ -1746,6 +1832,7 @@ def change_password():
 
     return jsonify(data)
 
+
 @route.route('/product/favorite/<id>', methods=['POST'])
 def product_favorite(id):
     product = tblProduct.query.get(id)
@@ -1754,28 +1841,32 @@ def product_favorite(id):
     listFavorite = []
     for obj in listJson:
         listFavorite.append(obj)
-    
+
     if current_user.id in listFavorite:
         listFavorite.remove(current_user.id)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has removed '+product.product+' from favorite', type='Remove', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has removed ' +
+                               product.product+' from favorite', type='Remove', createdBy=current_user.id)
         db.session.add(Activity)
     else:
         listFavorite.append(current_user.id)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added '+product.product+' to favorite', type='Add', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added ' +
+                               product.product+' to favorite', type='Add', createdBy=current_user.id)
         db.session.add(Activity)
         isSaved = True
-    
+
     product.listFavorite = json.dumps(listFavorite)
     db.session.commit()
     return jsonify({'msg': 'Success', 'data': isSaved})
 
+
 @route.route('/role')
 @login_required
 def role():
-    form = RoleForm() 
+    form = RoleForm()
     roles = tblRole.query.all()
     users = tblUser.query.all()
     return render_template('views/role.html', roles=roles, form=form, users=users)
+
 
 @route.route('/role', methods=['POST'])
 def get_roles():
@@ -1784,23 +1875,25 @@ def get_roles():
     Roles = r.dump(roles)
     return jsonify(Roles)
 
+
 @route.route('/role/add', methods=['POST'])
 def add_role():
     msg = {
-            'role': [],
-            'redirect': '',
-            'name': '',
-            'id': '',
-        }
+        'role': [],
+        'redirect': '',
+        'name': '',
+        'id': '',
+    }
     role = request.form['role']
     tags = request.form['tags']
     id = str(uuid4())
     Modal = tblRole(id=id, role=role,
-                        description=tags, createdBy=current_user.id)
+                    description=tags, createdBy=current_user.id)
     msg['name'] = role
     msg['id'] = id
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added role: '+role+' in category', type='Add', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has added role: '+role+' in category', type='Add', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.add(Modal)
         db.session.commit()
@@ -1812,6 +1905,7 @@ def add_role():
         for err in errorMessages:
             msg[fieldName].append(err)
     return jsonify(msg)
+
 
 @route.route('/role/change/<id>', methods=['POST'])
 def change_role(id):
@@ -1825,6 +1919,7 @@ def change_role(id):
     except:
         return jsonify({'data': 'Faild'})
 
+
 @route.route('/role/update/<id>', methods=['POST'])
 def update_role(id):
     Role = tblRole.query.get(id)
@@ -1832,20 +1927,23 @@ def update_role(id):
     data = request.form['data']
     Role.role = data
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified theme from '+old, type='Modify', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has modified theme from '+old, type='Modify', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'msg': 'Success'})
     except:
         return jsonify({'msg': 'Faild'})
-    
+
+
 @route.route('/role/remove/<id>', methods=['POST'])
 @login_required
 def remove_role(id):
     try:
         role = tblRole.query.get(id)
         name = role.role
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted role: '+role.role+' in role', type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has deleted role: '+role.role+' in role', type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.delete(role)
         db.session.commit()
@@ -1854,19 +1952,22 @@ def remove_role(id):
     except:
         return jsonify({'msg': 'Role cannot be deleted. Contact our support team for more details'})
 
+
 @route.route('/role/clear/<id>', methods=['POST'])
 @login_required
 def clear_role(id):
     user = tblUser.query.get(id)
     user.roles.clear()
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has cleared role from user:' + user.username, type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has cleared role from user:' + user.username, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         flash('You have removed role for user '+user.username, 'success')
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Faild'})
+
 
 @route.route('/admin')
 @login_required
@@ -1875,12 +1976,14 @@ def admin():
     roles = tblRole.query.all()
     return render_template('views/admin.html', users=users, roles=roles)
 
+
 @route.route('/admin/<id>', methods=['POST'])
 def get_admin(id):
     User = tblUser.query.get(id)
     json = UserSchema()
     user = json.dump(User)
     return jsonify(user)
+
 
 @route.route('/user/disable/<id>', methods=['POST'])
 def disable_user(id):
@@ -1891,6 +1994,7 @@ def disable_user(id):
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Faild'})
+
 
 @route.route('/admin/create', methods=['POST'])
 def create_admin():
@@ -1910,21 +2014,25 @@ def create_admin():
     else:
         birthdate = None
     user_id = str(uuid4())
-    User = tblUser(id=user_id, username=username, firstname=fullname.split(' ')[0], lastname=fullname.split(' ')[1], gender=gender, email=email, birthdate=birthdate, password=bcrypt.generate_password_hash(password).decode('utf-8'), publicId=str(uuid4()))
-    try: 
+    User = tblUser(id=user_id, username=username, firstname=fullname.split(' ')[0], lastname=fullname.split(' ')[
+                   1], gender=gender, email=email, birthdate=birthdate, password=bcrypt.generate_password_hash(password).decode('utf-8'), publicId=str(uuid4()))
+    try:
         db.session.add(User)
         db.session.commit()
         if role != '':
             Role = tblRole.query.get(role)
             User.roles.append(Role)
-        Profile = tblProfile(id=str(uuid4()), phone=phone, status=status, company=company, location=location, hometown=hometown, createdBy=user_id)
+        Profile = tblProfile(id=str(uuid4()), phone=phone, status=status,
+                             company=company, location=location, hometown=hometown, createdBy=user_id)
         db.session.add(Profile)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has created user: '+User.username, type='Created', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has created user: '+User.username, type='Created', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Faild'})
+
 
 @route.route('/admin/change/<id>', methods=['POST'])
 def change_admin(id):
@@ -1934,7 +2042,8 @@ def change_admin(id):
     user.lastname = request.form['fullname'].split(' ')[1]
     user.gender = request.form['gender']
     if request.form['birthdate'] != '':
-        user.birthdate = datetime.strptime(request.form['birthdate'], '%Y-%m-%d')
+        user.birthdate = datetime.strptime(
+            request.form['birthdate'], '%Y-%m-%d')
 
     user.email = request.form['email']
     user.profile[0].status = request.form['status']
@@ -1949,14 +2058,17 @@ def change_admin(id):
             user.roles.append(tblRole.query.get(request.form['role']))
 
     if request.form['password'] != '':
-        user.password = bcrypt.generate_password_hash(request.form['password']).decode('utf-8')
+        user.password = bcrypt.generate_password_hash(
+            request.form['password']).decode('utf-8')
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified user: '+user.username, type='Modify', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has modified user: '+user.username, type='Modify', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Faild'})
+
 
 @route.route('/expense', methods=['POST', 'GET'])
 @is_authorized('Admin')
@@ -1969,25 +2081,30 @@ def expense():
             details = request.form['expense']
             amount = request.form['amount']
             id = str(uuid4())
-            Outcome = tblOutcome(id=id, isStock=False, description=details, amount=amount, createdBy=current_user.id)
+            Outcome = tblOutcome(
+                id=id, isStock=False, description=details, amount=amount, createdBy=current_user.id)
             db.session.add(Outcome)
-            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added expense: '+Outcome.description, type='Create', createdBy=current_user.id)
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                   ' has added expense: '+Outcome.description, type='Create', createdBy=current_user.id)
             db.session.add(Activity)
             db.session.commit()
             return redirect(url_for('route.expense'))
     return render_template('views/expense.html', expenses=expenses, form=form)
+
 
 @route.route('/expense/delete/<id>', methods=['POST'])
 def delete_expense(id):
     Outcome = tblOutcome.query.get(id)
     try:
         db.session.delete(Outcome)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted expense: '+Outcome.description, type='Delete', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has deleted expense: '+Outcome.description, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Failed'})
+
 
 @route.route('/expense/save/<id>', methods=['POST'])
 def save_expense(id):
@@ -1995,12 +2112,14 @@ def save_expense(id):
     Outcome.description = request.form['details']
     Outcome.amount = request.form['amount']
     try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified expense from: '+Outcome.description+'/'+Outcome.amount, type='Modify', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified expense from: ' +
+                               Outcome.description+'/'+Outcome.amount, type='Modify', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'data': 'Success', 'details': Outcome.description, 'amount': Outcome.amount})
     except:
         return jsonify({'data': 'Failed'})
+
 
 @route.route('/store')
 def store():
@@ -2013,6 +2132,7 @@ def store():
 
     return render_template('views/store.html', storeForm=storeForm, floors=floors, floorForm=floorForm, store=store)
 
+
 @route.route('/floor/add', methods=['POST'])
 def add_floor():
     floor = request.form['floor']
@@ -2021,29 +2141,34 @@ def add_floor():
     Floor = tblFloor(id=id, floor=floor, storeId=store.id)
     try:
         db.session.add(Floor)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added floor: '+floor, type='Create', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has added floor: '+floor, type='Create', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'msg': 'Success', 'id': id, 'floor': floor})
     except:
         return jsonify({'msg': 'Failed'})
 
+
 @route.route('/floor/delete/<id>', methods=['POST'])
 def delete_floor(id):
     floor = tblFloor.query.get(id)
     try:
         db.session.delete(floor)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted floor: '+floor.floor, type='Deleted', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has deleted floor: '+floor.floor, type='Deleted', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'msg': 'Success'})
     except:
         return jsonify({'msg': 'Failed'})
 
+
 @route.route('/store/save', methods=['POST'])
 def save_store():
     Store = tblStore.query.first()
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified store from: '+Store.store+'/'+Store.phone+'/'+Store.location, type='Deleted', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified store from: ' +
+                           Store.store+'/'+Store.phone+'/'+Store.location, type='Deleted', createdBy=current_user.id)
 
     Store.store = request.form['store']
     Store.phone = request.form['phone']
@@ -2055,6 +2180,7 @@ def save_store():
     except:
         return jsonify({'msg': 'Failed'})
 
+
 @route.route('/room/add', methods=['POST'])
 def add_room():
     room = request.form['room']
@@ -2062,25 +2188,30 @@ def add_room():
     hour = request.form['hour']
     floor = request.form['floor']
     id = str(uuid4())
-    Room = tblRoom(id=id, room=room, price=price, hour=hour, floorId=floor, createdBy=current_user.id)
+    Room = tblRoom(id=id, room=room, price=price, hour=hour,
+                   floorId=floor, createdBy=current_user.id)
     try:
         db.session.add(Room)
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added room: '+Room.room, type='Create', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has added room: '+Room.room, type='Create', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         return jsonify({'msg': 'Success', 'id': id, 'price': price, 'room': room, 'hour': hour, 'floor': floor})
     except:
         return jsonify({'msg': 'Failed to add room! Please make sure that the name is unique.'})
 
+
 @route.route('/room/delete/<id>', methods=['POST'])
 def delete_room(id):
     Room = tblRoom.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted room: '+Room.room, type='Deleted', createdBy=current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has deleted room: '+Room.room, type='Deleted', createdBy=current_user.id)
 
     db.session.delete(Room)
     db.session.add(Activity)
     db.session.commit()
     return jsonify({'msg': 'Success'})
+
 
 @route.route('/customer/add', methods=['POST'])
 def add_customer():
@@ -2090,27 +2221,39 @@ def add_customer():
     if birthdate == '':
         birthdate = None
     id = str(uuid4())
-    Customer = tblCustomer(id=id, name=username, phone=phone, birthdate=birthdate, createdBy=current_user.id)
+    Customer = tblCustomer(id=id, name=username, phone=phone,
+                           birthdate=birthdate, createdBy=current_user.id)
     try:
         db.session.add(Customer)
         db.session.commit()
-        return jsonify({'msg': 'Success', 'username':username, 'phone': phone, 'birthdate': birthdate, 'id': id})
+        return jsonify({'msg': 'Success', 'username': username, 'phone': phone, 'birthdate': birthdate, 'id': id})
     except:
         return jsonify({'msg': 'Failed to create new user'})
+
 
 @route.route('/order', methods=['POST', 'GET'])
 def order():
     floors = tblFloor.query.order_by(tblFloor.createdOn).all()
     customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
-    orders = tblOrder.query.order_by(tblOrder.createdOn).filter(func.DATE(tblOrder.orderOn) == datetime.utcnow().date()).all()
+    # orders = tblOrder.query.order_by(tblOrder.createdOn).filter(func.DATE(tblOrder.orderOn) == datetime.utcnow().date()).all()
+    orders = tblOrder.query.order_by(tblOrder.createdOn).filter(
+        tblOrder.isComplete == False).all()
     date = datetime.utcnow()
     for floor in floors:
         floor.rooms.sort(key=lambda x: x.createdOn, reverse=False)
         if request.method == 'POST':
             orderSchema = OrderSchema(many=True)
             Orders = orderSchema.dump(orders)
-            return jsonify(Orders)
-    return render_template('views/order.html', floors=floors, customers=customers, orders=orders, date=date)
+            for order in Orders:
+                Room = tblRoom.query.get(order['order'])
+                order['order'] = Room.room
+                order['orderOn'] = datetimefilter(
+                    datetime.strptime(order['orderOn'], '%Y-%m-%dT%H:%M:%S'))
+                order['orderTo'] = datetimefilter(
+                    datetime.strptime(order['orderTo'], '%Y-%m-%dT%H:%M:%S'))
+            return jsonify({'Orders': Orders, 'date': datetimefilter(date, '%B %d, %Y')})
+    return render_template('views/orders.html', floors=floors, customers=customers, orders=orders, date=date)
+
 
 @route.route('/order/add', methods=['POST'])
 def add_order():
@@ -2130,13 +2273,15 @@ def add_order():
 
     id = str(uuid4())
 
-    Order = tblOrder(id=id, orderOn=utcFrom, orderTo=utcTo, roomId=room, orderedBy=customer, createdBy=current_user.id)
+    Order = tblOrder(id=id, orderOn=utcFrom, orderTo=utcTo,
+                     roomId=room, orderedBy=customer, createdBy=current_user.id)
     try:
         db.session.add(Order)
         db.session.commit()
         return jsonify({'msg': 'Success'})
     except:
         return jsonify({'msg': 'Failed'})
+
 
 @route.route('/order/remove/<id>', methods=['POST'])
 def remove_order(id):
@@ -2148,3 +2293,243 @@ def remove_order(id):
     except:
         return jsonify({'msg': 'Failed to delete order'})
 
+
+@route.route('/room/order/<id>', methods=['POST'])
+def room_order(id):
+    Room = tblRoom.query.get(id)
+    roomSchema = RoomSchema()
+    room = roomSchema.dump(Room)
+    for order in room['order']:
+        order['orderOn'] = datetimefilter(datetime.strptime(
+            order['orderOn'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%dT%H:%M:%S')
+        order['orderTo'] = datetimefilter(datetime.strptime(
+            order['orderTo'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%dT%H:%M:%S')
+    room['now'] = datetimefilter(datetime.utcnow(), '%H:%M:%S')
+    return jsonify(room)
+
+
+@route.route('/order/<id>')
+def get_order(id):
+    Order = tblOrder.query.get(id)
+    products = tblProduct.query.all()
+    brands = tblBrand.query.all()
+    categories = tblCategory.query.all()
+    return render_template('views/order.html', Order=Order, products=products, brands=brands, categories=categories)
+
+
+@route.route('/payment', methods=['POST'])
+def payment():
+    Payments = tblPayment.query.with_entities(tblPayment.id).all()
+    Drawer = tblDrawer.query.get(current_user.drawer)
+    transactions = json.loads(request.form['data'])
+    if transactions:
+        id = str(uuid4())
+        invoice = 'INV' + str(len(Payments) + 1).zfill(7)
+        Payment = tblPayment(
+            id=id, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
+        db.session.add(Payment)
+        total = 0
+        for transaction in transactions:
+            Transaction = tblTransaction.query.get(transaction)
+            total += Transaction.amount * Transaction.quantity
+            Payment.transactions.append(Transaction)
+        Payment.amount = total
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has ordered invoice: '+invoice, type='Order', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        p = PaymentSchema()
+        result = p.dump(Payment)
+
+        return jsonify({'result': 'Success', 'data': result, 'rate': Drawer.rate})
+    else:
+        return jsonify({'result': 'No transaction added'})
+
+
+@route.route('/checkin/order/<order_id>', methods=['POST'])
+def checkin(order_id):
+    Order = tblOrder.query.get(order_id)
+    if Order.order.status == 'Open':
+        Order.order.status = 'In Process'
+        Order.isComplete = True
+        Payments = tblPayment.query.with_entities(tblPayment.id).all()
+        id = str(uuid4())
+        pid = str(uuid4())
+        invoice = 'INV' + str(len(Payments) + 1).zfill(7)
+        Payment = tblPayment(
+            id=pid, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
+        CheckIn = tblCheckin(id=id, createdBy=current_user.id,
+                             orderId=order_id, paymentId=pid)
+        try:
+            db.session.add(Payment)
+            db.session.add(CheckIn)
+            db.session.commit()
+            return jsonify({'msg': 'Success'})
+        except:
+            return jsonify({'msg': 'Failed'})
+    else:
+        return jsonify({'msg': Order.order.room+' is active. Please try to select another room'})
+
+
+@route.route('/order/transaction/<product_id>', methods=['POST'])
+def order_transaction(product_id):
+    product = tblProduct.query.get(product_id)
+    data = json.loads(request.form['data'])
+    description = product.product
+    oid = request.form['id']
+
+    resultObj = {
+        'data': {},
+        'result': ''
+    }
+
+    Order = tblOrder.query.get(oid)
+
+    if Order.checkin:
+        if data['colorId'] == '':
+            data['colorId'] = None
+
+        if data['discount'] == '':
+            data['discount'] = 0
+
+        discount = Decimal(data['discount'])
+        price = Decimal(data['price'])
+        quantity = Decimal(data['quantity'])
+
+        amount = price * (1 - discount / 100)
+        pprice = price * (1 - discount / 100)
+
+        for v in data['values']:
+            value = tblValue.query.get(v['valueId'])
+            pprice -= value.price
+            description += '-'+value.value
+
+        tid = str(uuid4())
+        transaction = tblTransaction(id=tid, discount=discount, price=pprice,
+                                    amount=amount, description=description, createdBy=current_user.id, product=product_id)
+        db.session.add(transaction)
+
+        Order.checkin.orderPayment.transactions.append(transaction)
+
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                            ' has added transaction: '+description, type='Add', createdBy=current_user.id)
+        db.session.add(Activity)
+
+        if product.isStock:
+            if len(product.stocks) > 0:
+                total_stocks = 0
+                sum_stocks = 0
+                for stock in product.stocks:
+                    if stock.color == data['colorId']:
+                        sum_stocks += stock.quantity
+                    elif stock.color == '':
+                        sum_stocks += stock.quantity
+                    total_stocks += stock.quantity
+                available = sum_stocks - quantity
+                if available >= 0:
+                    sum_quantity = quantity
+                    for stock in product.stocks:
+                        if sum_quantity > 0 and stock.quantity > 0:
+                            qid = str(uuid4())
+                            if stock.color == data['colorId'] or stock.color == '':
+                                if stock.quantity < sum_quantity:
+                                    stock_quantity = stock.quantity
+                                    stock.quantity = 0
+                                    Quantity = tblQuantity(
+                                        id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                    db.session.add(Quantity)
+                                    transaction.quantity += stock_quantity
+                                    sum_quantity -= stock_quantity
+                                else:
+                                    Quantity = tblQuantity(
+                                        id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                    db.session.add(Quantity)
+                                    transaction.quantity += sum_quantity
+                                    stock.quantity -= sum_quantity
+                                    sum_quantity = 0
+                    amount *= quantity
+                    transaction.amount = amount
+                    total_stocks -= quantity
+                    db.session.commit()
+                    resultObj['result'] = 'success'
+                    resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
+                                        'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+                else:
+                    resultObj['result'] = 'failed'
+                    resultObj['data'] = {
+                        'message': 'The selected product has only '+str(sum_stocks)+' left'}
+            else:
+                resultObj['result'] = 'failed'
+                resultObj['data'] = {
+                    'message': 'The selected product is not available'}
+        else:
+            transaction.quantity = quantity
+            amount *= quantity
+            transaction.amount = amount
+            db.session.commit()
+            resultObj['result'] = 'success'
+            resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity,
+                                'price': price, 'isStock': False, 'discount': discount}
+        return jsonify(resultObj)
+    else:
+        resultObj['result'] = 'failed'
+        resultObj['data'] = {
+            'message': 'Please check in before you select the order'}
+        return jsonify(resultObj)
+
+
+@route.route('/payment/<id>', methods=['POST'])
+def get_payment(id):
+    Drawer = tblDrawer.query.get(current_user.drawer)
+    Payment = tblPayment.query.get(id)
+    transactions = json.loads(request.form['data'])
+
+    if transactions:
+        total = 0
+        for transaction in transactions:
+            Transaction = tblTransaction.query.get(transaction)
+            if Transaction.quantities:
+                quantity = 0
+                for q in Transaction.quantities:
+                    quantity += q.quantity
+                Transaction.quantity = quantity
+            total += Transaction.price * quantity
+            if Transaction not in Payment.transactions:
+                Payment.transactions.append(Transaction)
+        Payment.amount = total
+        db.session.commit()
+
+    p = PaymentSchema()
+    payment = p.dump(Payment)
+    return jsonify({'data': payment, 'rate': Drawer.rate})
+
+
+@route.route('/checkout/order/<order_id>', methods=['POST'])
+def checkout_order(order_id):
+    Order = tblOrder.query.get(order_id)
+    start = Order.checkin.startedOn
+    end = datetime.utcnow()
+    totalHour = end - start
+    minute = totalHour.seconds/60
+    totalPrice = (float(Order.order.price) * minute) / 60
+    hours = minute / 60
+    cid = str(uuid4())
+    CheckOut = tblCheckout(id=cid, totalHour=end - totalHour, createdBy=current_user.id, orderId=order_id, endedOn=end)
+    
+    description = Order.order.room
+    tid = str(uuid4())
+    transaction = tblTransaction(id=tid, price=Order.order.price, quantity=round(hours, 2), discount=0,
+                                 amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
+    json = {
+        'cost': Order.order.price,
+        'discount': '',
+        'quantity': minute,
+        'amount': totalPrice,
+        'description': description
+    }
+    db.session.add(CheckOut)
+    db.session.add(transaction)
+    Order.checkin.orderPayment.transactions.append(transaction)
+    db.session.commit()
+    return jsonify({'msg': 'Success', 'paymentId': Order.checkin.orderPayment.id, 'transaction': json})
+   

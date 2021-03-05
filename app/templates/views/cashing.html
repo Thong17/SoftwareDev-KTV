@@ -518,7 +518,7 @@
                     <input type="text" class="search-input color-text pl-2" placeholder="Search">
                 </div>
                 {% if current_user.drawer == '' %}
-                <div class="menu-icon drawer-btn">
+                <div class="menu-icon drawer-btn" id="none">
                     <i class="fa fa-usd" aria-hidden="true"></i>
                 </div>
                 {% else %}
@@ -1071,7 +1071,6 @@
         orderLists.push(orderList)
 
         if (validation.isSelected == true) {
-            // Stockform
             $('.order-form').html(orderForm(orderId, details, cost, '', '', accounting.formatMoney(0)))
             $('.order-form').find('#input-discount').focus()
             $('#productProperty').modal('hide')
@@ -1276,8 +1275,6 @@
         currencyFormat()
 
         $('.arrow').addClass('active')
-
-        currencyFormat()
         var products = Array.from(document.querySelectorAll('.product-item'))
 
         var temp_products = products

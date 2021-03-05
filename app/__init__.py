@@ -188,14 +188,15 @@ class tblCheckin(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     orderId = db.Column(db.String(36), db.ForeignKey('tbl_order.id'), nullable=False)
+    paymentId = db.Column(db.String(36), db.ForeignKey('tbl_payment.id'), nullable=False)
 
 class tblCheckout(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     endedOn = db.Column(db.DateTime, default=datetime.utcnow)
+    totalHour = db.Column(db.DateTime, nullable=False)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     orderId = db.Column(db.String(36), db.ForeignKey('tbl_order.id'), nullable=False)
-    paymentId = db.Column(db.String(36), db.ForeignKey('tbl_payment.id'), nullable=False)
 
 # Endwork
 
@@ -213,6 +214,7 @@ class tblTransaction(db.Model):
     quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
     profit = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     description = db.Column(db.Text(), nullable=True, default='')
+    product = db.Column(db.String(36), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade='save-update, merge, delete', single_parent=True)
@@ -225,6 +227,7 @@ class tblPayment(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
+    orderPayment = db.relationship('tblCheckin', backref='orderPayment', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     transactions = db.relationship('tblTransaction', secondary=payment, backref='transactions', lazy='dynamic')
 
 class tblUser(db.Model, UserMixin):
@@ -532,19 +535,19 @@ class RoleSchema(ModelSchema):
     class Meta:
         model = tblRole
 
-class RoomSchema(ModelSchema):
-    class Meta:
-        model = tblRoom
-
 class CustomerSchema(ModelSchema):
     class Meta:
         model = tblCustomer
 
 class OrderSchema(ModelSchema):
     customer = fields.Nested(CustomerSchema)
-    order = fields.Nested(RoomSchema)
     class Meta:
         model = tblOrder
+
+class RoomSchema(ModelSchema):
+    order = fields.Nested(OrderSchema, many=True)
+    class Meta:
+        model = tblRoom
 
 class CheckoutSchema(ModelSchema):
     class Meta:

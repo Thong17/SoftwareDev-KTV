@@ -6,7 +6,7 @@ $(document).on('click', '.order-btn', function() {
     var id = $(this).attr('id')
     var isChange = $(this).attr('data-change')
     var drawer = $('.drawer-btn').attr('id')
-    if (drawer == undefined) {
+    if (drawer == 'none') {
         $('.drawer-btn').click()
     } else {
         if (isChange == 'true') {
@@ -59,7 +59,14 @@ $(document).on('click', '.order-btn', function() {
                                                         <td style="text-align: center">`+price_before+`</td>
                                                         <td style="text-align: center">`+t.discount+`</td>
                                                         <td style="text-align: center">`+t.quantity+`</td>
-                                                        <td style="text-align: center">`+t.amount * t.quantity+`</td>
+                                                        <td style="text-align: center">`+accounting.formatMoney(t.amount, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%v%s",
+                                                                neg: "%v%s",
+                                                                zero: '...'
+                                                            }
+                                                        })+`</td>
                                                     </tr>`
                             })
                             
@@ -88,6 +95,7 @@ $(document).on('click', '.order-btn', function() {
                         data: json
                     },
                     success: function(data) {
+                        console.log(data)
                         $('.order-btn').attr('data-change', false)
                         var time = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toLocaleTimeString()
                         var date = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toDateString()
@@ -120,7 +128,14 @@ $(document).on('click', '.order-btn', function() {
                                                     <td style="text-align: center">`+price_before+`</td>
                                                     <td style="text-align: center">`+t.discount+`</td>
                                                     <td style="text-align: center">`+t.quantity+`</td>
-                                                    <td style="text-align: center">`+t.price * t.quantity+`</td>
+                                                    <td style="text-align: center">`+accounting.formatMoney(t.amount, {
+                                                        precision: 2,
+                                                        format: {
+                                                            pos: "%v%s",
+                                                            neg: "%v%s",
+                                                            zero: '...'
+                                                        }
+                                                    })+`</td>
                                                 </tr>`
                         })
                         

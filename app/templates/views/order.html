@@ -1,608 +1,1904 @@
 {% extends 'views/financial.html' %}
 
 {% block style %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
 <style>
-    .room-container {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: flex-start;
-        padding: 10px 10px 10px 15px;
-        background-color: var(--color-menu);
+    @font-face {
+        font-family: "Ionicons";
+        src: url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.eot?v=2.0.1");
+        src: url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.eot?v=2.0.1#iefix") format("embedded-opentype"), url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.ttf?v=2.0.1") format("truetype"), url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.woff?v=2.0.1") format("woff"), url("https://code.ionicframework.com/ionicons/2.0.1/fonts/ionicons.svg?v=2.0.1#Ionicons") format("svg");
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    td {
+        padding: 5px !important;
+        font-size: 13px !important;
+    }
+
+    tbody tr td {
+        font-size: 11px !important;
+    }
+
+    tbody tr td:hover {
+        color: var(--color-font) !important;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .cancel-btn:hover i {
+        color: var(--color-font);
+    }
+
+    .description {
+        max-width: 50px !important;
+    }
+
+    [contenteditable="true"]:active,
+    [contenteditable="true"]:focus {
+        border: 1px solid var(--color-hr);
         border-radius: 7px;
-        box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
-        height: 90px;
+        outline: none;
+        transform: scale(1.1) !important;
     }
 
-    .room-container.active {
-        border: 1px solid #2e6da4;
+    p[contenteditable="true"] {
+        cursor: text;
     }
 
-    .grid-products {
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-        grid-template-rows: repeat(auto-fill, minmax(90px, 90px));
-        padding: 15px 15px 15px 15px;
-        grid-row-gap: 30px;
-    }
-
-    .room-bottom {
+    .order-wrapper {
+        padding: 10px 20px 10px 10px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
         width: 100%;
+        background-color: var(--color-menu);
+        z-index: 10;
+        transition: 0.3s ease;
     }
 
     #list-orders {
-        width: 750px;
-        height: 100vh;
-    }
-
-
-    .fc-view-harness {
-        height: 70vh !important;
-    }
-
-    .fc-toolbar-title,
-    .fc-col-header-cell-cushion,
-    .fc-scrollgrid-shrink-cushion {
-        font-size: 13px !important;
-        color: var(--color-text) !important;
-        font-weight: 300;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
-    }
-
-    .fc-col-header-cell-cushion {
-        font-size: 15px !important;
-    }
-
-    .fc-toolbar-title {
-        font-size: 17px !important;
-        align-self: center;
-    }
-
-    .fc-today-button {
-        background-color: var(--color-menu) !important;
-        border: 1px solid var(--color-hr) !important;
-        padding: 3px 10px !important;
-    }
-
-    .fc-next-button,
-    .fc-prev-button {
-        background-color: var(--color-bg) !important;
-        border: 1px solid var(--color-bg) !important;
-        padding: 3px 0 !important;
-    }
-
-    .fc-icon {
-        font-size: 15px !important;
-        color: var(--color-text) !important;
-    }
-
-    .fc-button,
-    .dataTables_empty,
-    .dropdown-item,
-    .no-results,
-    .btn-light {
-        color: var(--color-text) !important;
-        border-radius: 7px !important;
-        font-weight: 300 !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif !important;
-
-    }
-
-    .fc-add-button {
-        background-color: var(--color-menu) !important;
-        border: 1px solid var(--color-hr) !important;
-        padding: 3px 10px !important;
-    }
-
-    .fc-toolbar-chunk {
-        display: flex !important;
-    }
-
-    .search-btn {
-        padding: 0px 14px 0 12px !important;
-        color: var(--color-text);
-    }
-
-    .modal-dialog .modal-content {
-        border-radius: 9px;
-    }
-
-    .modal-height {
-        height: 50vh;
-        overflow-y: scroll;
-    }
-
-    .dataTable {
-        width: 100% !important;
-        border: none !important;
-    }
-
-    #new-customer {
-        border-radius: 17px !important;
-    }
-
-    .dataTables_info {
-        display: none;
-    }
-
-    .action-btn {
-        width: 50px;
-        margin-left: 10px;
-    }
-
-    .modal-header {
-        border: none !important;
-        padding-bottom: 0 !important;
-    }
-
-    #list-customers {
         height: 100%;
-        overflow-y: scroll;
-    }
-
-    .form-control,
-    .btn-light {
-        border-radius: 9px !important;
-    }
-
-    #list-customers .customer-tr:hover {
-        background-color: var(--color-menu);
-    }
-
-    .bootstrap-select>.dropdown-toggle.bs-placeholder,
-    .btn-light:not(:disabled):not(.disabled).active,
-    .btn-light:not(:disabled):not(.disabled):active,
-    .show>.btn-light.dropdown-toggle {
-        border: 1px solid var(--color-hr) !important;
-        background-color: var(--color-bg) !important;
-        outline: none !important;
     }
 
     thead tr {
         background-color: var(--color-menu);
     }
 
-    .dash {
-        position: absolute;
-        top: 33px;
-        left: 50%;
-        transform: translateX(-50%);
+    .content-menu {
+        border: none;
     }
 
-    .clock-container {
-        padding: 7px 8px 7px 15px;
-        width: 170px;
+    .wrap-container {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        border-radius: 18px;
-        border: 1px solid var(--color-hr);
     }
 
-    #new-customer:hover {
+    .col-filter {
+        width: calc(100% - 350px);
+        padding-right: 20px;
+    }
+
+    .col-order {
+        width: 350px;
+        position: relative;
+    }
+
+    .drawer-btn {
+        color: crimson;
+        margin: 0 0 0 5px;
+    }
+
+    .drawer-btn.active {
+        color: limegreen;
+    }
+
+    .search-btn {
         background-color: var(--color-menu);
+        height: 34px;
+        border: none;
+        padding: 4px 3px 0 16px !important;
     }
 
-    #show-order {
-        position: absolute;
+    .search-input {
+        background-color: var(--color-menu) !important;
+    }
+
+    .grid-products {
+        grid-column-gap: 20px;
+        grid-row-gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+        grid-template-rows: repeat(auto-fill, minmax(200px, 200px)) !important;
+        padding: 15px 15px 0 15px;
+    }
+
+    .grid-products .product-item {
+        height: 200px;
+        background-color: var(--color-menu);
+        cursor: default;
+    }
+
+    .grid-products .product-item .item-wrapper .item-img {
+        height: 110px;
+        background-color: var(--color-bg);
+    }
+
+    .grid-products .product-item .item-wrapper .item-details {
+        height: calc(100% - 110px);
+    }
+
+    .product-btn {
+        background-color: rgba(31, 31, 31, 0.3);
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        font-size: 38px !important;
+        color: dodgerblue !important;
+        top: 0;
+        right: 0;
+        transform: scale(1) !important;
+        border-radius: none;
+        border-radius: 0;
+        transition: 0;
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .product-item:hover .product-btn,
+    .product-item.active .product-btn {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .drawer-dropdown {
+        left: -120px !important;
+    }
+
+    .list-products .product-item {
+        height: 130px;
+        padding: 10px 0;
+    }
+
+    .list-products .product-item .item-wrapper .item-details .details .color-font {
+        font-size: 18px !important;
+    }
+
+    .list-products .product-item .item-wrapper .item-details div:nth-child(2) p:first-child {
+        font-size: 13px !important;
+    }
+
+    .list-products .product-item .item-wrapper .item-img {
+        width: 130px;
+        height: 110px;
+    }
+
+    .product-item.active .product-btn {
+        color: crimson !important;
+    }
+
+    .check-in:hover,
+    .check-out:hover {
+        color: var(--color-bg) !important;
+    }
+
+    .form-empty {
+        padding: 5px;
+    }
+
+    .form-empty:disabled:hover {
+        border-color: var(--color-hr);
+    }
+
+    .list-products .product-item .item-wrapper .item-img .product-btn {
         top: 0;
         left: 0;
     }
 
-    .date-header {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
+    .check-in,
+    .check-out,
+    .order-btn {
+        border-radius: 20px;
+        margin-left: 10px;
+        padding: 5px 10px 5px 5px;
+        color: var(--color-menu) !important;
     }
 
-    .btn-date {
-        padding: 5px 20px;
+    .order-icon {
+        position: relative;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 31px;
+        height: 31px;
+        background-color: var(--color-menu);
+        border-radius: 50%;
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .sum-order {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        font-size: 11px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        color: var(--color-font);
+        background-color: dodgerblue;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .property-values {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .modal-wrapper {
+        height: 65vh;
+        position: relative;
+    }
+
+    .details-img {
+        width: 170px;
+        height: 170px;
+    }
+
+    .config-list {
+        border-top: 1px solid var(--color-hr);
+        margin-top: 10px;
+        padding: 5px 0;
+    }
+
+    .config-list p {
+        text-align: start;
+    }
+
+    .value-active {
+        color: var(--color-hr);
+    }
+
+    .span-border.active {
+        border: 1px solid dodgerblue;
+    }
+
+    .alert-btn {
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        font-size: 23px;
+        z-index: 100;
+    }
+
+    input#input-discount::after {
+        content: "%";
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .details-colors {
+        position: relative;
+        display: grid;
+        grid-gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-rows: repeat(auto-fill, minmax(75px, 75px));
+        width: 100%;
+        height: auto;
+    }
+
+    .span-border {
+        position: relative;
+        width: 100%;
+        height: 75px;
+        padding: 7px 10px 5px 10px;
+        margin: 0;
+        border-radius: 10px;
+        transition: 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        transition: 0 ease;
+        background-color: var(--color-menu);
+        border: none;
+        box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .span-border.active,
+    .span-border:hover {
+        border: none;
+    }
+
+    .span-border.active::after {
+        content: "\f3a7";
+        color: dodgerblue;
+        position: absolute;
+        font-family: "Ionicons";
+        top: 5px;
+        right: 10px;
+        font-size: 18px;
+    }
+
+    .span-color {
+        width: 33px;
+        height: 33px;
+        border-radius: 50%;
+    }
+
+    .money-add {
         cursor: pointer;
     }
 
-    .dropdown-item {
-        border-radius: 0 !important;
+    #list-money .form-empty {
+        border-radius: 7px;
+        padding-left: 7px;
+    }
+
+    .drawer-time {
+        width: auto;
+        height: 100%;
+        padding: 3px 3px 3px 1px;
+        border-radius: 23px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        border: 1px solid var(--color-hr);
+        transition: 0.3s ease;
+    }
+
+    .drawer-time.active .time-btn {
+        color: limegreen;
+    }
+
+    .drawer-time.active {
+        padding-left: 10px;
+    }
+
+    .time-btn {
+        margin-left: 3px;
+        cursor: pointer;
+        color: crimson;
+        font-size: 28px;
+    }
+
+    .pre-divied {
+        background-color: var(--color-menu);
+    }
+
+    .remove-btn:hover i {
+        color: var(--color-font);
+    }
+
+    .money-add,
+    .payment-add {
+        cursor: pointer;
+    }
+
+    .payment-add {
+        background-color: var(--color-menu);
+    }
+
+    .fav-btn {
+        padding: 5px 10px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 16px;
+        background-color: var(--color-menu);
+        color: var(--color-text);
+    }
+
+    .customer-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-transaction {
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown-menu {
+        width: 230px;
+    }
+
+    @media only screen and (max-width: 1100px) {
+
+        .view-btn,
+        .sort-btn {
+            display: none !important;
+        }
+
+        .menu-btn {
+            width: 100px;
+        }
+    }
+
+    @media only screen and (max-width: 991px) {
+        .product-details {
+            flex-direction: column;
+        }
+    }
+
+    @media only screen and (max-width: 950px) {
+        .col-order {
+            display: none;
+        }
+
+        .col-filter {
+            width: 100%;
+        }
+
+        .details-left,
+        .details-right {
+            width: 100%;
+        }
+    }
+
+    @media only screen and (max-width: 550px) {
+        .menu-btn {
+            display: none;
+        }
+
+        .grid-products .product-item .item-wrapper .item-details {
+            height: calc(100% - 80px);
+        }
+
+        .grid-products .product-item .item-wrapper .item-img {
+            height: 80px;
+        }
+
+        .product-item {
+            height: 150px !important;
+        }
+
+        .grid-products {
+            grid-column-gap: 10px;
+            grid-row-gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(150px, 150px));
+            padding: 5px 5px 0 5px;
+        }
+
+        .color-font {
+            font-size: 11px !important;
+        }
+
+        .color-text {
+            font-size: 10px !important;
+        }
+
+        .stock-tag {
+            font-size: 13px;
+        }
+
+        .fav-btn,
+        .menu-icon {
+            font-size: 13px;
+        }
+
+        .details-title,
+        .details-price,
+        .details-colors {
+            font-size: 18px !important;
+        }
+
+        .flex-between-end p {
+            font-size: 16px;
+        }
     }
 </style>
-
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.js"></script>
 {% endblock %}
 
 {% block content %}
-<div class="wrap-container flex-between-start">
-    <div class="row-wrapper">
-        <div class="column-wrapper" style="width: 100%;">
-            {% for floor in floors %}
-            <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ floor.floor }}</h5>
-            <div class="grid-products" id="grid-{{ floor.id }}">
-                {% if floor.rooms %}
-                {% for room in floor.rooms %}
-                <div class="room-container" id="{{ room.id }}">
-                    <div class="product-btn color-text">
-                        <i class="fa fa-pencil-square-o edit-room" aria-hidden="true"></i>
-                        <i class="fa fa-trash-o delete-room" aria-hidden="true"></i>
+<div class="wrap-container">
+    <div class="col-filter" style="border-right: 1px solid var(--color-hr);">
+        <!-- Begin -->
+        <div class="content-menu flex-between">
+            <div class="flex-start-center">
+                <div class="fav-btn"><i class="fa fa-bookmark-o" aria-hidden="true"></i></div>
+                <div class="dropdown" id="list-cates">
+                    <div class="menu-icon" data-toggle="dropdown">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
-                    <div class="flex-between-center room-bottom">
-                        <h5 class="color-font room-no notranslate">{{ room.room }}</h5>
-                        <div class="room-price color-text"><span class="currency-format notranslate">{{ room.price
-                                }}</span></div>
-                    </div>
-                    <div class="color-text room-bottom flex-between-center">
-                        {% if room.status == 'Open' %}
-                        <div class="room-status text-success">Open</div>
+                    <div class="dropdown-menu">
+                        {% if categories %}
+                        {% for category in categories %}
+                        <div class="dropdown-item category-item" id="{{category.id}}">{{category.category}}</div>
+                        {% endfor %}
                         {% else %}
-                        <div class="room-status text-danger">Close</div>
+                        <div class="dropdown-item">No categories</div>
                         {% endif %}
                     </div>
                 </div>
-                {% endfor %}
+                <div class="menu-items flex-start-center color-text notranslate">
+                    {% if brands %}
+                    {% for brand in brands %}
+                    <div class="menu-item" id="{{ brand.id }}">{{ brand.brand }}</div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="menu-item">...</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="menu-btn flex-end-center color-text">
+                <div class="view-btn"><i class="fa fa-list-ul list-btn" aria-hidden="true"></i></i></div>
+                <div class="view-btn active"><i class="fa fa-th grid-btn" aria-hidden="true"></i></div>
+                <div class="dropdown" id="list-filters">
+                    <div class="sort-btn" data-toggle="dropdown"><i class="fa fa-sliders" aria-hidden="true"></i></div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item sort-item" id="title">Title</div>
+                        <div class="dropdown-item sort-item" id="newest">Newest</div>
+                        <div class="dropdown-item sort-item" id="oldest">Oldest</div>
+                        <div class="dropdown-item sort-item" id="most-expensive">Most expensive</div>
+                        <div class="dropdown-item sort-item" id="cheapest">Cheapest</div>
+                    </div>
+                </div>
+                <div class="search-btn flex-between notranslate color-text">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <input type="text" class="search-input color-text pl-2" placeholder="Search">
+                </div>
+                {% if current_user.drawer == '' %}
+                <div class="menu-icon drawer-btn" id="none">
+                    <i class="fa fa-usd" aria-hidden="true"></i>
+                </div>
+                {% else %}
+                <div class="menu-icon drawer-btn active" id="{{ current_user.drawer }}">
+                    <i class="fa fa-usd" aria-hidden="true"></i>
+                </div>
                 {% endif %}
             </div>
+        </div>
+        <div class="grid-products product-container">
+            <div class="empty-result hide color-text">No product found...</div>
+            {% if products %}
+            {% for product in products %}
+            {% if current_user.id in product.listFavorite|tojson|safe %}
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+                <input type="hidden" id="details-brand" value="{{product.brandId}}">
+                <input type="hidden" id="details-categ" value="{{product.categoryId}}">
+                <div class="item-wrapper">
+                    <div class="item-img">
+                        <img src="/static/uploads/{{product.photo}}">
+                        <button class="product-btn color-text" title="Add product to list">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </button>
+                        {% if product.discount != '' %}
+                        <div class="product-discount">
+                            <p class="color-text">{{ product.discount }}%</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <div class="details">
+                            <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
+                                title="{{product.product}}">{{product.product}}</p>
+                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            </p>
+                            <p class="color-text" id="details-category" style="font-size: 10px;">
+                                {{product.productOfCategory.category}}</p>
+                            <p class="color-text hide" id="details-description" style="font-size: 10px;">
+                                {{product.description}}</p>
+                            <p class="price-tag color-text currency-format notranslate hide">{{ product.price }}</p>
+                        </div>
+                        <div class="notranslate flex-between-end color-text" style="width: 100%;">
+                            <p class="color-font text-wrapper" id="details-price"
+                                style="font-size: 14px; width: 110px;">
+                                <span class="symbol"></span><span class="stock-tag" style="font-size: 12px;">
+                                    {% if product.isStock == True %}
+                                    {% set total_stock = namespace(value=0) %}
+                                    {% if product.stocks %}
+                                    {% for stock in product.stocks %}
+                                    {% set total_stock.value = total_stock.value + stock.quantity %}
+                                    {% endfor %}
+                                    {% if total_stock.value > 0 %}
+                                    {{ total_stock.value }} Available
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Available
+                                    {% endif %}
+                                </span>
+                            </p>
+                            <p style="font-size: 12px;" class="favorite-btn active">
+                                <i class="fa fa-bookmark" aria-hidden="true"></i>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+                <input type="hidden" id="details-brand" value="{{product.brandId}}">
+                <input type="hidden" id="details-categ" value="{{product.categoryId}}">
+                <div class="item-wrapper">
+                    <div class="item-img">
+                        <img src="/static/uploads/{{product.photo}}">
+                        <button class="product-btn color-text" title="Add product to list">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </button>
+                        {% if product.discount != '' %}
+                        <div class="product-discount">
+                            <p class="color-text">{{ product.discount }}%</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <div class="details">
+                            <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
+                                title="{{product.product}}">{{product.product}}</p>
+                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            </p>
+                            <p class="color-text" id="details-category" style="font-size: 10px;">
+                                {{product.productOfCategory.category}}</p>
+                            <p class="color-text hide" id="details-description" style="font-size: 10px;">
+                                {{product.description}}</p>
+                            <p class="price-tag color-text currency-format notranslate hide">{{ product.price }}</p>
+                        </div>
+                        <div class="notranslate flex-between-end color-text" style="width: 100%;">
+                            <p class="color-font text-wrapper" id="details-price"
+                                style="font-size: 14px; width: 110px;">
+                                <span class="symbol"></span><span class="stock-tag" style="font-size: 12px;">
+                                    {% if product.isStock == True %}
+                                    {% set total_stock = namespace(value=0) %}
+                                    {% if product.stocks %}
+                                    {% for stock in product.stocks %}
+                                    {% set total_stock.value = total_stock.value + stock.quantity %}
+                                    {% endfor %}
+                                    {% if total_stock.value > 0 %}
+                                    {{ total_stock.value }} Available
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Out of stock
+                                    {% endif %}
+                                    {% else %}
+                                    Available
+                                    {% endif %}
+                                </span>
+                            </p>
+                            <p style="font-size: 12px;" class="favorite-btn">
+                                <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             {% endfor %}
+            {% else %}
+            <div class="empty-result color-text">No product found...</div>
+            {% endif %}
         </div>
-        <div class="border-right"></div>
-        <div class="column-wrapper" id="list-orders">
-            <div class="column-title flex-center-center mb-3" style="text-align: center;"><h4 class="color-font m-0">Order</h4></div>
-            <!-- <div id='external-events'>
-                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
-                  <div class='fc-event-main'>My Event 1</div>
+
+
+        <!-- Noted -->
+    </div>
+    <div class="col-order pl-4">
+        <h4 class="color-font" style="text-align: center;">{{ Order.order.room }}</h4>
+        <div class="customer-info">
+            <div class="customer-name color-text">Customer: {{ Order.customer.name }}</div>
+            <div class="customer-phone color-text">{{ Order.customer.phone }}</div>
+        </div>
+        <div class="order-container mt-2">
+            <table class="table order-table notranslate">
+                <thead>
+                    <tr class="color-font">
+                        <td style="width: 50%;">Description</td>
+                        <td class="text-center" style="width: 20%;">Price</td>
+                        <td class="text-center" style="width: 15%;">Disc</td>
+                        <td class="text-center" style="width: 15%;">Qty</td>
+                        <td class="text-center" style="width: 20%;">Amount</td>
+                        <td class="text-center cancel-btn"></td>
+                    </tr>
+                </thead>
+                <tbody id="list-orders">
+                    <tr class="order-form color-text notranslate"></tr>
+                    {% if Order.checkin %}
+                    {% for t in Order.checkin.orderPayment.transactions %}
+                    <tr class="color-text transaction-item" id="{{ t.id }}" data-id="{{ Order.id }}">
+                        <td class="description" id="order-description" data-id="{{ t.product }}">{{ t.description }}
+                        </td>
+                        <td class="text-center currency-format" id="order-price">{{ t.price }}</td>
+                        <td>
+                            <p class="color-text text-center" contenteditable="true" id="order-discount">{{ t.discount
+                                }}</p>
+                        </td>
+                        <td>
+                            <p class="color-text text-center" contenteditable="true" id="order-quantity">{{ t.quantity
+                                }}</p>
+                        </td>
+                        <td class="text-center currency-format" id="order-amount">{{ t.amount }}</td>
+                        <td class="cancel-btn hide">
+                            <ion-icon name="close-outline"></ion-icon>
+                        </td>
+                        <td class="save-btn hide">
+                            <ion-icon name="checkmark-outline"></ion-icon>
+                        </td>
+                        <td class="remove-btn">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+            <div class="order-wrapper flex-between-center">
+                {% if Order.checkin %}
+                    {% if Order.checkout %}
+                    <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}">
+                        <span class="mr-2 order-icon">
+                            <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
+                            <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
+                        </span>
+                        <span>Place Order</span>
+                    </button>
+                    {% else %}
+                    <button class="btn color-text check-out btn-danger btn-transaction" data-id="{{ Order.id }}"
+                        data-change="true" data-payment="{{ Order.checkin.paymentId }}">
+                        
+                        <div class="dropup">
+                            <span class="mr-2 order-icon" data-toggle="dropdown" style="color: var(--color-text);">0</span>
+                            <ul class="dropdown-menu m-0 p-2">
+                                <li class="flex-between-start"><span>Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
+                                <hr>
+                                <li class="mb-3 flex-between-center"><span>Duration </span><span id="calculate-time" class="text-danger"></span></li>
+                            </ul>
+                        </div>
+                        <span class="check-in-out">Check Out</span>
+                    </button>
+                    {% endif %}
+                {% else %}
+                <button class="btn color-text check-in btn-success btn-transaction" data-id="{{ Order.id }}"
+                    data-change="true" data-payment="{{ Order.checkin.paymentId }}">
+                    <span class="mr-2 order-icon" style="color: var(--color-text);">
+                        0
+                    </span>
+                    <span class="check-in-out">Check In</span>
+                </button>
+                {% endif %}
+                <div class="arrow arrow-left animate-left-to-right">
+                    <div class="flex-between-center">
+                        <span class="mr-3 color-text">Total:</span>
+                        <span id="sumTotal" class="color-font currency-format notranslate">0</span>
+                    </div>
                 </div>
-            </div> -->
-            <div class="calendar-container notranslate">
-                <div class="date-header">
-                    <span class="btn-date prev-date"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
-                    <h2 class="fc-toolbar-title m-0" id="date">{{ date | datetimefilter('%B %d, %Y') }}</h2>
-                    <span class="btn-date next-date"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-                </div>
-                <table id="order-table" class="table">
-                    <thead>
-                        <tr class="color-font">
-                            <td class="color-text">Customer</td>
-                            <td class="color-text">Phone</td>
-                            <td class="color-text">Room</td>
-                            <td class="color-text">Order</td>
-                        </tr>
-                    </thead>
-                    <tbody id="order-list">
-                        {% for order in orders %}
-                        <tr class="order-item" id="{{ order.id }}">
-                            <td class="color-text">{% if order.customer.name != '' %}{{ order.customer.name }}{%
-                                else %}...{% endif %}</td>
-                            <td class="color-text notranslate">{% if order.customer.phone != '' %}{{
-                                order.customer.phone }}{%
-                                else %}...{% endif %}</td>
-                            <td class="color-text notranslate">{{ order.order.room }}</td>
-                            <td class="color-text flex-between-center"><span>{{ order.orderOn | datetimefilter }}-{{ order.orderTo | datetimefilter }}</span><span class="remove-order"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+
+<div class="modal fade" id="productProperty" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
-            <div class="modal-header flex-column-start-start">
-                <div class="flex-between" style="width: 100%;">
-                    <div class="flex-center-center" style="width: calc(100% - 170px);">
-                        <h4 class="modal-title color-font"></h4>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="paymentModel" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="padding: 0; height: 80vh;">
+                <div class="payment-container">
+                    <div class="payment-bill">
+                        <div class="payment-header">
+                            <div class="payment-type">
+                                <div class="type-btn type-cash color-text active">Cash</div>
+                                <div class="type-btn type-card color-text">Card</div>
+                            </div>
+                        </div>
+                        <div class="payment-body">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <input type="number" step="any" class="form-control input-color"
+                                            name="receive-cash" id="receive-cash" required>
+                                        <label for="receive-cash" class="label receive-cash">Amount</label>
+                                        <select name="receive-currency" id="receive-currency"
+                                            class="form-control input-color">
+                                            <option value="USD"><span>&#36;</span></option>
+                                            <option value="KHR"><span>&#6107;</span></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 pl-0">
+                                    <div class="form-group">
+                                        <button class="btn color-text payment-add">
+                                            <ion-icon name="add-outline" style="vertical-align: middle"></ion-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="money-container mt-3" style="height: 100%; overflow: auto">
+                                <table class="table money-table">
+                                    <thead>
+                                        <tr class="color-font notranslate">
+                                            <td style="width: 40%;">Paid</td>
+                                            <td style="width: 15%; text-align:center;">Currency</td>
+                                            <td style="width: 10%; text-align:center;">Unit</td>
+                                            <td style="width: 25%; text-align:center;">Total</td>
+                                            <td style="width: 10%;"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="list-payment" class="color-text notranslate"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="payment-total color-text notranslate">
+
+                        </div>
                     </div>
-                    <div class="clock-container">
-                        <div id="clock-timer" class="color-font notranslate"></div>
-                        <ion-icon name="time-outline" class="text-success" style="font-size: 21px;"></ion-icon>
+                    <div class="payment-invoice">
+                        <div class="invoice-header">
+                            <h5 class="color-text notranslate"
+                                style="text-align: center; font-size: 23px; font-weight: 700;">{{
+                                current_user.profile[0].company }}</h5>
+                        </div>
+                        <div class="invoice-body">
+                            <div class="shop-details flex-column-start-center mb-1">
+                                <p class="color-text">Contact: {{ current_user.profile[0].phone }}</p>
+                                <p class="color-text notranslate">ABA: 077 777 377 (CHHAN Bunthong)</p>
+                            </div>
+                            <div class="flex-between-center pb-1">
+                                <p class="color-text">Date: <span id="invoiceDate" class="notranslate"></span></p>
+                                <p class="color-text notranslate"><span id="invoiceTime"></span></p>
+                            </div>
+                            <div class="flex-between-center border-dashed py-1">
+                                <p class="color-text">Invoice: <span class="notranslate" id="invoiceNo"></span></p>
+                                <p class="color-text">Cashier: <span class="notranslate">{{ current_user.username
+                                        }}</span></p>
+                            </div>
+                            <div class="item-payment">
+                                <table class="table invoice-table">
+                                    <thead>
+                                        <tr class="color-font">
+                                            <td style="width: 40%;" class="notranslate">Item Name</td>
+                                            <td style="width: 15%; text-align:center;">Price</td>
+                                            <td style="width: 10%; text-align:center;" class="notranslate">Disc</td>
+                                            <td style="width: 15%; text-align:center;" class="notranslate">Qty</td>
+                                            <td style="width: 20%; text-align:center;">Total</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="item-invoice" class="color-text notranslate"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="invoice-total border-dashed">
+                            <div class="flex-between-start" style="width: 100%;">
+                                <p class="color-text" style="width: 50%;">Total</p>
+                                <div class="flex-between-center notranslate" style="width: 50%;">
+                                    <p class="color-text">USD:</p>
+                                    <p class="color-text" id="totalUSD"><span>&#36;</span></p>
+                                </div>
+                            </div>
+                            <div class="flex-between-center notranslate">
+                                <p class="color-text">KHR:</p>
+                                <p class="color-text" id="totalKHR"><span>&#6107;</span></p>
+                            </div>
+                            <div class="flex-between-center border-dashed my-1 pt-1 notranslate">
+                                <p class="color-text">Cash:</p>
+                                <p class="color-text" id="totalCash">...</p>
+                            </div>
+                            <div class="flex-between-center notranslate">
+                                <p class="color-text">Return:</p>
+                                <p class="color-text" id="totalChange">...</p>
+                            </div>
+                        </div>
+                        <div class="invoice-footer">
+                            <p class="color-text">Thank you for purchasing</p>
+                        </div>
                     </div>
+                    <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </button>
                 </div>
-                <input type="hidden" id="input-room" value="">
-                <div class="row m-0" style="width: 100%;">
-                    <div class="col-md-7">
-                        <div class="form-group">
-                            <label for="input-customer" class="label">Customer Name</label>
-                            <select class="selectpicker" id="select-customer" data-live-search="true">
-                                {% if customers %}
-                                {% for customer in customers %}
-                                <option value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
-                                {% endfor %}
-                                {% else %}
-                                <option value="" disabled>No customer</option>
-                                {% endif %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <button class="btn border px-3 color-text" id="new-customer">New Customer</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row m-0" style="width: 100%; position: relative;">
-                    <span class="dash color-text">-</span>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <input type="time" class="form-control input-color" id="order-from">
-                            <label for="order-from" class="label">From</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <input type="time" class="form-control input-color" id="order-to">
-                            <label for="order-to" class="label">To</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-body modal-height">
-                <table id="list-customers" class="table">
-                    <thead>
-                        <tr class="color-font">
-                            <td class="color-text">Customer</td>
-                            <td class="color-text">Phone</td>
-                            <td class="color-text">Birthdate</td>
-                        </tr>
-                    </thead>
-                    <tbody class="customer-container">
-                        {% for customer in customers %}
-                        <tr class="customer-tr" id="{{ customer.id }}">
-                            <td class="color-text" id="cus-firstname">{% if customer.name != '' %}{{ customer.name }}{%
-                                else %}...{% endif %}</td>
-                            <td class="color-text notranslate" id="cus-lastname">{% if customer.phone != '' %}{{
-                                customer.phone }}{%
-                                else %}...{% endif %}</td>
-                            <td class="color-text" id="cus-phone">{% if customer.birthdate != '' %}{{ customer.birthdate
-                                }}{% else %}...{% endif %}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr id="customer-form" style="display: none;">
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn color-text" data-dismiss="modal">Close</button>
-                <button type="button" class="btn bg-menu color-text" id="save-order">Save Order</button>
             </div>
         </div>
     </div>
 </div>
 
+<div class="modal fade" id="drawerModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title color-font">Drawer</h4>
+                {% if current_user.drawer == '' %}
+                <div class="drawer-time" title="Drawer is off">
+                    <span class="color-text" id="drawerTime"></span>
+                    <ion-icon name="time-outline" class="time-btn"></ion-icon>
+                </div>
+                {% else %}
+                <div class="drawer-time active notranslate" title="Drawer is on">
+                    {% for drawer in current_user.drawers %}
+                    {% if drawer.id == current_user.drawer %}
+                    <span class="color-text" id="drawerTime">{{ drawer.startedOn.strftime("%b %d %Y %H:%M:%S") }}</span>
+                    {% endif %}
+                    {% endfor %}
+                    <ion-icon name="time-outline" class="time-btn"></ion-icon>
+                </div>
+                {% endif %}
+            </div>
 
+            <div class="modal-body">
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn color-font close-modal" data-dismiss="modal">Cancel</button>
+                {% if current_user.drawer == '' %}
+                <button class="btn border drawer-save color-font">Create</button>
+                <button class="btn border drawer-end color-font hide" id="{{ current_user.drawer }}">End</button>
+                {% else %}
+                <button class="btn border drawer-save color-font hide">Create</button>
+                <button class="btn border drawer-end color-font" id="{{ current_user.drawer }}">End</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block script %}
-<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script src="{{url_for('static', filename='js/printThis.js')}}"></script>
+<script src="{{url_for('static', filename='js/cashing.js')}}"></script>
+<script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
-    $(document).ready(function () {
-        $(document).on('click', '#show-order', function() {
+    $(document).on('click', '.check-in', function () {
+        id = $(this).attr('data-id')
+        _this = $(this)
+        drawer = $('.drawer-btn').attr('id')
+        if (drawer == 'none') {
+            $('.drawer-btn').click()
+        } else {
+
             $.ajax({
-                url: '/order',
+                url: '/checkin/order/' + id,
                 type: 'POST',
-                success: function(data) {
+                success: function (data) {
                     console.log(data)
-                    $('.column-title').html('<h4 class="color-font m-0">Order</h4>')
-                    $('.calendar-container').html(``)
+                    if (data.msg == 'Success') {
+                        _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
+                        _this.find('.check-in-out').text('Check Out')
+                    } else {
+                        alert(data.msg)
+                    }
                 }
             })
-        })
+        }
+    })
 
-        $(document).on('click', '.remove-order', function() {
-            id = $(this).closest('.order-item').attr('id')
-            if (confirm('Are you sure you want to remove this order?')) {
-                $.ajax({
-                    url: '/order/remove/'+id,
-                    type: 'POST',
-                    success: function(data) {
-                        if (data.msg == 'Success') {
-                            $('#'+id).fadeOut('slow', function() {
-                                $(this).remove()
-                            })
-                        } else {
-                            alert(data.msg)
-                        }
-                    }
-                })
-            }
-        })
-
-        $('#save-order').on('click', function () {
-            customer = $('#select-customer')
-            room = $('#input-room')
-            from = $('#order-from')
-            to = $('#order-to')
-            date = $('.fc-toolbar-title').text()
-            if (customer.val() == '' || room.val() == '' || from.val() == '' || to.val() == '') {
-                msg = 'Please fill the requirement to submit order.'
-                alert(msg)
-            } else {
-                $.ajax({
-                    url: '/order/add',
-                    type: 'POST',
-                    data: { customer: customer.val(), room: room.val(), from: from.val(), to: to.val(), date: date },
-                    success: function (data) {
-                        if (data.msg == 'Success') {
-                            $('#customerModal').modal('hide')
-                        } else {
-                            alert(data.msg)
-                        }
-                    }
-                })
-            }
-
-        })
-
-        $('#select-customer').selectpicker({
-            title: 'Select Customer'
-        })
-
-        $('#list-customers').on('click', '.customer-tr', function () {
-            console.log($(this).attr('id'))
-        })
-
-        $('#new-customer').on('click', function () {
-            $('#list-customers').find('#customer-form').html(createCustomerForm('', '', '')).css('display', 'table-row')
-        })
-
-        $(document).on('click', '.customer-close', function () {
-            $('#customer-form').empty()
-        })
-
-        $(document).on('click', '.customer-add', function () {
-            fname = $('#name').val()
-            phone = $('#phone').val()
-            birthdate = $('#birthdate').val()
-            if (fname != '' || phone != '' || birthdate != '') {
-                $.ajax({
-                    url: '/customer/add',
-                    type: 'POST',
-                    data: { fname: fname, phone: phone, birthdate: birthdate },
-                    success: function (data) {
-                        if (data.msg == 'Success') {
-                            validation = [data.username, data.phone]
-                            if (data.username == '') data.username = '...'
-                            if (data.phone == '') data.phone = '...'
-                            if (data.birthdate == null) data.birthdate = 'None'
-                            $('#list-customers tr#customer-form').after(`<tr id="` + data.id + `">
-                                <td class="color-text" id="cus-firstname">`+ data.username + `</td>
-                                <td class="color-text" id="cus-lastname">`+ data.phone + `</td>
-                                <td class="color-text" id="cus-phone">`+ data.birthdate + `</td>
-                            </tr>`)
-                            $('#name').val('').focus()
-                            $('#phone').val('')
-                        } else {
-                            alert(data.msg)
-                        }
-                    }
-                })
-            } else {
-                $('#name').focus()
-            }
-        })
-
-        $('#list-customers').DataTable({
-            paging: false,
-            searching: false,
-            "drawCallback": function (settings) {
-
-            }
-        })
-
-        $('#order-table').DataTable({
-            paging: false,
-            searching: false,
-            "drawCallback": function (settings) {
-
-            }
-        })
-
-        currencyFormat()
-
-        $(document).on('click', '.room-container', function () {
-            Array.from($('.grid-products').children()).forEach(r => {
-                $(r).removeClass('active')
-            })
-            $(this).addClass('active')
-            $('.column-title').html('<button class="btn border" id="show-order"><i class="fa fa-angle-left" aria-hidden="true"></i></button><h4 class="color-font m-0">'+$(this).find('.room-no').text()+'</h4>')
-            $('#input-room').val($(this).attr('id'))
-            $('.modal-title').text($(this).find('.room-no').text())
-            $('.calendar-container').html('<div id="calendar"></div>')
-            Calendar = FullCalendar.Calendar
-            Draggable = FullCalendar.Draggable
-
-            // containerEl = document.getElementById('external-events')
-            calendarEl = document.getElementById('calendar')
-
-            // new Draggable(containerEl, {
-            //     itemSelector: '.fc-event',
-            //     eventData: function (eventEl) {
-            //         return {
-            //             title: eventEl.innerText
-            //         };
-            //     }
-            // });
-
-            calendar = new Calendar(calendarEl, {
-                customButtons: {
-                    add: {
-                        text: '+',
-                        click: function () {
-                            $('#customerModal').modal('show')
-                        }
-                    }
-                },
-                headerToolbar: {
-                    left: 'today',
-                    center: 'prev title next',
-                    right: 'add'
-                },
-                initialView: 'timeGridDay',
-                editable: true,
-                droppable: true,
-                drop: function (info) {
-                    console.log(info)
+    $(document).on('click', '.check-out', function () {
+        id = $(this).attr('data-id')
+        $.ajax({
+            url: '/checkout/order/' + id,
+            type: 'POST',
+            success: function (data) {
+                if (data.msg == 'Success') {
+                    $('.btn-transaction').removeClass('check-out').addClass('order-btn').attr('id', data.paymentId).html(`<span class="mr-2 order-icon">
+                            <span class="sum-order notranslate">0</span>
+                            <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
+                        </span>
+                        <span>Place Order</span>`)
+                    orderId = generateString(23)
+                    $('.order-form').html(orderForm(orderId, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, accounting.formatMoney(data.transaction.amount)))
+                    $('.order-form').find('#input-discount').focus()
+                } else {
+                    alert(data.msg)
                 }
-            })
-
-            calendar.render()
+            }
         })
     })
 
-    function createCustomerForm(name, phone, birthdate) {
-        return `<td><input type="text" id="name" class="form-empty input-color color-text" value="` + name + `" placeholder="Name"></td>
-                <td><input type="text" id="phone" class="form-empty input-color color-text" value="`+ phone + `" placeholder="Phone"></td>
-                <td class="flex-between">
-                    <input type="date" id="birthdate" class="form-empty input-color color-text" value="`+ birthdate + `" placeholder="Birthdate">
-                    <div class="flex-between-center action-btn">
-                        <span class="customer-close pointer">
-                            <ion-icon name="close-outline"></ion-icon>
-                        </span>
-                        <span class="pointer customer-add">
-                            <ion-icon name="checkmark-outline"></ion-icon>
-                        </span>
+    $(document).on('click', '.type-btn', function () {
+        var types = $('.payment-type').children()
+        Array.from(types).forEach(t => {
+            $(t).removeClass('active')
+        })
+        $(this).addClass('active')
+        if ($(this).hasClass('type-cash')) {
+            $('.payment-body').html(`<div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <input type="number" step="any" class="form-control input-color" name="receive-cash" id="receive-cash" required>
+                                        <label for="receive-cash" class="label receive-cash">Amount</label>
+                                        <select name="receive-currency" id="receive-currency" class="form-control input-color">
+                                            <option value="USD"><span>&#36;</span></option>
+                                            <option value="KHR"><span>&#6107;</span></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 pl-0">
+                                    <div class="form-group">
+                                        <button class="btn color-text payment-add"><ion-icon name="add-outline" style="vertical-align: middle"></ion-icon></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="money-container mt-3" style="height: 100%; overflow: auto">
+                                <table class="table money-table">
+                                    <thead>
+                                        <tr class="color-font">
+                                            <td style="width: 40%;">Money</td>
+                                            <td style="width: 15%; text-align:center;">Currency</td>
+                                            <td style="width: 10%; text-align:center;">Unit</td>
+                                            <td style="width: 25%; text-align:center;">Total</td>
+                                            <td style="width: 10%;"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="list-payment" class="color-text"></tbody>
+                                </table>
+                            </div>`)
+        } else {
+            $('.payment-body').html('<div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center"><p class="color-text">Upgrade to advance mode</p></div>')
+        }
+    })
+
+
+
+    $('.favorite-btn').on('click', function () {
+        var id = $(this).closest('.product-item').attr('id')
+        $.ajax({
+            url: '/product/favorite/' + id,
+            type: 'POST',
+            success: function (data) {
+                if (data.msg == 'Success') {
+                    if (data.data) {
+                        $('#' + id).find('.favorite-btn').addClass('active')
+                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-bookmark" aria-hidden="true"></i>')
+                    } else {
+                        $('#' + id).find('.favorite-btn').removeClass('active')
+                        $('#' + id).find('.favorite-btn').html('<i class="fa fa-bookmark-o" aria-hidden="true"></i>')
+                    }
+                }
+            }
+        })
+    })
+
+    $('.drawer-btn').on('click', function () {
+        var id = $(this).attr('id')
+        $.ajax({
+            url: '/drawer/' + id,
+            type: 'POST',
+            success: function (data) {
+                $('#drawerModal').find('.modal-body').html(drawerForm(data.counter, data.rate, data.data))
+                $('#drawerModal').modal('show')
+            }
+        })
+    })
+
+    var orderLists = []
+
+    $(document).on('submit', '#orderForm', function () {
+        event.preventDefault()
+        var price = $('#input-price').val()
+        var discount = $('#input-discount').val()
+        var quantity = $('#input-quantity').val()
+        var id = $('#input-product').val()
+        var details = $('#input-details').val()
+        var orderId = $('.btn-transaction').attr('data-id')
+
+        if (quantity < 1) {
+            $('#input-quantity').focus()
+            alert('Value must be atleast 1')
+        } else {
+            var orderList = {}
+
+            orderLists.forEach(o => {
+                if (o.orderId == id) {
+                    orderList = o
+                }
+            })
+
+            orderList.discount = discount
+            orderList.quantity = quantity
+            orderList.price = price
+
+            var jsonObj = JSON.stringify(orderList)
+
+            $.ajax({
+                url: '/order/transaction/' + orderList.productId,
+                type: 'POST',
+                data: {
+                    data: jsonObj,
+                    id: orderId
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.result == 'success') {
+                        $('.btn-transaction').attr('data-change', true)
+                        $('#list-orders tr:last').before(showOrder(data.data.id, details, data.data.price, data.data.discount, data.data.quantity, data.data.amount, orderList.orderId, orderList.productId))
+                        $('.order-form').empty()
+                        if (data.data.isStock != false) {
+                            if (data.data.stock == 0) {
+                                data.data.stock = 'Out of stock'
+                            } else {
+                                data.data.stock = data.data.stock + ' Available'
+                            }
+                            $('#' + orderList.productId).find('.stock-tag').text(data.data.stock)
+                        }
+                        var total = accounting.unformat($('#sumTotal').text())
+                        total += data.data.amount
+                        $('#sumTotal').text(accounting.formatMoney(total))
+
+                        var order = parseInt($('.sum-order').text())
+                        order += data.data.quantity
+                        $('.sum-order').text(order)
+                    } else {
+                        alert(data.data.message)
+                    }
+                }
+            })
+        }
+
+        return false
+    })
+
+    $(document).on('click', '.continue-btn', function () {
+        var orderId = generateString(23)
+
+        var validation = {
+            isSelected: true
+        }
+
+        var orderList = {
+            'orderId': orderId,
+            'colorId': '',
+            'discount': 0,
+            'quantity': 0,
+            'price': 0,
+            'productId': '',
+            'values': []
+        }
+
+        var properties = document.querySelectorAll('.property-values')
+        var colors = $('.details-colors').children()
+        var details = $('.details-title').text()
+        var id = $('.details-title').attr('id')
+        var cost = accounting.unformat($('.details-price').text())
+
+        orderList.productId = id
+
+        if (colors.length > 0) {
+            validation.isSelected = false
+            Array.from(colors).forEach(c => {
+                var color = $(c).find('.span-color').attr('title')
+
+                if ($(c).hasClass('active')) {
+                    details += '-' + color
+                    validation.isSelected = true
+                    orderList.colorId = $(c).find('.span-color').attr('id')
+                }
+            })
+        }
+
+        Array.from(properties).forEach(p => {
+            var valueObj = {}
+            var pid = $(p).attr('id').split('_')[1]
+            var pname = $(p).attr('id').split('_')[0].toLowerCase()
+            var vname = $('.value').find('input[name=' + pname + ']:checked').parent().find('#value-value').text()
+
+            var value = $('.value').find('input[name=' + pname + ']:checked').val()
+            if (value != undefined) {
+                valueObj['propertyName'] = pname
+                valueObj['propertyId'] = pid
+                valueObj['valueId'] = value
+                orderList.values.push(valueObj)
+
+                if ($(p).children().length > 1) {
+                    details += '-' + vname
+                }
+            }
+        })
+
+        orderLists.push(orderList)
+
+        if (validation.isSelected == true) {
+            // Stockform
+            $('.order-form').html(orderForm(orderId, details, cost, '', '', accounting.formatMoney(0)))
+            $('.order-form').find('#input-discount').focus()
+            $('#productProperty').modal('hide')
+
+        } else {
+            alert('Color must be selected')
+        }
+    })
+
+    $(document).on('click', '.cancel-btn', function () {
+        if ($(this).closest('tr').hasClass('order-form')) {
+            $('.order-form').empty()
+        } else {
+            $(this).closest('tr').fadeOut('slow', function () {
+                $(this).remove()
+            })
+        }
+    })
+
+    $(document).on('input', '#input-quantity', function () {
+        if ($(this).val() != '' && $(this).val() > 0) {
+            toggleEdit($(this).closest('.order-form').find('.save-btn'), $(this).closest('.order-form').find('.cancel-btn'))
+        } else {
+            toggleEdit($(this).closest('.order-form').find('.cancel-btn'), $(this).closest('.order-form').find('.save-btn'))
+        }
+        var price = $(this).closest('tr').find('#input-price').val()
+        var discount = $(this).closest('tr').find('#input-discount').val()
+        var quantity = $(this).val()
+        var total = (price - (price * discount / 100)) * quantity
+        $('#calculated-result').text(accounting.formatMoney(total))
+    })
+
+    $(document).on('input', '#input-discount', function () {
+        if ($(this).val() < 0) {
+            $(this).val(0)
+        }
+        if ($(this).val() > 100) {
+            $(this).val(100)
+        }
+
+        var price = $(this).closest('tr').find('#input-price').val()
+        var quantity = $(this).closest('tr').find('#input-quantity').val()
+        var discount = $(this).val()
+        var total = (price - (price * discount / 100)) * quantity
+        $('#calculated-result').text(accounting.formatMoney(total))
+
+    })
+
+    $(document).on('input', '#input-price', function () {
+        if ($(this).val() < 0) {
+            $(this).val(0)
+        }
+
+        var discount = $(this).closest('tr').find('#input-discount').val()
+        var quantity = $(this).closest('tr').find('#input-quantity').val()
+        var price = $(this).val()
+        var total = (price - (price * discount / 100)) * quantity
+        $('#calculated-result').text(accounting.formatMoney(total))
+
+    })
+
+    $(document).on('keypress', '#input-discount', function (e) {
+        if (e.which == 13) {
+            $('#input-quantity').focus()
+        }
+    })
+
+    $(document).on('click', '.span-border', function () {
+        var self = $(this).find('.span-color')
+        var id = self.attr('id')
+        self.bind('click', function () {
+            return false;
+        });
+
+        Array.from($('.details-colors').children()).forEach(color => {
+            $(color).removeClass('active')
+        })
+        self.parent().addClass('active')
+        $.ajax({
+            url: '/color/' + id,
+            type: 'POST',
+            success: function (data) {
+                $('.details-img').html(showColorPhotos(data.photos, 'color-photo'))
+                gsap.from('.details-img', {
+                    opacity: 0,
+                    duration: 0.8,
+                    onComplete: function () {
+                        self.unbind('click')
+                    }
+                })
+            }
+        })
+    })
+
+    $('.product-btn').on('click', function () {
+        var id = $(this).closest('.product-item').attr('id')
+        $('#productProperty').modal('show')
+        $.ajax({
+            url: '/product/' + id,
+            type: 'POST',
+            success: function (data) {
+                var photo = '/static/uploads/' + data.photo
+                data.values.sort(dynamicSort('price'))
+                $('#productProperty').find('.modal-content').html(productConfiguration({
+                    image: photo,
+                    colors: data.colors,
+                    product: data.product,
+                    category: data.category.category,
+                    description: data.description,
+                    currency: data.currency,
+                    price: data.price,
+                    properties: data.category.properties,
+                    values: data.values,
+                    id: data.id,
+                    stocks: data.stocks
+                }))
+
+                // var labels = document.querySelectorAll('.input-radio')
+                // Array.from(labels).forEach(t => {
+                //     if(!$(t).is(':checked')) {
+                //         console.log($(t).prev().find('ion-icon').css('color', 'red'))
+                //     }
+                // })
+
+            }
+        })
+    })
+
+    $(document).on('click', '.save-btn', function () {
+        $('#orderForm').submit()
+    })
+
+    function orderForm(id, details, cost, discount, quantity, total) {
+
+        return `<input type="hidden" id="input-product" value="` + id + `">
+            <td><input type="text" class="form-empty color-text input-color" title="`+ details + `" id="input-details" value="` + details + `"
+                    placeholder="Details" disabled></td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-price" value="`+ cost + `"
+                    placeholder="Price"></td>
+            <td><input min="1" max="100" type="number" class="form-empty color-text input-color" id="input-discount" value="`+ discount + `"
+                    placeholder="Disc"></td>
+            <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
+                    placeholder="Qty" value="`+ quantity + `"></form></td>
+            <td id="calculated-result" style="text-align:center;">`+ total + `</td>
+            <td class="cancel-btn">
+                <ion-icon name="close-outline"></ion-icon>
+            </td>
+            <td class="save-btn hide">
+                <ion-icon name="checkmark-outline"></ion-icon>
+            </td>
+            <td class="remove-btn hide">
+                <i class="fa fa-trash-o" aria-hidden="true"></i>
+            </td>`
+    }
+
+    $(document).ready(function () {
+        $(document).on('change', '.input-radio', function () {
+            var pid = $(this).closest('.property-values').attr('id').split('_')[1]
+            var name = $(this).closest('.value').find('#value-value').text()
+            var description = $(this).closest('.value').find('#value-description').text()
+            var price = $(this).closest('.value').find('#value-price').text()
+
+
+            $('#value-price').text()
+
+            var values = $(this).closest('.property-values').children()
+            Array.from(values).forEach(v => {
+                var precision = 0
+                var v_price = $(v).find('#value-price').text()
+                var c_price = accounting.unformat(v_price) - accounting.unformat(price)
+                if (c_price % 1 != 0) {
+                    precision = 2
+                }
+
+                var n_price = accounting.formatMoney(c_price, {
+                    precision: precision,
+                    format: {
+                        pos: "+%s%v",
+                        neg: "-%s%v",
+                        zero: '<ion-icon class="value-active" name="checkmark-done-outline"></ion-icon>'
+                    }
+                })
+
+                $(v).find('#value-price').html(n_price)
+            })
+
+            var details_price = accounting.unformat($('.details-price').text()) + accounting.unformat(price)
+
+            $('.details-price').text(accounting.formatMoney(details_price))
+
+            var configList = document.querySelectorAll('.config-list')
+            Array.from(configList).forEach(c => {
+                if ($(c).attr('id') == pid) {
+                    $(c).find('.value-description').text(description.toLowerCase() + ' ' + name.toLowerCase())
+                }
+            })
+        })
+
+        $('[data-toggle="tooltip"]').tooltip({
+            trigger: 'hover'
+        })
+        currencyFormat()
+
+        $('.arrow').addClass('active')
+        var products = Array.from(document.querySelectorAll('.product-item'))
+
+        var temp_products = products
+
+        $('.search-input').on('input', function () {
+            searchProducts($(this).val(), temp_products, '#details-title')
+        })
+
+        $('.fav-btn').on('click', function () {
+            var value = $('.search-input').val()
+            toggleActive($(this))
+            if ($(this).hasClass('active')) {
+                $(this).html('<i class="fa fa-bookmark" aria-hidden="true"></i>')
+                favoriteProducts(value, temp_products, '.favorite-btn')
+            } else {
+                $(this).html('<i class="fa fa-bookmark-o" aria-hidden="true"></i>')
+                temp_products.forEach(l => {
+                    $(l).css('display', 'block')
+                })
+            }
+        })
+
+        $('.menu-item, .category-item').on('click', function () {
+            var menus = document.querySelectorAll('.menu-item')
+            var cates = document.querySelectorAll('.category-item')
+            var input = $('.search-input').val()
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active')
+                temp_products = selectMenu(products, menus, cates, input)
+            } else {
+                $(this).addClass('active')
+                temp_products = selectMenu(products, menus, cates, input)
+            }
+            event.stopPropagation()
+        })
+
+        $('.list-btn').on('click', function () {
+            var views = document.querySelectorAll('.view-btn')
+            Array.from(views).forEach(v => {
+                $(v).removeClass('active')
+            })
+            $(this).parent().addClass('active')
+            $('.product-container').removeClass('grid-products')
+            $('.product-container').addClass('list-products')
+        })
+
+        $('.grid-btn').on('click', function () {
+            var views = document.querySelectorAll('.view-btn')
+            Array.from(views).forEach(v => {
+                $(v).removeClass('active')
+            })
+            $(this).parent().addClass('active')
+            $('.product-container').removeClass('list-products')
+            $('.product-container').addClass('grid-products')
+        })
+
+        $('.fa-search').on('click', function () {
+            toggleActive($('.search-input'))
+        })
+
+        $('#list-cates').attrchange({
+            trackValues: true,
+            callback: function (evnt) {
+                if (evnt.attributeName == "class") {
+                    if (evnt.newValue.search(/open/i) == -1) {
+                        if ($('#list-cates').hasClass('show')) {
+                            $('#list-cates').find('.menu-icon').addClass('active')
+                        } else {
+                            $('#list-cates').find('.menu-icon').removeClass('active')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('#list-filters').attrchange({
+            trackValues: true,
+            callback: function (evnt) {
+                if (evnt.attributeName == "class") {
+                    if (evnt.newValue.search(/open/i) == -1) {
+                        if ($('#list-filters').hasClass('show')) {
+                            $('.sort-btn').addClass('active')
+                        } else {
+                            $('.sort-btn').removeClass('active')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('.sort-item').on('click', function () {
+            var items = document.querySelectorAll('.sort-item')
+            Array.from(items).forEach(item => {
+                $(item).removeClass('active')
+            })
+            toggleActive($(this))
+
+            var filter = $(this).attr('id')
+
+            if (filter == 'selected') {
+                return
+            } else {
+                switch (filter) {
+                    case 'most-expensive':
+                        filterProduct(products, '.price-tag', 'price-desc')
+                        break
+                    case 'cheapest':
+                        filterProduct(products, '.price-tag', 'price-asc')
+                        break
+                    case 'title':
+                        filterProduct(products, '#details-title', 'title-asc')
+                        break
+                    case 'newest':
+                        filterProduct(products, '#details-date', 'date-asc')
+                        break
+                    case 'oldest':
+                        filterProduct(products, '#details-date', 'date-desc')
+                        break
+                }
+            }
+
+            var i = 1
+            products.forEach(p => {
+                $(p).attr('order', i)
+                i++
+            })
+
+            $('.product-container').append($('.product-container .product-item').sort(function (a, b) {
+                return a.getAttribute('order') - b.getAttribute('order')
+            }))
+        })
+    })
+
+    function showOrder(id, description, price, discount, quantity, amount, oid, pid) {
+        return `<tr class="color-text transaction-item" id="` + id + `" data-id="` + oid + `">
+                    <td class="description" id="order-description" data-id="`+ pid + `">` + description + `</td>
+                    <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
+            precision: 2,
+            format: {
+                pos: "%s%v",
+                neg: "%s%v",
+                zero: '%s%v'
+            }
+        }).replace(/\.0+$/, '') + `</td>
+                    <td>
+                        <p class="color-text text-center" contenteditable="true" id="order-discount">`+ discount + `%</p>
+                    </td>
+                    <td>
+                        <p class="color-text text-center" contenteditable="true" id="order-quantity">`+ quantity + `</p>
+                    </td>
+                    <td class="text-center currency-format" id="order-amount">`+ accounting.formatMoney(amount, {
+            precision: 2,
+            format: {
+                pos: "%s%v",
+                neg: "%s%v",
+                zero: '%s%v'
+            }
+        }).replace(/\.0+$/, '') + `</td>
+                    <td class="cancel-btn hide">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </td>
+                    <td class="save-btn hide">
+                        <ion-icon name="checkmark-outline"></ion-icon>
+                    </td>
+                    <td class="remove-btn">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </td>
+                </tr>`
+    }
+
+    function drawerForm(counter, rate, moneys) {
+        var element = ''
+        if (moneys.length > 0) {
+            moneys.forEach(m => {
+                element += `<tr class="color-font">
+                                <td style="width: 25%;">`+ m.money + `</td>
+                                <td style="width: 15%; text-align:center;">`+ m.currency + `</td>
+                                <td style="width: 20%; text-align:center;">`+ m.unit + `</td>
+                                <td style="width: 25%; text-align:center;">`+ m.money * m.unit + `</td>
+                                <td class="color-text flex-between-center"><ion-icon name="remove-outline"></ion-icon><ion-icon name="add-outline"></ion-icon></td>
+                            </tr>`
+            })
+        }
+
+        return `<div class="row">
+                    <div class="col-md-4 pr-0">
+                        <div class="form-group">
+                            <input class="form-control input-color" step="any" type="number" name="drawer-rate" id="drawer-rate" value="` +
+            rate + `">
+                            <label class="label rate" for="drawer-rate">Rate</label>
+                        </div>
                     </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <input class="form-control input-color" type="text" name="drawer-counter" id="drawer-counter" value="` +
+            counter +
+            `">
+                            <label class="label counter" for="drawer-counter">Counter</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="money-container mt-3" style="height: 370px; overflow: auto">
+                    <table class="table money-table">
+                        <thead>
+                            <tr class="color-font">
+                                <td style="width: 35%;"><ion-icon name="add-outline" class="money-add mr-2" style="vertical-align: middle"></ion-icon>Money</td>
+                                <td style="width: 15%; text-align:center;">Currency</td>
+                                <td style="width: 20%; text-align:center;">Unit</td>
+                                <td style="width: 25%; text-align:center;">Total</td>
+                                <td style="width: 5%;"></td>
+                            </tr>
+                        </thead>
+                        <tbody id="list-money" class="color-text">
+                            `+ element + `
+                            <tr class="money-form color-text">
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                `
+    }
+
+    function moneyForm(money, currency, unit, total) {
+        var select = `<select name="money-currency" id="money-currency" class="form-empty color-text input-color">`
+        if (currency == 'dollar') {
+            select += `<option value="USD" selected><span>&#36;</span></option>
+                        <option value="KHR"><span>&#6107;</span></option>
+                    </select>`
+        } else {
+            select += `<option value="USD"><span>&#36;</span></option>
+                        <option value="KHR" selected><span>&#6107;</span></option>
+                    </select>`
+        }
+        select += '</div>'
+        return `<td class="pl-0">
+                    <input type="number" class="form-empty color-text input-color" id="money-money" value="` + money + `"
+                    placeholder="Money">
+                </td>
+                <td>
+                    `+ select + `
+                </td>
+                <td>
+                    <input min="1" type="number" class="form-empty color-text input-color" id="money-unit" value="`+ unit + `"
+                    placeholder="Unit">
+                </td>
+                <td>
+                    <input type="number" class="form-empty color-text input-color" id="money-total" value="`+ total + `"
+                    placeholder="Total">
+                </td>
+                <td class="money-btn">
+                    <ion-icon name="checkmark-outline" class="money-save hide"></ion-icon>
+                    <ion-icon name="close-outline" class="money-delete"></ion-icon>
                 </td>`
     }
 
-    function date_time() {
-        var date = new Date();
-        var am_pm = "AM";
-        var hour = date.getHours();
-        if (hour >= 12) {
-            am_pm = "PM";
-        }
-        if (hour == 0) {
-            hour = 12;
-        }
-        if (hour > 12) {
-            hour = hour - 12;
-        }
-        if (hour < 10) {
-            hour = "0" + hour;
-        }
 
-        var minute = date.getMinutes();
-        if (minute < 10) {
-            minute = "0" + minute;
-        }
-        var sec = date.getSeconds();
-        if (sec < 10) {
-            sec = "0" + sec;
-        }
 
-        document.getElementById("clock-timer").innerHTML = hour + ":" + minute + ":" + sec + " " + am_pm;
+    $(document).on('click', '.money-delete', function () {
+        if ($(this).closest('tr').hasClass('money-form')) {
+            $(this).closest('tr').empty()
+        } else {
+            var id = $(this).closest('tr').attr('id')
+            drawerObj.moneys.forEach((m, i) => {
+                if (m.id == id) {
+                    drawerObj.moneys.splice(i, 1)
+                    $(this).closest('tr').remove()
+                }
+            })
+        }
+    })
+
+    $(document).on('click', '.money-add', function () {
+        $('.money-form').html(moneyForm('', 'dollar', '', ''))
+    })
+
+    function exchangeMoney(rate, number, currency) {
+        switch (currency) {
+            case 'KHR':
+                number *= rate
+                break
+            case 'USD':
+                number /= rate
+                break
+        }
+        return number
     }
 
-    setInterval(date_time, 500)
+    var drawerObj = {
+        rate: 4000,
+        counter: 'Default',
+        moneys: []
+    }
+
+    var obj = {
+        'id': '',
+        'unit': 0,
+        'money': 0,
+        'currency': 'dollar',
+        'total': 0
+    }
+
+    $(document).on('input', '#drawer-rate', function () {
+        drawerObj.rate = $(this).val()
+    })
+
+    $(document).on('input', '#drawer-counter', function () {
+        drawerObj.counter = $(this).val()
+    })
+
+    $(document).on('input', '#money-money, #money-unit', function () {
+        var money = $(this).closest('tr').find('#money-money').val()
+        var unit = $(this).closest('tr').find('#money-unit').val()
+        if (money == '') {
+            money = 0
+        }
+        if (unit == '') {
+            unit = 0
+        }
+        if ($(this).val() < 0) {
+            $(this).val(0)
+        }
+        var total = parseFloat(money) * parseFloat(unit)
+        if (total > 0) {
+            toggleEdit($(this).closest('tr').find(('.money-save')), $(this).closest('tr').find(('.money-delete')))
+        } else {
+            toggleEdit($(this).closest('tr').find(('.money-delete')), $(this).closest('tr').find(('.money-save')))
+        }
+        $(this).closest('tr').find('#money-total').val(total)
+    })
+
+    $(document).on('input', '#money-total', function () {
+        var input = $(this).val()
+        if (input == '' || input < 0) {
+            input = 0
+        }
+        $(this).closest('tr').find(('.money-save'))
+        if (input > 0) {
+            toggleEdit($(this).closest('tr').find(('.money-save')), $(this).closest('tr').find(('.money-delete')))
+        } else {
+            toggleEdit($(this).closest('tr').find(('.money-delete')), $(this).closest('tr').find(('.money-save')))
+        }
+        var unit = $(this).closest('tr').find('#money-unit').val()
+        $(this).closest('tr').find('#money-money').val(parseInt(input / unit))
+    })
+
+    $(document).on('click', '.money-save', function () {
+        var money = $(this).closest('tr').find('#money-money').val()
+        var unit = $(this).closest('tr').find('#money-unit').val()
+        var currency = $(this).closest('tr').find('#money-currency').val()
+        var total = $(this).closest('tr').find('#money-total').val()
+        var id = generateString(8)
+        obj = {
+            'id': id,
+            'unit': unit,
+            'money': money,
+            'currency': currency,
+            'total': total
+        }
+        drawerObj.moneys.push(obj)
+        $('#list-money tr:last').before(`<tr id="` + obj.id + `">
+                                <td style="width: 35%;">`+ obj.money + `</td>
+                                <td style="width: 15%; text-align:center;">`+ obj.currency + `</td>
+                                <td style="width: 20%; text-align:center;">`+ obj.unit + `</td>
+                                <td style="width: 25%; text-align:center;">`+ obj.total + `</td>
+                                <td style="width: 5%;"><ion-icon name="close-outline" class="money-delete"></ion-icon></td>
+                                </tr>`)
+    })
+
+    $(document).on('click', '.drawer-save', function () {
+        var obj = JSON.stringify(drawerObj)
+        $.ajax({
+            url: '/drawer/create',
+            type: 'POST',
+            data: {
+                data: obj
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.data == 'Success') {
+                    $('.drawer-btn, .drawer-time').addClass('active')
+                    $('#drawerTime').html(data.startedOn)
+                    $('#list-money').html(`<tr class="money-form color-text"></tr>`)
+                    drawerObj.moneys.forEach(m => {
+                        $('#list-money tr:last').before(`<tr class="color-font">
+                            <td style="width: 35%;">`+ m.money + `</td>
+                            <td style="width: 15%; text-align:center;">`+ m.currency + `</td>
+                            <td style="width: 20%; text-align:center;">`+ m.unit + `</td>
+                            <td style="width: 25%; text-align:center;">`+ m.total + `</td>
+                            <td style="width: 5%;"></td>
+                            </tr>`)
+
+                    })
+                    toggleEdit($('.drawer-end'), $('.drawer-save'))
+                    $('.drawer-end, .drawer-btn').attr('id', data.id)
+                }
+            }
+        })
+    })
+
+    $(document).on('click', '.drawer-end', function () {
+        var id = $(this).attr('id')
+        $.ajax({
+            url: '/drawer/end/' + id,
+            type: 'POST',
+            success: function (data) {
+                if (data.data == 'Success') {
+                    $('.drawer-btn, .drawer-time').removeClass('active')
+                    $('#drawerTime').empty()
+                    $('#list-money').html(`<tr class="money-form color-text"></tr>`)
+                    drawerObj.moneys = []
+                    toggleEdit($('.drawer-save'), $('.drawer-end'))
+                    $('.drawer-btn').attr('id', 'none')
+                }
+            }
+        })
+    })
+
+    $(document).on('click', '.remove-btn', function () {
+        var id = $(this).closest('.transaction-item')
+        var pid = $(this).closest('.transaction-item').find('#order-description').attr('data-id')
+        var oid = $('.btn-transaction').attr('data-payment')
+        var total = 0
+        Array.from($('.transaction-item')).forEach(t => {
+            total += accounting.unformat($(t).find('#order-amount').text())
+        })
+        var amount = accounting.unformat($(this).closest('tr').find('#order-amount').text())
+        $.ajax({
+            url: '/transaction/delete/' + id.attr('id'),
+            data: {
+                data: oid
+            },
+            type: 'POST',
+            success: function (data) {
+                if (data.result == 'Success') {
+
+                    $('.btn-transaction').attr('data-change', true)
+                    var quantity = $('#' + pid).find('.stock-tag').text()
+                    if (quantity == 'Out of stock') {
+                        quantity = 0
+                    }
+                    var order = $('.sum-order').text()
+                    var sum_o = parseFloat(order) - data.quantity
+                    $('.sum-order').text(sum_o)
+                    var sum_q = parseInt(quantity) + data.quantity
+                    $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
+                    $('#sumTotal').text(accounting.formatMoney(total - amount))
+                    orderLists.forEach((o, i) => {
+                        if (o.orderId == id.attr('data-id')) {
+                            orderLists.splice(i, 1)
+                        }
+                    })
+                    $(id).fadeOut('slow', function () {
+                        $(this).remove()
+                    })
+                } else {
+                    alert(data.result)
+                }
+            }
+        })
+    })
+    start = new Date($('#checkin-date').text() +' '+ $('#checkin-time').text())
+    setInterval(function() {
+        
+        current = new Date()
+
+        cal = current - start
+
+        hour = Math.floor((cal % 86400000) / 3600000)
+        minute = Math.round(((cal % 86400000) % 3600000) / 60000)
+
+        if (hour < 10 && hour > 0) {
+            hour = '0'+hour+'h '
+        } else if (hour < 1) {
+            hour = ''
+        } else {
+            hour = hour+'h '
+        }
+
+        if (minute < 10) {
+            minute = '0'+minute+'min'
+        } else {
+            minute = minute+'min'
+        }
+        result = hour  + minute
+
+        $('#calculate-time').text(result)
+    }, 500)
+
 </script>
 {% endblock %}
