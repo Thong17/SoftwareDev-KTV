@@ -172,7 +172,8 @@ class tblRoom(db.Model):
 # Working on Order room and invoice
 class tblOrder(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    isComplete = db.Column(db.Boolean, default=False)
+    isCompleted = db.Column(db.Boolean, default=False)
+    isProcessed = db.Column(db.Boolean, default=False)
     orderOn = db.Column(db.DateTime, default=datetime.utcnow)
     orderTo = db.Column(db.DateTime, default=datetime.utcnow)
     roomId = db.Column(db.String(36), db.ForeignKey('tbl_room.id'), nullable=False)
@@ -208,6 +209,7 @@ payment = db.Table('payment',
 class tblTransaction(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     isComplete = db.Column(db.Boolean, default=False)
+    isEditable = db.Column(db.Boolean, default=True)
     discount = db.Column(db.String(3), nullable=True, default='')
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     amount = db.Column(db.Numeric(10,2), nullable=True, default=0.00)

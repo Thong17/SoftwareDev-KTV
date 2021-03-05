@@ -197,7 +197,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
 
     .btn-date {
@@ -487,6 +487,11 @@
                     success: function (data) {
                         if (data.msg == 'Success') {
                             $('#customerModal').modal('hide')
+                            Array.from($('.grid-products').children()).forEach(r => {
+                                if ($(r).hasClass('active')) {
+                                    $(r).click()
+                                }
+                            })
                         } else {
                             alert(data.msg)
                         }
@@ -573,7 +578,7 @@
                 success: function (data) {
                     eventsArr = []
 
-                    data.order.forEach(o => {
+                    data.orders.forEach(o => {
                         obj = {
                             title: o.customer.name + ': ' + o.customer.phone,
                             start: o.orderOn,

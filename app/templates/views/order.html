@@ -714,7 +714,7 @@
                         <td class="text-center currency-format" id="order-price">{{ t.price }}</td>
                         <td>
                             <p class="color-text text-center" contenteditable="true" id="order-discount">{{ t.discount
-                                }}</p>
+                                }}%</p>
                         </td>
                         <td>
                             <p class="color-text text-center" contenteditable="true" id="order-quantity">{{ t.quantity
@@ -727,9 +727,13 @@
                         <td class="save-btn hide">
                             <ion-icon name="checkmark-outline"></ion-icon>
                         </td>
+                        {% if t.isEditable %}
                         <td class="remove-btn">
                             <i class="fa fa-trash-o" aria-hidden="true"></i>
                         </td>
+                        {% else %}
+                        <td></td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                     {% endif %}
@@ -738,7 +742,7 @@
             <div class="order-wrapper flex-between-center">
                 {% if Order.checkin %}
                     {% if Order.checkout %}
-                    <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}">
+                    <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}" data-check='true'>
                         <span class="mr-2 order-icon">
                             <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                             <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
@@ -755,6 +759,7 @@
                                 <li class="flex-between-start"><span>Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
                                 <li class="mb-3 flex-between-center"><span>Duration </span><span id="calculate-time" class="text-danger"></span></li>
+                                <li><span class="btn btn-block border" data-is="false" id="isConfirm">Confirm</span></li>
                             </ul>
                         </div>
                         <span class="check-in-out">Check Out</span>
@@ -956,6 +961,7 @@
 <script src="{{url_for('static', filename='js/cashing.js')}}"></script>
 <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
+    
     $(document).on('click', '.check-in', function () {
         id = $(this).attr('data-id')
         _this = $(this)
@@ -970,8 +976,9 @@
                 success: function (data) {
                     console.log(data)
                     if (data.msg == 'Success') {
-                        _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
-                        _this.find('.check-in-out').text('Check Out')
+                        window.location.reload()
+                        // _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
+                        // _this.find('.check-in-out').text('Check Out')
                     } else {
                         alert(data.msg)
                     }
@@ -982,24 +989,73 @@
 
     $(document).on('click', '.check-out', function () {
         id = $(this).attr('data-id')
-        $.ajax({
-            url: '/checkout/order/' + id,
-            type: 'POST',
-            success: function (data) {
-                if (data.msg == 'Success') {
-                    $('.btn-transaction').removeClass('check-out').addClass('order-btn').attr('id', data.paymentId).html(`<span class="mr-2 order-icon">
-                            <span class="sum-order notranslate">0</span>
-                            <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
-                        </span>
-                        <span>Place Order</span>`)
-                    orderId = generateString(23)
-                    $('.order-form').html(orderForm(orderId, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, accounting.formatMoney(data.transaction.amount)))
-                    $('.order-form').find('#input-discount').focus()
-                } else {
-                    alert(data.msg)
+        if ($('#isConfirm').attr('data-is') == 'true') {
+            $.ajax({
+                url: '/checkout/order/' + id,
+                type: 'POST',
+                success: function (data) {
+                    console.log(data)
+                    if (data.msg == 'Success') {
+                        $('.btn-transaction').removeClass('check-out btn-danger').addClass('order-btn  btn-primary').attr({'id': data.paymentId, 'data-check': false})
+                        .html(`<span class="mr-2 order-icon">
+                                <span class="sum-order notranslate">0</span>
+                                <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
+                            </span>
+                            <span>Place Order</span>`)
+                        $('.order-form').html(checkoutForm(data.transaction.id, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, accounting.formatMoney(data.transaction.amount)))
+                        $('.order-form').find('#input-discount').focus()
+                    } else {
+                        alert(data.msg)
+                    }
                 }
-            }
-        })
+            })
+        } else {
+            $('.order-icon').click()
+            console.log('this')
+        }
+    })
+
+    $(document).on('click', '#isConfirm', function() {
+        $(this).attr('data-is', 'true')
+        $(this).text('Confirmed')
+    })
+
+    $(document).on('click', '.save-checkout', function() {
+        id = $('#input-transaction').val()
+        details = $('#input-details').val()
+        price = $('#input-price').val()
+        discount = $('#input-discount').val()
+        quantity = $('#input-quantity').val()
+
+        console.log(details, price, discount, quantity)
+
+        if (quantity < 0 || quantity == 0) {
+            $('#input-quantity').focus()
+            alert('Value must be atleast 1')
+        } else {
+            $.ajax({
+                url: '/transaction/update/'+id,
+                type: 'POST',
+                data: {details: details, price: price, discount: discount, quantity: quantity},
+                success: function(data) {
+                    if (data.result == 'success') {
+                        $('.btn-transaction').attr({'data-change': true, 'data-check': true})
+                        $('#list-orders tr:last').before(showOrder(data.data.id, details, accounting.formatMoney(data.data.price), data.data.discount, data.data.quantity, data.data.amount, '', ''))
+                        $('.order-form').empty()
+                        
+                        var total = accounting.unformat($('#sumTotal').text())
+                        total += data.data.amount
+                        $('#sumTotal').text(accounting.formatMoney(total))
+
+                        var order = parseInt($('.sum-order').text())
+                        order += 1
+                        $('.sum-order').text(order)
+                    } else {
+                        alert(data.result)
+                    }
+                }
+            })
+        }
     })
 
     $(document).on('click', '.type-btn', function () {
@@ -1133,7 +1189,7 @@
                         $('#sumTotal').text(accounting.formatMoney(total))
 
                         var order = parseInt($('.sum-order').text())
-                        order += data.data.quantity
+                        order += 1
                         $('.sum-order').text(order)
                     } else {
                         alert(data.data.message)
@@ -1223,6 +1279,10 @@
                 $(this).remove()
             })
         }
+    })
+
+    $(document).on('click', '.close-payment', function() {
+        window.location.href = '/order'
     })
 
     $(document).on('input', '#input-quantity', function () {
@@ -1361,6 +1421,23 @@
             </td>`
     }
 
+    function checkoutForm(id, details, cost, discount, quantity, total) {
+
+        return `<input type="hidden" id="input-transaction" value="` + id + `">
+            <td><input type="text" class="form-empty color-text input-color" title="`+ details + `" id="input-details" value="` + details + `"
+                    placeholder="Details" disabled></td>
+            <td><input type="number" class="form-empty color-text input-color" id="input-price" value="`+ cost + `"
+                    placeholder="Price"></td>
+            <td><input min="1" max="100" type="number" class="form-empty color-text input-color" id="input-discount" value="`+ discount + `"
+                    placeholder="Disc"></td>
+            <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
+                    placeholder="Qty" value="`+ quantity + `"></form></td>
+            <td id="calculated-result" style="text-align:center;">`+ total + `</td>
+            <td class="save-checkout">
+                <ion-icon name="checkmark-outline"></ion-icon>
+            </td>`
+        }
+
     $(document).ready(function () {
         $(document).on('change', '.input-radio', function () {
             var pid = $(this).closest('.property-values').attr('id').split('_')[1]
@@ -1407,7 +1484,7 @@
         $('[data-toggle="tooltip"]').tooltip({
             trigger: 'hover'
         })
-        currencyFormat()
+        currencyFormat('$', '2', false)
 
         $('.arrow').addClass('active')
         var products = Array.from(document.querySelectorAll('.product-item'))
@@ -1544,6 +1621,12 @@
     })
 
     function showOrder(id, description, price, discount, quantity, amount, oid, pid) {
+        removeBtn = ''
+        if (oid != '') {
+            removeBtn = `<td class="remove-btn">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </td>`
+        }
         return `<tr class="color-text transaction-item" id="` + id + `" data-id="` + oid + `">
                     <td class="description" id="order-description" data-id="`+ pid + `">` + description + `</td>
                     <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
@@ -1574,9 +1657,7 @@
                     <td class="save-btn hide">
                         <ion-icon name="checkmark-outline"></ion-icon>
                     </td>
-                    <td class="remove-btn">
-                        <i class="fa fa-trash-o" aria-hidden="true"></i>
-                    </td>
+                    `+removeBtn+`
                 </tr>`
     }
 
@@ -1853,7 +1934,7 @@
                         quantity = 0
                     }
                     var order = $('.sum-order').text()
-                    var sum_o = parseFloat(order) - data.quantity
+                    var sum_o = parseFloat(order) - 1
                     $('.sum-order').text(sum_o)
                     var sum_q = parseInt(quantity) + data.quantity
                     $('#' + pid).find('.stock-tag').text(sum_q + ' Available')

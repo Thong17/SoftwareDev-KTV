@@ -1199,6 +1199,7 @@ def order_product(id):
                                 stock.quantity -= sum_quantity
                                 sum_quantity = 0
                 amount *= quantity
+                transaction.amount = amount
                 total_stocks -= quantity
                 db.session.commit()
                 resultObj['result'] = 'success'
@@ -1214,8 +1215,9 @@ def order_product(id):
                 'message': 'The selected product is not available'}
     else:
         transaction.quantity = quantity
-        db.session.commit()
         amount *= quantity
+        transaction.amount = amount
+        db.session.commit()
         resultObj['result'] = 'success'
         resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity,
                              'price': price, 'isStock': False, 'discount': discount}
@@ -1279,12 +1281,15 @@ def checkout(id):
         moneys.append(moneyObj)
         for transaction in payment.transactions:
             transaction.isComplete = True
-            transaction.profit = transaction.price * transaction.quantity
+            transaction.profit = transaction.amount
             if transaction.quantities:
                 for quantity in transaction.quantities:
                     transaction.profit -= quantity.soq.cost * quantity.quantity
 
         payment.isComplete = True
+        if payment.orderPayment:
+            payment.orderPayment[0].checkin.order.status = 'Open'
+            payment.orderPayment[0].checkin.isCompleted = True
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                                ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
         db.session.add(Activity)
@@ -1323,6 +1328,42 @@ def undo_transaction():
         return jsonify({'data': 'Success'})
     except:
         return jsonify({'data': 'Could not find the selected transaction'})
+
+@route.route('/transaction/update/<id>', methods=['POST'])
+def update_transaction(id):
+    transaction = tblTransaction.query.get(id)
+    details = request.form['details']
+    price = request.form['price']
+    discount = request.form['discount']
+    quantity = request.form['quantity']
+
+    if discount == '':
+        discount = 0
+
+    amount = float(price) * float(quantity)
+    
+    transaction.amount = amount * (1 - float(discount) / 100)
+
+    transaction.description = details
+    transaction.price = price
+    transaction.discount = discount
+    transaction.quantity = round(float(quantity), 2)
+
+    resultObj = {
+        'result': '',
+        'data': {}
+    }
+    try:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has updated transaction ' +
+                               transaction.description, type='Modified', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        resultObj['result'] = 'success'
+        resultObj['data'] = {'id': transaction.id, 'amount': transaction.amount, 'quantity': transaction.quantity, 'price': price, 'isStock': False, 'discount': discount}
+        return jsonify(resultObj)
+    except:
+        resultObj['result'] = 'failed'
+        return jsonify(resultObj)
 
 
 @route.route('/invoice/search', methods=['POST'])
@@ -1374,9 +1415,9 @@ def income():
             if createdOn in labels:
                 for d in data:
                     if d['label'] == createdOn:
-                        d['data'] += transaction.amount * transaction.quantity
+                        d['data'] += transaction.amount
             else:
-                obj['data'] = transaction.amount * transaction.quantity
+                obj['data'] = transaction.amount
                 data.append(obj)
                 labels.append(createdOn)
 
@@ -2237,7 +2278,7 @@ def order():
     customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
     # orders = tblOrder.query.order_by(tblOrder.createdOn).filter(func.DATE(tblOrder.orderOn) == datetime.utcnow().date()).all()
     orders = tblOrder.query.order_by(tblOrder.createdOn).filter(
-        tblOrder.isComplete == False).all()
+        tblOrder.isProcessed == False).all()
     date = datetime.utcnow()
     for floor in floors:
         floor.rooms.sort(key=lambda x: x.createdOn, reverse=False)
@@ -2296,16 +2337,16 @@ def remove_order(id):
 
 @route.route('/room/order/<id>', methods=['POST'])
 def room_order(id):
-    Room = tblRoom.query.get(id)
-    roomSchema = RoomSchema()
-    room = roomSchema.dump(Room)
-    for order in room['order']:
+    Orders = tblOrder.query.filter(tblOrder.isCompleted == False, tblOrder.roomId == id).all()
+    orderSchema = OrderSchema(many=True)
+    orders = orderSchema.dump(Orders)
+    for order in orders:
         order['orderOn'] = datetimefilter(datetime.strptime(
             order['orderOn'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%dT%H:%M:%S')
         order['orderTo'] = datetimefilter(datetime.strptime(
             order['orderTo'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%dT%H:%M:%S')
-    room['now'] = datetimefilter(datetime.utcnow(), '%H:%M:%S')
-    return jsonify(room)
+    current = datetimefilter(datetime.utcnow(), '%H:%M:%S')
+    return jsonify({'orders': orders, 'now': current})
 
 
 @route.route('/order/<id>')
@@ -2328,12 +2369,14 @@ def payment():
         Payment = tblPayment(
             id=id, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
         db.session.add(Payment)
-        total = 0
+        totalPayment = 0
         for transaction in transactions:
             Transaction = tblTransaction.query.get(transaction)
-            total += Transaction.amount * Transaction.quantity
+            total = Transaction.price * Transaction.quantity
+            Transaction.amount = total
+            totalPayment += total
             Payment.transactions.append(Transaction)
-        Payment.amount = total
+        Payment.amount = totalPayment
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                                ' has ordered invoice: '+invoice, type='Order', createdBy=current_user.id)
         db.session.add(Activity)
@@ -2351,7 +2394,7 @@ def checkin(order_id):
     Order = tblOrder.query.get(order_id)
     if Order.order.status == 'Open':
         Order.order.status = 'In Process'
-        Order.isComplete = True
+        Order.isProcessed = True
         Payments = tblPayment.query.with_entities(tblPayment.id).all()
         id = str(uuid4())
         pid = str(uuid4())
@@ -2488,12 +2531,13 @@ def get_payment(id):
         total = 0
         for transaction in transactions:
             Transaction = tblTransaction.query.get(transaction)
+            quantity = Transaction.quantity
             if Transaction.quantities:
                 quantity = 0
                 for q in Transaction.quantities:
                     quantity += q.quantity
                 Transaction.quantity = quantity
-            total += Transaction.price * quantity
+            total += Transaction.amount
             if Transaction not in Payment.transactions:
                 Payment.transactions.append(Transaction)
         Payment.amount = total
@@ -2518,9 +2562,10 @@ def checkout_order(order_id):
     
     description = Order.order.room
     tid = str(uuid4())
-    transaction = tblTransaction(id=tid, price=Order.order.price, quantity=round(hours, 2), discount=0,
+    transaction = tblTransaction(id=tid, price=Order.order.price, quantity=round(hours, 2), discount=0, isEditable=False,
                                  amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
     json = {
+        'id': tid,
         'cost': Order.order.price,
         'discount': '',
         'quantity': minute,
@@ -2532,4 +2577,6 @@ def checkout_order(order_id):
     Order.checkin.orderPayment.transactions.append(transaction)
     db.session.commit()
     return jsonify({'msg': 'Success', 'paymentId': Order.checkin.orderPayment.id, 'transaction': json})
+
+
    
