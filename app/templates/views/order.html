@@ -439,12 +439,31 @@
     .checkout-container {
         position: relative;
         cursor: default;
+        height: 100%;
+        padding: 10px;
+    }
+
+    .confirm-checkout {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .input-min {
         position: absolute;
-        top: 2px;
-        right: 80px;
+        top: 5px;
+        right: 97px;
+    }
+
+    .checkout-li {
+        position: relative; 
+        height: 38px; 
+        width: 100%; 
+        border-radius: 7px;
+        overflow: hidden;
     }
 
     @media only screen and (max-width: 1100px) {
@@ -799,7 +818,7 @@
                                 <li class="flex-between-start"><span class="color-text">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
                                 <li class="mb-3 flex-between-center"><span class="color-text">Duration </span><span id="calculate-time" class="text-danger"></span></li>
-                                <li><span class="btn btn-block border"><span class="color-text confirm-checkout">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></span></li>
+                                <li><div class="border checkout-li"><span class="color-text confirm-checkout">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
                             </ul>
                         </div>
                         <span class="check-in-out">Check Out</span>
@@ -817,7 +836,7 @@
                 <div class="arrow arrow-left animate-left-to-right">
                     <div class="flex-between-center">
                         <span class="mr-3 color-text">Total:</span>
-                        <span id="sumTotal" class="color-font currency-format notranslate">0</span>
+                        <span id="sumTotal" class="color-font currency-format notranslate">{{ total }}</span>
                     </div>
                 </div>
             </div>

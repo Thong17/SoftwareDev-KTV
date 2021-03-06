@@ -453,7 +453,7 @@
             })
         })
 
-        $(document).on('click', '.remove-order', function () {
+        $(document).on('click', '.remove-order', function (event) {
             event.stopPropagation()
             id = $(this).closest('.order-item').attr('id')
             if (confirm('Are you sure you want to remove this order?')) {

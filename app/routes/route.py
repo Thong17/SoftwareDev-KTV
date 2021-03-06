@@ -2238,16 +2238,35 @@ def add_room():
         return jsonify({'msg': 'Failed to add room! Please make sure that the name is unique.'})
 
 
-@route.route('/room/delete/<id>', methods=['POST'])
-def delete_room(id):
+@route.route('/room/toggle/<id>', methods=['POST'])
+def lock_room(id):
     Room = tblRoom.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has deleted room: '+Room.room, type='Deleted', createdBy=current_user.id)
+                           ' has toggle room: '+Room.room+'from '+Room.status, type='Toggle', createdBy=current_user.id)
+    if Room.status == 'Open':            
+        Room.status = 'Close'
+    elif Room.status == 'Close':
+        Room.status = 'Open'
+    try:
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'msg': 'Success', 'status': Room.status})
+    except:
+        return jsonify({'msg': 'Unable to close '+Room.room+' now. Please contact to our support team.'})
 
-    db.session.delete(Room)
-    db.session.add(Activity)
-    db.session.commit()
-    return jsonify({'msg': 'Success'})
+@route.route('/room/edit/<id>', methods=['POST'])
+def edit_room(id):
+    Room = tblRoom.query.get(id)
+    Room.room = request.form['room']
+    Room.price = request.form['price']
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has modified room: '+Room.room+' from '+Room.room+'/'+Room.price, type='Modify', createdBy=current_user.id)
+    try:
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'msg': 'Success'})
+    except:
+        return jsonify({'msg': 'Failed to edit room'})
 
 
 @route.route('/customer/add', methods=['POST'])
@@ -2260,7 +2279,11 @@ def add_customer():
     id = str(uuid4())
     Customer = tblCustomer(id=id, name=username, phone=phone,
                            birthdate=birthdate, createdBy=current_user.id)
+
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has added customer: '+Customer.name, type='Add', createdBy=current_user.id)
     try:
+        db.session.add(Activity)
         db.session.add(Customer)
         db.session.commit()
         return jsonify({'msg': 'Success', 'username': username, 'phone': phone, 'birthdate': birthdate, 'id': id})
@@ -2312,7 +2335,11 @@ def add_order():
 
     Order = tblOrder(id=id, orderOn=utcFrom, orderTo=utcTo,
                      roomId=room, orderedBy=customer, createdBy=current_user.id)
+
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has added order from: '+utcFrom+' to '+utcTo, type='Add', createdBy=current_user.id)
     try:
+        db.session.add(Activity)
         db.session.add(Order)
         db.session.commit()
         return jsonify({'msg': 'Success'})
@@ -2323,7 +2350,10 @@ def add_order():
 @route.route('/order/remove/<id>', methods=['POST'])
 def remove_order(id):
     Order = tblOrder.query.get(id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has removed order from: '+Order.orderOn+' to '+Order.orderTo, type='Deleted', createdBy=current_user.id)
     try:
+        db.session.add(Activity)
         db.session.delete(Order)
         db.session.commit()
         return jsonify({'msg': 'Success'})
@@ -2351,7 +2381,11 @@ def get_order(id):
     products = tblProduct.query.all()
     brands = tblBrand.query.all()
     categories = tblCategory.query.all()
-    return render_template('views/order.html', Order=Order, products=products, brands=brands, categories=categories)
+    total = 0
+    if Order.checkin:
+        for t in Order.checkin.orderPayment.transactions:
+            total += t.amount
+    return render_template('views/order.html', Order=Order, products=products, brands=brands, categories=categories, total=total)
 
 
 @route.route('/payment', methods=['POST'])
@@ -2399,7 +2433,11 @@ def checkin(order_id):
             id=pid, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
         CheckIn = tblCheckin(id=id, createdBy=current_user.id,
                              orderId=order_id, paymentId=pid)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has checked in order from: '+Order.orderOn+' to '+Order.orderTo, type='Check In', createdBy=current_user.id)
+        
         try:
+            db.session.add(Activity)
             db.session.add(Payment)
             db.session.add(CheckIn)
             db.session.commit()
@@ -2573,11 +2611,18 @@ def checkout_order(order_id):
         'amount': totalPrice,
         'description': description
     }
-    db.session.add(CheckOut)
-    db.session.add(transaction)
-    Order.checkin.orderPayment.transactions.append(transaction)
-    db.session.commit()
-    return jsonify({'msg': 'Success', 'paymentId': Order.checkin.orderPayment.id, 'transaction': json})
+
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                               ' has checked out order from: '+Order.orderOn+' to '+Order.orderTo, type='Check Out', createdBy=current_user.id)
+    try:
+        db.session.add(Activity)
+        db.session.add(CheckOut)
+        db.session.add(transaction)
+        Order.checkin.orderPayment.transactions.append(transaction)
+        db.session.commit()
+        return jsonify({'msg': 'Success', 'paymentId': Order.checkin.orderPayment.id, 'transaction': json})
+    except:
+        return jsonify({'msg': 'Failed to check out! Please check your connection and try again.'})
 
 
    
