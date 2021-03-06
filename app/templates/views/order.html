@@ -407,6 +407,46 @@
         width: 230px;
     }
 
+    .input-checkout {
+        height: 23px;
+        width: 70px;
+        border: none;
+        background-color: var(--color-menu);
+        border-bottom: 1px solid var(--color-hr);
+    }
+
+    .input-checkout:hover {
+        border: none;
+        border-bottom: 1px solid var(--color-hover);
+    }
+
+    .input-checkout:focus {
+        border: none !important;
+        background-color: var(--color-menu);
+        outline: none;
+        border-bottom: 1px solid var(--color-hover) !important;
+    }
+
+    #isConfirm {
+        cursor: pointer;
+        padding: 0px 5px;
+    }
+
+    #isConfirm:hover {
+        color: var(--color-font);
+    }
+
+    .checkout-container {
+        position: relative;
+        cursor: default;
+    }
+
+    .input-min {
+        position: absolute;
+        top: 2px;
+        right: 80px;
+    }
+
     @media only screen and (max-width: 1100px) {
 
         .view-btn,
@@ -705,7 +745,6 @@
                     </tr>
                 </thead>
                 <tbody id="list-orders">
-                    <tr class="order-form color-text notranslate"></tr>
                     {% if Order.checkin %}
                     {% for t in Order.checkin.orderPayment.transactions %}
                     <tr class="color-text transaction-item" id="{{ t.id }}" data-id="{{ Order.id }}">
@@ -737,6 +776,7 @@
                     </tr>
                     {% endfor %}
                     {% endif %}
+                    <tr class="order-form color-text notranslate"></tr>
                 </tbody>
             </table>
             <div class="order-wrapper flex-between-center">
@@ -756,10 +796,10 @@
                         <div class="dropup">
                             <span class="mr-2 order-icon" data-toggle="dropdown" style="color: var(--color-text);">0</span>
                             <ul class="dropdown-menu m-0 p-2">
-                                <li class="flex-between-start"><span>Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
+                                <li class="flex-between-start"><span class="color-text">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
-                                <li class="mb-3 flex-between-center"><span>Duration </span><span id="calculate-time" class="text-danger"></span></li>
-                                <li><span class="btn btn-block border" data-is="false" id="isConfirm">Confirm</span></li>
+                                <li class="mb-3 flex-between-center"><span class="color-text">Duration </span><span id="calculate-time" class="text-danger"></span></li>
+                                <li><span class="btn btn-block border"><span class="color-text confirm-checkout">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></span></li>
                             </ul>
                         </div>
                         <span class="check-in-out">Check Out</span>
@@ -961,6 +1001,30 @@
 <script src="{{url_for('static', filename='js/cashing.js')}}"></script>
 <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
 <script>
+    $(document).on('click', '.dropdown-menu', function(event) {
+        event.stopPropagation()
+    })
+
+    $(document).on('click', '.confirm-checkout', function() {
+        duration_str = $('#calculate-time').text().split('min')[0]
+        hour = 0
+        min = 0
+        if (duration_str.includes('h')) {
+            hour = duration_str.split('h')[0]
+            min = duration_str.split('h')[1]
+        } else {
+            min = duration_str
+        }
+        duration_min = parseInt(hour) * 60 + parseInt(min)
+
+        $('.input-checkout').val(duration_min)
+        $(this).addClass('hide')
+        $('.checkout-container').removeClass('hide')
+    })
+
+    $(document).on('click', '.input-checkout', function(event) {
+        event.stopPropagation()
+    })
     
     $(document).on('click', '.check-in', function () {
         id = $(this).attr('data-id')
@@ -988,11 +1052,13 @@
     })
 
     $(document).on('click', '.check-out', function () {
+        duration = $('.input-checkout').val()
         id = $(this).attr('data-id')
         if ($('#isConfirm').attr('data-is') == 'true') {
             $.ajax({
                 url: '/checkout/order/' + id,
                 type: 'POST',
+                data: {duration: duration},
                 success: function (data) {
                     console.log(data)
                     if (data.msg == 'Success') {
@@ -1002,7 +1068,7 @@
                                 <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                             </span>
                             <span>Place Order</span>`)
-                        $('.order-form').html(checkoutForm(data.transaction.id, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, accounting.formatMoney(data.transaction.amount)))
+                        $('.order-form').html(checkoutForm(data.transaction.id, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, data.transaction.amount))
                         $('.order-form').find('#input-discount').focus()
                     } else {
                         alert(data.msg)
@@ -1011,13 +1077,13 @@
             })
         } else {
             $('.order-icon').click()
-            console.log('this')
+            alert('Confirm duration first!')
         }
     })
 
     $(document).on('click', '#isConfirm', function() {
         $(this).attr('data-is', 'true')
-        $(this).text('Confirmed')
+        $('.check-out').click()
     })
 
     $(document).on('click', '.save-checkout', function() {
@@ -1040,7 +1106,7 @@
                 success: function(data) {
                     if (data.result == 'success') {
                         $('.btn-transaction').attr({'data-change': true, 'data-check': true})
-                        $('#list-orders tr:last').before(showOrder(data.data.id, details, accounting.formatMoney(data.data.price), data.data.discount, data.data.quantity, data.data.amount, '', ''))
+                        $('#list-orders tr:last').before(showOrder(data.data.id, details, data.data.price, data.data.discount, data.data.quantity, data.data.amount, '', ''))
                         $('.order-form').empty()
                         
                         var total = accounting.unformat($('#sumTotal').text())
@@ -1431,8 +1497,8 @@
             <td><input min="1" max="100" type="number" class="form-empty color-text input-color" id="input-discount" value="`+ discount + `"
                     placeholder="Disc"></td>
             <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
-                    placeholder="Qty" value="`+ quantity + `"></form></td>
-            <td id="calculated-result" style="text-align:center;">`+ total + `</td>
+                    placeholder="Qty" value="`+ quantity + `" disabled></form></td>
+            <td id="calculated-result" style="text-align:center;">`+ accounting.formatMoney(total) + `</td>
             <td class="save-checkout">
                 <ion-icon name="checkmark-outline"></ion-icon>
             </td>`
@@ -1621,6 +1687,7 @@
     })
 
     function showOrder(id, description, price, discount, quantity, amount, oid, pid) {
+        console.log(price, amount)
         removeBtn = ''
         if (oid != '') {
             removeBtn = `<td class="remove-btn">
@@ -1629,28 +1696,14 @@
         }
         return `<tr class="color-text transaction-item" id="` + id + `" data-id="` + oid + `">
                     <td class="description" id="order-description" data-id="`+ pid + `">` + description + `</td>
-                    <td class="text-center currency-format" id="order-price">`+ accounting.formatMoney(price, {
-            precision: 2,
-            format: {
-                pos: "%s%v",
-                neg: "%s%v",
-                zero: '%s%v'
-            }
-        }).replace(/\.0+$/, '') + `</td>
+                    <td class="text-center" id="order-price">`+ accounting.formatMoney(price) +`</td>
                     <td>
                         <p class="color-text text-center" contenteditable="true" id="order-discount">`+ discount + `%</p>
                     </td>
                     <td>
                         <p class="color-text text-center" contenteditable="true" id="order-quantity">`+ quantity + `</p>
                     </td>
-                    <td class="text-center currency-format" id="order-amount">`+ accounting.formatMoney(amount, {
-            precision: 2,
-            format: {
-                pos: "%s%v",
-                neg: "%s%v",
-                zero: '%s%v'
-            }
-        }).replace(/\.0+$/, '') + `</td>
+                    <td class="text-center" id="order-amount">`+ accounting.formatMoney(amount) + `</td>
                     <td class="cancel-btn hide">
                         <ion-icon name="close-outline"></ion-icon>
                     </td>

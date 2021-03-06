@@ -194,7 +194,7 @@ class tblCheckin(db.Model):
 class tblCheckout(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     endedOn = db.Column(db.DateTime, default=datetime.utcnow)
-    totalHour = db.Column(db.DateTime, nullable=False)
+    totalHour = db.Column(db.Numeric(10), default=0)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     orderId = db.Column(db.String(36), db.ForeignKey('tbl_order.id'), nullable=False)

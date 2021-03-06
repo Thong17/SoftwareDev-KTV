@@ -1332,27 +1332,23 @@ def undo_transaction():
 @route.route('/transaction/update/<id>', methods=['POST'])
 def update_transaction(id):
     transaction = tblTransaction.query.get(id)
-    details = request.form['details']
     price = request.form['price']
     discount = request.form['discount']
-    quantity = request.form['quantity']
 
     if discount == '':
         discount = 0
-
-    amount = float(price) * float(quantity)
     
-    transaction.amount = amount * (1 - float(discount) / 100)
+    transaction.amount = round(float(price) * (1 - float(discount) / 100), 2)
 
-    transaction.description = details
     transaction.price = price
     transaction.discount = discount
-    transaction.quantity = round(float(quantity), 2)
+    
 
     resultObj = {
         'result': '',
         'data': {}
     }
+
     try:
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has updated transaction ' +
                                transaction.description, type='Modified', createdBy=current_user.id)
@@ -2551,24 +2547,29 @@ def get_payment(id):
 @route.route('/checkout/order/<order_id>', methods=['POST'])
 def checkout_order(order_id):
     Order = tblOrder.query.get(order_id)
-    start = Order.checkin.startedOn
-    end = datetime.utcnow()
-    totalHour = end - start
-    minute = totalHour.seconds/60
+    minute = int(request.form['duration'])
     totalPrice = (float(Order.order.price) * minute) / 60
-    hours = minute / 60
+
+    if minute / 60 > 1:
+        quantity = str(int(minute / 60)) + 'h ' + str(round(minute % 60, 2)) + 'min'
+    else:
+        quantity = str(round(minute, 0)) + 'min'
+
+    description = Order.order.room  + ', ' + quantity
+
     cid = str(uuid4())
-    CheckOut = tblCheckout(id=cid, totalHour=end - totalHour, createdBy=current_user.id, orderId=order_id, endedOn=end)
+    CheckOut = tblCheckout(id=cid, totalHour=minute, createdBy=current_user.id, orderId=order_id)
     
-    description = Order.order.room
+    
     tid = str(uuid4())
-    transaction = tblTransaction(id=tid, price=Order.order.price, quantity=round(hours, 2), discount=0, isEditable=False,
+
+    transaction = tblTransaction(id=tid, price=Order.order.price, quantity=1, discount=0, isEditable=False,
                                  amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
     json = {
         'id': tid,
-        'cost': Order.order.price,
+        'cost': totalPrice,
         'discount': '',
-        'quantity': minute,
+        'quantity': 1,
         'amount': totalPrice,
         'description': description
     }

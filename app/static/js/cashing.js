@@ -54,11 +54,16 @@ $(document).on('click', '.order-btn', function() {
                                 var invoice_item = ''
             
                                 data.data.transactions.forEach(t => {
-                                    console.log(t)
-                                    var price_before = parseFloat(t.price) / (1 - (parseFloat(t.discount) / 100))
                                     invoice_item += `<tr id="`+t.id+`">
                                                             <td>`+t.description+`</td>
-                                                            <td style="text-align: center">`+price_before+`</td>
+                                                            <td style="text-align: center">`+accounting.formatMoney(t.price, {
+                                                                precision: 2,
+                                                                format: {
+                                                                    pos: "%v%s",
+                                                                    neg: "%v%s",
+                                                                    zero: '...'
+                                                                }
+                                                            })+`</td>
                                                             <td style="text-align: center">`+t.discount+`</td>
                                                             <td style="text-align: center">`+t.quantity+`</td>
                                                             <td style="text-align: center">`+accounting.formatMoney(t.amount, {
@@ -124,10 +129,16 @@ $(document).on('click', '.order-btn', function() {
                             var invoice_item = ''
         
                             data.data.transactions.forEach(t => {
-                                var price_before = parseFloat(t.price) / (1 - (parseFloat(t.discount) / 100))
                                 invoice_item += `<tr id="`+t.id+`">
                                                         <td>`+t.description+`</td>
-                                                        <td style="text-align: center">`+price_before+`</td>
+                                                        <td style="text-align: center">`+accounting.formatMoney(t.price, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%v%s",
+                                                                neg: "%v%s",
+                                                                zero: '...'
+                                                            }
+                                                        })+`</td>
                                                         <td style="text-align: center">`+t.discount+`</td>
                                                         <td style="text-align: center">`+t.quantity+`</td>
                                                         <td style="text-align: center">`+accounting.formatMoney(t.amount, {

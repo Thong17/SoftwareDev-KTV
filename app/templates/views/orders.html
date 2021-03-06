@@ -166,6 +166,10 @@
         background-color: var(--color-menu);
     }
 
+    tbody tr {
+        background-color: var(--color-bg) !important;
+    }
+
     .dash {
         position: absolute;
         top: 33px;
@@ -353,9 +357,9 @@
                 <table id="list-customers" class="table">
                     <thead>
                         <tr class="color-font">
-                            <td class="color-text">Customer</td>
-                            <td class="color-text">Phone</td>
-                            <td class="color-text">Birthdate</td>
+                            <td class="color-text" style="width: 40%;">Customer</td>
+                            <td class="color-text" style="width: 30%;">Phone</td>
+                            <td class="color-text" style="width: 30%;">Birthdate</td>
                         </tr>
                     </thead>
                     <tbody class="customer-container">
@@ -632,8 +636,8 @@
         return `<td><input type="text" id="name" class="form-empty input-color color-text" value="` + name + `" placeholder="Name"></td>
                 <td><input type="text" id="phone" class="form-empty input-color color-text" value="`+ phone + `" placeholder="Phone"></td>
                 <td class="flex-between">
-                    <input type="date" id="birthdate" class="form-empty input-color color-text" value="`+ birthdate + `" placeholder="Birthdate">
-                    <div class="flex-between-center action-btn">
+                    <input type="date" id="birthdate" style="width: 100px" class="form-empty input-color color-text" value="`+ birthdate + `" placeholder="Birthdate">
+                    <div class="flex-between-center action-btn" style="width: 35px"> 
                         <span class="customer-close pointer">
                             <ion-icon name="close-outline"></ion-icon>
                         </span>
