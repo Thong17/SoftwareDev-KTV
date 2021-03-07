@@ -1,0 +1,114 @@
+body {color:black;}
+
+.invoice-container {
+    padding: 0 50px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+}
+
+.store-name {
+    font-size: 84px;
+    font-weight: bold;
+}
+
+.contact-number {
+    font-size: 48px;
+    font-weight: 600;
+}
+
+.location {
+    font-size: 43px;
+    font-weight: 500;
+    color: #333;
+}
+
+.date-time {
+    border-bottom: 3px solid rgba(0, 0, 0, 0.8);
+    -webkit-print-color-adjust: exact;
+}
+
+.date-time,
+.invoice-cashier {
+    font-size: 43px;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 0;
+    align-items: center;
+}
+
+.transaction-container {
+    width: 100%;
+}
+
+.bottom-spacing {
+    height: 300px;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.8);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    -webkit-print-color-adjust: exact;
+}
+
+thead tr {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    font-size: 43px;
+    font-weight: 700;
+}
+
+tbody tr {
+    font-size: 33px;
+    font-weight: 600;
+}
+
+.total-container {
+    -webkit-print-color-adjust: exact;
+    font-size: 43px;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.total-details {
+    width: 50%;
+}
+
+.total-price,
+.total-return {
+    width: 100%;
+}
+
+.total-details,
+.total-price,
+.total-return {
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.total-return {
+    border-top: 3px solid rgba(0, 0, 0, 0.8);
+    -webkit-print-color-adjust: exact;
+}
+
+.flex-between {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-container {
+    margin-top: 50px;
+    font-size: 43px;
+    font-weight: 700;
+}

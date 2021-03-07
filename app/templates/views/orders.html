@@ -195,6 +195,7 @@
         position: absolute;
         top: 0;
         left: 0;
+        color: var(--color-text)
     }
 
     .date-header {
@@ -215,6 +216,10 @@
 
     .remove-order:hover {
         color: var(--color-font);
+    }
+
+    .fc-theme-standard .fc-scrollgrid, .fc-theme-standard td, .fc-theme-standard th {
+        border: 1px solid var(--color-hr) !important; 
     }
 </style>
 
@@ -267,9 +272,9 @@
             </div> -->
             <div class="calendar-container notranslate">
                 <div class="date-header">
-                    <span class="btn-date prev-date"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
+                    <!-- <span class="btn-date prev-date"><i class="fa fa-angle-left" aria-hidden="true"></i></span> -->
                     <h2 class="fc-toolbar-title m-0" id="date">{{ date | datetimefilter('%B %d, %Y') }}</h2>
-                    <span class="btn-date next-date"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
+                    <!-- <span class="btn-date next-date"><i class="fa fa-angle-right" aria-hidden="true"></i></span> -->
                 </div>
                 <table id="order-table" class="table">
                     <thead>
@@ -509,12 +514,9 @@
             title: 'Select Customer'
         })
 
-        $('#list-customers').on('click', '.customer-tr', function () {
-            console.log($(this).attr('id'))
-        })
-
         $('#new-customer').on('click', function () {
             $('#list-customers').find('#customer-form').html(createCustomerForm('', '', '')).css('display', 'table-row')
+            $('#name').focus()
         })
 
         $(document).on('click', '.customer-close', function () {
@@ -620,9 +622,6 @@
                         droppable: true,
                         dayMaxEvents: true,
                         scrollTime: data.now,
-                        drop: function (info) {
-                            console.log(info)
-                        },
                         events: eventsArr
                     })
 
@@ -637,7 +636,7 @@
                 <td><input type="text" id="phone" class="form-empty input-color color-text" value="`+ phone + `" placeholder="Phone"></td>
                 <td class="flex-between">
                     <input type="date" id="birthdate" style="width: 100px" class="form-empty input-color color-text" value="`+ birthdate + `" placeholder="Birthdate">
-                    <div class="flex-between-center action-btn" style="width: 35px"> 
+                    <div class="flex-between-center action-btn color-text" style="width: 35px"> 
                         <span class="customer-close pointer">
                             <ion-icon name="close-outline"></ion-icon>
                         </span>

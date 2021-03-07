@@ -24,25 +24,6 @@
         background-color: var(--color-menu);
     }
 
-    .item::after {
-        content: '\f383';
-        position: absolute;
-        font-family: "Ionicons";
-        right: 10px;
-        top: 8px;
-        color: var(--color-hr);
-    }
-
-    .item.active::after {
-        content: '\f383';
-        position: absolute;
-        font-family: "Ionicons";
-        right: 10px;
-        top: 8px;
-        z-index: 10;
-        color: var(--color-text);
-    }
-
     thead {
         background-color: var(--color-menu);
     }
@@ -92,8 +73,9 @@
             <div class="item-container" style="height: 67vh;">
                 {% if payments %}
                 {% for payment in payments %}
-                <div class="flex-between item color-font" id="{{ payment.id }}">
-                    <p class="notranslate">{{ payment.invoice }}</p>
+                <div class="flex-between-center item color-font" id="{{ payment.id }}">
+                    <p class="notranslate ml-2" style="width: auto;">{{ payment.invoice }}</p>
+                    <a href="/invoice/{{ payment.id }}" target="_blank"><ion-icon style="vertical-align: middle;" name="print-outline"></ion-icon></a>
                 </div>
                 {% endfor %}
                 {% endif %}

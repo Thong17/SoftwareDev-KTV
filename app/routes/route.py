@@ -1129,99 +1129,111 @@ def get_drawer(id):
 
 @route.route('/order/product/<id>', methods=['POST'])
 def order_product(id):
-    product = tblProduct.query.get(id)
-    data = json.loads(request.form['data'])
-    description = product.product
-    oid = request.form['id']
-
     resultObj = {
         'data': {},
         'result': ''
     }
+    try:
+        product = tblProduct.query.get(id)
+        data = json.loads(request.form['data'])
+        description = product.product
+        oid = request.form['id']
 
-    if data['colorId'] == '':
-        data['colorId'] = None
+        Payment = tblPayment.query.get(oid)
+        
 
-    if data['discount'] == '':
-        data['discount'] = 0
+        if data['colorId'] == '':
+            data['colorId'] = None
 
-    discount = Decimal(data['discount'])
-    price = Decimal(data['price'])
-    quantity = Decimal(data['quantity'])
+        if data['discount'] == '':
+            data['discount'] = 0
 
-    amount = price * (1 - discount / 100)
-    pprice = price * (1 - discount / 100)
+        discount = Decimal(data['discount'])
+        price = Decimal(data['price'])
+        quantity = Decimal(data['quantity'])
 
-    for v in data['values']:
-        value = tblValue.query.get(v['valueId'])
-        pprice -= value.price
-        description += '-'+value.value
+        amount = price * (1 - discount / 100)
+        pprice = price * (1 - discount / 100)
 
-    tid = str(uuid4())
-    transaction = tblTransaction(id=tid, discount=discount, price=pprice,
-                                 amount=amount, description=description, createdBy=current_user.id, product=id)
-    db.session.add(transaction)
+        for v in data['values']:
+            value = tblValue.query.get(v['valueId'])
+            pprice -= value.price
+            description += '-'+value.value
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has added transaction: '+description, type='Add', createdBy=current_user.id)
-    db.session.add(Activity)
+        tid = str(uuid4())
+        transaction = tblTransaction(id=tid, discount=discount, price=pprice,
+                                    amount=amount, description=description, createdBy=current_user.id, product=id)
+        db.session.add(transaction)
+        if Payment:
+            Payment.transactions.append(transaction)
 
-    if product.isStock:
-        if len(product.stocks) > 0:
-            total_stocks = 0
-            sum_stocks = 0
-            for stock in product.stocks:
-                if stock.color == data['colorId']:
-                    sum_stocks += stock.quantity
-                elif stock.color == '':
-                    sum_stocks += stock.quantity
-                total_stocks += stock.quantity
-            available = sum_stocks - quantity
-            if available >= 0:
-                sum_quantity = quantity
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                            ' has added transaction: '+description, type='Add', createdBy=current_user.id)
+        db.session.add(Activity)
+
+        if product.isStock:
+            if len(product.stocks) > 0:
+                total_stocks = 0
+                sum_stocks = 0
                 for stock in product.stocks:
-                    if sum_quantity > 0 and stock.quantity > 0:
-                        qid = str(uuid4())
-                        if stock.color == data['colorId'] or stock.color == '':
-                            if stock.quantity < sum_quantity:
-                                stock_quantity = stock.quantity
-                                stock.quantity = 0
-                                Quantity = tblQuantity(
-                                    id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
-                                db.session.add(Quantity)
-                                transaction.quantity += stock_quantity
-                                sum_quantity -= stock_quantity
-                            else:
-                                Quantity = tblQuantity(
-                                    id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
-                                db.session.add(Quantity)
-                                transaction.quantity += sum_quantity
-                                stock.quantity -= sum_quantity
-                                sum_quantity = 0
-                amount *= quantity
-                transaction.amount = amount
-                total_stocks -= quantity
-                db.session.commit()
-                resultObj['result'] = 'success'
-                resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
-                                     'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+                    if stock.color == data['colorId']:
+                        sum_stocks += stock.quantity
+                    elif stock.color == '':
+                        sum_stocks += stock.quantity
+                    total_stocks += stock.quantity
+                available = sum_stocks - quantity
+                if available >= 0:
+                    sum_quantity = quantity
+                    for stock in product.stocks:
+                        if sum_quantity > 0 and stock.quantity > 0:
+                            qid = str(uuid4())
+                            if stock.color == data['colorId'] or stock.color == '':
+                                if stock.quantity < sum_quantity:
+                                    stock_quantity = stock.quantity
+                                    stock.quantity = 0
+                                    Quantity = tblQuantity(
+                                        id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                    db.session.add(Quantity)
+                                    transaction.quantity += stock_quantity
+                                    sum_quantity -= stock_quantity
+                                else:
+                                    Quantity = tblQuantity(
+                                        id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                    db.session.add(Quantity)
+                                    transaction.quantity += sum_quantity
+                                    stock.quantity -= sum_quantity
+                                    sum_quantity = 0
+                    amount *= quantity
+                    transaction.amount = amount
+                    total_stocks -= quantity
+                    db.session.commit()
+                    resultObj['result'] = 'success'
+                    resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
+                                        'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+                else:
+                    resultObj['result'] = 'failed'
+                    resultObj['data'] = {
+                        'message': 'The selected product has only '+str(sum_stocks)+' left'}
             else:
                 resultObj['result'] = 'failed'
                 resultObj['data'] = {
-                    'message': 'The selected product has only '+str(sum_stocks)+' left'}
+                    'message': 'The selected product is not available'}
         else:
-            resultObj['result'] = 'failed'
-            resultObj['data'] = {
-                'message': 'The selected product is not available'}
-    else:
-        transaction.quantity = quantity
-        amount *= quantity
-        transaction.amount = amount
-        db.session.commit()
-        resultObj['result'] = 'success'
-        resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity,
-                             'price': price, 'isStock': False, 'discount': discount}
-    return jsonify(resultObj)
+            transaction.quantity = quantity
+            amount *= quantity
+            transaction.amount = amount
+            if Payment:
+                Payment.amount += amount
+            db.session.commit()
+            resultObj['result'] = 'success'
+            resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity,
+                                'price': price, 'isStock': False, 'discount': discount}
+        return jsonify(resultObj)
+    except:
+        resultObj['result'] = 'failed'
+        resultObj['data'] = {
+                    'message': 'Something went wrong! Please reload and try again.'}
+        return jsonify(resultObj)
 
 @route.route('/transaction/delete/<id>', methods=['POST'])
 def delete_transaction(id):
@@ -1246,57 +1258,65 @@ def delete_transaction(id):
 @route.route('/checkout/<id>', methods=['POST'])
 def checkout(id):
     payment = tblPayment.query.get(id)
-    drawer = tblDrawer.query.get(current_user.drawer)
-    jsonObj = json.loads(request.form['data'])
-    amounts = jsonObj['amounts']
-    amount = 0
-    for a in amounts:
-        if a['currency'] != 'USD':
-            a['amount'] = Decimal(a['amount']) / drawer.rate
-        amount += Decimal(a['amount'])
-
-    if amount >= payment.amount:
-        moneys = []
-        change = Decimal(amount) - payment.amount
-        moneyObj = {
-            'money': change,
-            'currency': 'USD'
-        }
-        for money in (sorted(drawer.moneys, key=operator.attrgetter('value'), reverse=True)):
-            convertMoney = 0
-            if money.currency != 'USD':
-                convertMoney = money.money / drawer.rate
-            else:
-                convertMoney = money.money
-            if money.unit > 0 and convertMoney <= change:
-                for unit in range(int(money.unit)):
-                    if convertMoney <= change:
-                        moneys.append({
-                            'money': round(money.money, 4),
-                            'currency': money.currency
-                        })
-                        money.unit -= 1
-                        change -= convertMoney
-                        moneyObj['money'] = round(change, 4)
-        moneys.append(moneyObj)
-        for transaction in payment.transactions:
-            transaction.isComplete = True
-            transaction.profit = transaction.amount
-            if transaction.quantities:
-                for quantity in transaction.quantities:
-                    transaction.profit -= quantity.soq.cost * quantity.quantity
-
-        payment.isComplete = True
-        if payment.orderPayment:
-            payment.orderPayment[0].checkin.order.status = 'Open'
-            payment.orderPayment[0].checkin.isCompleted = True
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                               ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
-        db.session.add(Activity)
-        db.session.commit()
-        return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
+    if payment.isComplete:
+        return jsonify({'result': 'Order has paid already!'})
     else:
-        return jsonify({'result': 'Not enough money'})
+        drawer = tblDrawer.query.get(current_user.drawer)
+        jsonObj = json.loads(request.form['data'])
+        amounts = jsonObj['amounts']
+        amount = 0
+        for a in amounts:
+            if a['currency'] != 'USD':
+                a['amount'] = Decimal(a['amount']) / drawer.rate
+            amount += Decimal(a['amount'])
+
+        if amount >= payment.amount:
+            moneys = []
+            change = Decimal(amount) - payment.amount
+            moneyObj = {
+                'money': change,
+                'currency': 'USD'
+            }
+            for money in (sorted(drawer.moneys, key=operator.attrgetter('value'), reverse=True)):
+                convertMoney = 0
+                if money.currency != 'USD':
+                    convertMoney = money.money / drawer.rate
+                else:
+                    convertMoney = money.money
+                if money.unit > 0 and convertMoney <= change:
+                    for unit in range(int(money.unit)):
+                        if convertMoney <= change:
+                            moneys.append({
+                                'money': round(money.money, 4),
+                                'currency': money.currency
+                            })
+                            money.unit -= 1
+                            change -= convertMoney
+                            moneyObj['money'] = round(change, 4)
+            moneys.append(moneyObj)
+            for transaction in payment.transactions:
+                transaction.isComplete = True
+                transaction.profit = transaction.amount
+                if transaction.quantities:
+                    for quantity in transaction.quantities:
+                        transaction.profit -= quantity.soq.cost * quantity.quantity
+
+            payment.isComplete = True
+            
+            payment.receive = amount
+            payment.rate = drawer.rate
+            payment.change = change
+
+            if payment.orderPayment:
+                payment.orderPayment[0].checkin.order.status = 'Open'
+                payment.orderPayment[0].checkin.isCompleted = True
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
+            db.session.add(Activity)
+            db.session.commit()
+            return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
+        else:
+            return jsonify({'result': 'Not enough money'})
 
 
 @route.route('/transaction')
@@ -1604,9 +1624,9 @@ def product_report():
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
         Transactions = tblTransaction.query.filter(
-            tblTransaction.createdOn.between(s, e))
+            tblTransaction.createdOn.between(s, e)).filter(tblTransaction.isComplete == True).all()
     else:
-        Transactions = tblTransaction.query.all()
+        Transactions = tblTransaction.query.filter(tblTransaction.isComplete == True).all()
 
     data = []
     labels = []
@@ -1617,17 +1637,18 @@ def product_report():
             dates.append(datetime.strftime(transaction.createdOn, '%Y-%m-%d'))
             obj = {
                 'label': transaction.description,
-                'data': 0
+                'data': 0,
+                'id': transaction.product
             }
 
-            if transaction.description in labels:
+            if transaction.product in labels:
                 for d in data:
-                    if transaction.description == d['label']:
+                    if transaction.product == d['id']:
                         d['data'] += transaction.profit
             else:
                 obj['data'] = transaction.profit
                 data.append(obj)
-                labels.append(transaction.description)
+                labels.append(transaction.product)
 
     if s == '' and e == '':
         s = current_user.createdOn.strftime("%Y-%m-%d")
@@ -1645,10 +1666,9 @@ def quantity_report():
     if s != '' and e != '':
         s = datetime.strptime(request.form['start'], '%Y-%m-%d')
         e = datetime.strptime(request.form['end'], '%Y-%m-%d')
-        Transactions = tblTransaction.query.filter(
-            tblTransaction.createdOn.between(s, e))
+        Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e)).filter(tblTransaction.isComplete == True).all()
     else:
-        Transactions = tblTransaction.query.all()
+        Transactions = tblTransaction.query.filter(tblTransaction.isComplete == True).all()
 
     data = []
     labels = []
@@ -1659,17 +1679,18 @@ def quantity_report():
             dates.append(datetime.strftime(transaction.createdOn, '%Y-%m-%d'))
             obj = {
                 'label': transaction.description,
-                'data': 0
+                'data': 0,
+                'id': transaction.product
             }
 
-            if transaction.description in labels:
+            if transaction.product in labels:
                 for d in data:
-                    if transaction.description == d['label']:
+                    if transaction.product == d['id']:
                         d['data'] += transaction.quantity
-            else:
+            else:   
                 obj['data'] = transaction.quantity
                 data.append(obj)
-                labels.append(transaction.description)
+                labels.append(transaction.product)
 
     if s == '' and e == '':
         s = current_user.createdOn.strftime("%Y-%m-%d")
@@ -2337,7 +2358,7 @@ def add_order():
                      roomId=room, orderedBy=customer, createdBy=current_user.id)
 
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has added order from: '+utcFrom+' to '+utcTo, type='Add', createdBy=current_user.id)
+                           ' has added order from: '+datetimefilter(utcFrom)+' to '+datetimefilter(utcTo), type='Add', createdBy=current_user.id)
     try:
         db.session.add(Activity)
         db.session.add(Order)
@@ -2351,7 +2372,7 @@ def add_order():
 def remove_order(id):
     Order = tblOrder.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has removed order from: '+Order.orderOn+' to '+Order.orderTo, type='Deleted', createdBy=current_user.id)
+                           ' has removed order from: '+datetimefilter(Order.orderOn)+' to '+datetimefilter(Order.orderTo), type='Deleted', createdBy=current_user.id)
     try:
         db.session.add(Activity)
         db.session.delete(Order)
@@ -2434,7 +2455,7 @@ def checkin(order_id):
         CheckIn = tblCheckin(id=id, createdBy=current_user.id,
                              orderId=order_id, paymentId=pid)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                               ' has checked in order from: '+Order.orderOn+' to '+Order.orderTo, type='Check In', createdBy=current_user.id)
+                               ' has checked in order from: '+datetimefilter(Order.orderOn)+' to '+datetimefilter(Order.orderTo), type='Check In', createdBy=current_user.id)
         
         try:
             db.session.add(Activity)
@@ -2450,108 +2471,120 @@ def checkin(order_id):
 
 @route.route('/order/transaction/<product_id>', methods=['POST'])
 def order_transaction(product_id):
-    product = tblProduct.query.get(product_id)
-    data = json.loads(request.form['data'])
-    description = product.product
-    oid = request.form['id']
-
     resultObj = {
         'data': {},
         'result': ''
     }
 
-    Order = tblOrder.query.get(oid)
+    try:
+        product = tblProduct.query.get(product_id)
+        data = json.loads(request.form['data'])
+        description = product.product
+        oid = request.form['id']
 
-    if Order.checkin:
-        if data['colorId'] == '':
-            data['colorId'] = None
+        Order = tblOrder.query.get(oid)
 
-        if data['discount'] == '':
-            data['discount'] = 0
-
-        discount = Decimal(data['discount'])
-        price = Decimal(data['price'])
-        quantity = Decimal(data['quantity'])
-
-        amount = price * (1 - discount / 100)
-        pprice = price * (1 - discount / 100)
-
-        for v in data['values']:
-            value = tblValue.query.get(v['valueId'])
-            pprice -= value.price
-            description += '-'+value.value
-
-        tid = str(uuid4())
-        transaction = tblTransaction(id=tid, discount=discount, price=pprice,
-                                    amount=amount, description=description, createdBy=current_user.id, product=product_id)
-        db.session.add(transaction)
-
-        Order.checkin.orderPayment.transactions.append(transaction)
-
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                            ' has added transaction: '+description, type='Add', createdBy=current_user.id)
-        db.session.add(Activity)
-
-        if product.isStock:
-            if len(product.stocks) > 0:
-                total_stocks = 0
-                sum_stocks = 0
-                for stock in product.stocks:
-                    if stock.color == data['colorId']:
-                        sum_stocks += stock.quantity
-                    elif stock.color == '':
-                        sum_stocks += stock.quantity
-                    total_stocks += stock.quantity
-                available = sum_stocks - quantity
-                if available >= 0:
-                    sum_quantity = quantity
-                    for stock in product.stocks:
-                        if sum_quantity > 0 and stock.quantity > 0:
-                            qid = str(uuid4())
-                            if stock.color == data['colorId'] or stock.color == '':
-                                if stock.quantity < sum_quantity:
-                                    stock_quantity = stock.quantity
-                                    stock.quantity = 0
-                                    Quantity = tblQuantity(
-                                        id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
-                                    db.session.add(Quantity)
-                                    transaction.quantity += stock_quantity
-                                    sum_quantity -= stock_quantity
-                                else:
-                                    Quantity = tblQuantity(
-                                        id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
-                                    db.session.add(Quantity)
-                                    transaction.quantity += sum_quantity
-                                    stock.quantity -= sum_quantity
-                                    sum_quantity = 0
-                    amount *= quantity
-                    transaction.amount = amount
-                    total_stocks -= quantity
-                    db.session.commit()
-                    resultObj['result'] = 'success'
-                    resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
-                                        'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
-                else:
-                    resultObj['result'] = 'failed'
-                    resultObj['data'] = {
-                        'message': 'The selected product has only '+str(sum_stocks)+' left'}
-            else:
+        if Order.checkin:
+            if Order.checkin.orderPayment.isComplete:
                 resultObj['result'] = 'failed'
                 resultObj['data'] = {
-                    'message': 'The selected product is not available'}
+                    'message': 'Order has paid already!'}
+                return jsonify(resultObj)
+            else:
+                if data['colorId'] == '':
+                    data['colorId'] = None
+
+                if data['discount'] == '':
+                    data['discount'] = 0
+
+                discount = Decimal(data['discount'])
+                price = Decimal(data['price'])
+                quantity = Decimal(data['quantity'])
+
+                amount = price * (1 - discount / 100)
+                pprice = price * (1 - discount / 100)
+
+                for v in data['values']:
+                    value = tblValue.query.get(v['valueId'])
+                    pprice -= value.price
+                    description += '-'+value.value
+
+                tid = str(uuid4())
+                transaction = tblTransaction(id=tid, discount=discount, price=pprice,
+                                            amount=amount, description=description, createdBy=current_user.id, product=product_id)
+                db.session.add(transaction)
+
+                Order.checkin.orderPayment.transactions.append(transaction)
+
+                Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                    ' has added transaction: '+description, type='Add', createdBy=current_user.id)
+                db.session.add(Activity)
+
+                if product.isStock:
+                    if len(product.stocks) > 0:
+                        total_stocks = 0
+                        sum_stocks = 0
+                        for stock in product.stocks:
+                            if stock.color == data['colorId']:
+                                sum_stocks += stock.quantity
+                            elif stock.color == '':
+                                sum_stocks += stock.quantity
+                            total_stocks += stock.quantity
+                        available = sum_stocks - quantity
+                        if available >= 0:
+                            sum_quantity = quantity
+                            for stock in product.stocks:
+                                if sum_quantity > 0 and stock.quantity > 0:
+                                    qid = str(uuid4())
+                                    if stock.color == data['colorId'] or stock.color == '':
+                                        if stock.quantity < sum_quantity:
+                                            stock_quantity = stock.quantity
+                                            stock.quantity = 0
+                                            Quantity = tblQuantity(
+                                                id=qid, stock=stock_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                            db.session.add(Quantity)
+                                            transaction.quantity += stock_quantity
+                                            sum_quantity -= stock_quantity
+                                        else:
+                                            Quantity = tblQuantity(
+                                                id=qid, stock=sum_quantity, quantity=sum_quantity, stockId=stock.id, transactionId=tid)
+                                            db.session.add(Quantity)
+                                            transaction.quantity += sum_quantity
+                                            stock.quantity -= sum_quantity
+                                            sum_quantity = 0
+                            amount *= quantity
+                            transaction.amount = amount
+                            total_stocks -= quantity
+                            db.session.commit()
+                            resultObj['result'] = 'success'
+                            resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
+                                                'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
+                        else:
+                            resultObj['result'] = 'failed'
+                            resultObj['data'] = {
+                                'message': 'The selected product has only '+str(sum_stocks)+' left'}
+                    else:
+                        resultObj['result'] = 'failed'
+                        resultObj['data'] = {
+                            'message': 'The selected product is not available'}
+                else:
+                    transaction.quantity = quantity
+                    amount *= quantity
+                    transaction.amount = amount
+                    db.session.commit()
+                    resultObj['result'] = 'success'
+                    resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity,
+                                        'price': price, 'isStock': False, 'discount': discount}
+                return jsonify(resultObj)
         else:
-            transaction.quantity = quantity
-            amount *= quantity
-            transaction.amount = amount
-            db.session.commit()
-            resultObj['result'] = 'success'
-            resultObj['data'] = {'id': tid, 'amount': amount, 'quantity': quantity,
-                                'price': price, 'isStock': False, 'discount': discount}
-        return jsonify(resultObj)
-    else:
+            resultObj['result'] = 'failed'
+            resultObj['data'] = {
+                'message': 'Please check in before you select the order'}
+            return jsonify(resultObj)
+    except:
         resultObj['result'] = 'failed'
         resultObj['data'] = {
-            'message': 'Please check in before you select the order'}
+            'message': 'Something went wrong! Please reload and try again.'}
         return jsonify(resultObj)
 
 
@@ -2559,12 +2592,10 @@ def order_transaction(product_id):
 def get_payment(id):
     Drawer = tblDrawer.query.get(current_user.drawer)
     Payment = tblPayment.query.get(id)
-    transactions = json.loads(request.form['data'])
 
-    if transactions:
+    if Payment.transactions:
         total = 0
-        for transaction in transactions:
-            Transaction = tblTransaction.query.get(transaction)
+        for Transaction in Payment.transactions:
             quantity = Transaction.quantity
             if Transaction.quantities:
                 quantity = 0
@@ -2585,44 +2616,59 @@ def get_payment(id):
 @route.route('/checkout/order/<order_id>', methods=['POST'])
 def checkout_order(order_id):
     Order = tblOrder.query.get(order_id)
-    minute = int(request.form['duration'])
-    totalPrice = (float(Order.order.price) * minute) / 60
 
-    if minute / 60 > 1:
-        quantity = str(int(minute / 60)) + 'h ' + str(round(minute % 60, 2)) + 'min'
+    isCompleted = False
+
+    if Order.checkout:
+        isCompleted = True
+    
+    if not isCompleted:
+        minute = int(request.form['duration'])
+        totalPrice = (float(Order.order.price) * minute) / 60
+
+        if minute / 60 > 1:
+            quantity = str(int(minute / 60)) + 'h ' + str(round(minute % 60, 2)) + 'min'
+        else:
+            quantity = str(round(minute, 0)) + 'min'
+
+        description = Order.order.room  + ', ' + quantity
+
+        cid = str(uuid4())
+        CheckOut = tblCheckout(id=cid, totalHour=minute, createdBy=current_user.id, orderId=order_id)
+        
+        
+        tid = str(uuid4())
+
+        transaction = tblTransaction(id=tid, price=Order.order.price, quantity=1, discount=0, isEditable=False,
+                                    amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
+        json = {
+            'id': tid,
+            'cost': totalPrice,
+            'discount': '',
+            'quantity': 1,
+            'amount': totalPrice,
+            'description': description
+        }
+
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                ' has checked out order from: '+datetimefilter(Order.orderOn)+' to '+datetimefilter(Order.orderTo), type='Check Out', createdBy=current_user.id)
+        try:
+            db.session.add(Activity)
+            db.session.add(CheckOut)
+            db.session.add(transaction)
+            Order.checkin.orderPayment.transactions.append(transaction)
+            db.session.commit()
+            return jsonify({'msg': 'Success', 'paymentId': Order.checkin.orderPayment.id, 'transaction': json})
+        except:
+            return jsonify({'msg': 'Failed to check out! Please check your connection and try again.'})
     else:
-        quantity = str(round(minute, 0)) + 'min'
+        return jsonify({'msg': 'Order has already checked out!'})
 
-    description = Order.order.room  + ', ' + quantity
-
-    cid = str(uuid4())
-    CheckOut = tblCheckout(id=cid, totalHour=minute, createdBy=current_user.id, orderId=order_id)
-    
-    
-    tid = str(uuid4())
-
-    transaction = tblTransaction(id=tid, price=Order.order.price, quantity=1, discount=0, isEditable=False,
-                                 amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
-    json = {
-        'id': tid,
-        'cost': totalPrice,
-        'discount': '',
-        'quantity': 1,
-        'amount': totalPrice,
-        'description': description
-    }
-
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                               ' has checked out order from: '+Order.orderOn+' to '+Order.orderTo, type='Check Out', createdBy=current_user.id)
-    try:
-        db.session.add(Activity)
-        db.session.add(CheckOut)
-        db.session.add(transaction)
-        Order.checkin.orderPayment.transactions.append(transaction)
-        db.session.commit()
-        return jsonify({'msg': 'Success', 'paymentId': Order.checkin.orderPayment.id, 'transaction': json})
-    except:
-        return jsonify({'msg': 'Failed to check out! Please check your connection and try again.'})
+@route.route('/invoice/<id>')
+def print_invoice(id):
+    Payment = tblPayment.query.get(id)
+    Store = tblStore.query.first()
+    return render_template('views/invoice.html', payment=Payment, store=Store)
 
 
    

@@ -197,9 +197,7 @@
         left: 0;
     }
 
-    .check-in,
-    .check-out,
-    .order-btn {
+    .btn-transaction {
         border-radius: 20px;
         margin-left: 10px;
         padding: 5px 10px 5px 5px;
@@ -626,7 +624,7 @@
                 <div class="item-wrapper">
                     <div class="item-img">
                         <img src="/static/uploads/{{product.photo}}">
-                        <button class="product-btn color-text" title="Add product to list">
+                        <button class="product-btn color-text" title="Add product to order list" data-complete="{% if Order.checkin %}{{ Order.checkin.orderPayment.isComplete }}{% else %}False{% endif %}">
                             <ion-icon name="add-circle-outline"></ion-icon>
                         </button>
                         {% if product.discount != '' %}
@@ -684,7 +682,7 @@
                 <div class="item-wrapper">
                     <div class="item-img">
                         <img src="/static/uploads/{{product.photo}}">
-                        <button class="product-btn color-text" title="Add product to list">
+                        <button class="product-btn color-text" title="Add product to order list" data-complete="{% if Order.checkin %}{{ Order.checkin.orderPayment.isComplete }}{% else %}False{% endif %}">
                             <ion-icon name="add-circle-outline"></ion-icon>
                         </button>
                         {% if product.discount != '' %}
@@ -801,13 +799,23 @@
             <div class="order-wrapper flex-between-center">
                 {% if Order.checkin %}
                     {% if Order.checkout %}
-                    <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}" data-check='true'>
-                        <span class="mr-2 order-icon">
-                            <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
-                            <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
-                        </span>
-                        <span>Place Order</span>
-                    </button>
+                        {% if Order.checkin.orderPayment.isComplete %}
+                            <button class="btn color-text btn-success btn-transaction" id="{{ Order.checkin.orderPayment.id }}">
+                                <span class="mr-2 order-icon">
+                                    <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
+                                    <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
+                                </span>
+                                <span>Paid</span>
+                            </button>
+                        {% else %}
+                            <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}" data-check='true'>
+                                <span class="mr-2 order-icon">
+                                    <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
+                                    <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
+                                </span>
+                                <span>Place Order</span>
+                            </button>
+                        {% endif %}
                     {% else %}
                     <button class="btn color-text check-out btn-danger btn-transaction" data-id="{{ Order.id }}"
                         data-change="true" data-payment="{{ Order.checkin.paymentId }}">
@@ -825,13 +833,13 @@
                     </button>
                     {% endif %}
                 {% else %}
-                <button class="btn color-text check-in btn-success btn-transaction" data-id="{{ Order.id }}"
-                    data-change="true" data-payment="{{ Order.checkin.paymentId }}">
-                    <span class="mr-2 order-icon" style="color: var(--color-text);">
-                        0
-                    </span>
-                    <span class="check-in-out">Check In</span>
-                </button>
+                    <button class="btn color-text check-in btn-success btn-transaction" data-id="{{ Order.id }}"
+                        data-change="true" data-payment="{{ Order.checkin.paymentId }}">
+                        <span class="mr-2 order-icon" style="color: var(--color-text);">
+                            0
+                        </span>
+                        <span class="check-in-out">Check In</span>
+                    </button>
                 {% endif %}
                 <div class="arrow arrow-left animate-left-to-right">
                     <div class="flex-between-center">
@@ -1057,7 +1065,6 @@
                 url: '/checkin/order/' + id,
                 type: 'POST',
                 success: function (data) {
-                    console.log(data)
                     if (data.msg == 'Success') {
                         window.location.reload()
                         // _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
@@ -1079,7 +1086,6 @@
                 type: 'POST',
                 data: {duration: duration},
                 success: function (data) {
-                    console.log(data)
                     if (data.msg == 'Success') {
                         $('.btn-transaction').removeClass('check-out btn-danger').addClass('order-btn  btn-primary').attr({'id': data.paymentId, 'data-check': false})
                         .html(`<span class="mr-2 order-icon">
@@ -1095,8 +1101,10 @@
                 }
             })
         } else {
-            $('.order-icon').click()
-            alert('Confirm duration first!')
+            $("[data-toggle='dropup']").click(function(e) {
+                $(this).parents(".dropup").toggleClass("open")
+                e.stopPropagation()
+            })
         }
     })
 
@@ -1111,8 +1119,6 @@
         price = $('#input-price').val()
         discount = $('#input-discount').val()
         quantity = $('#input-quantity').val()
-
-        console.log(details, price, discount, quantity)
 
         if (quantity < 0 || quantity == 0) {
             $('#input-quantity').focus()
@@ -1446,37 +1452,33 @@
     })
 
     $('.product-btn').on('click', function () {
-        var id = $(this).closest('.product-item').attr('id')
-        $('#productProperty').modal('show')
-        $.ajax({
-            url: '/product/' + id,
-            type: 'POST',
-            success: function (data) {
-                var photo = '/static/uploads/' + data.photo
-                data.values.sort(dynamicSort('price'))
-                $('#productProperty').find('.modal-content').html(productConfiguration({
-                    image: photo,
-                    colors: data.colors,
-                    product: data.product,
-                    category: data.category.category,
-                    description: data.description,
-                    currency: data.currency,
-                    price: data.price,
-                    properties: data.category.properties,
-                    values: data.values,
-                    id: data.id,
-                    stocks: data.stocks
-                }))
-
-                // var labels = document.querySelectorAll('.input-radio')
-                // Array.from(labels).forEach(t => {
-                //     if(!$(t).is(':checked')) {
-                //         console.log($(t).prev().find('ion-icon').css('color', 'red'))
-                //     }
-                // })
-
-            }
-        })
+        if ($(this).attr('data-complete') == 'False') {
+            var id = $(this).closest('.product-item').attr('id')
+            $('#productProperty').modal('show')
+            $.ajax({
+                url: '/product/' + id,
+                type: 'POST',
+                success: function (data) {
+                    var photo = '/static/uploads/' + data.photo
+                    data.values.sort(dynamicSort('price'))
+                    $('#productProperty').find('.modal-content').html(productConfiguration({
+                        image: photo,
+                        colors: data.colors,
+                        product: data.product,
+                        category: data.category.category,
+                        description: data.description,
+                        currency: data.currency,
+                        price: data.price,
+                        properties: data.category.properties,
+                        values: data.values,
+                        id: data.id,
+                        stocks: data.stocks
+                    }))
+                }
+            })
+        } else {
+            alert('Order has already checked out!')
+        }
     })
 
     $(document).on('click', '.save-btn', function () {
@@ -1706,7 +1708,6 @@
     })
 
     function showOrder(id, description, price, discount, quantity, amount, oid, pid) {
-        console.log(price, amount)
         removeBtn = ''
         if (oid != '') {
             removeBtn = `<td class="remove-btn">

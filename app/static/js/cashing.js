@@ -102,7 +102,6 @@ $(document).on('click', '.order-btn', function() {
                             data: json
                         },
                         success: function(data) {
-                            console.log(data)
                             $('.order-btn').attr('data-change', false)
                             var time = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toLocaleTimeString()
                             var date = new Date(convertUTCDateToLocalDate(new Date(data.data.createdOn))).toDateString()
@@ -334,7 +333,7 @@ $(document).on('click', '.checkout-btn', function() {
 
                 
 
-                element += '</div></div><div class="invoice-btn"><button class="color-text close-payment">Continue</button><button class="color-font print-inv"><ion-icon name="print-outline"></ion-icon></button></div>'
+                element += '</div></div><div class="invoice-btn"><button class="color-text close-payment">Continue</button><a href="/invoice/'+payment+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
                 $('.payment-total').html(element)
 
                 // Bind click when checked out
@@ -367,10 +366,4 @@ $(document).on('click', '.close-payment', function() {
     $('.sum-order').text(0)
 })
 
-$(document).on('click', '.print-inv', function() {
-    $('.payment-invoice').printThis({
-        loadCSS: '/static/css/print.css',
-        canvas: true
-    })
-})
 

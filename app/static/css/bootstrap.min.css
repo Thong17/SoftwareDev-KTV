@@ -11388,7 +11388,7 @@ a.text-dark:hover {
 
     .table td,
     .table th {
-        background-color: #fff !important
+        background-color: rgba(0, 0, 0, 0.3) !important
     }
 
     .table-bordered td,

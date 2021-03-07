@@ -792,6 +792,10 @@ textarea:valid + label {
   cursor: pointer;
 }
 
+.side-menu.current a {
+  color: #2196F3;
+}
+
 .side-menu span {
   display: inline;
   opacity: 0;
@@ -1493,9 +1497,9 @@ table tbody tr {
 }
 
 .flex-between-center {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
+  display: -webkit-box !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -1505,12 +1509,24 @@ table tbody tr {
 }
 
 .flex-between-start {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
+  display: -webkit-box !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.flex-between-start-start {
+  display: -webkit-box !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
@@ -2959,7 +2975,7 @@ button.form-empty:hover {
 
 .invoice-footer {
   height: 30px;
-  font-size: 11px;
+  font-size: 13px !important;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -2969,6 +2985,14 @@ button.form-empty:hover {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+}
+
+.invoice-header {
+  font-size: 18px !important;
+}
+
+.invoice-text {
+  font-size: 13px !important;
 }
 
 .invoice-btn {

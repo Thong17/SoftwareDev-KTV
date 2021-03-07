@@ -760,27 +760,27 @@
                         </div>
                         <div class="invoice-body">
                             <div class="shop-details flex-column-start-center mb-1">
-                                <p class="color-text">Contact: {{ current_user.profile[0].phone }}</p>
-                                <p class="color-text notranslate">ABA: 077 777 377 (CHHAN Bunthong)</p>
+                                <p class="color-text invoice-text">Contact: {{ current_user.profile[0].phone }}</p>
+                                <p class="color-text notranslate invoice-text">ABA: 077 777 377 (CHHAN Bunthong)</p>
                             </div>
                             <div class="flex-between-center pb-1">
-                                <p class="color-text">Date: <span id="invoiceDate" class="notranslate"></span></p>
-                                <p class="color-text notranslate"><span id="invoiceTime"></span></p>
+                                <p class="color-text invoice-text">Date: <span id="invoiceDate" class="notranslate"></span></p>
+                                <p class="color-text notranslate invoice-text"><span id="invoiceTime"></span></p>
                             </div>
                             <div class="flex-between-center border-dashed py-1">
-                                <p class="color-text">Invoice: <span class="notranslate" id="invoiceNo"></span></p>
-                                <p class="color-text">Cashier: <span
-                                        class="notranslate">{{ current_user.username }}</span></p>
+                                <p class="color-text invoice-text">Invoice: <span class="notranslate" id="invoiceNo"></span></p>
+                                <p class="color-text invoice-text">Cashier: <span
+                                        class="notranslate invoice-text">{{ current_user.username }}</span></p>
                             </div>
                             <div class="item-payment">
                                 <table class="table invoice-table">
                                     <thead>
                                         <tr class="color-font">
-                                            <td style="width: 40%;" class="notranslate">Item Name</td>
-                                            <td style="width: 15%; text-align:center;">Price</td>
-                                            <td style="width: 10%; text-align:center;" class="notranslate">Disc</td>
-                                            <td style="width: 15%; text-align:center;" class="notranslate">Qty</td>
-                                            <td style="width: 20%; text-align:center;">Total</td>
+                                            <td style="width: 40%;" class="notranslate invoice-text">Item Name</td>
+                                            <td style="width: 15%; text-align:center;" class="invoice-text">Price</td>
+                                            <td style="width: 10%; text-align:center;" class="notranslate invoice-text">Disc</td>
+                                            <td style="width: 15%; text-align:center;" class="notranslate invoice-text">Qty</td>
+                                            <td style="width: 20%; text-align:center;" class="invoice-text">Total</td>
                                         </tr>
                                     </thead>
                                     <tbody id="item-invoice" class="color-text notranslate"></tbody>
@@ -789,23 +789,23 @@
                         </div>
                         <div class="invoice-total border-dashed">
                             <div class="flex-between-start" style="width: 100%;">
-                                <p class="color-text" style="width: 50%;">Total</p>
+                                <p class="color-text invoice-text" style="width: 50%;">Total</p>
                                 <div class="flex-between-center notranslate" style="width: 50%;">
-                                    <p class="color-text">USD:</p>
-                                    <p class="color-text" id="totalUSD"><span>&#36;</span></p>
+                                    <p class="color-text invoice-text">USD:</p>
+                                    <p class="color-text invoice-text" id="totalUSD"><span>&#36;</span></p>
                                 </div>
                             </div>
                             <div class="flex-between-center notranslate">
-                                <p class="color-text">KHR:</p>
-                                <p class="color-text" id="totalKHR"><span>&#6107;</span></p>
+                                <p class="color-text invoice-text">KHR:</p>
+                                <p class="color-text invoice-text" id="totalKHR"><span>&#6107;</span></p>
                             </div>
                             <div class="flex-between-center border-dashed my-1 pt-1 notranslate">
-                                <p class="color-text">Cash:</p>
-                                <p class="color-text" id="totalCash">...</p>
+                                <p class="color-text invoice-text">Cash:</p>
+                                <p class="color-text invoice-text" id="totalCash">...</p>
                             </div>
                             <div class="flex-between-center notranslate">
-                                <p class="color-text">Return:</p>
-                                <p class="color-text" id="totalChange">...</p>
+                                <p class="color-text invoice-text">Return:</p>
+                                <p class="color-text invoice-text" id="totalChange">...</p>
                             </div>
                         </div>
                         <div class="invoice-footer">
@@ -1187,14 +1187,6 @@
                     id: data.id,
                     stocks: data.stocks
                 }))
-
-                // var labels = document.querySelectorAll('.input-radio')
-                // Array.from(labels).forEach(t => {
-                //     if(!$(t).is(':checked')) {
-                //         console.log($(t).prev().find('ion-icon').css('color', 'red'))
-                //     }
-                // })
-
             }
         })
     })
