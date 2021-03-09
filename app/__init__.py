@@ -2,6 +2,7 @@ import os
 from app.config import Config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_alchemydumps import AlchemyDumps
 from sqlalchemy.types import PickleType
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
@@ -31,6 +32,8 @@ def datetimefilter(value, format="%I:%M %p"):
 
 db = SQLAlchemy()
 
+alchemydumps = AlchemyDumps()
+
 bcrypt = Bcrypt()
 
 ma = Marshmallow()
@@ -46,6 +49,7 @@ def create_app(config_class=Config):
     app.jinja_env.filters['datetimefilter'] = datetimefilter
 
     db.init_app(app)
+    alchemydumps.init_app(app, db)
 
     with app.app_context():
         db.create_all()
@@ -56,6 +60,20 @@ def create_app(config_class=Config):
             db.session.add(store)
             floor = tblFloor(id=str(uuid4()), floor='Ground Floor', storeId=id)
             db.session.add(floor)
+
+            uid = str(uuid4())
+            hashed_password = bcrypt.generate_password_hash('admin123').decode('utf-8')
+
+            User = tblUser(id=uid, username='Admin', password=hashed_password, isAdmin=True, isConfirm=True, publicId=str(uuid4()))
+            db.session.add(User)
+    
+            Profile = tblProfile(id=str(uuid4()), createdBy=uid)
+            db.session.add(Profile)
+
+            Role = tblRole(id=str(uuid4()), role='Administration', description='Admin, Cashier, Stock, Editor, Report', isDefault=True, createdBy=uid)
+            db.session.add(Role)
+            
+            User.roles.append(Role)
             db.session.commit()
 
     bcrypt.init_app(app)
@@ -237,12 +255,12 @@ class tblPayment(db.Model):
 
 class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
-    firstname = db.Column(db.String(20), nullable=False)
-    lastname = db.Column(db.String(20), nullable=False)
+    firstname = db.Column(db.String(20), nullable=True, default='')
+    lastname = db.Column(db.String(20), nullable=True, default='')
     username = db.Column(db.String(20), nullable=False, unique=True)
-    gender = db.Column(db.String(1), nullable=False)
+    gender = db.Column(db.String(1), nullable=True, default='')
     birthdate = db.Column(db.Date, nullable=True)
-    email = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=True, default='')
     password = db.Column(db.String(60), nullable=False)
     theme = db.Column(db.String(20), nullable=True, default='light')
     language = db.Column(db.String(20), nullable=True, default='english')
@@ -250,6 +268,7 @@ class tblUser(db.Model, UserMixin):
     token = db.Column(db.String(36), nullable=True, default='')
     drawer = db.Column(db.String(36), nullable=True, default='')
     isConfirm = db.Column(db.Boolean, default=False)
+    isAdmin = db.Column(db.Boolean, default=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     profile = db.relationship('tblProfile', backref='profile', lazy=True)
     sale = db.relationship('tblTransaction', backref='sale', lazy=True)
@@ -259,6 +278,7 @@ class tblRole(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     role = db.Column(db.String(20), nullable=False, unique=True)
     description = db.Column(db.Text(), nullable=True, default='')
+    isDefault = db.Column(db.Boolean, default=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     roles = db.relationship('tblUser', secondary=user_role, backref='roles', lazy='dynamic')

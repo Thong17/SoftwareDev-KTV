@@ -122,7 +122,7 @@
                     <img src="/static/uploads/{{current_user.profile[0].photo}}" alt="">
                 </div>
                 <div class="user-username">
-                    <p class="color-text">{{current_user.username}}</p>
+                    <p class="color-text notranslate">{{current_user.username}}</p>
                 </div>
             </div>
             {% if users %}
@@ -133,7 +133,7 @@
                     <img src="/static/uploads/{{user.profile[0].photo}}" alt="">
                 </div>
                 <div class="user-username">
-                    <p class="color-text">{{user.username}}</p>
+                    <p class="color-text notranslate">{{user.username}}</p>
                 </div>
             </div>
             {% endif %}
@@ -282,12 +282,12 @@
 
         $('.list-users').on('click', '.user-btn', function() {
             userForm('', '', '', '', '', '', '', '', '', '', '', '', '')
-            $('.username').focus()
+            $('#username').focus()
         })
 
         $('.btn-container').on('click', '#create-user', function() {
             event.preventDefault()
-            validations = [$('#username'), $('#fullname'), $('#email'), $('#password')]
+            validations = [$('#username'), $('#password')]
             invalid = []
             Array.from(validations).reverse().forEach(v => {
                 if (v.val() == '') {
@@ -340,7 +340,7 @@
         $('.btn-container').on('click', '#save-user', function() {
             id = $('.btn-container').attr('id')
             event.preventDefault()
-            validations = [$('#username'), $('#fullname'), $('#email')]
+            validations = [$('#username')]
             invalid = []
             Array.from(validations).reverse().forEach(v => {
                 if (v.val() == '') {

@@ -21,6 +21,18 @@
         </select>
     </div> -->
     <br>
+    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Backup</h5>
+    <p class="paragraph ml-4 mt-2">Back up your data to prevent data lose</p>
+    <div class="select-list">
+        <button class="btn border" id="backup-data"><ion-icon class="mr-1" name="download-outline"></ion-icon>Back Up</button>
+    </div>
+    <br>
+    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Restore</h5>
+    <p class="paragraph ml-4 mt-2">Back up your data to prevent data lose</p>
+    <div class="select-list">
+        <button class="btn border"><ion-icon class="mr-1" name="download-outline"></ion-icon>Restore</button>
+    </div>
+    <br>
     <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Language</h5>
     <p class="paragraph ml-4 mt-2">Choose your language</p>
     <div class="select-list">
@@ -33,6 +45,16 @@
     <script>
         $(document).ready(function() {
             $('.goog-te-combo').addClass('input-color')
+
+            $('#backup-data').on('click', function() {
+                $.ajax({
+                    url: '/backup',
+                    type: 'POST',
+                    success: function(data) {
+                        alert(data.msg)
+                    }
+                })
+            })
         })
     </script>
 {% endblock %}

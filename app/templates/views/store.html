@@ -85,7 +85,7 @@
     <div class="row-wrapper">
         <div class="column-wrapper">
             <div class="item-container">
-                <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Customize Store</h5>
+                <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Modify Store</h5>
                 <div class="form-group">
                     <input type="text" name="store" id="store" class="form-control input-color" autocomplete="off" value="{{ store.store }}">
                     <label for="store" class="label">Store</label>
@@ -151,7 +151,7 @@
                     </div>
                     <div class="col-md-4 selector pl-0">
                         <div class="form-group">
-                            <select name="hour" id="hour" class="form-control input-color">
+                            <select name="hour" id="hour" class="form-control input-color notranslate">
                                 <option value="1h" selected="seleceted">1h</option>
                             </select>
                             <label for="hour" class="label hour"></label>
@@ -166,7 +166,7 @@
         <div class="border-right"></div>
         <div class="column-wrapper" style="width: 100%;">
             {% for floor in floors %}
-            <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ floor.floor }}</h5>
+            <h5 class="color-font notranslate"><i class="fa fa-caret-right right" aria-hidden="true"></i>{{ floor.floor }}</h5>
             <div class="grid-products" id="grid-{{ floor.id }}">
             {% if floor.rooms %}
             {% for room in floor.rooms %}
@@ -181,9 +181,9 @@
                         <i class="fa fa-lock" aria-hidden="true"></i>
                         {% endif %}
                     </div>
-                    <h5 class="color-font room-no">{{ room.room }}</h5>
+                    <h5 class="color-font room-no notranslate">{{ room.room }}</h5>
                     <div class="color-text room-bottom flex-between-center">
-                        <div class="room-price"><span class="currency-format" id="room-price">{{ room.price }}</span>/ {{ room.hour }}</div>
+                        <div class="room-price notranslate"><span class="currency-format" id="room-price">{{ room.price }}</span>/ {{ room.hour }}</div>
                         {% if room.status == 'Open' %}
                         <div class="room-status text-success">Open</div>
                         {% elif room.status == 'In Process' %}

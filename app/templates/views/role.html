@@ -243,7 +243,7 @@
                             {% for user in users %}
                             {% if user.roles %}
                             <tr class="color-text" id="{{ user.id }}">
-                                <td>{{ user.username }}</td>
+                                <td class="notranslate">{{ user.username }}</td>
                                 <td class="role-td">
                                     <span class="selected-role">{{ user.roles[0].role }}</span>
                                 </td>
@@ -451,10 +451,12 @@
                 url: '/role/remove/' + id,
                 method: 'POST',
                 success: function (data) {
-                    if (data['msg'] == 'Success') {
+                    if (data.msg == 'Success') {
                         $('#' + id).fadeOut('slow', function () {
                             $(this).remove()
                         })
+                    } else {
+                        alert(data.msg)
                     }
                 }
             })

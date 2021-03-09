@@ -678,7 +678,7 @@ textarea:valid+label {
 }
 
 .side-menu.current a {
-    color: #2196F3;
+    color: #0686f0;
 }
 
 .side-menu span {
@@ -862,7 +862,7 @@ main {
     position: relative;
 }
 
-.select-list select, .select-list input {
+.select-list select, .select-list input, .select-list button {
     width: 200px;
     height: 30px;
     color: var(--color-text);
@@ -872,6 +872,12 @@ main {
     font-size: 13px;
     outline: none;
     border-width: 1px;
+    padding: 0 6px;
+}
+
+.select-list button {
+    vertical-align: middle;
+    padding: 0 10px;
 }
 
 .grid-container {

@@ -6,6 +6,8 @@ from flask import render_template, redirect, request, jsonify, Blueprint, url_fo
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
 import json
+import os
+import time
 import simplejson
 import operator
 from datetime import datetime, timedelta, date
@@ -64,8 +66,8 @@ def login():
             password = request.form['password']
             try:
                 user = tblUser.query.filter_by(username=username).first()
-                if user.isConfirm:
-                    while user is not None:
+                while user is not None:
+                    if user.isConfirm:
                         isMatch = bcrypt.check_password_hash(
                             user.password, password)
                         if isMatch is True:
@@ -78,10 +80,10 @@ def login():
                             return jsonify(msg)
                         msg['password'].append('Password does not match')
                         return jsonify(msg)
-                    msg['username'].append('Username does not exist')
-                else:
-                    msg['username'].append(
-                        'User may have been disabled! Contact your admin for more details')
+                    else:
+                        msg['username'].append('User may have been disabled! Contact your admin for more details')
+                        return jsonify(msg)
+                msg['username'].append('Username does not exist')
                 return jsonify(msg)
             except:
                 msg['username'].append('Connection is not available')
@@ -120,7 +122,6 @@ def register():
 
             try:
                 db.session.add(requestedUser)
-                db.session.commit()
                 pid = str(uuid4())
                 profileUser = tblProfile(id=pid, createdBy=id)
                 db.session.add(profileUser)
@@ -251,6 +252,7 @@ def setting():
 
 
 @route.route('/custome', methods=['POST', 'GET'])
+@is_authorized('Editor')
 @login_required
 def custome():
     if request.method == 'POST':
@@ -271,7 +273,7 @@ def custome():
 
 
 @route.route('/category', methods=['POST', 'GET'])
-@is_authorized('Admin')
+@is_authorized('Editor')
 @login_required
 def categories():
     form = CategoryForm()
@@ -429,7 +431,7 @@ def udpate_category(id):
 
 
 @route.route('/brand', methods=['POST', 'GET'])
-@is_authorized('Admin')
+@is_authorized('Editor')
 @login_required
 def brand():
     brands = tblBrand.query.all()
@@ -1019,7 +1021,6 @@ def save_stock(id):
 
 @route.route('/financial', defaults={'arg': None})
 @route.route('/financial/<arg>')
-@is_authorized('Report')
 @login_required
 def financial(arg):
     if arg is not None:
@@ -1390,6 +1391,7 @@ def search_invoice():
 
 @route.route('/report')
 @is_authorized('Report')
+@login_required
 def report():
     return render_template('views/report.html')
 
@@ -1706,7 +1708,7 @@ def financial_report():
 
 
 @route.route('/account')
-@is_authorized('Report')
+@is_authorized('Admin')
 @login_required
 def account():
     users = tblUser.query.all()
@@ -1734,6 +1736,7 @@ def account_report():
 
 @route.route('/sale_report')
 @is_authorized('Report')
+@login_required
 def sale_report():
     return render_template('views/sale_report.html')
 
@@ -1847,6 +1850,7 @@ def contact():
 
 
 @route.route('/activity')
+@is_authorized('Admin')
 @login_required
 def activity():
     Activities = tblActivity.query.order_by(tblActivity.createdOn.desc()).all()
@@ -1918,6 +1922,7 @@ def product_favorite(id):
 
 
 @route.route('/role')
+@is_authorized('Admin')
 @login_required
 def role():
     form = RoleForm()
@@ -1951,7 +1956,7 @@ def add_role():
     msg['id'] = id
     try:
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                               ' has added role: '+role+' in category', type='Add', createdBy=current_user.id)
+                               ' has added role: '+role, type='Add', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.add(Modal)
         db.session.commit()
@@ -1997,37 +2002,42 @@ def update_role(id):
 @route.route('/role/remove/<id>', methods=['POST'])
 @login_required
 def remove_role(id):
-    try:
-        role = tblRole.query.get(id)
-        name = role.role
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                               ' has deleted role: '+role.role+' in role', type='Delete', createdBy=current_user.id)
-        db.session.add(Activity)
-        db.session.delete(role)
-        db.session.commit()
-        flash('You have deleted role '+name, 'success')
-        return jsonify({'msg': 'Success'})
-    except:
-        return jsonify({'msg': 'Role cannot be deleted. Contact our support team for more details'})
+    role = tblRole.query.get(id)
+    if role.isDefault:
+        return jsonify({'msg': 'Default role cannot be deleted!'})
+    else:
+        try:
+            name = role.role
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                ' has deleted role: '+role.role, type='Delete', createdBy=current_user.id)
+            db.session.add(Activity)
+            db.session.delete(role)
+            db.session.commit()
+            return jsonify({'msg': 'Success'})
+        except:
+            return jsonify({'msg': 'Role cannot be deleted. Contact our support team for more details'})
 
 
 @route.route('/role/clear/<id>', methods=['POST'])
 @login_required
 def clear_role(id):
     user = tblUser.query.get(id)
-    user.roles.clear()
-    try:
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                               ' has cleared role from user:' + user.username, type='Delete', createdBy=current_user.id)
-        db.session.add(Activity)
-        db.session.commit()
-        flash('You have removed role for user '+user.username, 'success')
-        return jsonify({'data': 'Success'})
-    except:
-        return jsonify({'data': 'Faild'})
+    if user.isAdmin:
+        return jsonify({'data': 'Cannot remove default role from admin user'})
+    else:
+        user.roles.clear()
+        try:
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                ' has cleared role from user:' + user.username, type='Delete', createdBy=current_user.id)
+            db.session.add(Activity)
+            db.session.commit()
+            return jsonify({'data': 'Success'})
+        except:
+            return jsonify({'data': 'Faild'})
 
 
 @route.route('/admin')
+@is_authorized('Admin')
 @login_required
 def admin():
     users = tblUser.query.all()
@@ -2046,12 +2056,15 @@ def get_admin(id):
 @route.route('/user/disable/<id>', methods=['POST'])
 def disable_user(id):
     user = tblUser.query.get(id)
-    user.isConfirm = not user.isConfirm
-    try:
-        db.session.commit()
-        return jsonify({'data': 'Success'})
-    except:
-        return jsonify({'data': 'Faild'})
+    if user.isAdmin:
+        return jsonify({'data': 'Cannot disable admin user!'})
+    else:
+        user.isConfirm = not user.isConfirm
+        try:
+            db.session.commit()
+            return jsonify({'data': 'Success'})
+        except:
+            return jsonify({'data': 'Faild'})
 
 
 @route.route('/admin/create', methods=['POST'])
@@ -2067,13 +2080,19 @@ def create_admin():
     status = request.form['status']
     password = request.form['password']
     role = request.form['role']
+    firstname = ''
+    lastname = ''
+    if fullname != '':
+        fullname = fullname.split(' ')
+        firstname = fullname[0]
+        if len(fullname) > 1:
+            lastname = fullname[1]
     if request.form['birthdate'] != '':
         birthdate = datetime.strptime(request.form['birthdate'], '%m/%d/%y')
     else:
         birthdate = None
     user_id = str(uuid4())
-    User = tblUser(id=user_id, username=username, firstname=fullname.split(' ')[0], lastname=fullname.split(' ')[
-                   1], gender=gender, email=email, birthdate=birthdate, password=bcrypt.generate_password_hash(password).decode('utf-8'), publicId=str(uuid4()))
+    User = tblUser(id=user_id, username=username, firstname=firstname, lastname=lastname, gender=gender, email=email, birthdate=birthdate, password=bcrypt.generate_password_hash(password).decode('utf-8'), publicId=str(uuid4()))
     try:
         db.session.add(User)
         db.session.commit()
@@ -2096,8 +2115,15 @@ def create_admin():
 def change_admin(id):
     user = tblUser.query.get(id)
     user.username = request.form['username']
-    user.firstname = request.form['fullname'].split(' ')[0]
-    user.lastname = request.form['fullname'].split(' ')[1]
+    firstname = ''
+    lastname = ''
+    if request.form['fullname'] != '':
+        fullname = request.form['fullname'].split(' ')
+        firstname = fullname[0]
+        if len(fullname) > 1:
+            lastname = fullname[1]
+    user.firstname = firstname
+    user.lastname = lastname
     user.gender = request.form['gender']
     if request.form['birthdate'] != '':
         user.birthdate = datetime.strptime(
@@ -2129,7 +2155,7 @@ def change_admin(id):
 
 
 @route.route('/expense', methods=['POST', 'GET'])
-@is_authorized('Admin')
+@is_authorized('Stock')
 @login_required
 def expense():
     form = ExpenseForm()
@@ -2180,6 +2206,8 @@ def save_expense(id):
 
 
 @route.route('/store')
+@is_authorized('Editor')
+@login_required
 def store():
     floorForm = FloorForm()
     storeForm = StoreForm()
@@ -2313,6 +2341,8 @@ def add_customer():
 
 
 @route.route('/order', methods=['POST', 'GET'])
+@is_authorized('Cashier')
+@login_required
 def order():
     floors = tblFloor.query.order_by(tblFloor.createdOn).all()
     customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
@@ -2669,6 +2699,16 @@ def print_invoice(id):
     Payment = tblPayment.query.get(id)
     Store = tblStore.query.first()
     return render_template('views/invoice.html', payment=Payment, store=Store)
+
+@route.route('/backup', methods=['POST'])
+def backup():
+    try:
+        strtime = time.strftime('%Y-%m-%d-%H:%M:%S')
+        cmd = 'mysqldump -uroot -pmyroot restaurant > backup/backup_'+strtime+'.sql'
+        os.system(cmd)
+        return jsonify({'msg': 'Backup complete successfully'})
+    except: 
+        return jsonify({'msg': 'Failed to backup!'})
 
 
    
