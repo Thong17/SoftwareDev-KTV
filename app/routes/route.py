@@ -11,7 +11,7 @@ import time
 import simplejson
 import operator
 from datetime import datetime, timedelta, date
-from sqlalchemy import func
+from sqlalchemy import func, Date, cast
 from decimal import Decimal
 from functools import wraps
 
@@ -252,7 +252,6 @@ def setting():
 
 
 @route.route('/custome', methods=['POST', 'GET'])
-@is_authorized('Editor')
 @login_required
 def custome():
     if request.method == 'POST':
@@ -264,9 +263,60 @@ def custome():
         brand_schema = BrandSchema()
         brand = brand_schema.dump(brands, many=True)
 
+        floors = tblFloor.query.all()
+        floor_schema = FloorSchema()
+        floor = floor_schema.dump(floors, many=True)
+
+        advertises = tblAdvertise.query.all()
+
+        users = tblUser.query.all()
+
+        roles = tblRole.query.all()
+
+        roleArr = []
+        if roles:
+            for role in roles:
+                roleObj = {
+                    'label': role.role,
+                    'data': len(role.description.split(', '))
+                }
+                roleArr.append(roleObj)
+
+        userObj = {
+            'Confirm': 0,
+            'Pending': 0,
+            'Admin': 0,
+        }
+
+        advertiseObj = {
+            'Main': 0,
+            'Side': 0,
+        }
+
+        if users:
+            for user in users:
+                if user.isConfirm:
+                    if user.isAdmin:
+                        userObj['Admin'] += 1
+                    else:
+                        userObj['Confirm'] += 1
+                else:
+                    userObj['Pending'] += 1
+
+        if advertises:
+            for advertise in advertises:
+                if advertise.main:
+                    advertiseObj['Main'] += 1
+                else:
+                    advertiseObj['Side'] += 1
+
         result = {}
         result['categories'] = category
         result['brands'] = brand
+        result['floors'] = floor
+        result['advertises'] = advertiseObj
+        result['users'] = userObj
+        result['roles'] = roleArr
 
         return jsonify(result)
     return render_template('views/custome.html')
@@ -1390,9 +1440,11 @@ def search_invoice():
 
 
 @route.route('/report')
-@is_authorized('Report')
 @login_required
 def report():
+    outcome = tblOutcome.query.filter(cast(tblOutcome.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
+    income = tblTransaction.query.filter(cast(tblTransaction.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
+    
     return render_template('views/report.html')
 
 
@@ -1743,8 +1795,11 @@ def sale_report():
 
 @route.route('/financial', methods=['POST'])
 def get_financial():
-    transactions = tblTransaction.query.all()
-    payments = tblPayment.query.all()
+    transactions = tblTransaction.query.filter(cast(tblTransaction.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
+    payments = tblPayment.query.filter(cast(tblPayment.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
+    orders = tblOrder.query.filter(cast(tblOrder.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
+    expenses = tblOutcome.query.filter(cast(tblOutcome.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
+    stocks = tblStock.query.all()
 
     transactionObj = {
         'complete': [],
@@ -1752,24 +1807,69 @@ def get_financial():
     }
 
     paymentObj = {
+        'complete': 0,
+        'pending': 0
+    }
+
+    orderObj = {
         'complete': [],
+        'process': [],
         'pending': []
     }
 
+    expenseObj = {
+        'stock': 0,
+        'utility': 0,
+    }
+
+    labels = []
+    stockArr = []
+
+    if stocks:
+        for stock in stocks:
+            if stock.stocksOfProduct.id in labels:
+                for s in stockArr:
+                    if stock.stocksOfProduct.product == s['label']:
+                        s['data'] += stock.quantity
+            else:
+                labels.append(stock.stocksOfProduct.id)
+                stockObj = {
+                    'label': stock.stocksOfProduct.product,
+                    'data': stock.quantity
+                }
+                stockArr.append(stockObj)
+
     if payments:
         for payment in payments:
-            if payment.isComplete == True:
-                paymentObj['complete'].append(payment.id)
+            if payment.isComplete:
+                paymentObj['complete'] += payment.amount
             else:
-                paymentObj['pending'].append(payment.id)
+                paymentObj['pending'] += payment.amount
+
+    if expenses:
+        for expense in expenses:
+            if expense.isStock:
+                expenseObj['stock'] += expense.amount
+            else:
+                expenseObj['utility'] += expense.amount
+
+    if orders:
+        for order in orders:
+            if order.isCompleted:
+                orderObj['complete'].append(order.id)
+            else:
+                if order.isProcessed:
+                    orderObj['process'].append(order.id)
+                else:
+                    orderObj['pending'].append(order.id)
 
     if transactions:
         for transaction in transactions:
-            if transaction.isComplete == True:
+            if transaction.isComplete:
                 transactionObj['complete'].append(transaction.id)
             else:
                 transactionObj['pending'].append(transaction.id)
-    return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj})
+    return jsonify({'transactionObj': transactionObj, 'paymentObj': paymentObj, 'orderObj': orderObj, 'expenseObj': expenseObj, 'stockArr': stockArr})
 
 
 @route.route('/advertise')
@@ -1949,6 +2049,7 @@ def add_role():
     }
     role = request.form['role']
     tags = request.form['tags']
+    
     id = str(uuid4())
     Modal = tblRole(id=id, role=role,
                     description=tags, createdBy=current_user.id)
@@ -1963,11 +2064,10 @@ def add_role():
         msg['redirect'] = 'Success'
         return jsonify(msg)
     except:
-        return 'Failed'
-    for fieldName, errorMessages in form.errors.items():
-        for err in errorMessages:
-            msg[fieldName].append(err)
-    return jsonify(msg)
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                msg[fieldName].append(err)
+        return jsonify(msg)
 
 
 @route.route('/role/change/<id>', methods=['POST'])
@@ -2703,7 +2803,10 @@ def print_invoice(id):
 @route.route('/backup', methods=['POST'])
 def backup():
     try:
-        strtime = time.strftime('%Y-%m-%d-%H:%M:%S')
+        strtime = time.strftime('%Y-%m-%d-%H%M%S')
+        dirs = 'backup'
+        if not os.path.exists(dirs):
+            os.makedirs(dirs)
         cmd = 'mysqldump -uroot -pmyroot restaurant > backup/backup_'+strtime+'.sql'
         os.system(cmd)
         return jsonify({'msg': 'Backup complete successfully'})

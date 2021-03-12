@@ -27,11 +27,11 @@
             Role
         </a>
     </li>
-    <li class="menu-advertise">
+    <!-- <li class="menu-advertise">
         <a href="/advertise">
             Advertise
         </a>
-    </li>
+    </li> -->
 </ul>
 {% endblock %}
 
@@ -47,12 +47,45 @@
     </div>
     <div class="grid-item">
         <div class="item-header">
-            Product
+            Brand
         </div>
         <div class="item-body" id="doughnut">
             <canvas id="doughnutChart"></canvas>
         </div>
     </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Store
+        </div>
+        <div class="item-body" id="store">
+            <canvas id="chartStore"></canvas>
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            User
+        </div>
+        <div class="item-body" id="user">
+            <canvas id="chartUser"></canvas>
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Role
+        </div>
+        <div class="item-body" id="role">
+            <canvas id="chartRole"></canvas>
+        </div>
+    </div>
+    <!-- <div class="grid-item">
+        <div class="item-header">
+            Advertise
+        </div>
+        <div class="item-body" id="advertise">
+            <canvas id="chartAdvertise"></canvas>
+        </div>
+    </div> -->
+
 </div>
 {% endblock %}
 {% block script %}
@@ -71,9 +104,9 @@
                 data.categories.forEach(c => {
                     category.labels.push(c.category)
                     category.quantities.push(c.products.length)
-                    category.colors.push(generateColor())
+                    category.colors.push(hexToRgbA(generateColor()))
 
-                });
+                })
 
                 var brand = {
                     labels: [],
@@ -84,20 +117,72 @@
                 data.brands.forEach(b => {
                     brand.labels.push(b.brand)
                     brand.quantities.push(b.products.length)
-                    brand.colors.push(generateColor())
+                    brand.colors.push(hexToRgbA(generateColor()))
 
-                });
+                })
 
+                var floor = {
+                    labels: [],
+                    quantities: [],
+                    colors: []
+                }
+
+                data.floors.forEach(b => {
+                    floor.labels.push(b.floor)
+                    floor.quantities.push(b.rooms.length)
+                    floor.colors.push(hexToRgbA(generateColor()))
+
+                })
+
+                // var advertiseObj = {
+                //     labels: ['Main', 'Side'],
+                //     quantities: [data.advertises.Main, data.advertises.Side],
+                //     colors: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)']
+                // }
+
+                var userObj = {
+                    labels: ['Confirm', 'Pending', 'Admin'],
+                    quantities: [data.users.Confirm, data.users.Pending, data.users.Admin],
+                    colors: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(92, 184, 92, 0.5)']
+                }
+
+                var roleObj = {
+                    labels: [],
+                    quantities: [],
+                    colors: []
+                }
+
+                data.roles.forEach(r => {
+                    roleObj.labels.push(r.label)
+                    roleObj.quantities.push(r.data)
+                    roleObj.colors.push(hexToRgbA(generateColor()))
+                })
+
+                var role = document.getElementById('role')
+                var chartRole = document.getElementById('chartRole')
 
                 var pie = document.getElementById('pie')
                 var pieCanvas = document.getElementById('pieChart')
 
+                var store = document.getElementById('store')
+                var chartStore = document.getElementById('chartStore')
+
+                var user = document.getElementById('user')
+                var chartUser = document.getElementById('chartUser')
+
                 var doughnut = document.getElementById('doughnut')
                 var doughnutCanvas = document.getElementById('doughnutChart')
 
+                // var advertise = document.getElementById('advertise')
+                // var chartAdvertise = document.getElementById('chartAdvertise')
 
-                _Chart(pie, pieCanvas, 'doughnut', category)
-                _Chart(doughnut, doughnutCanvas, 'pie', brand)
+                // _Chart(advertise, chartAdvertise, 'pie', advertiseObj, '', '')
+                _Chart(store, chartStore, 'pie', floor, 'Room: ', '')
+                _Chart(role, chartRole, 'pie', roleObj, '', '')
+                _Chart(user, chartUser, 'pie', userObj, '', '')
+                _Chart(pie, pieCanvas, 'doughnut', category, 'Product: ', '')
+                _Chart(doughnut, doughnutCanvas, 'pie', brand, 'Product: ', '')
+
             }
         })
     })

@@ -48,6 +48,30 @@
             <canvas id="chartTransaction"></canvas>
         </div>
     </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Order
+        </div>
+        <div class="item-body" id="pieOrder">
+            <canvas id="chartOrder"></canvas>
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Expense
+        </div>
+        <div class="item-body" id="pieExpense">
+            <canvas id="chartExpense"></canvas>
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header">
+            Stock
+        </div>
+        <div class="item-body" id="pieStock">
+            <canvas id="chartStock"></canvas>
+        </div>
+    </div>
 </div>
 <div class="authentication {{ authentication }}"></div>
 {% endblock %}
@@ -68,12 +92,35 @@
                     colors: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)']
                 }
 
+                var expense = {
+                    labels: ['Stock', 'Utility'],
+                    quantities: [data.expenseObj.stock, data.expenseObj.utility],
+                    colors: ['rgba(217, 83, 79, 0.5)', 'rgba(255, 206, 86, 0.5)']
+                }
+
                 var payment = {
-                    labels: ['Completed', 'Cancelled'],
-                    quantities: [data.paymentObj.complete.length, data.paymentObj.pending.length],
+                    labels: ['Total', 'Pending'],
+                    quantities: [data.paymentObj.complete, data.paymentObj.pending],
                     colors: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)']
                 }
 
+                var order = {
+                    labels: ['Completed', 'In Process', 'Booking'],
+                    quantities: [data.orderObj.complete.length, data.orderObj.process.length, data.orderObj.pending.length],
+                    colors: ['rgba(54, 162, 235, 0.5)', 'rgba(92, 184, 92, 0.5)', 'rgba(255, 206, 86, 0.5)']
+                }
+
+                var stock = {
+                    labels: [],
+                    quantities: [],
+                    colors: []
+                }
+
+                data.stockArr.forEach(data => {
+                    stock.labels.push(data.label)
+                    stock.quantities.push(data.data)
+                    stock.colors.push(hexToRgbA(generateColor()))
+                });
 
                 var pieCashing = document.getElementById('pieCashing')
                 var chartCashing = document.getElementById('chartCashing')
@@ -81,8 +128,20 @@
                 var pieTransaction = document.getElementById('pieTransaction')
                 var chartTransaction = document.getElementById('chartTransaction')
 
-                _Chart(pieCashing, chartCashing, 'doughnut', payment)
-                _Chart(pieTransaction, chartTransaction, 'doughnut', transaction)
+                var pieOrder = document.getElementById('pieOrder')
+                var chartOrder = document.getElementById('chartOrder')
+
+                var pieExpense = document.getElementById('pieExpense')
+                var chartExpense = document.getElementById('chartExpense')
+
+                var pieStock = document.getElementById('pieStock')
+                var chartStock = document.getElementById('chartStock')
+
+                _Chart(pieCashing, chartCashing, 'doughnut', payment, 'Today: ', '$')
+                _Chart(pieTransaction, chartTransaction, 'doughnut', transaction, 'Today: ', '')
+                _Chart(pieOrder, chartOrder, 'doughnut', order, 'Today: ', '')
+                _Chart(pieExpense, chartExpense, 'doughnut', expense, 'Today: ', '$')
+                _Chart(pieStock, chartStock, 'doughnut', stock, 'In Stock: ', 'Qty')
             }
         })
     })

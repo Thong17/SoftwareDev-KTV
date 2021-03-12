@@ -21,18 +21,18 @@
                     <tr class="color-font">
                         <td class="color-text" style="width: 10%;">Activity</td>
                         <td class="color-text">Type</td>
-                        <td class="color-text">CreatedOn</td>
-                        <td class="color-text">CreatedBy</td>
+                        <td class="color-text">Date Created</td>
+                        <td class="color-text">Created By</td>
                         <td class="color-text"></td>
                     </tr>
                 </thead>
                 <tbody>
                     {% for activity in activities %}
                         <tr class="activity-item" style="font-size: 13px;" id="{{ activity.id }}">
-                            <td class="color-text" style="width: 65%;">{{ activity.activity }}</td>
-                            <td class="color-text">{{ activity.type }}</td>
+                            <td class="color-text notranslate" style="width: 65%;">{{ activity.activity }}</td>
+                            <td class="color-text notranslate">{{ activity.type }}</td>
                             <td class="color-text notranslate">{{ activity.createdOn }}</td>
-                            <td class="color-text">{{ activity.createdBy }}</td>
+                            <td class="color-text notranslate">{{ activity.createdBy }}</td>
                             <td class="color-text"></td>
                         </tr>
                     {% endfor %}

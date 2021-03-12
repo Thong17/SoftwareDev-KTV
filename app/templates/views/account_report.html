@@ -141,7 +141,7 @@
             <div class="account-img">
                 <img src="/static/uploads/{{ current_user.profile[0].photo }}" alt="Profile">
             </div>
-            <div class="account-name color-text text-wrapper">
+            <div class="account-name color-text text-wrapper notranslate">
                 {{ current_user.username }}
             </div>
         </div>
@@ -152,7 +152,7 @@
             <div class="account-img">
                 <img src="/static/uploads/{{ user.profile[0].photo }}" alt="Profile">
             </div>
-            <div class="account-name color-text text-wrapper">
+            <div class="account-name color-text text-wrapper notranslate">
                 {{ user.username }}
             </div>
         </div>
@@ -179,7 +179,7 @@
                         <tr class="color-font">
                             <td class="color-text" style="width: 50%;">Activity</td>
                             <td class="color-text">Type</td>
-                            <td class="color-text">CreatedOn</td>
+                            <td class="color-text">Date Created</td>
                         </tr>
                     </thead>
                     <tbody id="list-activities" class="notranslate">
@@ -286,7 +286,7 @@
                 var pie = document.getElementById('pie')
                 var pieCanvas = document.getElementById('pieChart')
 
-                _Chart(pie, pieCanvas, 'doughnut', activity)
+                _Chart(pie, pieCanvas, 'doughnut', activity, 'Activity: ', '')
             }
         })
     })

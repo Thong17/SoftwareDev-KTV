@@ -40,12 +40,12 @@
             </p>
             {% endif %}
         </div>
-        <li class="side-menu" id="home">
+        <!-- <li class="side-menu" id="home">
             <span>Home</span>
             <a href="{{ url_for('route.index') }}">
                 <i class="fa fa-home" aria-hidden="true"></i>
             </a>
-        </li>
+        </li> -->
         {% if current_user.is_authenticated %}
         <li class="side-menu" id="financial">
             <span>Financial</span>
@@ -61,7 +61,7 @@
         </li>
         <li class="side-menu" id="reports">
             <span>Reports</span>
-            <a href="{{ url_for('route.financial_report') }}">
+            <a href="{{ url_for('route.report') }}">
                 <i class="fa fa-bar-chart" aria-hidden="true"></i>
             </a>
         </li>
@@ -268,7 +268,7 @@
             })
         }
 
-        function _Chart(div, canvas, type, data) {
+        function _Chart(div, canvas, type, data, prefix, suffix) {
             this.div = div
             this.canvas = canvas
             this.type = type
@@ -311,6 +311,17 @@
                         },
                         position: 'left'
                     },
+                    tooltips: {
+                        enabled: true,
+                        mode: 'single',
+                        callbacks: {
+                            label: function(tooltipItems, data) {
+                                this.suffix = suffix
+                                this.prefix = prefix
+                                return data.labels[tooltipItems.index] + ' ' + this.prefix + data.datasets[0].data[tooltipItems.index] + this.suffix;
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -322,6 +333,19 @@
                 color += letters[Math.floor(Math.random() * 8)];
             }
             return color;
+        }
+
+        function hexToRgbA(hex){
+            var c;
+            if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+                c= hex.substring(1).split('');
+                if(c.length== 3){
+                    c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+                }
+                c= '0x'+c.join('');
+                return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',0.5)';
+            }
+            throw new Error('Bad Hex');
         }
 
         var menus = document.querySelectorAll('.menu-bar li')
@@ -354,7 +378,7 @@
             },
             {
                 route: 'reports',
-                sub: ['financial_report', 'sale_report', 'account', 'activity'] 
+                sub: ['financial_report', 'sale_report', 'account', 'activity', 'report'] 
             },
             {
                 route: 'configuration',
@@ -732,7 +756,7 @@
                                     <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;" title="` +
                 this.product + `">` +
                 this.product + `</p>
-                                    <p class="color-text" id="details-category" style="font-size: 12px;">` + this
+                                    <p class="color-text notranslate" id="details-category" style="font-size: 12px;">` + this
                     .category +
                 `</p>
                                 </div>

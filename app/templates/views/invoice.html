@@ -13,8 +13,8 @@
 <body>
     <div id="print" class="invoice-container">
         <div class="store-name">{{ store.store }}</div>
-        <div class="contact-number">{{ store.phone }}</div>
-        <div class="location mb-5">{{ store.location }}</div>
+        <div class="location">{{ store.location }}</div>
+        <div class="contact-number mb-5">{{ store.phone }}</div>
         <div class="date-time">
             <span class="date">Date: {{ payment.createdOn | datetimefilter('%a, %b %d %Y') }}</span>
             <span class="time">{{ payment.createdOn | datetimefilter }}</span>
@@ -64,12 +64,12 @@
                 <div class="total-return">
                     <div class="receive-cash flex-between">
                         <span>Cash:</span>
-                        <div><span class="dollar-format">{{ payment.receive }}</span>(<span class="riel-format">{{ payment.receive * payment.rate }}</span>)</div>
+                        <div><span class="dollar-format">{{ payment.receive }}</span></div>
                         
                     </div>
                     <div class="return-cash flex-between">
                         <span>Return:</span>
-                        <div><span class="dollar-format">{{ payment.change }}</span>(<span class="riel-format">{{ payment.change * payment.rate }}</span>)</div>
+                        <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span><span>(<span class="riel-format">{{ payment.change * payment.rate }}</span>)</span></div>
                     </div>
                 </div>
             </div>
@@ -100,7 +100,7 @@
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
                 $(n).text(accounting.formatMoney(text, {
-                                    precision: 2,
+                                    precision: 0,
                                     format: {
                                         pos: "%v\u17DB",
                                         neg: "%v\u17DB",

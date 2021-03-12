@@ -14,7 +14,7 @@
     </li>
     <li class="menu-account">
         <a href="/account" class="account">
-            User
+            Performance
         </a>
     </li>
     <li class="menu-activity">
@@ -26,8 +26,39 @@
 {% endblock %}
 
 {% block content %}
-    <div class="wrap-container">
-        
+    <div class="wrap-container grid-container">
+        <div class="grid-item">
+            <div class="item-header">
+                Financial
+            </div>
+            <div class="item-body" id="financial">
+                <canvas id="chartFinancial"></canvas>
+            </div>
+        </div>
+        <div class="grid-item">
+            <div class="item-header">
+                Product
+            </div>
+            <div class="item-body" id="product">
+                <canvas id="chartProduct"></canvas>
+            </div>
+        </div>
+        <div class="grid-item">
+            <div class="item-header">
+                Performance
+            </div>
+            <div class="item-body" id="performance">
+                <canvas id="chartPerformance"></canvas>
+            </div>
+        </div>
+        <div class="grid-item">
+            <div class="item-header">
+                Activity
+            </div>
+            <div class="item-body" id="activity">
+                <canvas id="chartActivity"></canvas>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

@@ -125,15 +125,15 @@
         background-color: var(--color-menu);
     }
 
+    .show>.btn-light.dropdown-toggle {
+        background-color: var(--color-bg);
+        border-color: var(--color-hr);
+    }
+
     .text {
         font-weight: 300;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
         color: var(--color-text);
-    }
-
-    .show>.btn-light.dropdown-toggle {
-        background-color: var(--color-bg);
-        border-color: var(--color-hr);
     }
 
     .form-control {
@@ -217,11 +217,11 @@
                         </div>
                         <div class="form-group m-0">
                             <select class="selectpicker" id="tags" multiple data-live-search="true">
-                                <option>Admin</option>
-                                <option>Cashier</option>
-                                <option>Stock</option>
-                                <option>Editor</option>
-                                <option>Report</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Cashier">Cashier</option>
+                                <option value="Stock">Stock</option>
+                                <option value="Editor">Editor</option>
+                                <option value="Report">Report</option>
                             </select>
                         </div>
                         <div class="form-group flex-end m-0">
@@ -306,13 +306,21 @@
 
         $(document).on('submit', '.form', function () {
             role = $('#role').val()
-            tags = $('.filter-option-inner-inner').text()
+            tags = $('#tags').val()
+            desc = ''
+            tags.forEach((t, i) => {
+                if (i == 0) {
+                    desc += t
+                } else {
+                    desc += ', ' + t
+                }
+            })
             event.preventDefault()
             $.ajax({
                 url: $(this).attr('action'),
                 type: $(this).attr('method'),
                 dataType: 'json',
-                data: {'role': role, 'tags': tags},
+                data: {'role': role, 'tags': desc},
                 success: function (data) {
                     if (data['redirect'] == 'Success') {
                         var element = `<div class="flex-between item color-font" id="` + data['id'] + `">

@@ -73,9 +73,11 @@
             <div class="item-container" style="height: 67vh;">
                 {% if payments %}
                 {% for payment in payments %}
-                <div class="flex-between-center item color-font" id="{{ payment.id }}">
-                    <p class="notranslate ml-2" style="width: auto;">{{ payment.invoice }}</p>
-                    <a href="/invoice/{{ payment.id }}" target="_blank"><ion-icon style="vertical-align: middle;" name="print-outline"></ion-icon></a>
+                <div class="item color-font" id="{{ payment.id }}">
+                    <div class="flex-between-center">
+                        <p class="notranslate" style="width: auto;">{{ payment.invoice }}</p>
+                        <a href="/invoice/{{ payment.id }}" target="_blank"><ion-icon style="vertical-align: middle;" name="print-outline"></ion-icon></a>
+                    </div>
                 </div>
                 {% endfor %}
                 {% endif %}
