@@ -85,8 +85,8 @@
         <tbody>
             {% for expense in expenses %}
             <tr id="{{ expense.id }}">
-                <td class="color-text" id="description">{{ expense.description }}</td>
-                <td class="color-text currency-format" id="amount">{{ expense.amount }}</td>
+                <td class="color-text notranslate" id="description">{{ expense.description }}</td>
+                <td class="color-text currency-format notranslate" id="amount">{{ expense.amount }}</td>
                 <td class="color-text flex-between-center notranslate"><span class="notranslate color-text" id="createdOn">{{ expense.createdOn }}</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>
             </tr>
             {% endfor %}

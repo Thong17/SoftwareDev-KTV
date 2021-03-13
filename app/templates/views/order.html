@@ -637,7 +637,7 @@
                         <div class="details">
                             <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
                                 title="{{product.product}}">{{product.product}}</p>
-                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            <p class="hide color-text notranslate" style="font-size: 10px;" id="details-date">{{product.createdOn}}
                             </p>
                             <p class="color-text notranslate" id="details-category" style="font-size: 10px;">
                                 {{product.productOfCategory.category}}</p>
@@ -695,7 +695,7 @@
                         <div class="details">
                             <p class="notranslate color-font text-wrapper" id="details-title" style="font-size: 14px;"
                                 title="{{product.product}}">{{product.product}}</p>
-                            <p class="hide color-text" style="font-size: 10px;" id="details-date">{{product.createdOn}}
+                            <p class="hide color-text notranslate" style="font-size: 10px;" id="details-date">{{product.createdOn}}
                             </p>
                             <p class="color-text notranslate" id="details-category" style="font-size: 10px;">
                                 {{product.productOfCategory.category}}</p>
@@ -744,10 +744,10 @@
         <!-- Noted -->
     </div>
     <div class="col-order pl-4">
-        <h4 class="color-font" style="text-align: center;">{{ Order.order.room }}</h4>
+        <h4 class="color-font notranslate" style="text-align: center;">{{ Order.order.room }}</h4>
         <div class="customer-info">
-            <div class="customer-name color-text">Customer: {{ Order.customer.name }}</div>
-            <div class="customer-phone color-text">{{ Order.customer.phone }}</div>
+            <div class="customer-name color-text">Customer: <span class="notranslate">{{ Order.customer.name }}</span></div>
+            <div class="customer-phone color-text notranslate">{{ Order.customer.phone }}</div>
         </div>
         <div class="order-container mt-2">
             <table class="table order-table notranslate">
@@ -805,7 +805,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span>Paid</span>
+                                <span>Already Paid</span>
                             </button>
                         {% else %}
                             <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}" data-check='true'>
@@ -813,7 +813,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span>Place Order</span>
+                                <span>Payment</span>
                             </button>
                         {% endif %}
                     {% else %}
@@ -821,15 +821,15 @@
                         data-change="true" data-payment="{{ Order.checkin.paymentId }}">
                         
                         <div class="dropup">
-                            <span class="mr-2 order-icon" data-toggle="dropdown" style="color: var(--color-text);">0</span>
+                            <span class="mr-2 order-icon notranslate" data-toggle="dropdown" style="color: var(--color-text);">0</span>
                             <ul class="dropdown-menu m-0 p-2">
-                                <li class="flex-between-start"><span class="color-text">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
+                                <li class="flex-between-start"><span class="color-text">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
-                                <li class="mb-3 flex-between-center"><span class="color-text">Duration </span><span id="calculate-time" class="text-danger"></span></li>
+                                <li class="mb-3 flex-between-center"><span class="color-text">Duration </span><span id="calculate-time" class="text-danger notranslate"></span></li>
                                 <li><div class="border checkout-li"><span class="color-text confirm-checkout">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
                             </ul>
                         </div>
-                        <span class="check-in-out">Check Out</span>
+                        <span class="check-in-out">End</span>
                     </button>
                     {% endif %}
                 {% else %}
@@ -838,7 +838,7 @@
                         <span class="mr-2 order-icon" style="color: var(--color-text);">
                             0
                         </span>
-                        <span class="check-in-out">Check In</span>
+                        <span class="check-in-out">Start</span>
                     </button>
                 {% endif %}
                 <div class="arrow arrow-left animate-left-to-right">
@@ -986,7 +986,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title color-font">Drawer</h4>
+                <h4 class="modal-title color-font">Cash Drawer</h4>
                 {% if current_user.drawer == '' %}
                 <div class="drawer-time" title="Drawer is off">
                     <span class="color-text" id="drawerTime"></span>
@@ -1009,7 +1009,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn color-font close-modal" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn color-font close-modal" data-dismiss="modal">Close</button>
                 {% if current_user.drawer == '' %}
                 <button class="btn border drawer-save color-font">Create</button>
                 <button class="btn border drawer-end color-font hide" id="{{ current_user.drawer }}">End</button>
@@ -1743,7 +1743,7 @@
                                 <td style="width: 15%; text-align:center;">`+ m.currency + `</td>
                                 <td style="width: 20%; text-align:center;">`+ m.unit + `</td>
                                 <td style="width: 25%; text-align:center;">`+ m.money * m.unit + `</td>
-                                <td class="color-text flex-between-center"><ion-icon name="remove-outline"></ion-icon><ion-icon name="add-outline"></ion-icon></td>
+                                <td class="color-text flex-between-center"></td>
                             </tr>`
             })
         }
@@ -1776,7 +1776,7 @@
                                 <td style="width: 5%;"></td>
                             </tr>
                         </thead>
-                        <tbody id="list-money" class="color-text">
+                        <tbody id="list-money" class="color-text notranslate">
                             `+ element + `
                             <tr class="money-form color-text">
 
@@ -1916,22 +1916,44 @@
         var unit = $(this).closest('tr').find('#money-unit').val()
         var currency = $(this).closest('tr').find('#money-currency').val()
         var total = $(this).closest('tr').find('#money-total').val()
-        var id = generateString(8)
-        obj = {
-            'id': id,
-            'unit': unit,
-            'money': money,
-            'currency': currency,
-            'total': total
+        drawer = $('.drawer-btn').attr('id')
+        if (drawer != 'none') {
+            $.ajax({
+                url: '/money/add/'+drawer,
+                type: 'POST',
+                data: {money: money, unit: unit, currency: currency, total: total},
+                success: function(data) {
+                    if (data.data == 'Success') {
+                        $('#list-money tr:last').before(`<tr class="notranslate">
+                                    <td style="width: 35%;">`+ money + `</td>
+                                    <td style="width: 15%; text-align:center;">`+ currency + `</td>
+                                    <td style="width: 20%; text-align:center;">`+ unit + `</td>
+                                    <td style="width: 25%; text-align:center;">`+ total + `</td>
+                                    <td style="width: 5%;"></td>
+                                    </tr>`)
+                    } else {
+                        alert(data.data)
+                    }
+                }
+            })
+        } else {
+            var id = generateString(8)
+            obj = {
+                'id': id,
+                'unit': unit,
+                'money': money,
+                'currency': currency,
+                'total': total
+            }
+            drawerObj.moneys.push(obj)
+            $('#list-money tr:last').before(`<tr class="notranslate" id="` + obj.id + `">
+                                    <td style="width: 35%;">`+ obj.money + `</td>
+                                    <td style="width: 15%; text-align:center;">`+ obj.currency + `</td>
+                                    <td style="width: 20%; text-align:center;">`+ obj.unit + `</td>
+                                    <td style="width: 25%; text-align:center;">`+ obj.total + `</td>
+                                    <td style="width: 5%;"><ion-icon name="close-outline" class="money-delete"></ion-icon></td>
+                                    </tr>`)
         }
-        drawerObj.moneys.push(obj)
-        $('#list-money tr:last').before(`<tr id="` + obj.id + `">
-                                <td style="width: 35%;">`+ obj.money + `</td>
-                                <td style="width: 15%; text-align:center;">`+ obj.currency + `</td>
-                                <td style="width: 20%; text-align:center;">`+ obj.unit + `</td>
-                                <td style="width: 25%; text-align:center;">`+ obj.total + `</td>
-                                <td style="width: 5%;"><ion-icon name="close-outline" class="money-delete"></ion-icon></td>
-                                </tr>`)
     })
 
     $(document).on('click', '.drawer-save', function () {
@@ -1949,7 +1971,7 @@
                     $('#drawerTime').html(data.startedOn)
                     $('#list-money').html(`<tr class="money-form color-text"></tr>`)
                     drawerObj.moneys.forEach(m => {
-                        $('#list-money tr:last').before(`<tr class="color-font">
+                        $('#list-money tr:last').before(`<tr class="notranslate color-font">
                             <td style="width: 35%;">`+ m.money + `</td>
                             <td style="width: 15%; text-align:center;">`+ m.currency + `</td>
                             <td style="width: 20%; text-align:center;">`+ m.unit + `</td>

@@ -5,11 +5,7 @@ from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSc
 from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
-import json
-import os
-import time
-import simplejson
-import operator
+import json, os, time, inspect, simplejson, operator
 from datetime import datetime, timedelta, date
 from sqlalchemy import func, Date, cast
 from decimal import Decimal
@@ -1149,6 +1145,28 @@ def create_drawer():
     startedOn = Drawer.startedOn.strftime("%b %d %Y %H:%M:%S")
     return jsonify({'data': 'Success', 'startedOn': startedOn, 'id': id})
 
+@route.route('/money/add/<id>', methods=['POST'])
+def add_money(id):
+    Drawer = tblDrawer.query.get(id)
+    money = request.form['money']
+    unit = request.form['unit']
+    currency = request.form['currency']
+
+    if currency == 'KHR':
+        value = float(money) / float(Drawer.rate)
+    else:
+        value = money
+    mid = str(uuid4())
+    Money = tblMoney(id=mid, money=money, currency=currency, unit=unit, drawerId=id, value=value)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +' has added money to drawer', type='Add', createdBy=current_user.id)
+    try: 
+        db.session.add(Money)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Failed'})
+
 
 @route.route('/drawer/end/<id>', methods=['POST'])
 def end_drawer(id):
@@ -1324,6 +1342,7 @@ def checkout(id):
         if amount >= payment.amount:
             moneys = []
             change = Decimal(amount) - payment.amount
+            total_change = change
             moneyObj = {
                 'money': change,
                 'currency': 'USD'
@@ -1356,7 +1375,7 @@ def checkout(id):
             
             payment.receive = amount
             payment.rate = drawer.rate
-            payment.change = change
+            payment.change = total_change
 
             if payment.orderPayment:
                 payment.orderPayment[0].checkin.order.status = 'Open'
@@ -1439,12 +1458,33 @@ def search_invoice():
     return jsonify({'data': 'Success'})
 
 
-@route.route('/report')
+@route.route('/report', methods=['POST', 'GET'])
 @login_required
 def report():
     outcome = tblOutcome.query.filter(cast(tblOutcome.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
-    income = tblTransaction.query.filter(cast(tblTransaction.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
-    
+    Transactions = tblTransaction.query.filter(cast(tblTransaction.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
+    if request.method == 'POST':
+        data = []
+        products = []
+        for transaction in Transactions:
+            obj = {
+                'label': transaction.description,
+                'data': transaction.profit,
+                'product': transaction.product
+            }
+            if transaction.product in products:
+                for d in data:
+                    if d['product'] == transaction.product:
+                        d['data'] += transaction.profit
+            else:
+                obj = {
+                    'label': transaction.description,
+                    'data': transaction.profit,
+                    'product': transaction.product
+                }
+                products.append(transaction.product)
+                data.append(obj)
+        return jsonify({'data': data})
     return render_template('views/report.html')
 
 
@@ -2809,9 +2849,28 @@ def backup():
             os.makedirs(dirs)
         cmd = 'mysqldump -uroot -pmyroot restaurant > backup/backup_'+strtime+'.sql'
         os.system(cmd)
-        return jsonify({'msg': 'Backup complete successfully'})
+        return jsonify({'msg': 'Backup completed successfully'})
     except: 
         return jsonify({'msg': 'Failed to backup!'})
 
+@route.route('/restore', methods=['POST'])
+def restore():
+    try:
+        strtime = time.strftime('%Y-%m-%d-%H%M%S')
+        dirs = 'backup'
+        if not os.path.exists(dirs):
+            os.makedirs(dirs)
+        backup = 'mysqldump -uroot -pmyroot restaurant > backup/restore_'+strtime+'.sql'
+        os.system(backup)
+        _file = request.files['file']
+        if _file.filename.split('.')[1] == 'sql':
+            restore_file = os.path.abspath('backup/'+_file.filename)
+            restore = 'mysql -uroot -pmyroot restaurant < '+restore_file
+            os.system(restore)
+            return jsonify({'msg': 'Restore completed successfully', 'data': 'Success'})
+        else:
+            return jsonify({'msg': 'The selected file is not valid!', 'data': 'Failed'})
+    except: 
+        return jsonify({'msg': 'Failed to backup!', 'data': 'Failed'})
 
    

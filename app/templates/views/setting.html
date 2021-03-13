@@ -30,7 +30,7 @@
     <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Restore</h5>
     <p class="paragraph ml-4 mt-2">Restore data to go back to the previous change</p>
     <div class="select-list">
-        <button class="btn border"><ion-icon class="mr-1" name="download-outline"></ion-icon>Restore</button>
+        <input type="file" class="border" name="restore" id="restore">
     </div>
     <br>
     <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Language</h5>
@@ -54,6 +54,31 @@
                         alert(data.msg)
                     }
                 })
+            })
+        })
+
+        $('#restore').on('change', function() {
+            file = document.querySelector('#restore').files[0]
+            form = new FormData()
+            form.append('file', file)
+            $.ajax({
+                url: '/restore',
+                type: 'POST',
+                data: form,
+                contentType: false,
+                cache: false,
+                processData: false,
+                beforeSend: function () {
+
+                },
+                success: function(data) {
+                    if (data.data == 'Success') {
+                        alert(data.msg)
+                        window.location.reload()
+                    } else {
+                        alert(data.msg)
+                    }
+                }
             })
         })
     </script>

@@ -1,5 +1,13 @@
 {% extends 'layout/layout.html' %}
 
+{% block style %}
+<style>
+    .wrap-container {
+        height: calc(100vh - 170px);
+    }
+</style>
+{% endblock %}
+
 {% block navbar %}
 <ul class="menu-bar">
     <li class="menu-financial_report">
@@ -26,44 +34,95 @@
 {% endblock %}
 
 {% block content %}
-    <div class="wrap-container grid-container">
-        <div class="grid-item">
-            <div class="item-header">
-                Financial
-            </div>
-            <div class="item-body" id="financial">
-                <canvas id="chartFinancial"></canvas>
-            </div>
-        </div>
-        <div class="grid-item">
-            <div class="item-header">
-                Product
-            </div>
-            <div class="item-body" id="product">
-                <canvas id="chartProduct"></canvas>
-            </div>
-        </div>
-        <div class="grid-item">
-            <div class="item-header">
-                Performance
-            </div>
-            <div class="item-body" id="performance">
-                <canvas id="chartPerformance"></canvas>
-            </div>
-        </div>
-        <div class="grid-item">
-            <div class="item-header">
-                Activity
-            </div>
-            <div class="item-body" id="activity">
-                <canvas id="chartActivity"></canvas>
-            </div>
-        </div>
-    </div>
+<div class="wrap-container" id="grid-container">
+    <canvas id="canvas"></canvas>
+</div>
 {% endblock %}
 
 {% block script %}
-    <script>
+<script>
+    $(document).ready(function () {
 
-    </script>
+        var chart = document.getElementById('grid-container')
+        var canvas = document.getElementById('canvas')
+
+        canvas.width = chart.offsetWidth
+        canvas.height = chart.offsetHeight
+
+        $(window).on('resize', function () {
+            canvas.width = chart.offsetWidth
+            canvas.height = chart.offsetHeight
+        })
+
+        $.ajax({
+            url: '/report',
+            type: 'POST',
+            success: function (data) {
+                var dataObj = {
+                    labels: [],
+                    data: [],
+                    background: [],
+                    border: [],
+                    hover: []
+                }
+
+                data.data.forEach(d => {
+                    var color = generateColor()
+                    dataObj.labels.push(d.label)
+                    dataObj.data.push(d.data)
+                    dataObj.background.push(color + '50')
+                    dataObj.border.push(color + 'cc ')
+                    dataObj.hover.push(color + '50')
+                })
+
+                console.log(dataObj)
+
+                var ctx = canvas.getContext('2d')
+                myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: dataObj.labels,
+                        datasets: [{
+                            label: 'Daily Profit',
+                            data: dataObj.data,
+                            backgroundColor: dataObj.background,
+                            borderColor: dataObj.border,
+                            hoverBackgroundColor: dataObj.hover,
+                            hoverBorderColor: dataObj.border,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                fontSize: 22
+                            }
+                        },
+                        hover: {
+                            mode: 'label'
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    beginAtZero: true,
+                                    steps: 10,
+                                    stepValue: 5
+                                }
+                            }]
+                        }
+                    }
+                })
+            }
+        })
+    })
+</script>
 {% endblock %}

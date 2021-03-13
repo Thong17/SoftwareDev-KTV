@@ -2,7 +2,6 @@ import os
 from app.config import Config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_alchemydumps import AlchemyDumps
 from sqlalchemy.types import PickleType
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
@@ -32,8 +31,6 @@ def datetimefilter(value, format="%I:%M %p"):
 
 db = SQLAlchemy()
 
-alchemydumps = AlchemyDumps()
-
 bcrypt = Bcrypt()
 
 ma = Marshmallow()
@@ -49,7 +46,6 @@ def create_app(config_class=Config):
     app.jinja_env.filters['datetimefilter'] = datetimefilter
 
     db.init_app(app)
-    alchemydumps.init_app(app, db)
 
     with app.app_context():
         db.create_all()

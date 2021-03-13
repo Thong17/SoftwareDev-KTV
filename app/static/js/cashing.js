@@ -320,14 +320,34 @@ $(document).on('click', '.checkout-btn', function() {
                 var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+paid.toFixed(2)+' USD</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+' USD</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+change.toFixed(2)+' USD</span></div><div class="list-changes">'
 
                 changeArr.forEach(m => {
+                    console.log(m)
                     if (m.money != 0) {
                         var money_currency = ''
+                        var money = 0
                         if (m.currency == 'USD') {
-                            money_currency = 'x'+m.unit+' ('+m.money*data.rate*m.unit+'\u17DB)'
+                            money_currency = 'x'+m.unit
+
+                            money = accounting.formatMoney(m.money, {
+                                precision: 2,
+                                format: {
+                                    pos: "%v("+m.money * data.rate+"\u17DB)",
+                                    neg: "%v",
+                                    zero: '...'
+                                }
+                            })
                         } else {
                             money_currency = 'x'+m.unit
+
+                            money = accounting.formatMoney(m.money, {
+                                precision: 0,
+                                format: {
+                                    pos: "%v("+m.money / data.rate+"$)",
+                                    neg: "%v",
+                                    zero: '...'
+                                }
+                            })
                         }
-                        element += '<div class="change-row"><span>'+m.currency+' '+m.money.toFixed(2)+'</span><span>'+money_currency+'</span></div>'
+                        element += '<div class="change-row"><span>'+m.currency+' '+money+'</span><span>'+money_currency+'</span></div>'
                     }
                 })
 

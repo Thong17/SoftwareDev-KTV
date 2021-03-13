@@ -1619,22 +1619,44 @@
         var unit = $(this).closest('tr').find('#money-unit').val()
         var currency = $(this).closest('tr').find('#money-currency').val()
         var total = $(this).closest('tr').find('#money-total').val()
-        var id = generateString(8)
-        obj = {
-            'id': id,
-            'unit': unit,
-            'money': money,
-            'currency': currency,
-            'total': total
+        drawer = $('.drawer-btn').attr('id')
+        if (drawer != 'none') {
+            $.ajax({
+                url: '/money/add/'+drawer,
+                type: 'POST',
+                data: {money: money, unit: unit, currency: currency, total: total},
+                success: function(data) {
+                    if (data.data == 'Success') {
+                        $('#list-money tr:last').before(`<tr class="notranslate">
+                                    <td style="width: 35%;">`+ money + `</td>
+                                    <td style="width: 15%; text-align:center;">`+ currency + `</td>
+                                    <td style="width: 20%; text-align:center;">`+ unit + `</td>
+                                    <td style="width: 25%; text-align:center;">`+ total + `</td>
+                                    <td style="width: 5%;"></td>
+                                    </tr>`)
+                    } else {
+                        alert(data.data)
+                    }
+                }
+            })
+        } else {
+            var id = generateString(8)
+            obj = {
+                'id': id,
+                'unit': unit,
+                'money': money,
+                'currency': currency,
+                'total': total
+            }
+            drawerObj.moneys.push(obj)
+            $('#list-money tr:last').before(`<tr class="notranslate" id="` + obj.id + `">
+                                    <td style="width: 35%;">`+ obj.money + `</td>
+                                    <td style="width: 15%; text-align:center;">`+ obj.currency + `</td>
+                                    <td style="width: 20%; text-align:center;">`+ obj.unit + `</td>
+                                    <td style="width: 25%; text-align:center;">`+ obj.total + `</td>
+                                    <td style="width: 5%;"><ion-icon name="close-outline" class="money-delete"></ion-icon></td>
+                                    </tr>`)
         }
-        drawerObj.moneys.push(obj)
-        $('#list-money tr:last').before(`<tr id="` + obj.id + `">
-                                <td style="width: 35%;">`+ obj.money + `</td>
-                                <td style="width: 15%; text-align:center;">`+ obj.currency + `</td>
-                                <td style="width: 20%; text-align:center;">`+ obj.unit + `</td>
-                                <td style="width: 25%; text-align:center;">`+ obj.total + `</td>
-                                <td style="width: 5%;"><ion-icon name="close-outline" class="money-delete"></ion-icon></td>
-                                </tr>`)
     })
 
     $(document).on('click', '.drawer-save', function () {

@@ -281,7 +281,7 @@
         <div class="border-right"></div>
         <div class="column-wrapper" id="list-orders">
             <div class="column-title flex-center-center mb-3" style="text-align: center;">
-                <h4 class="color-font m-0">Order</h4>
+                <h4 class="notranslate color-font m-0">Order</h4>
             </div>
             <!-- <div id='external-events'>
                 <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
@@ -331,7 +331,7 @@
             <div class="modal-header flex-column-start-start">
                 <div class="flex-between" style="width: 100%;">
                     <div class="flex-center-center" style="width: calc(100% - 170px);">
-                        <h4 class="modal-title color-font"></h4>
+                        <h4 class="notranslate modal-title color-font"></h4>
                     </div>
                     <div class="clock-container">
                         <div id="clock-timer" class="color-font notranslate"></div>
@@ -346,7 +346,7 @@
                             <select class="selectpicker" id="select-customer" data-live-search="true">
                                 {% if customers %}
                                 {% for customer in customers %}
-                                <option value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
+                                <option class="notranslate" value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
                                 {% endfor %}
                                 {% else %}
                                 <option value="" disabled>No customer</option>
@@ -388,12 +388,12 @@
                     <tbody class="customer-container">
                         {% for customer in customers %}
                         <tr class="customer-tr" id="{{ customer.id }}">
-                            <td class="color-text" id="cus-firstname">{% if customer.name != '' %}{{ customer.name }}{%
+                            <td class="color-text notranslate" id="cus-firstname">{% if customer.name != '' %}{{ customer.name }}{%
                                 else %}...{% endif %}</td>
                             <td class="color-text notranslate" id="cus-lastname">{% if customer.phone != '' %}{{
                                 customer.phone }}{%
                                 else %}...{% endif %}</td>
-                            <td class="color-text" id="cus-phone">{% if customer.birthdate != '' %}{{ customer.birthdate
+                            <td class="color-text notranslate" id="cus-phone">{% if customer.birthdate != '' %}{{ customer.birthdate
                                 }}{% else %}...{% endif %}</td>
                         </tr>
                         {% endfor %}
@@ -407,7 +407,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn color-text" data-dismiss="modal">Close</button>
-                <button type="button" class="btn bg-menu color-text" id="save-order">Save Order</button>
+                <button type="button" class="btn bg-menu color-text" id="save-order">Order</button>
             </div>
         </div>
     </div>
@@ -455,7 +455,7 @@
                             <td class="color-text flex-between-center"><span>`+ date + `</span><span class="remove-order"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
                             </tr>`
                     })
-                    $('.column-title').html('<h4 class="color-font m-0">Order</h4>')
+                    $('.column-title').html('<h4 class="notranslate color-font m-0">Order</h4>')
                     $('.calendar-container').html(`<div class="date-header">
                         <span class="btn-date prev-date"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
                         <h2 class="fc-toolbar-title m-0" id="date">`+ data.date + `</h2>
@@ -590,7 +590,7 @@
                 $(r).removeClass('active')
             })
             $(this).addClass('active')
-            $('.column-title').html('<button class="btn border" id="show-order"><i class="fa fa-angle-left" aria-hidden="true"></i></button><h4 class="color-font m-0">' + $(this).find('.room-no').text() + '</h4>')
+            $('.column-title').html('<button class="btn border" id="show-order"><i class="fa fa-angle-left" aria-hidden="true"></i></button><h4 class="notranslate color-font m-0">' + $(this).find('.room-no').text() + '</h4>')
             $('#input-room').val($(this).attr('id'))
             $('.modal-title').text($(this).find('.room-no').text())
 
