@@ -2847,7 +2847,7 @@ def backup():
         dirs = 'backup'
         if not os.path.exists(dirs):
             os.makedirs(dirs)
-        cmd = 'mysqldump -uroot -pmyroot restaurant > backup/backup_'+strtime+'.sql'
+        cmd = "mysqldump -uroot -p'S0ftw@reDev' restaurant > backup/backup_"+strtime+".sql"
         os.system(cmd)
         return jsonify({'msg': 'Backup completed successfully'})
     except: 
@@ -2860,12 +2860,12 @@ def restore():
         dirs = 'backup'
         if not os.path.exists(dirs):
             os.makedirs(dirs)
-        backup = 'mysqldump -uroot -pmyroot restaurant > backup/restore_'+strtime+'.sql'
+        backup = "mysqldump -uroot -p'S0ftw@reDev' restaurant > backup/restore_"+strtime+".sql"
         os.system(backup)
         _file = request.files['file']
         if _file.filename.split('.')[1] == 'sql':
             restore_file = os.path.abspath('backup/'+_file.filename)
-            restore = 'mysql -uroot -pmyroot restaurant < '+restore_file
+            restore = "mysql -uroot -p'S0ftw@reDev' restaurant < "+restore_file
             os.system(restore)
             return jsonify({'msg': 'Restore completed successfully', 'data': 'Success'})
         else:
