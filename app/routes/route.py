@@ -2443,6 +2443,21 @@ def lock_room(id):
     except:
         return jsonify({'msg': 'Unable to close '+Room.room+' now. Please contact to our support team.'})
 
+
+@route.route('/room/delete/<id>', methods=['POST'])
+def delete_room(id):
+    Room = tblRoom.query.get(id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has delete room: '+Room.room, type='Delete', createdBy=current_user.id)
+    try:
+        db.session.delete(Room)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Failed to delete '+Room.room})
+
+
 @route.route('/room/edit/<id>', methods=['POST'])
 def edit_room(id):
     Room = tblRoom.query.get(id)

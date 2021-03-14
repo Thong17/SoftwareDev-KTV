@@ -411,6 +411,26 @@
         }
         
     })
+
+    
+    $(document).on('click', '.delete-room', function() {
+        id = $(this).closest('.room-container').attr('id')
+        $.ajax({
+            url: '/room/delete/'+id,
+            type: 'POST',
+            success: function(data) {
+                if (data.data == 'Success') {
+                    $('#'+id).fadeOut('slow', function() {
+                        $(this).remove()
+                    })
+                } else {
+                    alert(data.data)
+                }
+            }
+        })
+    })
+
+
     $(document).on('submit', '#floorForm', function() {
         event.preventDefault()
         value = $('#floor').val()
