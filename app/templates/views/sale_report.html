@@ -116,7 +116,7 @@
 <script>
     var myChart = null
 
-    function updateChart(value, label, start, end, id) {
+    function updateChart(value, label, start, end, id, prefix, suffix) {
         $.ajax({
             url: '/' + id,
             type: 'POST',
@@ -140,9 +140,19 @@
                     dataset.label = label
                 })
 
+                newTooltips = {
+                            enabled: true,
+                            mode: 'single',
+                            callbacks: {
+                                label: function(tooltipItems, data) {
+                                    return prefix + data.datasets[0].data[tooltipItems.index] + suffix;
+                                }
+                            }
+                        }
+
+                myChart.options.tooltips = newTooltips
+
                 myChart.update()
-
-
             }
         })
     }
@@ -159,7 +169,11 @@
             }
         })
 
-        updateChart(value, label, start, end, id)
+        if (id == 'product_report') {
+            updateChart(value, label, start, end, id, 'Sale: ', '$')
+        } else {
+            updateChart(value, label, start, end, id, 'Quantity: ', 'pcs')
+        } 
     })
 
     $(document).ready(function () {
@@ -280,7 +294,11 @@
             var label = $('#filter option:selected').text()
             var id = $(this).attr('id')
 
-            updateChart(value, label, start, end, id)
+            if (id == 'product_report') {
+                updateChart(value, label, start, end, id, 'Sale: ', '$')
+            } else {
+                updateChart(value, label, start, end, id, 'Quantity: ', 'pcs')
+            }
         })
 
         $('#start-date, #end-date').on('change', function () {
@@ -295,7 +313,11 @@
                 }
             })
 
-            updateChart(value, label, start, end, id)
+            if (id == 'product_report') {
+                updateChart(value, label, start, end, id, 'Sale: ', '$')
+            } else {
+                updateChart(value, label, start, end, id, 'Quantity: ', 'pcs')
+            }
         })
 
         $.ajax({
@@ -372,6 +394,15 @@
                                     stepValue: 5
                                 }
                             }]
+                        },
+                        tooltips: {
+                            enabled: true,
+                            mode: 'single',
+                            callbacks: {
+                                label: function(tooltipItems, data) {
+                                    return 'Sale: '+data.datasets[0].data[tooltipItems.index] + '$';
+                                }
+                            }
                         }
                     }
                 });
