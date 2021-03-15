@@ -11,7 +11,7 @@
                         <i class="fa fa-calendar" aria-hidden="true"></i>
                         <p>Today</p>
                     </div>
-                    <div class="box-result">
+                    <div class="box-result notranslate">
                         <p>{{today|length}}</p>
                     </div>
                 </div>
@@ -20,7 +20,7 @@
                         <i class="fa fa-inbox" aria-hidden="true"></i>
                         <p>Total</p>
                     </div>
-                    <div class="box-result">
+                    <div class="box-result notranslate">
                         <p>{{total}}</p>
                     </div>
 
@@ -30,7 +30,7 @@
                         <i class="fa fa-line-chart" aria-hidden="true"></i>
                         <p>Activity</p>
                     </div>
-                    <div class="box-result">
+                    <div class="box-result notranslate">
                         0
                     </div>
 
@@ -314,11 +314,14 @@
             $.ajax({
                 url: '/property/remove/' + id,
                 method: 'POST',
-                data: {
-                    data: id
-                },
                 success: function (data) {
-                    $('#prp-' + id).remove()
+                    if (data.data == 'Success') {
+                        $('#prp-' + id).fadeOut('slow', function() {
+                            $(this).remove()
+                        })
+                    } else {
+                        alert(data.data)
+                    }
                 }
             })
         } else {

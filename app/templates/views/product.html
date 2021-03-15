@@ -527,6 +527,8 @@
                     data: { brand: brand, product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
                     success: function (data) {
                         $('.product-image').removeClass('hide')
+                        console.log('#select-brands')
+                        $('#select-brands').val(brand)
                         toggleEdit($('.save-product'), $('.submit-product'))
                         $('.save-product').attr('id', data['id'])
                         $('.pickr').attr('id', data['id'])

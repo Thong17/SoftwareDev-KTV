@@ -1412,10 +1412,10 @@
             }
         }).replace(/\.0+$/, '') + `</td>
                     <td>
-                        <p class="color-text text-center" contenteditable="true" id="order-discount">`+ discount + `%</p>
+                        <p class="color-text text-center" id="order-discount">`+ discount + `%</p>
                     </td>
                     <td>
-                        <p class="color-text text-center" contenteditable="true" id="order-quantity">`+ quantity + `</p>
+                        <p class="color-text text-center" id="order-quantity">`+ quantity + `</p>
                     </td>
                     <td class="text-center currency-format" id="order-amount">`+ accounting.formatMoney(amount, {
             precision: 2,
@@ -1725,9 +1725,9 @@
             type: 'POST',
             success: function (data) {
                 if (data.result == 'Success') {
-                    
                     $('.order-btn').attr('data-change', true)
                     var quantity = $('#' + pid).find('.stock-tag').text()
+                    console.log(quantity)
                     if (quantity == 'Out of stock') {
                         quantity = 0
                     }
@@ -1735,7 +1735,9 @@
                     var sum_o = parseFloat(order) - data.quantity
                     $('.sum-order').text(sum_o)
                     var sum_q = parseInt(quantity) + data.quantity
-                    $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
+                    if (quantity.trim() != 'Available') {
+                        $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
+                    }
                     $('#sumTotal').text(accounting.formatMoney(total - amount))
                     orderLists.forEach((o, i) => {
                         if (o.orderId == id.attr('data-id')) {

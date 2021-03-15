@@ -209,10 +209,11 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        width: 31px;
+        padding: 10px;
+        min-width: 31px;
         height: 31px;
         background-color: var(--color-menu);
-        border-radius: 50%;
+        border-radius: 20px;
         box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
     }
 
@@ -399,6 +400,7 @@
     .btn-transaction {
         display: flex;
         align-items: center;
+        position: relative;
     }
 
     .dropdown-menu {
@@ -462,6 +464,21 @@
         width: 100%; 
         border-radius: 7px;
         overflow: hidden;
+    }
+
+    .flash{
+        animation: flash 0.5s linear infinite;
+        color:var(--color-font);
+    }
+
+    @keyframes flash {
+        25% {
+            color:var(--color-hr);
+        }
+        
+        75% {
+            color: var(--color-text);
+        }
     }
 
     @media only screen and (max-width: 1100px) {
@@ -769,11 +786,11 @@
                         </td>
                         <td class="text-center currency-format" id="order-price">{{ t.price }}</td>
                         <td>
-                            <p class="color-text text-center" contenteditable="true" id="order-discount">{{ t.discount
+                            <p class="color-text text-center" id="order-discount">{{ t.discount
                                 }}%</p>
                         </td>
                         <td>
-                            <p class="color-text text-center" contenteditable="true" id="order-quantity">{{ t.quantity
+                            <p class="color-text text-center" id="order-quantity">{{ t.quantity
                                 }}</p>
                         </td>
                         <td class="text-center currency-format" id="order-amount">{{ t.amount }}</td>
@@ -821,7 +838,7 @@
                         data-change="true" data-payment="{{ Order.checkin.paymentId }}">
                         
                         <div class="dropup">
-                            <span class="mr-2 order-icon notranslate" data-toggle="dropdown" style="color: var(--color-text);">0</span>
+                            <span class="mr-2 order-icon notranslate" id="duration-btn" data-toggle="dropdown" style="color: var(--color-text);">0</span>
                             <ul class="dropdown-menu m-0 p-2">
                                 <li class="flex-between-start"><span class="color-text">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
@@ -1047,6 +1064,7 @@
         $('.input-checkout').val(duration_min)
         $(this).addClass('hide')
         $('.checkout-container').removeClass('hide')
+        $('#duration-btn').removeClass('flash')
     })
 
     $(document).on('click', '.input-checkout', function(event) {
@@ -1101,10 +1119,8 @@
                 }
             })
         } else {
-            $("[data-toggle='dropup']").click(function(e) {
-                $(this).parents(".dropup").toggleClass("open")
-                e.stopPropagation()
-            })
+            $('#duration-btn').addClass('flash')
+            alert('Confirm duration first!')
         }
     })
 
@@ -1718,10 +1734,10 @@
                     <td class="description" id="order-description" data-id="`+ pid + `">` + description + `</td>
                     <td class="text-center" id="order-price">`+ accounting.formatMoney(price) +`</td>
                     <td>
-                        <p class="color-text text-center" contenteditable="true" id="order-discount">`+ discount + `%</p>
+                        <p class="color-text text-center" id="order-discount">`+ discount + `%</p>
                     </td>
                     <td>
-                        <p class="color-text text-center" contenteditable="true" id="order-quantity">`+ quantity + `</p>
+                        <p class="color-text text-center" id="order-quantity">`+ quantity + `</p>
                     </td>
                     <td class="text-center" id="order-amount">`+ accounting.formatMoney(amount) + `</td>
                     <td class="cancel-btn hide">
@@ -2032,7 +2048,9 @@
                     var sum_o = parseFloat(order) - 1
                     $('.sum-order').text(sum_o)
                     var sum_q = parseInt(quantity) + data.quantity
-                    $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
+                    if (quantity.trim() != 'Available') {
+                        $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
+                    }
                     $('#sumTotal').text(accounting.formatMoney(total - amount))
                     orderLists.forEach((o, i) => {
                         if (o.orderId == id.attr('data-id')) {
@@ -2057,7 +2075,7 @@
 
         hour = Math.floor((cal % 86400000) / 3600000)
         minute = Math.round(((cal % 86400000) % 3600000) / 60000)
-
+        $('#duration-btn').text(minute + hour * 60)
         if (hour < 10 && hour > 0) {
             hour = '0'+hour+'h '
         } else if (hour < 1) {
@@ -2072,9 +2090,8 @@
             minute = minute+'min'
         }
         result = hour  + minute
-
+        
         $('#calculate-time').text(result)
     }, 500)
-
 </script>
 {% endblock %}

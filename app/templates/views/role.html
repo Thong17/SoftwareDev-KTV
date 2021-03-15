@@ -216,7 +216,7 @@
                             {{ form.role(class='form-control input-color', placeholder='Role', autocomplete='off') }}
                         </div>
                         <div class="form-group m-0">
-                            <select class="selectpicker" id="tags" multiple data-live-search="true">
+                            <select class="selectpicker notranslate" id="tags" multiple data-live-search="true">
                                 <option value="Admin">Admin</option>
                                 <option value="Cashier">Cashier</option>
                                 <option value="Stock">Stock</option>
@@ -244,10 +244,10 @@
                             {% if user.roles %}
                             <tr class="color-text" id="{{ user.id }}">
                                 <td class="notranslate">{{ user.username }}</td>
-                                <td class="role-td">
+                                <td class="role-td notranslate">
                                     <span class="selected-role">{{ user.roles[0].role }}</span>
                                 </td>
-                                <td class="flex-between-center">
+                                <td class="flex-between-center notranslate">
                                     <span class="tags-td">
                                         {% if user.roles[0].description == '' %}
                                         ...

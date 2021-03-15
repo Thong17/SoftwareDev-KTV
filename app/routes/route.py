@@ -402,19 +402,16 @@ def add_property():
 @route.route('/property/remove/<id>', methods=['POST'])
 @login_required
 def remove_property(id):
-    if request.form['data']:
-        id = request.form['data']
-        try:
-            _property = tblProperty.query.get(id)
-            Category = tblCategory.query.get(categoryId)
-            Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted property: ' +
-                                   _property.property+' in category '+Category.category, type='Delete', createdBy=current_user.id)
-            db.session.add(Activity)
-            db.session.delete(_property)
-            db.session.commit()
-            return jsonify({'msg': 'Property deleted'})
-        except:
-            return 'Failded'
+    try:
+        _property = tblProperty.query.get(id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted property: ' +
+                                _property.property+' in category', type='Delete', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.delete(_property)
+        db.session.commit()
+        return jsonify({'msg': 'Property deleted', 'data': 'Success'})
+    except:
+        return jsonify({'data': 'Failed to delete property'})
 
 
 @route.route('/property/update/<id>', methods=['POST'])
@@ -793,11 +790,8 @@ def save_product(id):
     Product.appearance[0].weight = weight
     Product.appearance[0].depth = depth
     Product.appearance[0].material = material
-    try:
-        db.session.commit()
-        return jsonify({'data': 'Success'})
-    except:
-        return jsonify({'data': 'Faild'})
+    db.session.commit()
+    return jsonify({'data': 'Success'})
 
 
 @route.route('/product/remove/<id>', methods=['POST'])
@@ -1315,7 +1309,7 @@ def delete_transaction(id):
         q.soq.quantity += quantity
     if pid != '':
         Payment = tblPayment.query.get(pid)
-        Payment.amount -= Transaction.price
+        Payment.amount -= Transaction.amount
     try:
         db.session.delete(Transaction)
         db.session.commit()
@@ -1496,8 +1490,9 @@ def income():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        offset = datetime.utcnow() - datetime.now()
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.order_by(
             tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
     else:
@@ -1545,10 +1540,9 @@ def outcome():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(
-            request.form['start'], '%Y-%m-%d') - timedelta(days=1)
-        e = datetime.strptime(
-            request.form['end'], '%Y-%m-%d') + timedelta(days=1)
+        offset = datetime.utcnow() - datetime.now()
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Outcome = tblOutcome.query.order_by(tblOutcome.createdOn).filter(
             tblOutcome.createdOn.between(s, e))
     else:
@@ -1595,8 +1589,9 @@ def profit():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        offset = datetime.utcnow() - datetime.now()
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.order_by(
             tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
         Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).filter(
@@ -1673,8 +1668,9 @@ def sale():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        offset = datetime.utcnow() - datetime.now()
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.filter(
             tblTransaction.createdOn.between(s, e))
     else:
@@ -1715,8 +1711,9 @@ def product_report():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        offset = datetime.utcnow() - datetime.now()
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.filter(
             tblTransaction.createdOn.between(s, e)).filter(tblTransaction.isComplete == True).all()
     else:
@@ -1758,8 +1755,9 @@ def quantity_report():
     e = request.form['end']
 
     if s != '' and e != '':
-        s = datetime.strptime(request.form['start'], '%Y-%m-%d')
-        e = datetime.strptime(request.form['end'], '%Y-%m-%d')
+        offset = datetime.utcnow() - datetime.now()
+        s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
+        e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.filter(tblTransaction.createdOn.between(s, e)).filter(tblTransaction.isComplete == True).all()
     else:
         Transactions = tblTransaction.query.filter(tblTransaction.isComplete == True).all()
@@ -1971,6 +1969,7 @@ def delete_advertise(id):
 
 @route.route('/')
 @route.route('/home')
+@login_required
 def index():
     categories = tblCategory.query.all()
     brands = tblBrand.query.all()
@@ -2824,7 +2823,7 @@ def checkout_order(order_id):
         
         tid = str(uuid4())
 
-        transaction = tblTransaction(id=tid, price=Order.order.price, quantity=1, discount=0, isEditable=False,
+        transaction = tblTransaction(id=tid, price=round(Decimal(totalPrice), 2), quantity=1, discount=0, isEditable=False,
                                     amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
         json = {
             'id': tid,
@@ -2862,7 +2861,7 @@ def backup():
         dirs = 'backup'
         if not os.path.exists(dirs):
             os.makedirs(dirs)
-        cmd = "mysqldump -uroot -p'S0ftw@reDev' restaurant > backup/backup_"+strtime+".sql"
+        cmd = "mysqldump -uroot -p'myroot' restaurant > backup/backup_"+strtime+".sql"
         os.system(cmd)
         return jsonify({'msg': 'Backup completed successfully'})
     except: 
@@ -2875,12 +2874,12 @@ def restore():
         dirs = 'backup'
         if not os.path.exists(dirs):
             os.makedirs(dirs)
-        backup = "mysqldump -uroot -p'S0ftw@reDev' restaurant > backup/restore_"+strtime+".sql"
+        backup = "mysqldump -uroot -p'myroot' restaurant > backup/restore_"+strtime+".sql"
         os.system(backup)
         _file = request.files['file']
         if _file.filename.split('.')[1] == 'sql':
             restore_file = os.path.abspath('backup/'+_file.filename)
-            restore = "mysql -uroot -p'S0ftw@reDev' restaurant < "+restore_file
+            restore = "mysql -uroot -p'myroot' restaurant < "+restore_file
             os.system(restore)
             return jsonify({'msg': 'Restore completed successfully', 'data': 'Success'})
         else:
