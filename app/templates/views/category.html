@@ -9,7 +9,7 @@
                 <div class="box today">
                     <div class="box-icon">
                         <i class="fa fa-calendar" aria-hidden="true"></i>
-                        <p>Today</p>
+                        <p class="ln-today">Today</p>
                     </div>
                     <div class="box-result notranslate">
                         <p>{{today|length}}</p>
@@ -18,7 +18,7 @@
                 <div class="box total">
                     <div class="box-icon">
                         <i class="fa fa-inbox" aria-hidden="true"></i>
-                        <p>Total</p>
+                        <p class="ln-total">Total</p>
                     </div>
                     <div class="box-result notranslate">
                         <p>{{total}}</p>
@@ -28,7 +28,7 @@
                 <div class="box activity">
                     <div class="box-icon">
                         <i class="fa fa-line-chart" aria-hidden="true"></i>
-                        <p>Activity</p>
+                        <p class="ln-activity">Activity</p>
                     </div>
                     <div class="box-result notranslate">
                         0
@@ -38,7 +38,7 @@
             </div>
             <br>
             <div class="flex-between-end mt-0">
-                <h5 class="color-font">Categories</h5>
+                <h5 class="color-font ln-category">Categories</h5>
                 <button class="btn border color-font btn-slim" id="add-category">
                     <p class="plus">+</p>
                 </button>
@@ -72,16 +72,16 @@
         <div class="column-wrapper" style="width: 100%;">
             <div class="content-header">
                 <div class="flex-between" id="prop-header">
-                    <h3 class="color-font">Category</h3>
+                    <h3 class="color-font ln-category">Category</h3>
                 </div>
             </div>
             <div class="content-body" style="overflow-y: auto;">
                 <table class="table">
                     <thead>
                         <tr class="color-font">
-                            <td style="width: 30%;">Column</td>
-                            <td style="width: 20%;">Type</td>
-                            <td style="width: 50%;">Description</td>
+                            <td style="width: 30%;" class="ln-name">Name</td>
+                            <td style="width: 20%;" class="ln-category">Type</td>
+                            <td style="width: 50%;" class="ln-description">Description</td>
                         </tr>
                     </thead>
                     <tbody id="list-properties">

@@ -265,11 +265,11 @@
                     </div>
                     <div class="color-text room-bottom flex-between-center">
                         {% if room.status == 'Open' %}
-                        <div class="room-status text-success">Open</div>
+                        <div class="room-status text-success ln-open">Open</div>
                         {% elif room.status == 'In Process' %}
-                        <div class="room-status text-danger">In Process</div>
+                        <div class="room-status text-danger ln-process">In Process</div>
                         {% else %}
-                        <div class="room-status text-danger">Close</div>
+                        <div class="room-status text-danger ln-close">Close</div>
                         {% endif %}
                     </div>
                 </div>
@@ -281,7 +281,7 @@
         <div class="border-right"></div>
         <div class="column-wrapper" id="list-orders">
             <div class="column-title flex-center-center mb-3" style="text-align: center;">
-                <h4 class="notranslate color-font m-0">Order</h4>
+                <h4 class="notranslate color-font m-0 order">Order</h4>
             </div>
             <!-- <div id='external-events'>
                 <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
@@ -297,10 +297,10 @@
                 <table id="order-table" class="table">
                     <thead>
                         <tr class="color-font">
-                            <td class="color-text">Customer</td>
-                            <td class="color-text">Phone</td>
-                            <td class="color-text">Room</td>
-                            <td class="color-text">Order</td>
+                            <td class="color-text ln-customer">Customer</td>
+                            <td class="color-text ln-phone">Phone</td>
+                            <td class="color-text ln-room">Room</td>
+                            <td class="color-text order">Order</td>
                         </tr>
                     </thead>
                     <tbody id="order-list">
@@ -342,7 +342,7 @@
                 <div class="row m-0" style="width: 100%;">
                     <div class="col-md-7">
                         <div class="form-group">
-                            <label for="input-customer" class="label">Customer Name</label>
+                            <label for="input-customer" class="label ln-customer">Customer Name</label>
                             <select class="selectpicker" id="select-customer" data-live-search="true">
                                 {% if customers %}
                                 {% for customer in customers %}
@@ -356,7 +356,7 @@
                     </div>
                     <div class="col-md-5">
                         <div class="form-group">
-                            <button class="btn border px-3 color-text" id="new-customer">New Customer</button>
+                            <button class="btn border px-3 color-text ln-new-customer" id="new-customer">New Customer</button>
                         </div>
                     </div>
                 </div>
@@ -365,13 +365,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <input type="time" class="form-control input-color" id="order-from">
-                            <label for="order-from" class="label">From</label>
+                            <label for="order-from" class="label ln-from">From</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <input type="time" class="form-control input-color" id="order-to">
-                            <label for="order-to" class="label">To</label>
+                            <label for="order-to" class="label ln-to">To</label>
                         </div>
                     </div>
                 </div>
@@ -380,9 +380,9 @@
                 <table id="list-customers" class="table">
                     <thead>
                         <tr class="color-font">
-                            <td class="color-text" style="width: 40%;">Customer</td>
-                            <td class="color-text" style="width: 30%;">Phone</td>
-                            <td class="color-text" style="width: 30%;">Birthdate</td>
+                            <td class="color-text ln-customer" style="width: 40%;">Customer</td>
+                            <td class="color-text ln-phone" style="width: 30%;">Phone</td>
+                            <td class="color-text ln-birthdate" style="width: 30%;">Birthdate</td>
                         </tr>
                     </thead>
                     <tbody class="customer-container">
@@ -406,8 +406,8 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn color-text" data-dismiss="modal">Close</button>
-                <button type="button" class="btn bg-menu color-text" id="save-order">Order</button>
+                <button type="button" class="btn color-text ln-close" data-dismiss="modal">Close</button>
+                <button type="button" class="btn bg-menu color-text ln-okay" id="save-order">Process</button>
             </div>
         </div>
     </div>

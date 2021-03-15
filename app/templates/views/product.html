@@ -11,7 +11,7 @@
         <div class="column-wrapper" style="width: 350px; box-sizing: border-box; overflow: hidden;">
             <div id="brand-nav">
                 <div class="flex-between-end">
-                    <h5 class="color-font">Brands</h5>
+                    <h5 class="color-font ln-brand">Brands</h5>
                     <button class="btn border color-font btn-slim" id="add-brand">
                         <p class="plus">+</p>
                     </button>
@@ -334,7 +334,7 @@
                             weight: data.appearance[0].weight,
                             depth: data.appearance[0].depth,
                             material: data.appearance[0].material
-                        }))
+                        })).translator()
 
                         var options = $('#category').children()
 
@@ -700,7 +700,7 @@
                         weight: "",
                         depth: "",
                         material: ""
-                    }))
+                    })).translator()
 
                     $.ajax({
                         url: '/brands',

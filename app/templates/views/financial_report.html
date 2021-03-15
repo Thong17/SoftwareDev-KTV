@@ -49,23 +49,23 @@
 
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 350px">
-            <h5 class="color-font">Categories</h5>
+            <h5 class="color-font ln-category">Categories</h5>
             <hr>
             <div class="item-container">
                 <div class="flex-between item active color-font" id="income">
-                    <p>Income</p>
+                    <p class="ln-income">Income</p>
                     <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
                 </div>
                 <div class="flex-between item color-font" id="outcome">
-                    <p>Expenses</p>
+                    <p class="ln-expense">Expenses</p>
                     <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
                 </div>
                 <div class="flex-between item color-font" id="profit">
-                    <p>Profit</p>
+                    <p class="ln-profit">Profit</p>
                     <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
                 </div>
                 <div class="flex-between item color-font" id="sale">
-                    <p>Sale</p>
+                    <p class="ln-sale">Sale</p>
                     <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
                 </div>
             </div>
@@ -76,11 +76,11 @@
                 <div class="select-list color-text">
                     <i class="fa fa-caret-right right" aria-hidden="true"></i>
                     <select id="filter" class="input-color ml-0 mr-2" name="filter">
-                        <option value="daily">Daily</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
+                        <option class="ln-daily" value="daily">Daily</option>
+                        <option class="ln-monthly" value="monthly">Monthly</option>
+                        <option class="ln-yearly" value="yearly">Yearly</option>
                     </select>
-                    From: <input type="date" class="input-color mx-1" id="start-date">
+                    <span class="ln-from">From</span>: <input type="date" class="input-color mx-1" id="start-date">
                     - <input type="date" class="input-color ml-1" id="end-date">
                 </div>
                 <div class="generate-button">

@@ -85,35 +85,35 @@
     <div class="row-wrapper">
         <div class="column-wrapper">
             <div class="item-container">
-                <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Modify Store</h5>
+                <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-storeModify">Modify Store</span></h5>
                 <div class="form-group">
                     <input type="text" name="store" id="store" class="form-control input-color" autocomplete="off" value="{{ store.store }}">
-                    <label for="store" class="label">Store</label>
+                    <label for="store" class="label ln-store">Store</label>
                 </div>
                 <div class="row">
                     <div class="col-md-8">
                         <div class="form-group">
                             <input type="text" name="phone" id="phone" class="form-control input-color" autocomplete="off" value="{{ store.phone }}" title="{{ store.phone }}">
-                            <label for="phone" class="label">Phone</label>
+                            <label for="phone" class="label ln-phone">Phone</label>
                         </div>
                     </div>
                     <div class="col-md-4 pl-0">
                         <div class="form-group">
                             <input type="text" name="location" id="location" class="form-control input-color" autocomplete="off" value="{{ store.location }}" title="{{ store.location }}">
-                            <label for="location" class="label">Location</label>
+                            <label for="location" class="label ln-description">Location</label>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-shadow btn-block color-font bg-menu" id="saveStore">Save Store Info</button>
+                    <button class="btn btn-shadow btn-block color-font bg-menu ln-save-store" id="saveStore">Save Store Info</button>
                 </div>
                 <hr>
                 <div class="form-group selector">
-                    <p class="detail-content ml-1">Select floor for specific property</p>
+                    <p class="detail-content ml-1 ln-floor-details">Select floor for specific property</p>
                     <div class="flex-between-center">
 
                         <div class="dropdown" id="select-floor">
-                            <button class="btn btn-block border color-text flex-between-center btn-floor" data-toggle="dropdown"><span class="select-text">Select Floor</span><span class="dropdown-icon"><i class="fa fa-caret-down" aria-hidden="true"></i></span></button>
+                            <button class="btn btn-block border color-text flex-between-center btn-floor" data-toggle="dropdown"><span class="select-text ln-selectFloor">Select Floor</span><span class="dropdown-icon"><i class="fa fa-caret-down" aria-hidden="true"></i></span></button>
                             <div class="dropdown-menu" id="list-floors">
                                 {% if floors %}
                                 {% for floor in floors %}
@@ -138,14 +138,14 @@
                 <hr>
                 <div class="form-group" id="str">
                     <input type="text" name="room" id="room" class="form-control input-color" autocomplete="off" required>
-                    <label for="room" class="label">Room No</label>
+                    <label for="room" class="label ln-roomNo">Room No</label>
                 </div>
                 <div class="row" style="position: relative;">
                     <span class="per color-text">/</span>
                     <div class="col-md-8">
                         <div class="form-group" id="amt">
                             <input type="text" name="price" id="price" class="form-control input-color" autocomplete="off" required>
-                            <label for="price" class="label">Price</label>
+                            <label for="price" class="label ln-price">Price</label>
                             <span class="percentage hide">$</span>
                         </div>
                     </div>
@@ -159,7 +159,7 @@
                     </div>
                 </div>
                 <div class="form-group flex-end m-0">
-                    <button class="btn btn-shadow bg-menu color-font" id="addRoom">Add Room</button>
+                    <button class="btn btn-shadow bg-menu color-font ln-add" id="addRoom">Add Room</button>
                 </div>
             </div>
         </div>
@@ -185,11 +185,11 @@
                     <div class="color-text room-bottom flex-between-center">
                         <div class="room-price notranslate"><span class="currency-format" id="room-price">{{ room.price }}</span>/ {{ room.hour }}</div>
                         {% if room.status == 'Open' %}
-                        <div class="room-status text-success">Open</div>
+                        <div class="room-status text-success ln-open">Open</div>
                         {% elif room.status == 'In Process' %}
-                        <div class="room-status text-danger">In Process</div>
+                        <div class="room-status text-danger ln-process">In Process</div>
                         {% else %}
-                        <div class="room-status text-danger">Close</div>
+                        <div class="room-status text-danger ln-close">Close</div>
                         {% endif %}
                     </div>
                 </div>
@@ -204,21 +204,21 @@
     <div class="modal-dialog modal-dialog-centered" role="document" style="width: 370px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title color-font" id="myModalLabel">Edit Room</h4>
+                <h4 class="modal-title color-font ln-editRoom" id="myModalLabel">Edit Room</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <input type="text" name="edit-room" class="input-color form-control" id="edit-room">
-                    <label class="label edit-room" for="property-price">Room</label>
+                    <label class="label edit-room ln-room" for="property-price">Room</label>
                 </div>
                 <div class="form-group">
                     <input step="any" type="number" name="edit-price" class="input-color form-control" id="edit-price">
-                    <label class="label edit-price" for="property-price">Price</label>
+                    <label class="label edit-price ln-price" for="property-price">Price</label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn color-font" data-dismiss="modal">Cancel</button>
-                <button class="btn border save-room color-font">Save</button>
+                <button type="button" class="btn color-font ln-cancel" data-dismiss="modal">Cancel</button>
+                <button class="btn border save-room color-font ln-save">Save</button>
             </div>
         </div>
     </div>

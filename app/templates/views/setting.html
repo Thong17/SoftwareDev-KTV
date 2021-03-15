@@ -2,13 +2,22 @@
 
 {% block content %}
 <div class="wrap-container">
-    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Theme</h5>
-    <p class="paragraph ml-4 mt-2">Choose your favorite background color</p>
+    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-theme">Theme</span></h5>
+    <p class="paragraph ml-4 mt-2 ln-theme-details">Choose your favorite background color</p>
     <div class="select-list">
         <select id="select-theme" class="input-color" name="theme">
             <option value="light">Light</option>
             <option value="dark">Dark</option>
             <option value="green">Green</option>
+        </select>
+    </div>
+    <br>
+    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-lang">Language</span></h5>
+    <p class="paragraph ml-4 mt-2 ln-lang-details">Choose your language</p>
+    <div class="select-list">
+        <select id="select-lang" class="input-color" name="lang">
+            <option value="english">English</option>
+            <option value="khmer">Khmer</option>
         </select>
     </div>
     <!-- <br>
@@ -21,30 +30,30 @@
         </select>
     </div> -->
     <br>
-    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Backup</h5>
-    <p class="paragraph ml-4 mt-2">Back up your data to prevent data lose</p>
+    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-backup">Backup</span></h5>
+    <p class="paragraph ml-4 mt-2 ln-backup-details">Back up your data to prevent data lose</p>
     <div class="select-list">
-        <button class="btn border" id="backup-data"><ion-icon class="mr-1" name="download-outline"></ion-icon>Back Up</button>
+        <button class="btn border" id="backup-data"><ion-icon class="mr-1" name="download-outline"></ion-icon>Backup</button>
     </div>
     <br>
-    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Restore</h5>
-    <p class="paragraph ml-4 mt-2">Restore data to go back to the previous change</p>
+    <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-restore">Restore</span></h5>
+    <p class="paragraph ml-4 mt-2 ln-restore-details">Restore data to go back to the previous change</p>
     <div class="select-list">
         <input type="file" class="border" name="restore" id="restore">
     </div>
-    <br>
+    <!-- <br>
     <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Language</h5>
     <p class="paragraph ml-4 mt-2">Choose your language</p>
     <div class="select-list">
         <div id="google_translate_element"></div>
-    </div>
+    </div> -->
 </div>
 {% endblock %}
 
 {% block script %}
     <script>
         $(document).ready(function() {
-            $('.goog-te-combo').addClass('input-color')
+            // $('.goog-te-combo').addClass('input-color')
 
             $('#backup-data').on('click', function() {
                 $.ajax({
@@ -52,6 +61,20 @@
                     type: 'POST',
                     success: function(data) {
                         alert(data.msg)
+                    }
+                })
+            })
+
+            $('#select-lang').on('change', function() {
+                lang = $(this).children('option:selected').val()
+                $.ajax({
+                    url: '/language/change',
+                    method: 'POST',
+                    data: {
+                        data: lang
+                    },
+                    success: function (data) {
+                        window.location.reload()
                     }
                 })
             })

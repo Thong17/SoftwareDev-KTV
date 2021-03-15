@@ -58,15 +58,15 @@
 
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 350px">
-            <h5 class="color-font">Categories</h5>
+            <h5 class="color-font ln-category">Categories</h5>
             <hr>
             <div class="item-container">
                 <div class="flex-between item active color-font" id="product_report">
-                    <p>Sale</p>
+                    <p class="ln-sale">Sale</p>
                     <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
                 </div>
                 <div class="flex-between item color-font" id="quantity_report">
-                    <p>Quantity</p>
+                    <p class="ln-quantity">Quantity</p>
                     <p><i class="fa fa-caret-right" aria-hidden="true"></i></p>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                     <select id="filter" class="input-color ml-0 mr-2" name="filter">
                         <option value="daily">Daily</option>
                     </select>
-                    From: <input type="date" class="input-color mx-1" id="start-date">
+                    <span class="ln-from">From</span>: <input type="date" class="input-color mx-1" id="start-date">
                     - <input type="date" class="input-color ml-1" id="end-date">
                 </div>
                 <div class="generate-button">

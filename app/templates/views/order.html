@@ -631,7 +631,7 @@
             </div>
         </div>
         <div class="grid-products product-container">
-            <div class="empty-result hide color-text">No product found...</div>
+            <div class="empty-result hide color-text ln-result">No product found...</div>
             {% if products %}
             {% for product in products %}
             {% if current_user.id in product.listFavorite|tojson|safe %}
@@ -753,7 +753,7 @@
             {% endif %}
             {% endfor %}
             {% else %}
-            <div class="empty-result color-text">No product found...</div>
+            <div class="empty-result color-text ln-result">No product found...</div>
             {% endif %}
         </div>
 
@@ -763,18 +763,18 @@
     <div class="col-order pl-4">
         <h4 class="color-font notranslate" style="text-align: center;">{{ Order.order.room }}</h4>
         <div class="customer-info">
-            <div class="customer-name color-text">Customer: <span class="notranslate">{{ Order.customer.name }}</span></div>
+            <div class="customer-name color-text"><span class="ln-customer">Customer</span>: <span class="notranslate">{{ Order.customer.name }}</span></div>
             <div class="customer-phone color-text notranslate">{{ Order.customer.phone }}</div>
         </div>
         <div class="order-container mt-2">
             <table class="table order-table notranslate">
                 <thead>
                     <tr class="color-font">
-                        <td style="width: 50%;">Description</td>
-                        <td class="text-center" style="width: 20%;">Price</td>
-                        <td class="text-center" style="width: 15%;">Disc</td>
-                        <td class="text-center" style="width: 15%;">Qty</td>
-                        <td class="text-center" style="width: 20%;">Amount</td>
+                        <td style="width: 50%;" class="ln-description">Description</td>
+                        <td class="text-center ln-price" style="width: 20%;">Price</td>
+                        <td class="text-center ln-disc" style="width: 15%;">Disc</td>
+                        <td class="text-center ln-qty" style="width: 15%;">Qty</td>
+                        <td class="text-center ln-amount" style="width: 20%;">Amount</td>
                         <td class="text-center cancel-btn"></td>
                     </tr>
                 </thead>
@@ -822,7 +822,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span>Already Paid</span>
+                                <span class="ln-paid">Already Paid</span>
                             </button>
                         {% else %}
                             <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}" data-check='true'>
@@ -830,7 +830,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span>Payment</span>
+                                <span class="ln-payment">Payment</span>
                             </button>
                         {% endif %}
                     {% else %}
@@ -840,13 +840,13 @@
                         <div class="dropup">
                             <span class="mr-2 order-icon notranslate" id="duration-btn" data-toggle="dropdown" style="color: var(--color-text);">0</span>
                             <ul class="dropdown-menu m-0 p-2">
-                                <li class="flex-between-start"><span class="color-text">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
+                                <li class="flex-between-start"><span class="color-text ln-checkin">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
-                                <li class="mb-3 flex-between-center"><span class="color-text">Duration </span><span id="calculate-time" class="text-danger notranslate"></span></li>
-                                <li><div class="border checkout-li"><span class="color-text confirm-checkout">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
+                                <li class="mb-3 flex-between-center"><span class="color-text ln-duration">Duration </span><span id="calculate-time" class="text-danger notranslate"></span></li>
+                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-confirm">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
                             </ul>
                         </div>
-                        <span class="check-in-out">End</span>
+                        <span class="check-in-out ln-checkout">End</span>
                     </button>
                     {% endif %}
                 {% else %}
@@ -855,12 +855,12 @@
                         <span class="mr-2 order-icon" style="color: var(--color-text);">
                             0
                         </span>
-                        <span class="check-in-out">Start</span>
+                        <span class="check-in-out ln-checkin">Start</span>
                     </button>
                 {% endif %}
                 <div class="arrow arrow-left animate-left-to-right">
                     <div class="flex-between-center">
-                        <span class="mr-3 color-text">Total:</span>
+                        <span class="mr-3 color-text ln-total">Total:</span>
                         <span id="sumTotal" class="color-font currency-format notranslate">{{ total }}</span>
                     </div>
                 </div>
@@ -885,8 +885,8 @@
                     <div class="payment-bill">
                         <div class="payment-header">
                             <div class="payment-type">
-                                <div class="type-btn type-cash color-text active">Cash</div>
-                                <div class="type-btn type-card color-text">Card</div>
+                                <div class="type-btn type-cash color-text active ln-cash">Cash</div>
+                                <div class="type-btn type-card color-text ln-card">Card</div>
                             </div>
                         </div>
                         <div class="payment-body">
@@ -895,7 +895,7 @@
                                     <div class="form-group">
                                         <input type="number" step="any" class="form-control input-color"
                                             name="receive-cash" id="receive-cash" required>
-                                        <label for="receive-cash" class="label receive-cash">Amount</label>
+                                        <label for="receive-cash" class="label receive-cash ln-amount">Amount</label>
                                         <select name="receive-currency" id="receive-currency"
                                             class="form-control input-color">
                                             <option value="USD"><span>&#36;</span></option>
@@ -915,10 +915,10 @@
                                 <table class="table money-table">
                                     <thead>
                                         <tr class="color-font notranslate">
-                                            <td style="width: 40%;">Paid</td>
-                                            <td style="width: 15%; text-align:center;">Currency</td>
-                                            <td style="width: 10%; text-align:center;">Unit</td>
-                                            <td style="width: 25%; text-align:center;">Total</td>
+                                            <td style="width: 40%;" class="ln-paid">Paid</td>
+                                            <td style="width: 15%; text-align:center;" class="ln-currency">Currency</td>
+                                            <td style="width: 10%; text-align:center;" class="ln-unit">Unit</td>
+                                            <td style="width: 25%; text-align:center;" class="ln-total">Total</td>
                                             <td style="width: 10%;"></td>
                                         </tr>
                                     </thead>
@@ -938,27 +938,27 @@
                         </div>
                         <div class="invoice-body">
                             <div class="shop-details flex-column-start-center mb-1">
-                                <p class="color-text">Contact: {{ current_user.profile[0].phone }}</p>
+                                <p class="color-text"><span class="ln-contact">Contact</span>: {{ current_user.profile[0].phone }}</p>
                                 <p class="color-text notranslate">ABA: 077 777 377 (CHHAN Bunthong)</p>
                             </div>
                             <div class="flex-between-center pb-1">
-                                <p class="color-text">Date: <span id="invoiceDate" class="notranslate"></span></p>
+                                <p class="color-text"><span class="ln-date">Date</span>: <span id="invoiceDate" class="notranslate"></span></p>
                                 <p class="color-text notranslate"><span id="invoiceTime"></span></p>
                             </div>
                             <div class="flex-between-center border-dashed py-1">
-                                <p class="color-text">Invoice: <span class="notranslate" id="invoiceNo"></span></p>
-                                <p class="color-text">Cashier: <span class="notranslate">{{ current_user.username
+                                <p class="color-text"><span class="ln-invoice">Invoice</span>: <span class="notranslate" id="invoiceNo"></span></p>
+                                <p class="color-text"><span class="ln-cashier">Cashier</span>: <span class="notranslate">{{ current_user.username
                                         }}</span></p>
                             </div>
                             <div class="item-payment">
                                 <table class="table invoice-table">
                                     <thead>
                                         <tr class="color-font">
-                                            <td style="width: 40%;" class="notranslate">Item Name</td>
-                                            <td style="width: 15%; text-align:center;">Price</td>
-                                            <td style="width: 10%; text-align:center;" class="notranslate">Disc</td>
-                                            <td style="width: 15%; text-align:center;" class="notranslate">Qty</td>
-                                            <td style="width: 20%; text-align:center;">Total</td>
+                                            <td style="width: 40%;" class="notranslate ln-description">Item Name</td>
+                                            <td style="width: 15%; text-align:center;" class="ln-price">Price</td>
+                                            <td style="width: 10%; text-align:center;" class="notranslate ln-disc">Disc</td>
+                                            <td style="width: 15%; text-align:center;" class="notranslate ln-qty">Qty</td>
+                                            <td style="width: 20%; text-align:center;" class="ln-total">Total</td>
                                         </tr>
                                     </thead>
                                     <tbody id="item-invoice" class="color-text notranslate"></tbody>
@@ -967,7 +967,7 @@
                         </div>
                         <div class="invoice-total border-dashed">
                             <div class="flex-between-start" style="width: 100%;">
-                                <p class="color-text" style="width: 50%;">Total</p>
+                                <p class="color-text ln-total" style="width: 50%;">Total</p>
                                 <div class="flex-between-center notranslate" style="width: 50%;">
                                     <p class="color-text">USD:</p>
                                     <p class="color-text" id="totalUSD"><span>&#36;</span></p>
@@ -978,16 +978,16 @@
                                 <p class="color-text" id="totalKHR"><span>&#6107;</span></p>
                             </div>
                             <div class="flex-between-center border-dashed my-1 pt-1 notranslate">
-                                <p class="color-text">Cash:</p>
+                                <p class="color-text ln-paid">Cash:</p>
                                 <p class="color-text" id="totalCash">...</p>
                             </div>
                             <div class="flex-between-center notranslate">
-                                <p class="color-text">Return:</p>
+                                <p class="color-text ln-return">Return:</p>
                                 <p class="color-text" id="totalChange">...</p>
                             </div>
                         </div>
                         <div class="invoice-footer">
-                            <p class="color-text">Thank you for purchasing</p>
+                            <p class="color-text ln-greet">Thank you for purchasing</p>
                         </div>
                     </div>
                     <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal">
@@ -1003,7 +1003,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title color-font">Cash Drawer</h4>
+                <h4 class="modal-title color-font ln-drawer">Cash Drawer</h4>
                 {% if current_user.drawer == '' %}
                 <div class="drawer-time" title="Drawer is off">
                     <span class="color-text" id="drawerTime"></span>
@@ -1026,13 +1026,13 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn color-font close-modal" data-dismiss="modal">Close</button>
+                <button type="button" class="btn color-font close-modal ln-close" data-dismiss="modal">Close</button>
                 {% if current_user.drawer == '' %}
-                <button class="btn border drawer-save color-font">Create</button>
-                <button class="btn border drawer-end color-font hide" id="{{ current_user.drawer }}">End</button>
+                <button class="btn border drawer-save color-font ln-create">Create</button>
+                <button class="btn border drawer-end color-font hide ln-end" id="{{ current_user.drawer }}">End</button>
                 {% else %}
-                <button class="btn border drawer-save color-font hide">Create</button>
-                <button class="btn border drawer-end color-font" id="{{ current_user.drawer }}">End</button>
+                <button class="btn border drawer-save color-font hide ln-create">Create</button>
+                <button class="btn border drawer-end color-font ln-end" id="{{ current_user.drawer }}">End</button>
                 {% endif %}
             </div>
         </div>

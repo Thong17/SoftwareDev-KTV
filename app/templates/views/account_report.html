@@ -163,23 +163,23 @@
     <div class="dash-board">
         <div class="right-container">
             <div class="chart-header">
-                <h5 class="color-text">Performance</h5>
+                <h5 class="color-text ln-performance">Performance</h5>
             </div>
             <div class="grid-item" id="pie">
                 <canvas id="pieChart"></canvas>
             </div>
         </div>
         <div class="left-container">
-            <h5 class="color-text flex-start mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Done by <p
+            <h5 class="color-text flex-start mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-doneBy">Done by</span> <p
                     class="sold-by ml-1 notranslate">{{ current_user.username }}</p>
             </h5>
             <div class="list-activities">
                 <table class="table">
                     <thead>
                         <tr class="color-font">
-                            <td class="color-text" style="width: 50%;">Activity</td>
-                            <td class="color-text">Type</td>
-                            <td class="color-text">Date Created</td>
+                            <td class="color-text ln-activity" style="width: 50%;">Activity</td>
+                            <td class="color-text ln-category">Type</td>
+                            <td class="color-text ln-date-create">Date Created</td>
                         </tr>
                     </thead>
                     <tbody id="list-activities" class="notranslate">

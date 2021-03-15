@@ -62,7 +62,7 @@
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 350px; box-sizing: border-box; overflow: hidden;">
             <div class="flex-between-center mt-0">
-                <h5 class="color-font">Invoices</h5>
+                <h5 class="color-font ln-invoice">Invoices</h5>
                 
                 <div class="form-group p-0">
                     <input type="text" class="form-control input-color input-inv" placeholder="Search">
@@ -89,13 +89,13 @@
                 <table class="table">
                     <thead>
                         <tr class="color-font">
-                            <td class="color-text" style="width: 10%;">Invoice</td>
-                            <td class="color-text">Description</td>
-                            <td class="color-text">Amount</td>
-                            <td class="color-text">Quantity</td>
-                            <td class="color-text">Discount</td>
-                            <td class="color-text">Since</td>
-                            <td class="color-text">Status</td>
+                            <td class="color-text ln-invoice" style="width: 10%;">Invoice</td>
+                            <td class="color-text ln-description">Description</td>
+                            <td class="color-text ln-amount">Amount</td>
+                            <td class="color-text ln-qty">Quantity</td>
+                            <td class="color-text ln-disc">Discount</td>
+                            <td class="color-text ln-since">Since</td>
+                            <td class="color-text ln-status">Status</td>
                             <td class="color-text"></td>
                         </tr>
                     </thead>
@@ -114,7 +114,7 @@
                                 <td class="color-text">{{ transaction.description }}</td>
                                 <td class="color-text">{{ transaction.amount }}</td>
                                 <td class="color-text">{{ transaction.quantity }}</td>
-                                <td class="color-text">{{ transaction.discount }}</td>
+                                <td class="color-text">{{ transaction.discount }}%</td>
                                 <td class="color-text">{{ transaction.createdOn }}</td>
                                 <td class="color-text">
                                     {% if transaction.isComplete %}

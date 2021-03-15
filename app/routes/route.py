@@ -2887,4 +2887,15 @@ def restore():
     except: 
         return jsonify({'msg': 'Failed to backup!', 'data': 'Failed'})
 
+@route.route('/language/change', methods=['POST'])
+def change_lang():
+    lang = request.form['data']
+    user = tblUser.query.get(current_user.id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has modified language from '+user.language, type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
+    user.language = lang
+    db.session.commit()
+    return jsonify({'lang': lang})
+
    

@@ -51,8 +51,8 @@
 <div class="wrap-container flex-between-start">
     <form action="/expense" method="post" class="pr-4 mr-4">
         {{ form.csrf_token }}
-        <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>Expense</h5>
-        <p class="paragraph mt-3">Add expense details and amount</p>
+        <h5 class="color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-expense"></span></h5>
+        <p class="paragraph mt-3 ln-expense-details">Add expense details and amount</p>
         <div class="form-group pt-2 m-0" id="exp">
             {{ form.expense(class='form-control input-color', placeholder='Details', autocomplete='off') }}
         </div>
@@ -77,9 +77,9 @@
     <table id="list-expenses" class="table">
         <thead>
             <tr class="color-font">
-                <td class="color-text">Details</td>
-                <td class="color-text">Price</td>
-                <td class="color-text">Created On</td>
+                <td class="color-text ln-details">Details</td>
+                <td class="color-text ln-price">Price</td>
+                <td class="color-text ln-date-create">Created On</td>
             </tr>
         </thead>
         <tbody>

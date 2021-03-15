@@ -8,7 +8,7 @@
                 <div class="box total color-text" style="grid-row: 3/4; grid-column: 1/3;">
                     <div class="box-icon">
                         <i class="fa fa-line-chart" aria-hidden="true"></i>
-                        <p>Total</p>
+                        <p class="ln-total">Total</p>
                     </div>
                     <div class="box-result">
                         <p id="total_cost" class="currency-format text-wrapper notranslate">{{ total_cost }}</p>
@@ -18,7 +18,7 @@
                 <div class="box today color-text" style="grid-row: 2/3;">
                     <div class="box-icon">
                         <ion-icon name="pricetags"></ion-icon>
-                        <p>Price</p>
+                        <p class="ln-price">Price</p>
                     </div>
                     <div class="box-result notranslate">
                         <p style="font-size: 16px;" title="{{ product.price }}" class="currency-format text-wrapper">{{ product.price }}</p>
@@ -44,7 +44,7 @@
                                 <div class="box-container flex-between-end">
                                     <div class="box-icon">
                                         <i class="fa fa-inbox" aria-hidden="true"></i>
-                                        <p>Stock</p>
+                                        <p class="ln-stock">Stock</p>
                                     </div>
                                     <div class="box-result">
                                         <p id="total_stock" class="notranslate">{{ total_stock }}</p>
@@ -79,7 +79,7 @@
             </div>
             <div class="item-container" style="height: 330px;">
                 <div class="flex-between-end mt-4">
-                    <h5 class="color-font" style="font-size: 18px;">Colors</h5>
+                    <h5 class="color-font ln-color" style="font-size: 18px;">Colors</h5>
                 </div>
                 <hr class="mt-2">
                 {% if product.colors %}
@@ -123,13 +123,13 @@
                         <table class="table stock-table">
                             <thead>
                                 <tr class="color-font">
-                                    <td style="width: 13%;">Color</td>
-                                    <td style="width: 10%;">Cost</td>
-                                    <td style="width: 5%;">Currency</td>
-                                    <td style="width: 10%;">Rate</td>
-                                    <td style="width: 10%;">Quantity</td>
-                                    <td style="width: 10%;">Adjust</td>
-                                    <td style="width: 20%;">Total</td>
+                                    <td style="width: 13%;" class="ln-color">Color</td>
+                                    <td style="width: 10%;" class="ln-cost">Cost</td>
+                                    <td style="width: 5%;" class="ln-currency">Currency</td>
+                                    <td style="width: 10%;" class="ln-rate">Rate</td>
+                                    <td style="width: 10%;" class="ln-qty">Quantity</td>
+                                    <td style="width: 10%;" class="ln-adjust">Adjust</td>
+                                    <td style="width: 20%;" class="ln-total">Total</td>
                                 </tr>
                             </thead>
                             <tbody id="list-stocks">
