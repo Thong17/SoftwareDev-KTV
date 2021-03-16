@@ -830,7 +830,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span class="ln-payment">Payment</span>
+                                <span class="ln-order">Payment</span>
                             </button>
                         {% endif %}
                     {% else %}
@@ -934,7 +934,7 @@
                         <div class="invoice-header">
                             <h5 class="color-text notranslate"
                                 style="text-align: center; font-size: 23px; font-weight: 700;">{{
-                                current_user.profile[0].company }}</h5>
+                                store.store }}</h5>
                         </div>
                         <div class="invoice-body">
                             <div class="shop-details flex-column-start-center mb-1">
@@ -1110,7 +1110,7 @@
                                 <span class="sum-order notranslate">0</span>
                                 <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                             </span>
-                            <span>Place Order</span>`)
+                            <span class="ln-order">Place Order</span>`).translator()
                         $('.order-form').html(checkoutForm(data.transaction.id, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, data.transaction.amount))
                         $('.order-form').find('#input-discount').focus()
                     } else {

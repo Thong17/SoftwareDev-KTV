@@ -320,9 +320,9 @@
                                     <div class="room-price notranslate">
                                     <span>`+ accounting.formatMoney(data.price) +`</span>/ `+ data.hour +`
                                     </div>
-                                    <div class="room-status text-success">Open</div>
+                                    <div class="room-status text-success ln-open">Open</div>
                                 </div>
-                            </div>`)
+                            </div>`).translator()
                         } else {
                             alert(data.msg)
                         }

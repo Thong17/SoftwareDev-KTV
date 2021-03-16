@@ -1105,7 +1105,8 @@ def cashing(token):
         products = tblProduct.query.all()
         brands = tblBrand.query.all()
         categories = tblCategory.query.all()
-        return render_template('views/cashing.html', products=products, brands=brands, categories=categories)
+        store = tblStore.query.first()
+        return render_template('views/cashing.html', products=products, brands=brands, categories=categories, store=store)
     else:
         return redirect('/financial/authentication')
 
@@ -2586,11 +2587,12 @@ def get_order(id):
     products = tblProduct.query.all()
     brands = tblBrand.query.all()
     categories = tblCategory.query.all()
+    store = tblStore.query.first()
     total = 0
     if Order.checkin:
         for t in Order.checkin.orderPayment.transactions:
             total += t.amount
-    return render_template('views/order.html', Order=Order, products=products, brands=brands, categories=categories, total=total)
+    return render_template('views/order.html', Order=Order, products=products, brands=brands, categories=categories, total=total, store=store)
 
 
 @route.route('/payment', methods=['POST'])

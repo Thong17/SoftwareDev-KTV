@@ -325,7 +325,7 @@
                     result: 'គ្នានរបស់បានបង្កើត...',
                     description: 'ពិពណ៌នា',
                     price: 'តម្លៃ',
-                    discount: 'បញ្ចុះ',
+                    disc: 'បញ្ចុះ',
                     quantity: 'ចំនួន',
                     amount: 'សរុប',
                     placeOrder: 'គិតលុយ',
@@ -428,6 +428,10 @@
                     lang: 'ភាសា',
                     theme: 'ផ្ទៃខាងក្រោយ',
                     backup: 'បម្រុងទុកទិន្នន័យ',
+                    changePwd: 'ប្តូរពាក្យសម្ងាត់',
+                    currentPwd: 'ពាក្យសម្ងាត់បច្ចុប្បន្ន',
+                    newPwd: 'ពាក្យសម្ងាត់ថ្មី',
+                    confirmPwd: 'ផ្ទៀងផ្ទាត់ពាក្យសម្ងាត់',
                 }
             }
             language = $('html').attr('data-lang')
@@ -437,6 +441,11 @@
                     $(this).attr('selected', 'selected')
                 }
             })
+
+            $('.ln-changepwd').text(languages[language].changePwd)
+            $('.ln-currentpwd').text(languages[language].currentPwd)
+            $('.ln-newpwd').text(languages[language].newPwd)
+            $('.ln-confirmpwd').text(languages[language].confirmPwd)
 
             $('.ln-theme-details').text(languages[language].themeDetails)
             $('.ln-lang-details').text(languages[language].langDetails)
@@ -570,7 +579,7 @@
 
             $('.ln-description').text(languages[language].description)
             $('.ln-price').text(languages[language].price)
-            $('.ln-disc').text(languages[language].discount)
+            $('.ln-disc').text(languages[language].disc)
             $('.ln-qty').text(languages[language].quantity)
             $('.ln-amount').text(languages[language].amount)
             
