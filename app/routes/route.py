@@ -1584,7 +1584,7 @@ def outcome():
 @route.route('/profit', methods=['POST'])
 def profit():
     Transactions = None
-    Outcomes = None
+    # Outcomes = None
     f = request.form['filter']
     s = request.form['start']
     e = request.form['end']
@@ -1595,12 +1595,12 @@ def profit():
         e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.order_by(
             tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
-        Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).filter(
-            tblOutcome.createdOn.between(s, e))
+        # Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).filter(
+        #     tblOutcome.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.order_by(
             tblTransaction.createdOn).all()
-        Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).all()
+        # Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).all()
 
     data = []
     labels = []
@@ -1629,31 +1629,31 @@ def profit():
                 data.append(obj)
                 labels.append(createdOn)
 
-    if Outcomes:
-        for transaction in Outcomes:
-            if not transaction.isStock:
-                createdOn = None
-                if f == 'daily':
-                    createdOn = utc2local(
-                        transaction.createdOn).strftime("%Y-%m-%d")
-                elif f == 'monthly':
-                    createdOn = utc2local(
-                        transaction.createdOn).strftime("%Y-%m")
-                elif f == 'yearly':
-                    createdOn = utc2local(transaction.createdOn).strftime("%Y")
-                obj = {
-                    'label': createdOn,
-                    'data': 0
-                }
+    # if Outcomes:
+    #     for transaction in Outcomes:
+    #         if not transaction.isStock:
+    #             createdOn = None
+    #             if f == 'daily':
+    #                 createdOn = utc2local(
+    #                     transaction.createdOn).strftime("%Y-%m-%d")
+    #             elif f == 'monthly':
+    #                 createdOn = utc2local(
+    #                     transaction.createdOn).strftime("%Y-%m")
+    #             elif f == 'yearly':
+    #                 createdOn = utc2local(transaction.createdOn).strftime("%Y")
+    #             obj = {
+    #                 'label': createdOn,
+    #                 'data': 0
+    #             }
 
-                if createdOn in labels:
-                    for d in data:
-                        if d['label'] == createdOn:
-                            d['data'] -= transaction.amount
-                else:
-                    obj['data'] = transaction.amount
-                    data.append(obj)
-                    labels.append(createdOn)
+    #             if createdOn in labels:
+    #                 for d in data:
+    #                     if d['label'] == createdOn:
+    #                         d['data'] -= transaction.amount
+    #             else:
+    #                 obj['data'] = transaction.amount
+    #                 data.append(obj)
+    #                 labels.append(createdOn)
 
     if s == '' and e == '':
         s = current_user.createdOn.strftime("%Y-%m-%d")

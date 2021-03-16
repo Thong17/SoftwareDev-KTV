@@ -171,49 +171,17 @@
             canvas.height = chart.offsetHeight
         })
 
-        $('.export-excel').on('click', function () {
-
-            $('#export-table').html(`
-                <thead>
-                    <tr>
-                        <td>Date</td>
-                        <td>Result</td>
-                    </tr>
-                </thead>
-                <tbody id="data-table">
-
-                </tbody>`)
-
-
-            myChart.data.labels.forEach((l, i) => {
-                $('#data-table').append('<tr><td>' + l + '</td><td>' + myChart.data.datasets[0].data[i] + '</td></tr>')
+        $('.export-print, .export-pdf, .export-excel').on('click', function () {
+            sub = ''
+            date = $('#filter option:selected').text()
+            
+            Array.from($('.item-container').children()).forEach(i => {
+                if ($(i).hasClass('active')) {
+                    sub = $(i).find('p').text()
+                }
             })
 
-            $('#export-table').DataTable({
-                "bDestroy": true,
-                searching: false,
-                paging: false,
-                dom: 'Bfrtip',
-                buttons: [
-                    'excel', 'pdf', 'print'
-                ]
-            })
-
-            $('.buttons-excel').click()
-        })
-
-        $('.export-pdf').on('click', function () {
-
-            $('#export-table').html(`
-                <thead>
-                    <tr>
-                        <td>Date</td>
-                        <td>Result</td>
-                    </tr>
-                </thead>
-                <tbody id="data-table">
-
-                </tbody>`)
+            $('#export-table').html(`<tbody id="data-table"></tbody>`)
 
 
             myChart.data.labels.forEach((l, i) => {
@@ -225,43 +193,24 @@
                 paging: false,
                 dom: 'Bfrtip',
                 "bDestroy": true,
-                buttons: [
-                    'excel', 'pdf', 'print'
-                ]
+                buttons: ['print', 'excel', 'pdf'],
+                "columns": [
+                    {
+                        'title': date
+                    },
+                    {
+                        'title': sub
+                    }
+                ],
             })
 
-            $('.buttons-pdf').click()
-        })
-
-        $('.export-print').on('click', function () {
-
-            $('#export-table').html(`
-        <thead>
-            <tr>
-                <td>Date</td>
-                <td>Result</td>
-            </tr>
-        </thead>
-        <tbody id="data-table">
-
-        </tbody>`)
-
-
-            myChart.data.labels.forEach((l, i) => {
-                $('#data-table').append('<tr><td>' + l + '</td><td>' + myChart.data.datasets[0].data[i] + '</td></tr>')
-            })
-
-            $('#export-table').DataTable({
-                searching: false,
-                paging: false,
-                dom: 'Bfrtip',
-                "bDestroy": true,
-                buttons: [
-                    'excel', 'pdf', 'print'
-                ]
-            })
-
-            $('.buttons-print').click()
+            if ($(this).hasClass('export-excel')) {
+                $('.buttons-excel').click()
+            } else if ($(this).hasClass('export-pdf')) {
+                $('.buttons-pdf').click()
+            } else {
+                $('.buttons-print').click()
+            }
         })
 
         $('.item').on('click', function () {
@@ -361,6 +310,9 @@
                         }]
                     },
                     options: {
+                        onClick: function (a, b) {
+                            console.log(b)
+                        },
                         responsive: true,
                         legend: {
                             position: 'bottom',

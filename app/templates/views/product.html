@@ -589,12 +589,12 @@
             success: function (data) {
                 var properties = ''
                 var element = ''
-                if (product != '') {
-                    element = '<button class="btn border btn-value color-font"><p class="plus">+</p></button>'
-                } else {
-                    element = '<button class="btn border btn-value color-font disabled" disabled><p class="plus">+</p></button>'
-                }
                 if (data.property.properties.length) {
+                    if (product != '') {
+                        element = '<button class="btn border btn-value color-font"><p class="plus">+</p></button>'
+                    } else {
+                        element = '<button class="btn border btn-value color-font disabled" disabled><p class="plus">+</p></button>'
+                    }
                     data.property.properties.forEach((property, i) => {
                         var value_element = ''
                         if (data.product != '') {
@@ -649,6 +649,8 @@
                         opacity: 0,
                         scale: 0.7
                     })
+                } else {
+                    $('.details-property').empty()
                 }
             }
         })
