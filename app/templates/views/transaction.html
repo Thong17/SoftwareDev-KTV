@@ -115,7 +115,7 @@
                                 <td class="color-text">{{ transaction.amount }}</td>
                                 <td class="color-text">{{ transaction.quantity }}</td>
                                 <td class="color-text">{{ transaction.discount }}%</td>
-                                <td class="color-text">{{ transaction.createdOn }}</td>
+                                <td class="color-text">{{ transaction.createdOn | datetimefilter('%Y/%m/%d %H:%M:%S') }}</td>
                                 <td class="color-text">
                                     {% if transaction.isComplete %}
                                         Completed

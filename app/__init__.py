@@ -574,6 +574,10 @@ class CheckoutSchema(ModelSchema):
     class Meta:
         model = tblCheckout
 
+class OutcomeSchema(ModelSchema):
+    class Meta:
+        model = tblOutcome
+
 #Custome datetime
 def utc2local (utc):
     epoch = time.mktime(utc.timetuple())

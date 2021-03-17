@@ -309,6 +309,7 @@
                     daily: 'Daily',
                     monthly: 'Monthly',
                     yearly: 'Yearly',
+                    alreadyPaid: 'Already Paid'
                 },
                 khmer: {
                     financial: 'ហិរញ្ញវត្ថុ',
@@ -438,6 +439,7 @@
                     daily: 'ប្រចាំថ្ងៃ',
                     monthly: 'ប្រចាំខែ',
                     yearly: 'ប្រចាំឆ្នាំ',
+                    alreadyPaid: 'បានបង់ប្រាក់រួច'
                 }
             }
             language = $('html').attr('data-lang')
@@ -448,6 +450,7 @@
                 }
             })
 
+            $('.ln-alreadyPaid').text(languages[language].alreadyPaid)
             $('.ln-daily').text(languages[language].daily)
             $('.ln-monthly').text(languages[language].monthly)
             $('.ln-yearly').text(languages[language].yearly)

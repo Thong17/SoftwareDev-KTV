@@ -822,7 +822,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span class="ln-paid">Already Paid</span>
+                                <span class="ln-alreadyPaid">Already Paid</span>
                             </button>
                         {% else %}
                             <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}" data-check='true'>

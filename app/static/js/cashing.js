@@ -64,7 +64,7 @@ $(document).on('click', '.order-btn', function() {
                                                                     zero: '...'
                                                                 }
                                                             })+`</td>
-                                                            <td style="text-align: center">`+t.discount+`</td>
+                                                            <td style="text-align: center">`+t.discount+`%</td>
                                                             <td style="text-align: center">`+t.quantity+`</td>
                                                             <td style="text-align: center">`+accounting.formatMoney(t.amount, {
                                                                 precision: 2,
@@ -138,7 +138,7 @@ $(document).on('click', '.order-btn', function() {
                                                                 zero: '...'
                                                             }
                                                         })+`</td>
-                                                        <td style="text-align: center">`+t.discount+`</td>
+                                                        <td style="text-align: center">`+t.discount+`%</td>
                                                         <td style="text-align: center">`+t.quantity+`</td>
                                                         <td style="text-align: center">`+accounting.formatMoney(t.amount, {
                                                             precision: 2,

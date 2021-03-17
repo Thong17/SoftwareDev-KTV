@@ -41,6 +41,15 @@
         width: 130px;
         padding-left: 8px;
     }
+
+    thead tr {
+        background-color: var(--color-menu);
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: scroll;
+    }
 </style>
 {% endblock %}
 
@@ -100,6 +109,31 @@
                 <canvas id="canvas"></canvas>
             </div>
             <table id="export-table"></table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="transactionModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title color-font" id="transaction-title"></h4>
+                <h4 class="color-text" id="total-title"></h4>
+            </div>
+
+            <div class="modal-body">
+                <table class="table">
+                    <thead id="table-head">
+                        
+                    </thead>
+                    <tbody id="table-body">
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn color-font close-modal ln-close" data-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -311,7 +345,185 @@
                     },
                     options: {
                         onClick: function (a, b) {
-                            console.log(b)
+                            date = b[0]._model.label
+                            item = ''
+                            title = ''
+                            filter = $('#filter option:selected').text()
+                            Array.from($('.item-container').children()).forEach(i => {
+                                if ($(i).hasClass('active')) {
+                                    item = $(i).attr('id')
+                                    title = $(i).find('p').text()
+                                }
+                            })
+                            switch (item) {
+                                case 'income':
+                                    $.ajax({
+                                        url: '/income/details',
+                                        type: 'POST',
+                                        data: {date: date},
+                                        success: function(data) {
+                                            console.log(data)
+                                            element = ''
+                                            amount = 0
+                                            
+                                            data.forEach(d => {
+                                                amount += parseFloat(d.amount)
+                                                element += `<tr class="color-text">
+                                                                <td>`+d.description+`</td>
+                                                                <td>`+accounting.formatMoney(d.price)+`</td>
+                                                                <td>`+d.quantity+`</td>
+                                                                <td>`+d.discount+`%</td>
+                                                                <td>`+accounting.formatMoney(d.amount)+`</td>
+                                                            </tr>`
+                                            })
+                                            $('#table-head').html(`<tr class="color-font">
+                                                <td class="ln-description">Description</td>
+                                                <td class="ln-price">Price</td>
+                                                <td class="ln-quantity">Quantity</td>
+                                                <td class="ln-discount">Discount</td>
+                                                <td class="ln-total">Total</td>
+                                            </tr>`)
+                                            $('#table-body').html(element)
+                                            $('#transaction-title').text(capitalizeFirstLetter(title)+filter+': '+date)
+                                            $('#total-title').text(accounting.formatMoney(amount, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%s%v",
+                                                                neg: "-%s%v",
+                                                                zero: '...'
+                                                            }
+                                                        }))
+                                            $('#transactionModal').modal('show')
+                                        }
+                                    })
+                                    break;
+                                case 'outcome':
+                                    $.ajax({
+                                        url: '/outcome/details',
+                                        type: 'POST',
+                                        data: {date: date},
+                                        success: function(data) {
+                                            console.log(data)
+                                            element = ''
+                                            amount = 0
+                                            
+                                            data.forEach(d => {
+                                                amount += parseFloat(d.amount)
+                                                element += `<tr class="color-text">
+                                                                <td>`+d.description+`</td>
+                                                                <td>`+accounting.formatMoney(d.amount)+`</td>
+                                                            </tr>`
+                                            })
+                                            $('#table-head').html(`<tr class="color-font">
+                                                <td class="ln-description">Description</td>
+                                                <td class="ln-total">Total</td>
+                                            </tr>`)
+                                            $('#table-body').html(element)
+                                            $('#transaction-title').text(capitalizeFirstLetter(title)+filter+': '+date)
+                                            $('#total-title').text(accounting.formatMoney(amount, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%s%v",
+                                                                neg: "-%s%v",
+                                                                zero: '...'
+                                                            }
+                                                        }))
+                                            $('#transactionModal').modal('show')
+                                        }
+                                    })
+                                    break;
+                                case 'profit':
+                                    $.ajax({
+                                        url: '/profit/details',
+                                        type: 'POST',
+                                        data: {date: date},
+                                        success: function(data) {
+                                            console.log(data)
+                                            element = ''
+                                            amount = 0
+                                            
+                                            data.forEach(d => {
+                                                amount += parseFloat(d.profit)
+                                                element += `<tr class="color-text">
+                                                                <td>`+d.description+`</td>
+                                                                <td>`+accounting.formatMoney(d.amount)+`</td>
+                                                                <td>`+accounting.formatMoney(d.profit, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%s%v",
+                                                                neg: "-%s%v",
+                                                                zero: '...'
+                                                            }
+                                                        })+`</td>
+                                                            </tr>`
+                                            })
+                                            $('#table-head').html(`<tr class="color-font">
+                                                <td class="ln-description">Description</td>
+                                                <td class="ln-amount">Amount</td>
+                                                <td class="ln-profit">Profit</td>
+                                            </tr>`)
+                                            $('#table-body').html(element)
+                                            $('#transaction-title').text(capitalizeFirstLetter(title)+filter+': '+date)
+                                            $('#total-title').text(accounting.formatMoney(amount, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%s%v",
+                                                                neg: "-%s%v",
+                                                                zero: '...'
+                                                            }
+                                                        }))
+                                            $('#transactionModal').modal('show')
+                                        }
+                                    })
+                                    break;
+                                case 'sale':
+                                    $.ajax({
+                                        url: '/sale/details',
+                                        type: 'POST',
+                                        data: {date: date},
+                                        success: function(data) {
+                                            console.log(data)
+                                            element = ''
+                                            amount = 0
+                                            
+                                            data.forEach(d => {
+                                                amount += parseFloat(d.profit)
+                                                element += `<tr class="color-text">
+                                                                <td>`+d.description+`</td>
+                                                                <td>`+accounting.formatMoney(d.amount)+`</td>
+                                                                <td>`+accounting.formatMoney(d.profit, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%s%v",
+                                                                neg: "-%s%v",
+                                                                zero: '...'
+                                                            }
+                                                        })+`</td>
+                                                            </tr>`
+                                            })
+                                            $('#table-head').html(`<tr class="color-font">
+                                                <td class="ln-description">Description</td>
+                                                <td class="ln-amount">Amount</td>
+                                                <td class="ln-profit">Profit</td>
+                                            </tr>`)
+                                            $('#table-body').html(element)
+                                            $('#transaction-title').text(capitalizeFirstLetter(title)+': '+date)
+                                            $('#total-title').text(accounting.formatMoney(amount, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%s%v",
+                                                                neg: "-%s%v",
+                                                                zero: '...'
+                                                            }
+                                                        }))
+                                            $('#transactionModal').modal('show')
+                                        }
+                                    })
+                                    break;
+                                default:
+                                    break;
+                            }
+                            
                         },
                         responsive: true,
                         legend: {

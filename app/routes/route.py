@@ -1,7 +1,7 @@
 from app import bcrypt, db, login_manager, upload, delete_photo, utc2local, datetimefilter
 from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout, tblCheckin
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm, ExpenseForm, StoreForm, FloorForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema, FloorSchema, StoreSchema, RoomSchema, OrderSchema, CheckoutSchema
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema, FloorSchema, StoreSchema, RoomSchema, OrderSchema, CheckoutSchema, OutcomeSchema
 from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -1217,15 +1217,13 @@ def order_product(id):
         quantity = Decimal(data['quantity'])
 
         amount = price * (1 - discount / 100)
-        pprice = price * (1 - discount / 100)
 
         for v in data['values']:
             value = tblValue.query.get(v['valueId'])
-            pprice -= value.price
             description += '-'+value.value
 
         tid = str(uuid4())
-        transaction = tblTransaction(id=tid, discount=discount, price=pprice,
+        transaction = tblTransaction(id=tid, discount=discount, price=price,
                                     amount=amount, description=description, createdBy=current_user.id, product=id)
         db.session.add(transaction)
         if Payment:
@@ -1389,8 +1387,6 @@ def checkout(id):
 def transaction():
     Transactions = tblTransaction.query.order_by(
         tblTransaction.createdOn).all()
-    for t in Transactions:
-        t.createdOn = datetimefilter(t.createdOn, '%Y/%m/%d %H:%M:%S')
     Payments = tblPayment.query.order_by(tblPayment.invoice).all()
     return render_template('views/transaction.html', transactions=Transactions, payments=Payments)
 
@@ -1789,6 +1785,54 @@ def quantity_report():
         s = current_user.createdOn.strftime("%Y-%m-%d")
         e = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
     return jsonify({'data': data, 'oldest': s, 'latest': e})
+
+
+@route.route('/income/details', methods=['POST'])
+def details_income():
+    data = request.form['date']
+    date = datetime.strptime(data, '%Y-%m-%d')
+    Transactions = tblTransaction.query.filter(cast(tblTransaction.createdOn, Date) == date, tblTransaction.isComplete == True).all()
+    schema = TransactionSchema(many=True)
+    transactions = schema.dump(Transactions)
+    return jsonify(transactions)
+
+@route.route('/outcome/details', methods=['POST'])
+def details_outcome():
+    data = request.form['date']
+    date = datetime.strptime(data, '%Y-%m-%d')
+    Outcomes = tblOutcome.query.filter(cast(tblOutcome.createdOn, Date) == date).all()
+    schema = OutcomeSchema(many=True)
+    outcomes = schema.dump(Outcomes)
+    return jsonify(outcomes)
+
+@route.route('/profit/details', methods=['POST'])
+def details_profit():
+    data = request.form['date']
+    date = datetime.strptime(data, '%Y-%m-%d')
+    Transactions = tblTransaction.query.filter(cast(tblTransaction.createdOn, Date) == date, tblTransaction.isComplete == True).all()
+    schema = TransactionSchema(many=True)
+    transactions = schema.dump(Transactions)
+    return jsonify(transactions)
+
+@route.route('/sale/details', methods=['POST'])
+def details_sale():
+    sale = request.form['date']
+    Transactions = tblTransaction.query.filter(tblTransaction.sale.has(username=sale)).all()
+    schema = TransactionSchema(many=True)
+    transactions = schema.dump(Transactions)
+    return jsonify(transactions)
+
+
+
+@route.route('/sale_report/details', methods=['POST'])
+def details_quantity_report():
+    product = request.form['label']
+    Transaction = tblTransaction.query.filter(tblTransaction.description.like(product)).first()
+    Transactions = tblTransaction.query.filter(tblTransaction.product == Transaction.product)
+    schema = TransactionSchema(many=True)
+    transactions = schema.dump(Transactions)
+    return jsonify(transactions)
+
 
 
 @route.route('/financial_report')
@@ -2521,6 +2565,22 @@ def order():
     return render_template('views/orders.html', floors=floors, customers=customers, orders=orders, date=date)
 
 
+@route.route('/order/process', methods=['POST'])
+def order_process():
+    orders = tblOrder.query.order_by(tblOrder.createdOn).filter(tblOrder.isProcessed == True, tblOrder.isCompleted == False).all()
+    orderSchema = OrderSchema(many=True)
+    Orders = orderSchema.dump(orders)
+    date = datetime.utcnow()
+    for order in Orders:
+        Room = tblRoom.query.get(order['order'])
+        order['order'] = Room.room
+        order['orderOn'] = datetimefilter(
+            datetime.strptime(order['orderOn'], '%Y-%m-%dT%H:%M:%S'))
+        order['orderTo'] = datetimefilter(
+            datetime.strptime(order['orderTo'], '%Y-%m-%dT%H:%M:%S'))
+    return jsonify({'Orders': Orders, 'date': datetimefilter(date, '%B %d, %Y')})
+
+
 @route.route('/order/add', methods=['POST'])
 def add_order():
     customer = request.form['customer']
@@ -2609,9 +2669,7 @@ def payment():
         totalPayment = 0
         for transaction in transactions:
             Transaction = tblTransaction.query.get(transaction)
-            total = Transaction.price * Transaction.quantity
-            Transaction.amount = total
-            totalPayment += total
+            totalPayment += Transaction.amount
             Payment.transactions.append(Transaction)
         Payment.amount = totalPayment
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
@@ -2688,15 +2746,13 @@ def order_transaction(product_id):
                 quantity = Decimal(data['quantity'])
 
                 amount = price * (1 - discount / 100)
-                pprice = price * (1 - discount / 100)
 
                 for v in data['values']:
                     value = tblValue.query.get(v['valueId'])
-                    pprice -= value.price
                     description += '-'+value.value
 
                 tid = str(uuid4())
-                transaction = tblTransaction(id=tid, discount=discount, price=pprice,
+                transaction = tblTransaction(id=tid, discount=discount, price=price,
                                             amount=amount, description=description, createdBy=current_user.id, product=product_id)
                 db.session.add(transaction)
 
