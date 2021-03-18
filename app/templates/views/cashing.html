@@ -760,8 +760,8 @@
                         </div>
                         <div class="invoice-body">
                             <div class="shop-details flex-column-start-center mb-1">
-                                <p class="color-text invoice-text "><span class="ln-contact"></span>: {{ current_user.profile[0].phone }}</p>
-                                <p class="color-text notranslate invoice-text">ABA: 077 777 377 (CHHAN Bunthong)</p>
+                                <p class="color-text invoice-text "><span class="ln-contact"></span>: {{ store.phone }}</p>
+                                <p class="color-text notranslate invoice-text">{{ store.location }}</p>
                             </div>
                             <div class="flex-between-center pb-1">
                                 <p class="color-text invoice-text"><span class="ln-date"></span>: <span id="invoiceDate" class="notranslate"></span></p>

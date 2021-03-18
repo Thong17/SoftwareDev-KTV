@@ -933,13 +933,12 @@
                     <div class="payment-invoice">
                         <div class="invoice-header">
                             <h5 class="color-text notranslate"
-                                style="text-align: center; font-size: 23px; font-weight: 700;">{{
-                                store.store }}</h5>
+                                style="text-align: center; font-size: 23px; font-weight: 700;">{{ store.store }}</h5>
                         </div>
                         <div class="invoice-body">
                             <div class="shop-details flex-column-start-center mb-1">
-                                <p class="color-text"><span class="ln-contact">Contact</span>: {{ current_user.profile[0].phone }}</p>
-                                <p class="color-text notranslate">ABA: 077 777 377 (CHHAN Bunthong)</p>
+                                <p class="color-text"><span class="ln-contact">Contact</span>: {{ store.phone }}</p>
+                                <p class="color-text notranslate">{{ store.location }}</p>
                             </div>
                             <div class="flex-between-center pb-1">
                                 <p class="color-text"><span class="ln-date">Date</span>: <span id="invoiceDate" class="notranslate"></span></p>
@@ -1729,6 +1728,8 @@
             removeBtn = `<td class="remove-btn">
                         <i class="fa fa-trash-o" aria-hidden="true"></i>
                     </td>`
+        } else {
+            removeBtn = '<td></td>'
         }
         return `<tr class="color-text transaction-item" id="` + id + `" data-id="` + oid + `">
                     <td class="description" id="order-description" data-id="`+ pid + `">` + description + `</td>

@@ -1491,10 +1491,10 @@ def income():
         s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
         e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.order_by(
-            tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
+            tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e), tblTransaction.isComplete == True)
     else:
         Transactions = tblTransaction.query.order_by(
-            tblTransaction.createdOn).all()
+            tblTransaction.createdOn).filter(tblTransaction.isComplete == True)
 
     data = []
     labels = []
@@ -1590,12 +1590,12 @@ def profit():
         s = datetime.strptime(request.form['start'], '%Y-%m-%d') + offset - timedelta(days=1)
         e = datetime.strptime(request.form['end'], '%Y-%m-%d') + offset + timedelta(days=1)
         Transactions = tblTransaction.query.order_by(
-            tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e))
+            tblTransaction.createdOn).filter(tblTransaction.createdOn.between(s, e), tblTransaction.isComplete == True)
         # Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).filter(
         #     tblOutcome.createdOn.between(s, e))
     else:
         Transactions = tblTransaction.query.order_by(
-            tblTransaction.createdOn).all()
+            tblTransaction.createdOn).filter(tblTransaction.isComplete == True)
         # Outcomes = tblOutcome.query.order_by(tblOutcome.createdOn).all()
 
     data = []
