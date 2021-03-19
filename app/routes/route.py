@@ -701,6 +701,11 @@ def color_photo(id):
 @route.route('/product/<id>', methods=['POST', 'GET'])
 def product(id):
     product = tblProduct.query.get(id)
+    if product.period is not None:
+        if product.period < datetime.utcnow().date():
+            product.period = None
+            product.discount = ''
+            db.session.commit()
     if request.method == 'POST':
         json = ProductSchema()
         result = json.dump(product)

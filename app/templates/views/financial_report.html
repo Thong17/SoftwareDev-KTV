@@ -446,6 +446,8 @@
                                                 amount += parseFloat(d.profit)
                                                 element += `<tr class="color-text">
                                                                 <td>`+d.description+`</td>
+                                                                <td>`+d.quantity+`</td>
+                                                                <td>`+d.discount+`%</td>
                                                                 <td>`+accounting.formatMoney(d.amount)+`</td>
                                                                 <td>`+accounting.formatMoney(d.profit, {
                                                             precision: 2,
@@ -459,6 +461,8 @@
                                             })
                                             $('#table-head').html(`<tr class="color-font">
                                                 <td class="ln-description">Description</td>
+                                                <td class="ln-profit">Quantity</td>
+                                                <td class="ln-profit">Discount</td>
                                                 <td class="ln-amount">Amount</td>
                                                 <td class="ln-profit">Profit</td>
                                             </tr>`)

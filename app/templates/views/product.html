@@ -80,7 +80,8 @@
 {% endblock %}
 
 {% block script %}
-<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script> -->
+<script src="{{ url_for('static', filename='js/pickr.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/lightbox.min.js') }}"></script>
 <script>
     $(document).on('focus', '#discount', function () {
