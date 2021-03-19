@@ -105,9 +105,10 @@
                     placeholder="Description"></td>
             <td><input type="number" class="form-empty color-text input-color" id="input-amount" value="`+ amount + `"
                     placeholder="Amount"></td>
-            <td class="flex-between">
+            <td class="flex-between-center color-text" style="border-bottom: 1px solid var(--color-bg) !important;">
                 <span class="notranslate color-text" id="createdOn">`+ date +`</span>
-                <div class="flex-between-center action-btn"><span class="form-cancel pointer">
+                <div class="flex-between-center action-btn">
+                    <span class="form-cancel pointer">
                     <ion-icon name="close-outline"></ion-icon>
                 </span>
                 <span class="pointer form-save">
@@ -122,7 +123,7 @@
                 
             }
         })
-        $('.fa-trash-o').on('click', function() {
+        $(document).on('click', '.fa-trash-o', function() {
             id = $(this).closest('tr').attr('id')
             if (confirm('Deleting an expense may cause an unaccurate data. Are you sure you want to delete it? ')) {
                 $.ajax({

@@ -2227,7 +2227,13 @@ button.form-empty:hover {
 }
 
 .order-container {
-    height: calc(100vh - 240px);
+    height: calc(100vh - 300px);
+    overflow: scroll;
+}
+
+.item-payment {
+    height: calc(100% - 100px);
+    overflow-y: scroll;
 }
 
 .btn-search-customer {

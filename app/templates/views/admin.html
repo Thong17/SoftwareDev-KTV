@@ -431,9 +431,13 @@
             type: 'POST',
             success: function(data) {
                 if (data.data == 'Success') {
-                    window.location.reload()
+                    if (data.confirm) {
+                        $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-danger" id="disable-user">Disable</button>')
+                    } else {
+                        $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-primary" id="enable-user">Enable</button>')
+                    }
                 } else {
-
+                    alert(data.data)
                 }
             }
         })

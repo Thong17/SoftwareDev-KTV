@@ -2251,9 +2251,9 @@ def disable_user(id):
         user.isConfirm = not user.isConfirm
         try:
             db.session.commit()
-            return jsonify({'data': 'Success'})
+            return jsonify({'data': 'Success', 'confirm': user.isConfirm})
         except:
-            return jsonify({'data': 'Faild'})
+            return jsonify({'data': 'Unable to to proceed your request. Please try again later'})
 
 
 @route.route('/admin/create', methods=['POST'])
