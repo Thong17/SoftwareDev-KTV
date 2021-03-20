@@ -1244,6 +1244,8 @@ def order_product(id):
                 sum_stocks = 0
                 for stock in product.stocks:
                     if stock.color == data['colorId']:
+                        Color = tblColor.query.get(data['colorId'])
+                        transaction.description += '-'+Color.color
                         sum_stocks += stock.quantity
                     elif stock.color == '':
                         sum_stocks += stock.quantity
