@@ -1,10 +1,17 @@
 {% extends 'views/financial.html' %}
 
 {% block style %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" /> -->
+
+<link rel="stylesheet" href="{{url_for('static', filename='css/fullcalendar.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/dataTables.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/buttons.dataTables.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap-select.css')}}">
+
+
 <style>
     .room-container {
         position: relative;
@@ -249,7 +256,9 @@
     }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.js"></script> -->
+
+<script src="{{url_for('static', filename='js/fullcalendar.js')}}"></script>
 {% endblock %}
 
 {% block content %}
@@ -431,9 +440,13 @@
 {% endblock %}
 
 {% block script %}
-<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<!-- <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script> -->
+
+<script src="{{url_for('static', filename='js/dataTables.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/bootstrap-select.min.js')}}"></script>
 <script>
     $(document).ready(function () {
         $(document).on('click', '.order-item', function() {

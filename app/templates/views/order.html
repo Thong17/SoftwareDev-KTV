@@ -1042,7 +1042,9 @@
 {% block script %}
 <script src="{{url_for('static', filename='js/printThis.js')}}"></script>
 <script src="{{url_for('static', filename='js/cashing.js')}}"></script>
-<script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
+<script src="{{url_for('static', filename='js/attrchange.js')}}"></script>
+
+<!-- <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script> -->
 <script>
     $(document).on('click', '.dropdown-menu', function(event) {
         event.stopPropagation()

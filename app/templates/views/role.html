@@ -1,7 +1,10 @@
 {% extends 'views/custome.html' %}
 
 {% block style %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" /> -->
+
+<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap-select.css')}}">
+
 <style>
     .role-header {
         display: flex;
@@ -278,7 +281,10 @@
 {% endblock %}
 
 {% block script %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script> -->
+
+<script src="{{url_for('static', filename='js/bootstrap-select.min.js')}}"></script>
+
 <script>
     $(document).ready(function () {
         $('.action-btn').on('click', '.fa-pencil-square-o', function() {

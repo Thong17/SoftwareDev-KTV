@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, date
 from sqlalchemy import func, Date, cast
 from decimal import Decimal
 from functools import wraps
+from app.config import mysqlObj
 
 route = Blueprint('route', __name__)
 
@@ -2926,7 +2927,7 @@ def backup():
         dirs = 'backup'
         if not os.path.exists(dirs):
             os.makedirs(dirs)
-        cmd = "mysqldump -uroot -p'myroot' restaurant > backup/backup_"+strtime+".sql"
+        cmd = "mysqldump -u"+mysqlObj['user']+" -p"+mysqlObj['password']+" "+mysqlObj['database']+" > backup/backup_"+strtime+".sql"
         os.system(cmd)
         return jsonify({'msg': 'Backup completed successfully'})
     except: 
@@ -2939,12 +2940,12 @@ def restore():
         dirs = 'backup'
         if not os.path.exists(dirs):
             os.makedirs(dirs)
-        backup = "mysqldump -uroot -p'myroot' restaurant > backup/restore_"+strtime+".sql"
+        backup = "mysqldump -u"+mysqlObj['user']+" -p"+mysqlObj['password']+" "+mysqlObj['database']+" > backup/restore_"+strtime+".sql"
         os.system(backup)
         _file = request.files['file']
         if _file.filename.split('.')[1] == 'sql':
             restore_file = os.path.abspath('backup/'+_file.filename)
-            restore = "mysql -uroot -p'myroot' restaurant < "+restore_file
+            restore = "mysql -u"+mysqlObj['user']+" -p"+mysqlObj['password']+" "+mysqlObj['database']+" < "+restore_file
             os.system(restore)
             return jsonify({'msg': 'Restore completed successfully', 'data': 'Success'})
         else:
