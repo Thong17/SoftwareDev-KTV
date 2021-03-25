@@ -1,12 +1,15 @@
 $.fn.translator = function () {
     languages = {
         english: {
+            advertise: 'Advertise',
+            about: 'About',
+            home: 'Home',
             financial: 'Financial',
             customize: 'Modify',
             reports: 'Reports',
             configuration: 'Setting',
             cashing: 'Cashing',
-            order: 'Order',
+            order: 'Book',
             stock: 'Stock',
             expense: 'Expense',
             transaction: 'Transaction',
@@ -18,8 +21,8 @@ $.fn.translator = function () {
             result: 'No product found...',
             description: 'Description',
             price: 'Price',
-            discount: 'Disc',
-            quantity: 'Qty',
+            disc: 'Disc',
+            qty: 'Qty',
             amount: 'Amount',
             placeOrder: 'Place Order',
             cash: 'Cash',
@@ -121,14 +124,21 @@ $.fn.translator = function () {
             lang: 'Language',
             theme: 'Theme',
             backup: 'Backup',
+            daily: 'Daily',
+            monthly: 'Monthly',
+            yearly: 'Yearly',
+            alreadyPaid: 'Already Paid'
         },
         khmer: {
+            advertise: 'ពាណិជ្ជកម្ម',
+            about: 'អំពី',
+            home: 'ទំព័រដើម',
             financial: 'ហិរញ្ញវត្ថុ',
             customize: 'កែប្រែ',
             reports: 'របាយការណ៍',
             configuration: 'កំណត់',
-            cashing: 'បញ្ជរ',
-            order: 'កម្មង់',
+            cashing: 'លក់',
+            order: 'កក់',
             stock: 'ស្តុក',
             expense: 'ចំណាយ',
             transaction: 'ប្រតិបត្តិការ',
@@ -141,7 +151,7 @@ $.fn.translator = function () {
             description: 'ពិពណ៌នា',
             price: 'តម្លៃ',
             disc: 'បញ្ចុះ',
-            quantity: 'ចំនួន',
+            qty: 'ចំនួន',
             amount: 'សរុប',
             placeOrder: 'គិតលុយ',
             cash: 'សាច់ប្រាក់',
@@ -186,7 +196,7 @@ $.fn.translator = function () {
             add: 'បន្ថែម',
             since: 'ថ្ងៃបង្កើត',
             status: 'ស្ថានភាព',
-            user: 'អ្នកប្រើប្រាស់',
+            user: 'អ្នកប្រើ',
             category: 'ប្រភេទ',
             brand: 'ម៉ាក',
             product: 'ផលិតផល',
@@ -247,6 +257,10 @@ $.fn.translator = function () {
             currentPwd: 'ពាក្យសម្ងាត់បច្ចុប្បន្ន',
             newPwd: 'ពាក្យសម្ងាត់ថ្មី',
             confirmPwd: 'ផ្ទៀងផ្ទាត់ពាក្យសម្ងាត់',
+            daily: 'ប្រចាំថ្ងៃ',
+            monthly: 'ប្រចាំខែ',
+            yearly: 'ប្រចាំឆ្នាំ',
+            alreadyPaid: 'បានបង់ប្រាក់រួច'
         }
     }
     language = $('html').attr('data-lang')
@@ -256,6 +270,14 @@ $.fn.translator = function () {
             $(this).attr('selected', 'selected')
         }
     })
+
+    $('.ln-advertise').text(languages[language].advertise)
+    $('.ln-alreadyPaid').text(languages[language].alreadyPaid)
+    $('.ln-daily').text(languages[language].daily)
+    $('.ln-monthly').text(languages[language].monthly)
+    $('.ln-yearly').text(languages[language].yearly)
+    $('.ln-home').text(languages[language].home)
+    $('.ln-about').text(languages[language].about)
 
     $('.ln-changepwd').text(languages[language].changePwd)
     $('.ln-currentpwd').text(languages[language].currentPwd)
@@ -371,6 +393,7 @@ $.fn.translator = function () {
     $('.ln-cashier').text(languages[language].cashier)
 
     // Side Nav
+    $('#home').find('span').text(languages[language].home)
     $('#financial').find('span').text(languages[language].financial)
     $('#customize').find('span').text(languages[language].customize)
     $('#reports').find('span').text(languages[language].reports)
@@ -395,9 +418,9 @@ $.fn.translator = function () {
     $('.ln-description').text(languages[language].description)
     $('.ln-price').text(languages[language].price)
     $('.ln-disc').text(languages[language].disc)
-    $('.ln-qty').text(languages[language].quantity)
+    $('.ln-qty').text(languages[language].qty)
     $('.ln-amount').text(languages[language].amount)
-
+    
     $('.ln-order').text(languages[language].placeOrder)
 
     $('.ln-cash').text(languages[language].cash)

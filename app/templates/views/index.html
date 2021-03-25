@@ -1,19 +1,24 @@
 {% extends 'layout/layout.html' %}
 
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
 {% block navbar %}
 <ul class="menu-bar">
     <li class="menu-home">
-        <a href="/home" class="home">
+        <a href="/home" class="home ln-home">
             Home
         </a>
     </li>
     <li class="menu-about">
-        <a href="/about" class="about">
+        <a href="/about" class="about ln-about">
             About
         </a>
     </li>
     <li class="menu-contact">
-        <a href="/contact" class="contact">
+        <a href="/contact" class="contact ln-contact">
             Contact
         </a>
     </li>

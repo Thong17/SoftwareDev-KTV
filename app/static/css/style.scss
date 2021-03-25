@@ -740,6 +740,59 @@ textarea:valid+label {
     border-radius: 3px;
 }
 
+.social-nav {
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px 0;
+    height: 170px;
+    position: fixed;
+    right: 0;
+    top: 45%;
+    transform: translateY(-50%);
+    background-color: var(--color-bg);
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
+    font-size: 18px;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
+}
+
+.facebook:hover a {
+    color: #096df0;
+}
+
+.youtube:hover a {
+    color: #d40303;
+}
+
+.instagram:hover {
+    background: #d6249f;
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+}
+
+.facebook a, .youtube a {
+    color: var(--color-text);
+}
+
+.instagram {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    border-radius: 5px;
+    font-size: 12px;
+    line-height: 20px;
+    vertical-align: middle;
+    background: var(--color-text);
+}
+
+.instagram a {
+    color: var(--color-bg) !important;
+}
+
 .nav-on {
     width: 30%;
 }
@@ -748,8 +801,16 @@ header {
     position: relative;
     min-height: 100%;
     padding-bottom: 70px;
-    margin-left: 58px;
+    margin-left: 0;
     box-sizing: border-box;
+}
+
+header.isAuthenticated {
+    margin-left: 58px !important;
+}
+
+.menu-nav.isAuthenticated {
+    width: calc(100% - 58px) !important;
 }
 
 .menu-nav {
@@ -757,7 +818,7 @@ header {
     justify-content: space-between;
     align-items: center;
     position: fixed;
-    width: calc(100% - 58px);
+    width: 100%;
     padding: 20px 100px;
     z-index: 100;
     background-color: var(--color-menu-bg);

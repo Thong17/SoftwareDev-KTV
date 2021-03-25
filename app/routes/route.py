@@ -14,7 +14,6 @@ from app.config import mysqlObj
 
 route = Blueprint('route', __name__)
 
-
 def parametrized(dec):
     def layer(*args, **kwargs):
         def repl(f):
@@ -43,6 +42,21 @@ def is_authorized(f, r):
     wrap.__name__ = f.__name__
     return wrap
 
+@parametrized
+def is_confirmed(f):
+    def wrap(*args, **kwargs):
+        if not request.referrer:
+            referrer = '/'
+        else:
+            referrer = request.referrer
+        if current_user.isConfirm:
+            return f(*args, **kwargs)
+        else:
+            flash('You are not allowed to enter this route!', 'warning')
+            return redirect(referrer)
+    wrap.__name__ = f.__name__
+    return wrap
+
 
 @login_manager.user_loader
 def load_user(id):
@@ -64,22 +78,18 @@ def login():
             try:
                 user = tblUser.query.filter_by(username=username).first()
                 while user is not None:
-                    if user.isConfirm:
-                        isMatch = bcrypt.check_password_hash(
-                            user.password, password)
-                        if isMatch is True:
-                            Activity = tblActivity(id=str(
-                                uuid4()), activity=user.username+' has logged in', type='Login', createdBy=user.id)
-                            db.session.add(Activity)
-                            db.session.commit()
-                            login_user(user)
-                            msg['redirect'] = '/'
-                            return jsonify(msg)
-                        msg['password'].append('Password does not match')
+                    isMatch = bcrypt.check_password_hash(
+                        user.password, password)
+                    if isMatch is True:
+                        Activity = tblActivity(id=str(
+                            uuid4()), activity=user.username+' has logged in', type='Login', createdBy=user.id)
+                        db.session.add(Activity)
+                        db.session.commit()
+                        login_user(user)
+                        msg['redirect'] = '/'
                         return jsonify(msg)
-                    else:
-                        msg['username'].append('User may have been disabled! Contact your admin for more details')
-                        return jsonify(msg)
+                    msg['password'].append('Password does not match')
+                    return jsonify(msg)
                 msg['username'].append('Username does not exist')
                 return jsonify(msg)
             except:
@@ -250,6 +260,7 @@ def setting():
 
 @route.route('/custome', methods=['POST', 'GET'])
 @login_required
+@is_confirmed()
 def custome():
     if request.method == 'POST':
         categories = tblCategory.query.all()
@@ -321,6 +332,7 @@ def custome():
 
 @route.route('/category', methods=['POST', 'GET'])
 @is_authorized('Editor')
+@is_confirmed()
 @login_required
 def categories():
     form = CategoryForm()
@@ -476,6 +488,7 @@ def udpate_category(id):
 
 @route.route('/brand', methods=['POST', 'GET'])
 @is_authorized('Editor')
+@is_confirmed()
 @login_required
 def brand():
     brands = tblBrand.query.all()
@@ -905,6 +918,7 @@ def _property(id):
 
 @route.route('/stock')
 @is_authorized('Stock')
+@is_confirmed()
 @login_required
 def stocks():
     products = tblProduct.query.all()
@@ -915,6 +929,7 @@ def stocks():
 
 @route.route('/stock/product/<id>')
 @is_authorized('Stock')
+@is_confirmed()
 @login_required
 def stock(id):
     product = tblProduct.query.get(id)
@@ -1067,6 +1082,7 @@ def save_stock(id):
 
 @route.route('/financial', defaults={'arg': None})
 @route.route('/financial/<arg>')
+@is_confirmed()
 @login_required
 def financial(arg):
     if arg is not None:
@@ -1105,6 +1121,7 @@ def authenticate():
 
 @route.route('/cashing/<token>')
 @is_authorized('Cashier')
+@is_confirmed()
 @login_required
 def cashing(token):
     if token == current_user.token:
@@ -1392,6 +1409,7 @@ def checkout(id):
 
 @route.route('/transaction')
 @is_authorized('Cashier')
+@is_confirmed()
 def transaction():
     Transactions = tblTransaction.query.order_by(
         tblTransaction.createdOn).all()
@@ -1458,6 +1476,7 @@ def search_invoice():
 
 
 @route.route('/report', methods=['POST', 'GET'])
+@is_confirmed()
 @login_required
 def report():
     outcome = tblOutcome.query.filter(cast(tblOutcome.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
@@ -1845,6 +1864,7 @@ def details_quantity_report():
 
 @route.route('/financial_report')
 @is_authorized('Report')
+@is_confirmed()
 @login_required
 def financial_report():
     return render_template('views/financial_report.html')
@@ -1852,6 +1872,7 @@ def financial_report():
 
 @route.route('/account')
 @is_authorized('Admin')
+@is_confirmed()
 @login_required
 def account():
     users = tblUser.query.all()
@@ -1879,6 +1900,7 @@ def account_report():
 
 @route.route('/sale_report')
 @is_authorized('Report')
+@is_confirmed()
 @login_required
 def sale_report():
     return render_template('views/sale_report.html')
@@ -1965,6 +1987,7 @@ def get_financial():
 
 @route.route('/advertise')
 @is_authorized('Editor')
+@is_confirmed()
 @login_required
 def advertise():
     Advertises = tblAdvertise.query.all()
@@ -2022,13 +2045,13 @@ def delete_advertise(id):
 
 @route.route('/')
 @route.route('/home')
-@login_required
 def index():
     categories = tblCategory.query.all()
     brands = tblBrand.query.all()
     products = tblProduct.query.all()
     advertises = tblAdvertise.query.all()
-    return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises)
+    store = tblStore.query.first()
+    return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises, store=store)
 
 
 @route.route('/about')
@@ -2043,6 +2066,7 @@ def contact():
 
 @route.route('/activity')
 @is_authorized('Admin')
+@is_confirmed()
 @login_required
 def activity():
     Activities = tblActivity.query.order_by(tblActivity.createdOn.desc()).all()
@@ -2115,6 +2139,7 @@ def product_favorite(id):
 
 @route.route('/role')
 @is_authorized('Admin')
+@is_confirmed()
 @login_required
 def role():
     form = RoleForm()
@@ -2230,6 +2255,7 @@ def clear_role(id):
 
 @route.route('/admin')
 @is_authorized('Admin')
+@is_confirmed()
 @login_required
 def admin():
     users = tblUser.query.all()
@@ -2348,6 +2374,7 @@ def change_admin(id):
 
 @route.route('/expense', methods=['POST', 'GET'])
 @is_authorized('Stock')
+@is_confirmed()
 @login_required
 def expense():
     form = ExpenseForm()
@@ -2399,6 +2426,7 @@ def save_expense(id):
 
 @route.route('/store')
 @is_authorized('Editor')
+@is_confirmed()
 @login_required
 def store():
     floorForm = FloorForm()
@@ -2549,6 +2577,7 @@ def add_customer():
 
 @route.route('/order', methods=['POST', 'GET'])
 @is_authorized('Cashier')
+@is_confirmed()
 @login_required
 def order():
     floors = tblFloor.query.order_by(tblFloor.createdOn).all()
