@@ -332,8 +332,8 @@ def custome():
 
 @route.route('/category', methods=['POST', 'GET'])
 @is_authorized('Editor')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def categories():
     form = CategoryForm()
     categories = tblCategory.query.all()
@@ -488,8 +488,8 @@ def udpate_category(id):
 
 @route.route('/brand', methods=['POST', 'GET'])
 @is_authorized('Editor')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def brand():
     brands = tblBrand.query.all()
     categories = tblCategory.query.with_entities(
@@ -918,8 +918,8 @@ def _property(id):
 
 @route.route('/stock')
 @is_authorized('Stock')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def stocks():
     products = tblProduct.query.all()
     brands = tblBrand.query.all()
@@ -929,8 +929,8 @@ def stocks():
 
 @route.route('/stock/product/<id>')
 @is_authorized('Stock')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def stock(id):
     product = tblProduct.query.get(id)
     total_stock = 0
@@ -1082,8 +1082,8 @@ def save_stock(id):
 
 @route.route('/financial', defaults={'arg': None})
 @route.route('/financial/<arg>')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def financial(arg):
     if arg is not None:
         return render_template('views/financial.html', authentication='require')
@@ -1121,8 +1121,8 @@ def authenticate():
 
 @route.route('/cashing/<token>')
 @is_authorized('Cashier')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def cashing(token):
     if token == current_user.token:
         products = tblProduct.query.all()
@@ -1409,6 +1409,7 @@ def checkout(id):
 
 @route.route('/transaction')
 @is_authorized('Cashier')
+@login_required
 @is_confirmed()
 def transaction():
     Transactions = tblTransaction.query.order_by(
@@ -1476,8 +1477,8 @@ def search_invoice():
 
 
 @route.route('/report', methods=['POST', 'GET'])
-@is_confirmed()
 @login_required
+@is_confirmed()
 def report():
     outcome = tblOutcome.query.filter(cast(tblOutcome.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
     Transactions = tblTransaction.query.filter(cast(tblTransaction.createdOn, Date) == cast(datetime.utcnow(), Date)).all()
@@ -1864,16 +1865,16 @@ def details_quantity_report():
 
 @route.route('/financial_report')
 @is_authorized('Report')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def financial_report():
     return render_template('views/financial_report.html')
 
 
 @route.route('/account')
 @is_authorized('Admin')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def account():
     users = tblUser.query.all()
     return render_template('views/account_report.html', users=users)
@@ -1900,8 +1901,8 @@ def account_report():
 
 @route.route('/sale_report')
 @is_authorized('Report')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def sale_report():
     return render_template('views/sale_report.html')
 
@@ -1987,8 +1988,8 @@ def get_financial():
 
 @route.route('/advertise')
 @is_authorized('Editor')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def advertise():
     Advertises = tblAdvertise.query.all()
     return render_template('views/advertise.html', advertises=Advertises)
@@ -2066,8 +2067,8 @@ def contact():
 
 @route.route('/activity')
 @is_authorized('Admin')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def activity():
     Activities = tblActivity.query.order_by(tblActivity.createdOn.desc()).all()
     activities = []
@@ -2139,8 +2140,8 @@ def product_favorite(id):
 
 @route.route('/role')
 @is_authorized('Admin')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def role():
     form = RoleForm()
     roles = tblRole.query.all()
@@ -2255,8 +2256,8 @@ def clear_role(id):
 
 @route.route('/admin')
 @is_authorized('Admin')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def admin():
     users = tblUser.query.all()
     roles = tblRole.query.all()
@@ -2374,8 +2375,8 @@ def change_admin(id):
 
 @route.route('/expense', methods=['POST', 'GET'])
 @is_authorized('Stock')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def expense():
     form = ExpenseForm()
     expenses = tblOutcome.query.all()
@@ -2426,8 +2427,8 @@ def save_expense(id):
 
 @route.route('/store')
 @is_authorized('Editor')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def store():
     floorForm = FloorForm()
     storeForm = StoreForm()
@@ -2577,8 +2578,8 @@ def add_customer():
 
 @route.route('/order', methods=['POST', 'GET'])
 @is_authorized('Cashier')
-@is_confirmed()
 @login_required
+@is_confirmed()
 def order():
     floors = tblFloor.query.order_by(tblFloor.createdOn).all()
     customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
