@@ -347,7 +347,7 @@ class tblStock(db.Model):
     rate = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
     color = db.Column(db.String(36), nullable=True)
-    adjust = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    expire = db.Column(db.Date, nullable=True)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)

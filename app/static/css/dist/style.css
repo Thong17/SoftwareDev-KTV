@@ -777,14 +777,20 @@ textarea:valid + label {
   color: var(--color-text);
 }
 
+.bs-searchbox input, .no-results {
+  background-color: var(--color-menu) !important;
+  color: var(--color-text) !important;
+  font-weight: 300;
+}
+
 .instagram {
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   text-align: center;
   border-radius: 5px;
   font-size: 12px;
-  line-height: 20px;
+  line-height: 19px;
   vertical-align: middle;
   background: var(--color-text);
 }
@@ -806,11 +812,11 @@ header {
 }
 
 header.isAuthenticated {
-  margin-left: 58px !important;
+  margin-left: 58px;
 }
 
 .menu-nav.isAuthenticated {
-  width: calc(100% - 58px) !important;
+  width: calc(100% - 58px);
 }
 
 .menu-nav {
@@ -2764,11 +2770,11 @@ button.form-empty:hover {
   }
 
   header, footer {
-    margin-left: 0;
+    margin-left: 0 !important;
   }
 
   .menu-nav {
-    width: 100%;
+    width: 100% !important;
   }
 
   .menu-profile {

@@ -146,8 +146,8 @@
             {% endwith %}
             {% block content %}{% endblock %}
             <div class="loading-container">
-            {% if store %}
-                {% for c in store.store %}
+            {% if Store %}
+                {% for c in Store.store %}
                     {% if c == ' ' %}
                     <span>-</span>
                     {% else %}
@@ -389,6 +389,13 @@
 
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function dateDifference(date) {
+            now = new Date()
+            this.date = new Date(date)
+            diff = (this.date - now) / (1000 * 3600 * 24)
+            return diff
         }
 
         function generateColor() {

@@ -2,6 +2,26 @@
 
 {% block style %}
 <style>
+    .expired {
+        background-color: #dc3545ee !important;
+        color: #f2f2f2;
+        position: absolute;
+        padding: 1px 7px;
+        border-radius: 5px;
+        top: 3px;
+        left: 3px;
+    }
+
+    .expire {
+        background-color: #ffc107ee !important;
+        color: #f2f2f2;
+        position: absolute;
+        padding: 1px 7px;
+        border-radius: 5px;
+        top: 3px;
+        left: 3px;
+    }
+
     @media only screen and (max-width: 1100px) {
         .wrap-container {
             padding: 0 20px;
@@ -132,21 +152,43 @@
                                 <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 110px;">
                                     <span class="symbol"></span><span class="stock-tag">
                                         {% if product.isStock == True %}
-                                        {% set total_stock = namespace(value=0) %}
-                                        {% if product.stocks %}
-                                        {% for stock in product.stocks %}
-                                        {% set total_stock.value = total_stock.value + stock.quantity %}
-                                        {% endfor %}
-                                        {% if total_stock.value > 0 %}
-                                        {{ total_stock.value }} Available
+                                            {% set total_stock = namespace(value=0, expire=None) %}
+                                            {% if product.stocks %}
+                                                {% for stock in product.stocks %}
+                                                    {% if stock.expire %}
+                                                        {% if (stock.expire - current_date).days < 7 %}
+                                                            {% if total_stock.expire %}
+                                                                {% if total_stock.expire > (stock.expire - current_date).days %}
+                                                                    {% set total_stock.expire = (stock.expire - current_date).days %}
+                                                                {% endif %}
+                                                            {% else %}
+                                                                {% set total_stock.expire = (stock.expire - current_date).days %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {% set total_stock.value = total_stock.value + stock.quantity %}
+                                                {% endfor %}
+                                                {% if total_stock.value > 0 %}
+                                                    {{ total_stock.value }} Available
+                                                {% else %}
+                                                    Out of stock
+                                                {% endif %}
+                                            {% else %}
+                                                Out of stock
+                                            {% endif %}
+                                            {% if total_stock.expire != None %}
+                                                {% if total_stock.expire > 0 %}
+                                                <span class="expire">
+                                                    {{ total_stock.expire }} days left
+                                                </span>
+                                                {% else %}
+                                                <span class="expired">
+                                                    Expired
+                                                </span>
+                                                {% endif %}
+                                            {% endif %}
                                         {% else %}
-                                        Out of stock
-                                        {% endif %}
-                                        {% else %}
-                                        Out of stock
-                                        {% endif %}
-                                        {% else %}
-                                        Available
+                                            Available
                                         {% endif %}
                                     </span></p>
                                 <p style="font-size: 12px;" class="favorite-btn active">
@@ -183,21 +225,43 @@
                                 <p class="color-font text-wrapper" id="details-price" style="font-size: 14px; width: 110px;">
                                     <span class="symbol"></span><span class="stock-tag">
                                         {% if product.isStock == True %}
-                                        {% set total_stock = namespace(value=0) %}
-                                        {% if product.stocks %}
-                                        {% for stock in product.stocks %}
-                                        {% set total_stock.value = total_stock.value + stock.quantity %}
-                                        {% endfor %}
-                                        {% if total_stock.value > 0 %}
-                                        {{ total_stock.value }} Available
+                                            {% set total_stock = namespace(value=0, expire=None) %}
+                                            {% if product.stocks %}
+                                                {% for stock in product.stocks %}
+                                                    {% if stock.expire %}
+                                                        {% if (stock.expire - current_date).days < 7 %}
+                                                            {% if total_stock.expire %}
+                                                                {% if total_stock.expire > (stock.expire - current_date).days %}
+                                                                    {% set total_stock.expire = (stock.expire - current_date).days %}
+                                                                {% endif %}
+                                                            {% else %}
+                                                                {% set total_stock.expire = (stock.expire - current_date).days %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {% set total_stock.value = total_stock.value + stock.quantity %}
+                                                {% endfor %}
+                                                {% if total_stock.value > 0 %}
+                                                    {{ total_stock.value }} Available
+                                                {% else %}
+                                                    Out of stock
+                                                {% endif %}
+                                            {% else %}
+                                                Out of stock
+                                            {% endif %}
+                                                {% if total_stock.expire != None %}
+                                                    {% if total_stock.expire > 0 %}
+                                                    <span class="expire">
+                                                        {{ total_stock.expire }} days left
+                                                    </span>
+                                                    {% else %}
+                                                    <span class="expired">
+                                                        Expired
+                                                    </span>
+                                                    {% endif %}
+                                                {% endif %}
                                         {% else %}
-                                        Out of stock
-                                        {% endif %}
-                                        {% else %}
-                                        Out of stock
-                                        {% endif %}
-                                        {% else %}
-                                        Available
+                                            Available
                                         {% endif %}
                                     </span></p>
                                 <p style="font-size: 12px;" class="favorite-btn">

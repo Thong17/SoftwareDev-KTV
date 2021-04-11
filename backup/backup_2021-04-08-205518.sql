@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.17, for macos10.14 (x86_64)
 --
--- Host: localhost    Database: restaurant
+-- Host: localhost    Database: mart_shop
 -- ------------------------------------------------------
 -- Server version	8.0.17
 
@@ -92,7 +92,7 @@ CREATE TABLE `tbl_activity` (
 
 LOCK TABLES `tbl_activity` WRITE;
 /*!40000 ALTER TABLE `tbl_activity` DISABLE KEYS */;
-INSERT INTO `tbl_activity` VALUES ('a9db27b1-827d-47b8-87f9-9ea3ee615acb','Admin has logged in','Login','2021-03-14 15:20:19','174084d3-74e4-495b-8e00-cb44eadcbf15');
+INSERT INTO `tbl_activity` VALUES ('76b62f0c-1cb3-471c-9031-903937fec5d1','Admin has modified language from english','Modify','2021-04-08 13:55:16','3c8bcabf-df81-4ead-bd0f-7a2e609323f1'),('ad030bba-1599-4101-b4c0-8996f4fb5d89','Admin has logged in','Login','2021-04-08 13:53:03','3c8bcabf-df81-4ead-bd0f-7a2e609323f1'),('e1f7b868-6329-4f30-862c-017781866637','Admin has modified theme from light','Modify','2021-04-08 13:55:11','3c8bcabf-df81-4ead-bd0f-7a2e609323f1'),('e354396b-387f-4b7a-afcd-fb5d498269e3','Admin has uploaded his profile picture ','Modify','2021-04-08 13:54:57','3c8bcabf-df81-4ead-bd0f-7a2e609323f1');
 /*!40000 ALTER TABLE `tbl_activity` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -395,7 +395,7 @@ CREATE TABLE `tbl_floor` (
 
 LOCK TABLES `tbl_floor` WRITE;
 /*!40000 ALTER TABLE `tbl_floor` DISABLE KEYS */;
-INSERT INTO `tbl_floor` VALUES ('436f239c-9d00-46ef-bb8d-b39ffb7944ee','Ground Floor','2021-03-14 15:20:10','c3cb5134-a51e-450a-835f-dd59c9d42cfe');
+INSERT INTO `tbl_floor` VALUES ('e080b818-c9a5-4ad8-934e-45bbaf9838f3','Ground Floor','2021-04-08 13:50:57','d11bc9e0-a6fd-4fe9-8339-6e3e4e2ffd15');
 /*!40000 ALTER TABLE `tbl_floor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -639,7 +639,7 @@ CREATE TABLE `tbl_profile` (
 
 LOCK TABLES `tbl_profile` WRITE;
 /*!40000 ALTER TABLE `tbl_profile` DISABLE KEYS */;
-INSERT INTO `tbl_profile` VALUES ('96ad051c-71b8-41c0-bda6-b74c578eaede','default.png','Single','','','','','','2021-03-14 15:20:10','174084d3-74e4-495b-8e00-cb44eadcbf15');
+INSERT INTO `tbl_profile` VALUES ('1f2c4d57-eef1-4d62-a782-323c1e3c6619','a85b6773-a915-4c90-88dc-772a6d1f6642.jpg','Single','','','','','','2021-04-08 13:50:57','3c8bcabf-df81-4ead-bd0f-7a2e609323f1');
 /*!40000 ALTER TABLE `tbl_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -733,7 +733,7 @@ CREATE TABLE `tbl_role` (
 
 LOCK TABLES `tbl_role` WRITE;
 /*!40000 ALTER TABLE `tbl_role` DISABLE KEYS */;
-INSERT INTO `tbl_role` VALUES ('ff681de8-3d05-450c-8d35-1b7f47326182','Administration','Admin, Cashier, Stock, Editor, Report',1,'2021-03-14 15:20:10','174084d3-74e4-495b-8e00-cb44eadcbf15');
+INSERT INTO `tbl_role` VALUES ('d1b61084-7c3c-43bc-94e7-0899d688c2d2','Administration','Admin, Cashier, Stock, Editor, Report',1,'2021-04-08 13:50:57','3c8bcabf-df81-4ead-bd0f-7a2e609323f1');
 /*!40000 ALTER TABLE `tbl_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -785,7 +785,7 @@ CREATE TABLE `tbl_stock` (
   `rate` decimal(10,2) DEFAULT NULL,
   `quantity` decimal(10,0) DEFAULT NULL,
   `color` varchar(36) DEFAULT NULL,
-  `adjust` decimal(10,2) DEFAULT NULL,
+  `expire` date DEFAULT NULL,
   `createdOn` datetime DEFAULT NULL,
   `createdBy` varchar(36) NOT NULL,
   `productId` varchar(36) NOT NULL,
@@ -829,7 +829,7 @@ CREATE TABLE `tbl_store` (
 
 LOCK TABLES `tbl_store` WRITE;
 /*!40000 ALTER TABLE `tbl_store` DISABLE KEYS */;
-INSERT INTO `tbl_store` VALUES ('c3cb5134-a51e-450a-835f-dd59c9d42cfe','Store Name','','','2021-03-14 15:20:10');
+INSERT INTO `tbl_store` VALUES ('d11bc9e0-a6fd-4fe9-8339-6e3e4e2ffd15','Store Name','','','2021-04-08 13:50:57');
 /*!40000 ALTER TABLE `tbl_store` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -907,7 +907,7 @@ CREATE TABLE `tbl_user` (
 
 LOCK TABLES `tbl_user` WRITE;
 /*!40000 ALTER TABLE `tbl_user` DISABLE KEYS */;
-INSERT INTO `tbl_user` VALUES ('174084d3-74e4-495b-8e00-cb44eadcbf15','','','Admin','',NULL,'','$2b$12$B212Iy7eHShZmr2IRiTb7.K.9a3.PSDXq5JmKiO5UAKuRnL8mAqVK','light','english','e4769719-e2a2-4a1b-9685-09d045a4a20e','','',1,1,'2021-03-14 15:20:10');
+INSERT INTO `tbl_user` VALUES ('3c8bcabf-df81-4ead-bd0f-7a2e609323f1','','','Admin','',NULL,'','$2b$12$6jyiAAl9bteWPBJuQjTbEOfXhFjGgygWmShFqW9kKUSq0jH6rwfSu','dark','khmer','fc4d744c-7880-490f-b2bd-d62c24b4f43c','','',1,1,'2021-04-08 13:50:57');
 /*!40000 ALTER TABLE `tbl_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -970,7 +970,7 @@ CREATE TABLE `user_role` (
 
 LOCK TABLES `user_role` WRITE;
 /*!40000 ALTER TABLE `user_role` DISABLE KEYS */;
-INSERT INTO `user_role` VALUES ('174084d3-74e4-495b-8e00-cb44eadcbf15','ff681de8-3d05-450c-8d35-1b7f47326182');
+INSERT INTO `user_role` VALUES ('3c8bcabf-df81-4ead-bd0f-7a2e609323f1','d1b61084-7c3c-43bc-94e7-0899d688c2d2');
 /*!40000 ALTER TABLE `user_role` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -983,4 +983,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-14 22:20:25
+-- Dump completed on 2021-04-08 20:55:19

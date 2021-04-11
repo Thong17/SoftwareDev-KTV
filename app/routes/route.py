@@ -924,7 +924,8 @@ def stocks():
     products = tblProduct.query.all()
     brands = tblBrand.query.all()
     categories = tblCategory.query.all()
-    return render_template('views/stock.html', products=products, brands=brands, categories=categories)
+    today = date.today()
+    return render_template('views/stock.html', products=products, brands=brands, categories=categories, current_date=today)
 
 
 @route.route('/stock/product/<id>')
@@ -944,6 +945,7 @@ def stock(id):
 
     product.stocks.sort(key=lambda r: r.createdOn, reverse=True)
     stocks = []
+    today = date.today()
     if product.colors:
         for color in product.colors:
             total_quantity = 0
@@ -959,7 +961,7 @@ def stock(id):
 
             stocks.append(stock)
 
-    return render_template('views/product_stock.html', product=product, total_stock=total_stock, total_cost=total_cost, stocks=stocks)
+    return render_template('views/product_stock.html', product=product, total_stock=total_stock, total_cost=total_cost, stocks=stocks, today=today)
 
 
 @route.route('/stock/add', methods=['POST'])
@@ -969,13 +971,13 @@ def add_stock():
     quantity = request.form['quantity']
     currency = request.form['currency']
     rate = request.form['rate']
-    adjust = request.form['adjust']
+    expire = request.form['expire']
     product = request.form['product']
 
     Product = tblProduct.query.get(product)
 
-    if adjust == '':
-        adjust = 0.00
+    if expire == '':
+        expire = None
 
     if rate == '':
         rate = 4000
@@ -983,15 +985,15 @@ def add_stock():
     id = str(uuid4())
 
     model = tblStock(id=id, cost=cost, quantity=quantity, currency=currency, rate=rate,
-                     adjust=adjust, productId=product, color=color, createdBy=current_user.id)
-    amount = (float(cost) * int(quantity)) - float(adjust)
+                     expire=expire, productId=product, color=color, createdBy=current_user.id)
+    amount = float(cost) * int(quantity)
     outcome = tblOutcome(id=id, description=Product.product +
                          ' x'+quantity, amount=amount, createdBy=current_user.id)
     try:
         db.session.add(model)
         db.session.add(outcome)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added stock: '+str(cost)+'/'+currency+'/'+str(
-            quantity)+'/'+str(rate)+'/'+str(adjust)+' in product '+Product.product, type='Add', createdBy=current_user.id)
+            quantity)+'/'+str(rate)+'/'+str(expire)+' in product '+Product.product, type='Add', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock = 0
@@ -1001,7 +1003,7 @@ def add_stock():
             total_stock += stock.quantity
             total_cost = stock.cost * stock.quantity
             total_costs += total_cost
-        return jsonify({'data': 'success', 'id': id, 'cost': cost, 'quantity': quantity, 'currency': currency, 'rate': rate, 'adjust': adjust, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S'), 'total_cost': total_costs})
+        return jsonify({'data': 'success', 'id': id, 'cost': cost, 'quantity': quantity, 'currency': currency, 'rate': rate, 'expire': expire, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S'), 'total_cost': total_costs})
     except:
         return jsonify({'data': 'failed'})
 
@@ -1024,7 +1026,7 @@ def delete_stock(id):
         db.session.delete(outcome)
         db.session.delete(stock)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted stock: '+str(stock.cost)+'/'+stock.currency+'/'+str(
-            stock.quantity)+'/'+str(stock.rate)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Delete', createdBy=current_user.id)
+            stock.quantity)+'/'+str(stock.rate)+'/'+str(stock.expire)+' in product '+stock.stocksOfProduct.product, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock -= delete_stock
@@ -1039,17 +1041,21 @@ def save_stock(id):
     stock = tblStock.query.get(id)
     outcome = tblOutcome.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified stock from: '+str(stock.cost)+'/'+stock.currency+'/'+str(
-        stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.adjust)+' in product '+stock.stocksOfProduct.product, type='Modify', createdBy=current_user.id)
+        stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.expire)+' in product '+stock.stocksOfProduct.product, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
+
+    expire =  request.form['expire']
+    if expire == '':
+        expire = None
+
 
     stock.color = request.form['color']
     stock.cost = request.form['cost']
     stock.currency = request.form['currency']
     stock.rate = request.form['rate']
     stock.quantity = request.form['quantity']
-    stock.adjust = request.form['adjust']
-    outcome.amount = (float(stock.cost) * int(stock.quantity)
-                      ) - float(stock.adjust)
+    stock.expire = expire
+    outcome.amount = float(stock.cost) * int(stock.quantity)
     try:
         db.session.commit()
         total_stock = 0
@@ -2052,7 +2058,7 @@ def index():
     products = tblProduct.query.all()
     advertises = tblAdvertise.query.all()
     store = tblStore.query.first()
-    return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises, store=store)
+    return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises, Store=store)
 
 
 @route.route('/about')
@@ -2512,7 +2518,7 @@ def add_room():
 def lock_room(id):
     Room = tblRoom.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has toggle room: '+Room.room+'from '+Room.status, type='Toggle', createdBy=current_user.id)
+                           ' has toggle room: '+Room.room+' from '+Room.status, type='Toggle', createdBy=current_user.id)
     if Room.status == 'Open':            
         Room.status = 'Close'
     elif Room.status == 'Close':
@@ -2637,11 +2643,13 @@ def add_order():
 
     id = str(uuid4())
 
+    Customer = tblCustomer.query.get(customer)
+
     Order = tblOrder(id=id, orderOn=utcFrom, orderTo=utcTo,
                      roomId=room, orderedBy=customer, createdBy=current_user.id)
 
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has added order from: '+datetimefilter(utcFrom)+' to '+datetimefilter(utcTo), type='Add', createdBy=current_user.id)
+                           ' has added order from '+datetimefilter(utcFrom, '%Y-%m-%d %I:%M %p')+' to '+datetimefilter(utcTo, '%Y-%m-%d %I:%M %p') +' for customer '+Customer.name, type='Add', createdBy=current_user.id)
     try:
         db.session.add(Activity)
         db.session.add(Order)
@@ -2654,8 +2662,9 @@ def add_order():
 @route.route('/order/remove/<id>', methods=['POST'])
 def remove_order(id):
     Order = tblOrder.query.get(id)
+    Customer = tblCustomer.query.get(Order.orderedBy)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has removed order from: '+datetimefilter(Order.orderOn)+' to '+datetimefilter(Order.orderTo), type='Deleted', createdBy=current_user.id)
+                           ' has removed order from '+datetimefilter(Order.orderOn, '%Y-%m-%d %I:%M %p')+' to '+datetimefilter(Order.orderTo, '%Y-%m-%d %I:%M %p')+' for customer '+Customer.name, type='Deleted', createdBy=current_user.id)
     try:
         db.session.add(Activity)
         db.session.delete(Order)

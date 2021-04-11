@@ -254,6 +254,12 @@
     .order-item:hover {
         background-color: var(--color-menu) !important;
     }
+
+    .date-below {
+        font-size: 9px;
+        color: var(--color-hover);
+        position: absolute;
+    }
 </style>
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.js"></script> -->
@@ -314,7 +320,7 @@
                         </select>
                     </div>
                     <!-- <span class="btn-date prev-date"><i class="fa fa-angle-left" aria-hidden="true"></i></span> -->
-                    <h2 class="fc-toolbar-title m-0" id="date"><span class="ln-date">Date</span>: {{ date | datetimefilter('%B %d, %Y') }}</h2>
+                    <!-- <h2 class="fc-toolbar-title m-0" id="date"><span class="ln-date">Date</span>: {{ date | datetimefilter('%B %d, %Y') }}</h2> -->
                     <!-- <span class="btn-date next-date"><i class="fa fa-angle-right" aria-hidden="true"></i></span> -->
                 </div>
                 <table id="order-table" class="table">
@@ -335,8 +341,8 @@
                                 order.customer.phone }}{%
                                 else %}...{% endif %}</td>
                             <td class="color-text notranslate">{{ order.order.room }}</td>
-                            <td class="color-text flex-between-center"><span>{{ order.orderOn | datetimefilter }}-{{
-                                    order.orderTo | datetimefilter }}</span><span class="remove-order"><i
+                            <td class="color-text flex-between-center"><div class="flex-column-between"><div><span>{{ order.orderOn | datetimefilter }}-{{
+                                order.orderTo | datetimefilter }}</span></div><span class="date-below">{{ order.orderOn | datetimefilter("%Y-%m-%d") }}</span></div><span class="remove-order"><i
                                         class="fa fa-trash-o" aria-hidden="true"></i></span></td>
                         </tr>
                         {% endfor %}
@@ -747,7 +753,7 @@
 
                     data.orders.forEach(o => {
                         obj = {
-                            title: o.customer.name + ': ' + o.customer.phone,
+                            title: o.customer.name + ' ' + o.customer.phone,
                             start: o.orderOn,
                             end: o.orderTo,
                             backgroundColor: '#337ab799',
@@ -779,7 +785,7 @@
                         },
                         initialView: 'timeGridDay',
                         nowIndicator: true,
-                        editable: true,
+                        editable: false,
                         droppable: true,
                         dayMaxEvents: true,
                         scrollTime: data.now,

@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.17, for macos10.14 (x86_64)
 --
--- Host: localhost    Database: restaurant
+-- Host: localhost    Database: mart_shop
 -- ------------------------------------------------------
 -- Server version	8.0.17
 
@@ -64,7 +64,6 @@ CREATE TABLE `payment` (
 
 LOCK TABLES `payment` WRITE;
 /*!40000 ALTER TABLE `payment` DISABLE KEYS */;
-INSERT INTO `payment` VALUES ('27e65462-8dc7-43cb-adb1-ee2865090832','63fe684b-3b70-45f3-a230-9060828821a5'),('27e65462-8dc7-43cb-adb1-ee2865090832','36d214d7-f003-4935-9926-fe04ef035218'),('27e65462-8dc7-43cb-adb1-ee2865090832','90f38092-ae79-453d-863a-44e4012fda53');
 /*!40000 ALTER TABLE `payment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -93,7 +92,7 @@ CREATE TABLE `tbl_activity` (
 
 LOCK TABLES `tbl_activity` WRITE;
 /*!40000 ALTER TABLE `tbl_activity` DISABLE KEYS */;
-INSERT INTO `tbl_activity` VALUES ('05fa4dd8-4519-4454-bcbb-5fbaf7e52337','Admin has checked out order from: 10:05 PM to 11:05 PM','Check Out','2021-03-14 15:05:46','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('17bb5f18-81d8-4765-b97c-fbbd6d2fb598','Admin has logged in','Login','2021-03-14 15:20:51','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('1e2ac129-fc39-4654-9ca9-6b2da51a5c2c','Admin has checked out payment INV0000001','Payment','2021-03-14 15:05:54','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('22208b53-48c7-4a7b-a429-e341b012484a','Admin has added brand: Coca Cola in brand','Add','2021-03-14 15:04:11','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('237bf740-f8b5-420b-9832-d6bf9592ea2a','Admin has updated transaction បន្ទប់ទី 3, 60min','Modified','2021-03-14 15:05:48','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('2390030a-0cb5-4135-af36-399c9a6fcf8a','Admin has added brand: សាកល្បង in brand','Add','2021-03-14 14:47:39','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('29e83e4a-b4ef-4626-a3d4-9afb7cbd1240','Admin has modified theme from light','Modify','2021-03-14 14:45:58','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('2e1a63de-aa75-4c37-a45d-50bc6c593558','Admin has added role: អ្នកកែប្រែ','Add','2021-03-14 14:51:56','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('333fef33-4f68-41b5-9964-3a352687106c','Admin has added room: បន្ទប់ទី 10','Create','2021-03-14 14:51:01','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('37f77847-ee1b-41c0-a6fa-788755c44844','Admin has added order from: 10:04 PM to 11:04 PM','Add','2021-03-14 15:05:23','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('39d9c713-8275-4eca-8e81-73d1dc85cc3d','Admin has upload photo for product: Coca Cola Original taste','Upload','2021-03-14 15:04:26','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('3af713bd-9623-462b-9e18-758c29d68538','Admin has added product ឆាក្ដៅកង្កែប','Add','2021-03-14 14:48:24','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('52364795-3e69-4a95-9ddd-5bb1287f56f0','Admin has added product Coca Cola Original taste','Add','2021-03-14 15:04:22','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('54a04779-e036-4d8e-8eee-f6b1221aa6bd','Admin has modified user: ថុង','Modify','2021-03-14 14:52:35','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('5ac35f5b-46f9-4cff-b246-99e04476a1e1','Admin has added category: Beverage in category','Add','2021-03-14 15:04:03','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('5ae77790-1458-4f2a-8337-5b7e5fb2b4d7','Admin has modified theme from light','Modify','2021-03-14 15:21:17','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('63703033-5deb-4bad-819e-21466b827d48','Admin has modified theme from dark','Modify','2021-03-14 15:11:52','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('6a127992-a446-44a3-9992-8e61534d6e07','Admin has upload photo for product: ឆាក្ដៅកង្កែប','Upload','2021-03-14 14:48:33','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('725f480d-5e6a-4a2a-a43a-1bb162cbde86','Admin has checked in order from: 10:05 PM to 11:05 PM','Check In','2021-03-14 15:05:30','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('790a1521-5251-404b-a21f-9cbe19c13989','Admin has logged in','Login','2021-03-14 14:45:47','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('815d8404-227c-4d5b-a93f-fd6b2402ead3','Admin has added room: បន្ទប់ទី 11','Create','2021-03-14 14:51:04','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('83bc8b7b-7701-4ba1-99c8-ff45c323c524','Admin has modified product from ឆាក្ដៅកង្កែប//True/dollar/3.00///None/មុខម្អូប','Modify','2021-03-14 14:49:05','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('8a4057a6-d76e-4f3a-8e21-4baf2f671228','Admin has modified store from: Store Name//','Deleted','2021-03-14 14:50:01','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('8cce4eed-f5d2-433d-9fb5-91af4eee873e','Admin has modified theme from dark','Modify','2021-03-14 14:46:01','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('8de8f46a-429f-4c02-b6e0-61b3e57849bf','Admin has modified theme from green','Modify','2021-03-14 14:46:06','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('97dff718-0708-47b6-a0d3-b88897a2b439','Admin has added stock: 0.2/dollar/100/4000/0.0 in product Coca Cola Original taste','Add','2021-03-14 15:04:44','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('a721c215-4b7f-4a8b-9bad-3e204b1ba6b7','Admin has added room: បន្ទប់ទី 2','Create','2021-03-14 14:50:33','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('ad4a6443-8ff3-4a18-a98f-a4feafc76a60','Admin has added floor: 1F','Create','2021-03-14 14:50:41','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('af100eb9-7ef1-4d9d-ad88-0f8467b550f1','Admin has opened drawer','Open','2021-03-14 15:05:27','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('b3ccca0f-c29c-4f93-bff9-bd5de4ae27c4','Admin has added transaction: Coca Cola Original taste','Add','2021-03-14 15:05:39','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('b9ca63b3-2352-4086-942b-7be061e13055','Admin has added transaction: ឆាក្ដៅត្រី','Add','2021-03-14 15:05:35','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('cb068581-2861-4b11-99df-3ff41a2a6b40','Admin has modified theme from light','Modify','2021-03-14 15:12:36','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('dd2458df-7807-4675-b354-717d8d0a2b99','Admin has added room: បន្ទប់ទី 1','Create','2021-03-14 14:50:29','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('e00a4f96-8013-463d-9a21-e059c70eab7b','Admin has modified theme from dark','Modify','2021-03-14 15:17:21','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('e4441b8e-d199-4dba-a22b-fe15dffa11e8','Admin has modified product from ឆាក្ដៅត្រី//True/dollar/3.00///None/មុខម្អូប','Modify','2021-03-14 15:03:50','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('e72154ff-9b32-4c49-850c-8b52355392f8','Admin has added room: បន្ទប់ទី 3','Create','2021-03-14 14:50:36','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('ef41425b-28d7-42b8-936b-754c7efce876','Admin has added category: មុខម្អូប in category','Add','2021-03-14 14:47:09','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('f3496dc2-c497-4d51-9c92-d19870006cf8','Admin has added customer: Thong','Add','2021-03-14 15:05:13','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('f9837236-2e8b-42a5-ab41-991b20c311fc','Admin has created user: ថុង','Created','2021-03-14 14:52:26','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
+INSERT INTO `tbl_activity` VALUES ('1f0cd498-4162-4735-b4d0-620ebbd3b9ea','Admin has modified theme from light','Modify','2021-04-08 14:03:51','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('228880dc-4842-442c-863a-2db5cfd22cc4','Admin has modified product from ឆាក្តៅ//True/dollar/3.00///None/មុខម្អូប','Modify','2021-04-08 14:20:55','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('25abc6c1-dc70-494e-9f4e-827c9ba1fe29','Admin has added product Coca Cola Original Taste','Add','2021-04-08 14:06:49','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('3908dfe4-db28-4a18-93bd-967190b134ed','Admin has added property: Size in category មុខម្អូប','Add','2021-04-08 14:05:21','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('3cf9561b-bf1d-4da8-86d5-3e0d61b080b6','Admin has upload photo for product: Coca Cola Original Taste','Upload','2021-04-08 14:07:03','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('6cf37832-c1f2-46ed-8d0e-45079d50e137','Admin has added brand: ម្អូប in brand','Add','2021-04-08 14:07:46','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('6e012cb1-bf75-4044-b6a6-9722acb23f8b','Admin has modified language from english','Modify','2021-04-08 14:03:56','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('7ab45112-1dc4-4baa-815a-d25d016faf20','Admin has logged in','Login','2021-04-08 14:02:40','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('7e93dcd4-9f95-4d75-bf37-932ff68973c1','Admin has uploaded his profile picture ','Modify','2021-04-08 14:03:37','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('a11714c3-cf2e-42b2-bbb6-bf299e5d2ecb','Admin has added brand: Coca Cola in brand','Add','2021-04-08 14:05:57','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('a456a1e8-31ec-4849-8185-0e748088ae4c','Admin has added category: Beverage in category','Add','2021-04-08 14:04:50','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('a6e94e11-6306-4915-880f-f379163dc3ba','Admin has added category: Food in category','Add','2021-04-08 14:04:54','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('a70f48da-7160-48a4-9ae1-d1ddb04e85e4','Admin has modified product from Coca Cola Original Taste//True/dollar/1.25///None/Beverage','Modify','2021-04-08 14:07:28','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('a7e87deb-e513-45bf-881e-a21fb5802280','Admin has modified category from Food','Modify','2021-04-08 14:05:12','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('b434f6b6-75ec-436e-af5c-c01bec864c5a','Admin has modified property from Size/text/','Modify','2021-04-08 14:05:34','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('d29ad244-971a-4106-9fd1-39805bfc771f','Admin has upload photo for product: ឆាក្តៅ','Upload','2021-04-08 14:08:20','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('e886ce27-0877-4e72-ab98-e8eed21dca4f','Admin has modified theme from dark','Modify','2021-04-08 14:19:48','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('ea3271c2-3673-4b3f-be8a-7afc3c1c36bd','Admin has added product ឆាក្តៅ','Add','2021-04-08 14:08:10','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_activity` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -154,7 +153,7 @@ CREATE TABLE `tbl_appearance` (
 
 LOCK TABLES `tbl_appearance` WRITE;
 /*!40000 ALTER TABLE `tbl_appearance` DISABLE KEYS */;
-INSERT INTO `tbl_appearance` VALUES ('203141b4-0dfb-4439-a8e3-efba381c0a72','','','','','','a9eae3db-267d-45c0-8bda-ca75bc7813ad'),('b28f8508-dd19-47da-9deb-c1374563e4f2','','','','','','77b2d17d-f2d5-44c4-8029-1ea582f96703');
+INSERT INTO `tbl_appearance` VALUES ('70155de2-c3d4-4ff8-9a5c-0168c5f2ed48','','','','','','389e5237-e1f0-4534-9962-2da8a95038a3'),('8834ec4f-6a27-4429-84fa-8eae967f4db8','','','','','','6263cdc5-fde9-43ba-9a96-47b544236f4f');
 /*!40000 ALTER TABLE `tbl_appearance` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -184,7 +183,7 @@ CREATE TABLE `tbl_brand` (
 
 LOCK TABLES `tbl_brand` WRITE;
 /*!40000 ALTER TABLE `tbl_brand` DISABLE KEYS */;
-INSERT INTO `tbl_brand` VALUES ('13c2eb54-36cb-43b4-813c-c641d46f0f47','Coca Cola','','2021-03-14 15:04:11','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('a2dae041-7915-4c86-9189-72955c453f46','សាកល្បង','','2021-03-14 14:47:39','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
+INSERT INTO `tbl_brand` VALUES ('2237a3f2-96ba-40e2-ab64-c2bb90cd8e23','Coca Cola','','2021-04-08 14:05:57','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('e2c5a715-44e5-41be-bcde-7818534c7471','ម្អូប','','2021-04-08 14:07:46','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_brand` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -215,7 +214,7 @@ CREATE TABLE `tbl_category` (
 
 LOCK TABLES `tbl_category` WRITE;
 /*!40000 ALTER TABLE `tbl_category` DISABLE KEYS */;
-INSERT INTO `tbl_category` VALUES ('4b1afc94-21b2-487b-b5eb-e6436203b052','មុខម្អូប','default.png','','2021-03-14 14:47:09','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('8f29a30a-cde3-4d2d-8fcb-92fa8ad01d70','Beverage','default.png','','2021-03-14 15:04:03','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
+INSERT INTO `tbl_category` VALUES ('3b9db328-e98c-48e0-a7e9-4a467faf29b6','មុខម្អូប','default.png','','2021-04-08 14:04:54','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('ca0a978f-8391-425c-8c39-886bae9f7f62','Beverage','default.png','','2021-04-08 14:04:50','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -249,7 +248,6 @@ CREATE TABLE `tbl_checkin` (
 
 LOCK TABLES `tbl_checkin` WRITE;
 /*!40000 ALTER TABLE `tbl_checkin` DISABLE KEYS */;
-INSERT INTO `tbl_checkin` VALUES ('3bfad982-0953-46af-8016-c726164d4a5e','2021-03-14 15:05:30','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','2021-03-14 15:05:30','230ccdd1-92e1-46a3-a320-2e1f643a3bb9','27e65462-8dc7-43cb-adb1-ee2865090832');
 /*!40000 ALTER TABLE `tbl_checkin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -281,7 +279,6 @@ CREATE TABLE `tbl_checkout` (
 
 LOCK TABLES `tbl_checkout` WRITE;
 /*!40000 ALTER TABLE `tbl_checkout` DISABLE KEYS */;
-INSERT INTO `tbl_checkout` VALUES ('332e225c-cb62-4423-a933-a042ebd98c26','2021-03-14 15:05:46',60,'2ed66aa6-ef6b-4e84-a095-adf0505d8c19','2021-03-14 15:05:46','230ccdd1-92e1-46a3-a320-2e1f643a3bb9');
 /*!40000 ALTER TABLE `tbl_checkout` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -343,7 +340,6 @@ CREATE TABLE `tbl_customer` (
 
 LOCK TABLES `tbl_customer` WRITE;
 /*!40000 ALTER TABLE `tbl_customer` DISABLE KEYS */;
-INSERT INTO `tbl_customer` VALUES ('138ea1e0-f341-4d97-92ab-f004e6e73ad4','Thong',NULL,'012 345 678','2021-03-14 15:05:13','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
 /*!40000 ALTER TABLE `tbl_customer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -375,7 +371,6 @@ CREATE TABLE `tbl_drawer` (
 
 LOCK TABLES `tbl_drawer` WRITE;
 /*!40000 ALTER TABLE `tbl_drawer` DISABLE KEYS */;
-INSERT INTO `tbl_drawer` VALUES ('8382c362-98d0-4576-8cd0-d4adf6adc680','',4000.00,'Default',0.00,'2021-03-14 15:05:27',NULL,'2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
 /*!40000 ALTER TABLE `tbl_drawer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -403,7 +398,7 @@ CREATE TABLE `tbl_floor` (
 
 LOCK TABLES `tbl_floor` WRITE;
 /*!40000 ALTER TABLE `tbl_floor` DISABLE KEYS */;
-INSERT INTO `tbl_floor` VALUES ('361fa7a8-75f9-433e-a3ad-c5ddbfa0fd06','Ground Floor','2021-03-14 14:44:05','05cdf4f1-205b-45b0-a4fe-08143a6c67d4'),('ae1347e0-adf4-4f3f-84e6-e248ecedc899','1F','2021-03-14 14:50:41','05cdf4f1-205b-45b0-a4fe-08143a6c67d4');
+INSERT INTO `tbl_floor` VALUES ('4981b50a-a104-4f1a-b091-af099d67bdaf','Ground Floor','2021-04-08 14:00:03','bf4c4791-3a77-4b4e-8d4c-daa67edb4514');
 /*!40000 ALTER TABLE `tbl_floor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -471,7 +466,6 @@ CREATE TABLE `tbl_order` (
 
 LOCK TABLES `tbl_order` WRITE;
 /*!40000 ALTER TABLE `tbl_order` DISABLE KEYS */;
-INSERT INTO `tbl_order` VALUES ('230ccdd1-92e1-46a3-a320-2e1f643a3bb9',1,1,'2021-03-14 15:05:00','2021-03-14 16:05:00','28977e15-c068-417f-ad6e-ae77a4829abe','138ea1e0-f341-4d97-92ab-f004e6e73ad4','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','2021-03-14 15:05:23');
 /*!40000 ALTER TABLE `tbl_order` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -502,7 +496,6 @@ CREATE TABLE `tbl_outcome` (
 
 LOCK TABLES `tbl_outcome` WRITE;
 /*!40000 ALTER TABLE `tbl_outcome` DISABLE KEYS */;
-INSERT INTO `tbl_outcome` VALUES ('f724ca98-9db5-4bca-8f3b-9e14ab43d7d1',1,'Coca Cola Original taste x100',20.00,'2021-03-14 15:04:44','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
 /*!40000 ALTER TABLE `tbl_outcome` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -539,7 +532,6 @@ CREATE TABLE `tbl_payment` (
 
 LOCK TABLES `tbl_payment` WRITE;
 /*!40000 ALTER TABLE `tbl_payment` DISABLE KEYS */;
-INSERT INTO `tbl_payment` VALUES ('27e65462-8dc7-43cb-adb1-ee2865090832',1,'INV0000001',19.50,20.00,4000.00,0.50,'2021-03-14 15:05:30','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','8382c362-98d0-4576-8cd0-d4adf6adc680');
 /*!40000 ALTER TABLE `tbl_payment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -617,7 +609,7 @@ CREATE TABLE `tbl_product` (
 
 LOCK TABLES `tbl_product` WRITE;
 /*!40000 ALTER TABLE `tbl_product` DISABLE KEYS */;
-INSERT INTO `tbl_product` VALUES ('77b2d17d-f2d5-44c4-8029-1ea582f96703','Coca Cola Original taste','',1,0.50,'dollar','',NULL,'70b9afdd-295c-4de4-89b9-4d7c10a01661.jpeg','','[]','2021-03-14 15:04:22','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','13c2eb54-36cb-43b4-813c-c641d46f0f47','8f29a30a-cde3-4d2d-8fcb-92fa8ad01d70'),('a9eae3db-267d-45c0-8bda-ca75bc7813ad','ឆាក្ដៅត្រី','',0,3.00,'dollar','',NULL,'3654e409-b54c-4fda-ac5c-5e2061543411.jpeg','','[]','2021-03-14 14:48:24','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','a2dae041-7915-4c86-9189-72955c453f46','4b1afc94-21b2-487b-b5eb-e6436203b052');
+INSERT INTO `tbl_product` VALUES ('389e5237-e1f0-4534-9962-2da8a95038a3','Coca Cola Original Taste','',1,1.25,'dollar','20',NULL,'271571ce-bba4-4e85-86be-05f087ea1902.jpeg','','[]','2021-04-08 14:06:49','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','2237a3f2-96ba-40e2-ab64-c2bb90cd8e23','ca0a978f-8391-425c-8c39-886bae9f7f62'),('6263cdc5-fde9-43ba-9a96-47b544236f4f','ឆាក្តៅ','',0,3.00,'dollar','',NULL,'9f14f102-5ecb-4f6b-a102-fec3e5b5061d.png','','[]','2021-04-08 14:08:10','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','e2c5a715-44e5-41be-bcde-7818534c7471','3b9db328-e98c-48e0-a7e9-4a467faf29b6');
 /*!40000 ALTER TABLE `tbl_product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -651,7 +643,7 @@ CREATE TABLE `tbl_profile` (
 
 LOCK TABLES `tbl_profile` WRITE;
 /*!40000 ALTER TABLE `tbl_profile` DISABLE KEYS */;
-INSERT INTO `tbl_profile` VALUES ('2ebe3f35-f1e9-44b3-8501-d79a12da2bd6','default.png','','','','','','','2021-03-14 14:52:26','cb242a40-077e-44a5-bbb4-d510bb93ffd7'),('3d8ba67c-0d60-4898-9d4c-4ff92102e25b','default.png','Single','','','','','','2021-03-14 14:44:05','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
+INSERT INTO `tbl_profile` VALUES ('2724d5a9-1ba7-4796-a692-12e1233c1229','ab44ae3d-ec58-4b35-9521-2149bba5a393.jpg','Single','','','','','','2021-04-08 14:00:03','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -684,6 +676,7 @@ CREATE TABLE `tbl_property` (
 
 LOCK TABLES `tbl_property` WRITE;
 /*!40000 ALTER TABLE `tbl_property` DISABLE KEYS */;
+INSERT INTO `tbl_property` VALUES ('7610ac5b-e1e3-4763-ba5d-6d5cd6953caa','ទំហំ','text','','2021-04-08 14:05:21','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','3b9db328-e98c-48e0-a7e9-4a467faf29b6');
 /*!40000 ALTER TABLE `tbl_property` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -714,7 +707,6 @@ CREATE TABLE `tbl_quantity` (
 
 LOCK TABLES `tbl_quantity` WRITE;
 /*!40000 ALTER TABLE `tbl_quantity` DISABLE KEYS */;
-INSERT INTO `tbl_quantity` VALUES ('e02d5a6a-5f25-449e-b735-e536566ad05a',5,5,'f724ca98-9db5-4bca-8f3b-9e14ab43d7d1','36d214d7-f003-4935-9926-fe04ef035218');
 /*!40000 ALTER TABLE `tbl_quantity` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -746,7 +738,7 @@ CREATE TABLE `tbl_role` (
 
 LOCK TABLES `tbl_role` WRITE;
 /*!40000 ALTER TABLE `tbl_role` DISABLE KEYS */;
-INSERT INTO `tbl_role` VALUES ('e9dba7cd-2346-4184-8a99-8e303b02062b','អ្នកកែប្រែ','Editor',0,'2021-03-14 14:51:56','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('ed608021-a5e4-4b4e-a7bb-760f786dda84','Administration','Admin, Cashier, Stock, Editor, Report',1,'2021-03-14 14:44:05','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
+INSERT INTO `tbl_role` VALUES ('94ebafc7-ee9c-411f-bec3-58775fb14f21','Administration','Admin, Cashier, Stock, Editor, Report',1,'2021-04-08 14:00:03','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -781,7 +773,6 @@ CREATE TABLE `tbl_room` (
 
 LOCK TABLES `tbl_room` WRITE;
 /*!40000 ALTER TABLE `tbl_room` DISABLE KEYS */;
-INSERT INTO `tbl_room` VALUES ('189033b3-3b84-4b58-91dc-98f933201b7b','បន្ទប់ទី 11',10.00,'1h','Open','2021-03-14 14:51:04','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','ae1347e0-adf4-4f3f-84e6-e248ecedc899'),('28977e15-c068-417f-ad6e-ae77a4829abe','បន្ទប់ទី 3',8.00,'1h','Open','2021-03-14 14:50:36','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','361fa7a8-75f9-433e-a3ad-c5ddbfa0fd06'),('33dc0056-368b-4be4-bdaf-db19332174f3','បន្ទប់ទី 2',8.00,'1h','Open','2021-03-14 14:50:33','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','361fa7a8-75f9-433e-a3ad-c5ddbfa0fd06'),('373dbcf4-4496-4c33-ba80-a02cf5e260c1','បន្ទប់ទី 10',10.00,'1h','Open','2021-03-14 14:51:01','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','ae1347e0-adf4-4f3f-84e6-e248ecedc899'),('e998579d-0580-4359-a6c7-9c90186f9053','បន្ទប់ទី 1',8.00,'1h','Open','2021-03-14 14:50:29','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','361fa7a8-75f9-433e-a3ad-c5ddbfa0fd06');
 /*!40000 ALTER TABLE `tbl_room` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -799,7 +790,7 @@ CREATE TABLE `tbl_stock` (
   `rate` decimal(10,2) DEFAULT NULL,
   `quantity` decimal(10,0) DEFAULT NULL,
   `color` varchar(36) DEFAULT NULL,
-  `adjust` decimal(10,2) DEFAULT NULL,
+  `expire` date DEFAULT NULL,
   `createdOn` datetime DEFAULT NULL,
   `createdBy` varchar(36) NOT NULL,
   `productId` varchar(36) NOT NULL,
@@ -817,7 +808,6 @@ CREATE TABLE `tbl_stock` (
 
 LOCK TABLES `tbl_stock` WRITE;
 /*!40000 ALTER TABLE `tbl_stock` DISABLE KEYS */;
-INSERT INTO `tbl_stock` VALUES ('f724ca98-9db5-4bca-8f3b-9e14ab43d7d1',0.20,'dollar',4000.00,95,'',0.00,'2021-03-14 15:04:44','2ed66aa6-ef6b-4e84-a095-adf0505d8c19','77b2d17d-f2d5-44c4-8029-1ea582f96703');
 /*!40000 ALTER TABLE `tbl_stock` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -844,7 +834,7 @@ CREATE TABLE `tbl_store` (
 
 LOCK TABLES `tbl_store` WRITE;
 /*!40000 ALTER TABLE `tbl_store` DISABLE KEYS */;
-INSERT INTO `tbl_store` VALUES ('05cdf4f1-205b-45b0-a4fe-08143a6c67d4','ឈ្មោះសាកល្បង','012 345 678','ទីតាំងសាកល្បង','2021-03-14 14:44:05');
+INSERT INTO `tbl_store` VALUES ('bf4c4791-3a77-4b4e-8d4c-daa67edb4514','Store Name','','','2021-04-08 14:00:03');
 /*!40000 ALTER TABLE `tbl_store` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -882,7 +872,6 @@ CREATE TABLE `tbl_transaction` (
 
 LOCK TABLES `tbl_transaction` WRITE;
 /*!40000 ALTER TABLE `tbl_transaction` DISABLE KEYS */;
-INSERT INTO `tbl_transaction` VALUES ('36d214d7-f003-4935-9926-fe04ef035218',1,1,'0',0.50,2.50,5,1.50,'Coca Cola Original taste','77b2d17d-f2d5-44c4-8029-1ea582f96703','2021-03-14 15:05:39','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('63fe684b-3b70-45f3-a230-9060828821a5',1,1,'0',3.00,9.00,3,9.00,'ឆាក្ដៅត្រី','a9eae3db-267d-45c0-8bda-ca75bc7813ad','2021-03-14 15:05:35','2ed66aa6-ef6b-4e84-a095-adf0505d8c19'),('90f38092-ae79-453d-863a-44e4012fda53',1,0,'0',8.00,8.00,1,8.00,'បន្ទប់ទី 3, 60min','28977e15-c068-417f-ad6e-ae77a4829abe','2021-03-14 15:05:46','2ed66aa6-ef6b-4e84-a095-adf0505d8c19');
 /*!40000 ALTER TABLE `tbl_transaction` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -923,7 +912,7 @@ CREATE TABLE `tbl_user` (
 
 LOCK TABLES `tbl_user` WRITE;
 /*!40000 ALTER TABLE `tbl_user` DISABLE KEYS */;
-INSERT INTO `tbl_user` VALUES ('2ed66aa6-ef6b-4e84-a095-adf0505d8c19','','','Admin','',NULL,'','$2b$12$3tdEK4fVNqN3JDVeaJErJOpJ.Vt1jU06IujDQJ2pgKJ7NBJ/GTvLe','dark','english','d07ecd6e-6dc8-43c1-910d-0d9aa14b99b8','','8382c362-98d0-4576-8cd0-d4adf6adc680',1,1,'2021-03-14 14:44:05'),('cb242a40-077e-44a5-bbb4-d510bb93ffd7','','','ថុង','M',NULL,'','$2b$12$KQgjC5p4pj7U95I8Z1b7eOQrnzWJGjooXu66TDRX3.qPb65niBim2','light','english','e00d3639-10dc-466d-aa8b-b7a733ed4f09','','',1,0,'2021-03-14 14:52:26');
+INSERT INTO `tbl_user` VALUES ('9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','','','Admin','',NULL,'','$2b$12$j1KQOIem47gzgpS7Du07yuQj9jooPoIySgprSnYpfUixXnlkf4Qz.','light','khmer','8c6131d5-f8af-41a1-bfa8-9625f289e493','8a6cb227-7a18-46aa-86db-262f6194a485','',1,1,'2021-04-08 14:00:03');
 /*!40000 ALTER TABLE `tbl_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -986,7 +975,7 @@ CREATE TABLE `user_role` (
 
 LOCK TABLES `user_role` WRITE;
 /*!40000 ALTER TABLE `user_role` DISABLE KEYS */;
-INSERT INTO `user_role` VALUES ('2ed66aa6-ef6b-4e84-a095-adf0505d8c19','ed608021-a5e4-4b4e-a7bb-760f786dda84'),('cb242a40-077e-44a5-bbb4-d510bb93ffd7','e9dba7cd-2346-4184-8a99-8e303b02062b');
+INSERT INTO `user_role` VALUES ('9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','94ebafc7-ee9c-411f-bec3-58775fb14f21');
 /*!40000 ALTER TABLE `user_role` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -999,4 +988,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-14 22:21:25
+-- Dump completed on 2021-04-08 21:21:10

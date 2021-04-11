@@ -127,7 +127,9 @@ $.fn.translator = function () {
             daily: 'Daily',
             monthly: 'Monthly',
             yearly: 'Yearly',
-            alreadyPaid: 'Already Paid'
+            alreadyPaid: 'Already Paid',
+            expire: 'Expire',
+            noColor: 'No color added'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -137,7 +139,7 @@ $.fn.translator = function () {
             customize: 'កែប្រែ',
             reports: 'របាយការណ៍',
             configuration: 'កំណត់',
-            cashing: 'លក់',
+            cashing: 'គិតលុយ',
             order: 'កក់',
             stock: 'ស្តុក',
             expense: 'ចំណាយ',
@@ -260,7 +262,9 @@ $.fn.translator = function () {
             daily: 'ប្រចាំថ្ងៃ',
             monthly: 'ប្រចាំខែ',
             yearly: 'ប្រចាំឆ្នាំ',
-            alreadyPaid: 'បានបង់ប្រាក់រួច'
+            alreadyPaid: 'បានបង់ប្រាក់រួច',
+            expire: 'ផុតកំណត់',
+            noColor: 'គ្មានពណ៍បានបង្កើតទេ'
         }
     }
     language = $('html').attr('data-lang')
@@ -271,6 +275,8 @@ $.fn.translator = function () {
         }
     })
 
+    $('.ln-no-color').text(languages[language].noColor)
+    $('.ln-expire').text(languages[language].expire)
     $('.ln-advertise').text(languages[language].advertise)
     $('.ln-alreadyPaid').text(languages[language].alreadyPaid)
     $('.ln-daily').text(languages[language].daily)
