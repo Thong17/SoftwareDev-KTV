@@ -152,12 +152,13 @@
 
         var name = $(label).find('#value-value').text()
         var price = $(label).find('#value-price').text()
+        var currency = $(label).find('#value-currency').text()
         var description = $(label).find('#value-description').text()
 
         $('#addValue').modal('show')
         $('.edit-btn').attr('id', id)
         toggleEdit($('.edit-btn'), $('.save-btn'))
-        $('.modal-body').html(valueForm(name, price, description))
+        $('.modal-body').html(valueForm(name, price, description, currency))
         return false
     })
 
@@ -177,13 +178,25 @@
                 data: { value: value, price: price, currency: currency, description: description },
                 success: function (data) {
                     $('#addValue').modal('hide')
-                    if (data.currency == 'riel') {
-                        data.currency = 'R'
+                    currencyValue = ''
+                    if (data.currency == 'KHR') {
+                        currencyValue = '\u17DB'
+                        precision = 0
                     } else {
-                        data.currency = '$'
+                        currencyValue = '$'
+                        precision = 2
                     }
+                    price = accounting.formatMoney(data.price, {
+                                                precision: precision,
+                                                format: {
+                                                    pos: "%v"+currencyValue,
+                                                    neg: "-%v"+currencyValue,
+                                                    zero: '...'
+                                                }
+                                            })
+
                     $('label#' + id).find('#value-value').text(data.value)
-                    $('label#' + id).find('#value-price').text(data.price)
+                    $('label#' + id).find('#value-price').text(price)
                     $('label#' + id).find('#value-currency').text(data.currency)
                     $('label#' + id).find('#value-description').text(data.description)
                 }
@@ -280,6 +293,7 @@
             success: function (data) {
                 var photo = 'static/uploads/' + data.photo
                 data.values.sort(dynamicSort('price'))
+
                 $('.grid-products').html(showProductDetails({
                     image: photo,
                     colors: data.colors,
@@ -287,7 +301,7 @@
                     category: data.category.category,
                     description: data.description,
                     currency: data.currency,
-                    price: data.price,
+                    price: data.priceCurrency,
                     properties: data.category.properties,
                     values: data.values,
                     id: data.id,
@@ -324,7 +338,8 @@
                             product: data.product,
                             barcode: data.barcode,
                             stock: data.isStock,
-                            price: data.price,
+                            price: data.priceCurrency,
+                            currency: data.currency,
                             discount: data.discount,
                             period: data.period,
                             description: data.description,
@@ -528,7 +543,6 @@
                     data: { brand: brand, product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock },
                     success: function (data) {
                         $('.product-image').removeClass('hide')
-                        console.log('#select-brands')
                         $('#select-brands').val(brand)
                         toggleEdit($('.save-product'), $('.submit-product'))
                         $('.save-product').attr('id', data['id'])
@@ -574,6 +588,11 @@
         $('#details-description').text(description)
     })
 
+    $('#product-nav').on('change', '#currency', function () {
+        var currency = $('#currency option:selected').text()
+        $('.details-currency').text(currency)
+    })
+
     $('#product-nav').on('change', '#category', function () {
         var category = $('#category option:selected').text()
         id = $(this).val()
@@ -601,8 +620,8 @@
                         if (data.product != '') {
                             if (data.product.values.length > 0) {
                                 data.product.values.forEach(value => {
-                                    if (value.currency == 'riel') {
-                                        value.currency = 'R'
+                                    if (value.currency == 'KHR') {
+                                        value.currency = '\u17DB'
                                     } else {
                                         value.currency = '$'
                                     }
@@ -659,8 +678,8 @@
 
     $('#product-nav').on('change', '#currency', function () {
         var currency = $('#currency').val()
-        if (currency == 'riel') {
-            $('.details-symbol').html('R')
+        if (currency == 'KHR') {
+            $('.details-symbol').html('\u17DB')
         } else {
             $('.details-symbol').html('$')
         }
@@ -786,7 +805,7 @@
                     }, 300)
                     results.forEach(data => {
                         showProduct($('.grid-products'), data.id, data.product, data
-                            .category, data.photo, data.price, data.arrival, data.discount)
+                            .category, data.photo, data.priceCurrency, data.currency, data.arrival, data.discount)
 
                     });
 
@@ -958,11 +977,9 @@
             success: function (results) {
                 results.forEach(data => {
                     showProduct($('.grid-products'), data.id, data.product, data.category,
-                        data.photo, data.price, data.arrival, data.discount)
+                        data.photo, data.priceCurrency, data.currency, data.arrival, data.discount)
 
                 });
-
-                currencyFormat('$', 0, false)
 
                 setTimeout(function () {
                     $('.item').unbind('click')

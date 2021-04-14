@@ -1112,8 +1112,13 @@
                                 <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                             </span>
                             <span class="ln-order">Place Order</span>`).translator()
-                        $('.order-form').html(checkoutForm(data.transaction.id, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, data.transaction.amount))
-                        $('.order-form').find('#input-discount').focus()
+
+                        if (data.transaction != null) {
+                            $('.order-form').html(checkoutForm(data.transaction.id, data.transaction.description, data.transaction.cost, data.transaction.discount, data.transaction.quantity, data.transaction.amount))
+                            $('.order-form').find('#input-discount').focus()
+                        } else {
+                            $('.btn-transaction').attr({'data-change': true, 'data-check': true})
+                        }
                     } else {
                         alert(data.msg)
                     }
@@ -1471,7 +1476,6 @@
     $('.product-btn').on('click', function () {
         if ($(this).attr('data-complete') == 'False') {
             var id = $(this).closest('.product-item').attr('id')
-            $('#productProperty').modal('show')
             $.ajax({
                 url: '/product/' + id,
                 type: 'POST',
@@ -1491,6 +1495,11 @@
                         id: data.id,
                         stocks: data.stocks
                     }))
+                    if (data.colors.length > 0 || data.values.length > 0) {
+                        $('#productProperty').modal('show')
+                    } else {
+                        $('.continue-btn').click()
+                    }
                 }
             })
         } else {
@@ -1809,7 +1818,7 @@
 
     function moneyForm(money, currency, unit, total) {
         var select = `<select name="money-currency" id="money-currency" class="form-empty color-text input-color">`
-        if (currency == 'dollar') {
+        if (currency == 'USD') {
             select += `<option value="USD" selected><span>&#36;</span></option>
                         <option value="KHR"><span>&#6107;</span></option>
                     </select>`
@@ -1857,7 +1866,7 @@
     })
 
     $(document).on('click', '.money-add', function () {
-        $('.money-form').html(moneyForm('', 'dollar', '', ''))
+        $('.money-form').html(moneyForm('', 'USD', '', ''))
     })
 
     function exchangeMoney(rate, number, currency) {
@@ -1882,7 +1891,7 @@
         'id': '',
         'unit': 0,
         'money': 0,
-        'currency': 'dollar',
+        'currency': 'USD',
         'total': 0
     }
 
@@ -2069,6 +2078,7 @@
             }
         })
     })
+    
     start = new Date($('#checkin-date').text() +' '+ $('#checkin-time').text())
     setInterval(function() {
         

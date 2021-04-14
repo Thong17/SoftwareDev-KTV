@@ -1168,13 +1168,15 @@
 
     $('.product-btn').on('click', function () {
         var id = $(this).closest('.product-item').attr('id')
-        $('#productProperty').modal('show')
+        
         $.ajax({
             url: '/product/' + id,
             type: 'POST',
             success: function (data) {
                 var photo = '/static/uploads/' + data.photo
+            
                 data.values.sort(dynamicSort('price'))
+
                 $('#productProperty').find('.modal-content').html(productConfiguration({
                     image: photo,
                     colors: data.colors,
@@ -1188,6 +1190,12 @@
                     id: data.id,
                     stocks: data.stocks
                 }))
+
+                if (data.colors.length > 0 || data.values.length > 0) {
+                    $('#productProperty').modal('show')
+                } else {
+                    $('.continue-btn').click()
+                }
             }
         })
     })
@@ -1494,7 +1502,7 @@
 
     function moneyForm(money, currency, unit, total) {
         var select = `<select name="money-currency" id="money-currency" class="form-empty color-text input-color">`
-        if (currency == 'dollar') {
+        if (currency == 'USD') {
             select += `<option value="USD" selected><span>&#36;</span></option>
                         <option value="KHR"><span>&#6107;</span></option>
                     </select>`
@@ -1542,7 +1550,7 @@
     })
 
     $(document).on('click', '.money-add', function () {
-        $('.money-form').html(moneyForm('', 'dollar', '', ''))
+        $('.money-form').html(moneyForm('', 'USD', '', ''))
     })
 
     function exchangeMoney(rate, number, currency) {
@@ -1567,7 +1575,7 @@
         'id': '',
         'unit': 0,
         'money': 0,
-        'currency': 'dollar',
+        'currency': 'USD',
         'total': 0
     }
 
@@ -1700,6 +1708,8 @@
                 if (data.data == 'Success') {
                     $('.drawer-btn, .drawer-time').removeClass('active')
                     $('#drawerTime').empty()
+                    $('#drawer-rate').val('4000')
+                    $('#drawer-counter').val('Default')
                     $('#list-money').html(`<tr class="money-form color-text"></tr>`)
                     drawerObj.moneys = []
                     toggleEdit($('.drawer-save'), $('.drawer-end'))

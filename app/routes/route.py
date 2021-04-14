@@ -602,8 +602,13 @@ def add_product():
 
     id = str(uuid4())
 
-    Model = tblProduct(id=id, product=product, barcode=barcode, isStock=isStock, price=price, discount=discount, period=period,
-                       currency=currency, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
+    if currency == 'KHR':
+        priceCurrency = float(price) / 4000
+    else: 
+        priceCurrency = price
+
+    Model = tblProduct(id=id, product=product, barcode=barcode, isStock=isStock, price=priceCurrency, discount=discount, period=period,
+                       currency=currency, priceCurrency=price, description=description, createdBy=current_user.id, categoryId=category, brandId=brand)
     try:
         db.session.add(Model)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
@@ -623,7 +628,7 @@ def add_product():
 def products():
     id = request.form['data']
     Products = tblProduct.query.with_entities(tblProduct.id, tblProduct.product, tblProduct.createdOn,
-                                              tblProduct.price, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
+                                              tblProduct.price, tblProduct.currency, tblProduct.priceCurrency, tblProduct.photo, tblProduct.categoryId, tblProduct.discount).filter_by(brandId=id).all()
     products = []
     for Product in Products:
         price = simplejson.dumps({"price": Product.price})
@@ -636,7 +641,9 @@ def products():
             'photo': Product.photo,
             'category': Category.category,
             'arrival': arrival.days,
-            'discount': Product.discount
+            'discount': Product.discount,
+            'currency': Product.currency,
+            'priceCurrency': Product.priceCurrency
         }
         product.update(price)
         products.append(product)
@@ -745,11 +752,16 @@ def add_value():
     currency = request.form['currency']
     description = request.form['description']
 
+    if currency == 'KHR':
+        priceCurrency = float(price) / 4000
+    else:
+        priceCurrency = price
+
     id = str(uuid4())
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                            ' has added value '+value+' in product', type='Add', createdBy=current_user.id)
     db.session.add(Activity)
-    model = tblValue(id=id, value=value, price=price, currency=currency, description=description,
+    model = tblValue(id=id, value=value, price=priceCurrency, priceCurrency=price, currency=currency, description=description,
                      createdBy=current_user.id, productId=product_id, propertyId=property_id)
     db.session.add(model)
 
@@ -760,6 +772,8 @@ def add_value():
 @route.route('/product/save/<id>', methods=['POST'])
 def save_product(id):
     Product = tblProduct.query.get(id)
+
+    
 
     category = request.form['category']
     brand = request.form['brand']
@@ -777,6 +791,11 @@ def save_product(id):
     weight = request.form['weight']
     depth = request.form['depth']
     material = request.form['material']
+
+    if currency == 'KHR':
+        priceCurrency = float(price) / 4000
+    else:
+        priceCurrency = price
 
     Category = tblCategory.query.get(category)
     Brand = tblBrand.query.get(brand)
@@ -797,7 +816,8 @@ def save_product(id):
     Product.barcode = barcode
     Product.isStock = isStock
     Product.currency = currency
-    Product.price = price
+    Product.price = priceCurrency
+    Product.priceCurrency = price
     Product.description = description
     Product.categoryId = category
     Product.brandId = brand
@@ -1358,12 +1378,20 @@ def checkout(id):
         jsonObj = json.loads(request.form['data'])
         amounts = jsonObj['amounts']
         amount = 0
+
+        paidKHR = 0
+        paidUSD = 0
+
         for a in amounts:
-            if a['currency'] != 'USD':
+            if a['currency'] == 'KHR':
                 a['amount'] = Decimal(a['amount']) / drawer.rate
+                paidKHR += Decimal(a['amount'])
+            else:
+                paidUSD += Decimal(a['amount'])
             amount += Decimal(a['amount'])
 
         if amount >= payment.amount:
+
             moneys = []
             change = Decimal(amount) - payment.amount
             total_change = change
@@ -1373,7 +1401,7 @@ def checkout(id):
             }
             for money in (sorted(drawer.moneys, key=operator.attrgetter('value'), reverse=True)):
                 convertMoney = 0
-                if money.currency != 'USD':
+                if money.currency == 'KHR':
                     convertMoney = money.money / drawer.rate
                 else:
                     convertMoney = money.money
@@ -1408,7 +1436,7 @@ def checkout(id):
                                 ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
             db.session.add(Activity)
             db.session.commit()
-            return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate})
+            return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate, 'total_change': total_change})
         else:
             return jsonify({'result': 'Not enough money'})
 
@@ -2912,7 +2940,11 @@ def checkout_order(order_id):
         isCompleted = True
     
     if not isCompleted:
-        minute = int(request.form['duration'])
+        duration = request.form['duration']
+        if duration == '':
+            duration = 0
+
+        minute = int(duration)
         totalPrice = (float(Order.order.price) * minute) / 60
 
         if minute / 60 > 1:
@@ -2930,22 +2962,26 @@ def checkout_order(order_id):
 
         transaction = tblTransaction(id=tid, price=round(Decimal(totalPrice), 2), quantity=1, discount=0, isEditable=False,
                                     amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
-        json = {
-            'id': tid,
-            'cost': totalPrice,
-            'discount': '',
-            'quantity': 1,
-            'amount': totalPrice,
-            'description': description
-        }
+        
+        if totalPrice == 0:
+            json = None
+        else:
+            json = {
+                'id': tid,
+                'cost': totalPrice,
+                'discount': '',
+                'quantity': 1,
+                'amount': totalPrice,
+                'description': description
+            }
+            db.session.add(transaction)
+            Order.checkin.orderPayment.transactions.append(transaction)
 
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                                 ' has checked out order from: '+datetimefilter(Order.orderOn)+' to '+datetimefilter(Order.orderTo), type='Check Out', createdBy=current_user.id)
         try:
             db.session.add(Activity)
             db.session.add(CheckOut)
-            db.session.add(transaction)
-            Order.checkin.orderPayment.transactions.append(transaction)
             db.session.commit()
             return jsonify({'msg': 'Success', 'paymentId': Order.checkin.orderPayment.id, 'transaction': json})
         except:
