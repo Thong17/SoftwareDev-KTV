@@ -1384,38 +1384,51 @@ def checkout(id):
 
         for a in amounts:
             if a['currency'] == 'KHR':
-                a['amount'] = Decimal(a['amount']) / drawer.rate
+                a['amount'] = Decimal(a['amount']) / 4000
                 paidKHR += Decimal(a['amount'])
             else:
                 paidUSD += Decimal(a['amount'])
             amount += Decimal(a['amount'])
 
-        if amount >= payment.amount:
 
+        if amount >= payment.amount:
             moneys = []
-            change = Decimal(amount) - payment.amount
-            total_change = change
+            change = 0
+            
             moneyObj = {
                 'money': change,
                 'currency': 'USD'
             }
+
+            paymentAmount = payment.amount
+            paymentAmount -= paidUSD
+            if paymentAmount > 0:
+                paymentAmount *= drawer.rate / 4000
+                change = paidKHR - paymentAmount
+            else:
+                change = paidUSD - payment.amount
+            total_change = change
+
             for money in (sorted(drawer.moneys, key=operator.attrgetter('value'), reverse=True)):
                 convertMoney = 0
                 if money.currency == 'KHR':
-                    convertMoney = money.money / drawer.rate
+                        convertMoney = money.money / 4000
                 else:
                     convertMoney = money.money
                 if money.unit > 0 and convertMoney <= change:
                     for unit in range(int(money.unit)):
                         if convertMoney <= change:
                             moneys.append({
-                                'money': round(money.money, 4),
+                                'money': money.money,
                                 'currency': money.currency
                             })
                             money.unit -= 1
                             change -= convertMoney
-                            moneyObj['money'] = round(change, 4)
+                            moneyObj['money'] = change
+
+            moneyObj['money'] = change
             moneys.append(moneyObj)
+
             for transaction in payment.transactions:
                 transaction.isComplete = True
                 transaction.profit = transaction.amount

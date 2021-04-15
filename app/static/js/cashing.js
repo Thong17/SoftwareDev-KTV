@@ -236,7 +236,6 @@ $(document).on('click', '.checkout-btn', function() {
         },
         success: function(data) {
             if (data.result == 'Success') {
-                console.log(data)
                 $('.payment-add').attr('disabled', true)
                 $('.clear-btn ion-icon').addClass('hide')
                 var changeObj = {
@@ -246,7 +245,6 @@ $(document).on('click', '.checkout-btn', function() {
 
                 var moneyArr = []
                 var changeArr = []
-                
 
                 data.change.forEach(c => {
                     if (moneyArr.includes(c.money+c.currency)) {
@@ -298,11 +296,46 @@ $(document).on('click', '.checkout-btn', function() {
                 var format_money = ''
 
                 if (khr == 0) {
-                    format_money += dlr.toFixed(2) + "$"
+
+                    format_money = accounting.formatMoney(dlr, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%v%s",
+                                                                neg: "%v%s",
+                                                                zero: '...'
+                                                            }
+                                                        })
                 } else if (dlr == 0) {
-                    format_money += khr.toFixed(0) + "\u17DB"
+
+                    format_money = accounting.formatMoney(khr, {
+                        precision: 0,
+                        format: {
+                            pos: "%v\u17DB",
+                            neg: "%v\u17DB",
+                            zero: '...'
+                        }
+                    })
                 } else {
-                    format_money += dlr.toFixed(2) + "$ + " + khr.toFixed(0)+"\u17DB"
+
+                    dlr = accounting.formatMoney(dlr, {
+                        precision: 2,
+                        format: {
+                            pos: "%v%s",
+                            neg: "%v%s",
+                            zero: '...'
+                        }
+                    })
+
+                    khr = accounting.formatMoney(khr, {
+                        precision: 0,
+                        format: {
+                            pos: "%v\u17DB",
+                            neg: "%v\u17DB",
+                            zero: '...'
+                        }
+                    })
+
+                    format_money = dlr +' + '+khr
                 }
 
                 $('#totalCash').text(format_money)
@@ -310,16 +343,24 @@ $(document).on('click', '.checkout-btn', function() {
                 $('#totalChange').text(accounting.formatMoney(data.total_change, {
                     precision: 2,
                     format: {
-                        pos: "%v%s("+(change * data.rate).toFixed(0)+"\u17DB)",
+                        pos: "%v%s("+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
                         neg: "%v%s",
                         zero: '...'
                     }
                 }))
 
-                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+paid.toFixed(2)+' USD</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+' USD</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+change.toFixed(2)+' USD</span></div><div class="list-changes">'
+                total_change = accounting.formatMoney(data.total_change, {
+                                                        precision: 2,
+                                                        format: {
+                                                            pos: "%v%s",
+                                                            neg: "%v%s",
+                                                            zero: '...'
+                                                        }
+                                                    })
 
+                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+format_money+'</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+'$</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
+                                                    
                 changeArr.forEach(m => {
-                    console.log(m)
                     if (m.money != 0) {
                         var money_currency = ''
                         var money = 0
@@ -329,7 +370,7 @@ $(document).on('click', '.checkout-btn', function() {
                             money = accounting.formatMoney(m.money, {
                                 precision: 2,
                                 format: {
-                                    pos: "%v%s("+(m.money * data.rate).toFixed(0)+"\u17DB)",
+                                    pos: "%v%s("+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
                                     neg: "%v",
                                     zero: '...'
                                 }
