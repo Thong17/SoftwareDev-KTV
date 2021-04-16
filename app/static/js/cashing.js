@@ -42,7 +42,7 @@ $(document).on('click', '.order-btn', function() {
                                         zero: '...'
                                     }
                                 }))
-                                $('#totalKHR').text(accounting.formatMoney(data.data.amount * data.rate, {
+                                $('#totalKHR').text(accounting.formatMoney(Math.round(data.data.amount * data.rate / 100) * 100, {
                                     precision: 0,
                                     format: {
                                         pos: "%v\u17DB",
@@ -116,7 +116,7 @@ $(document).on('click', '.order-btn', function() {
                                     zero: '...'
                                 }
                             }))
-                            $('#totalKHR').text(accounting.formatMoney(data.data.amount * data.rate, {
+                            $('#totalKHR').text(accounting.formatMoney(Math.round(data.data.amount * data.rate / 100) * 100, {
                                 precision: 0,
                                 format: {
                                     pos: "%v\u17DB",
@@ -206,7 +206,7 @@ $(document).on('input', '#receive-cash', function() {
 
 $(document).on('click', '.payment-add', function() {
     var amount = $('#receive-cash').val()
-    var currency = $('#receive-currency option:selected').text()
+    var currency = $('#receive-currency').val()
     if (amount > 0) {
         var id = generateString(8)
         $('#list-payment').append(amountList(id, amount, currency, 1))
@@ -358,7 +358,7 @@ $(document).on('click', '.checkout-btn', function() {
                                                         }
                                                     })
 
-                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+format_money+'</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+amount+'$</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
+                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+format_money+'</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+accounting.formatMoney(amount, {format:{pos:'%v%s'}})+'</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
                                                     
                 changeArr.forEach(m => {
                     if (m.money != 0) {

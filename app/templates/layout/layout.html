@@ -312,10 +312,17 @@
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
                 var title = $(n).attr('title')
-                $(n).text(accounting.formatMoney(text, currency, decimal))
-                if (isAttribute) {
-                    $(n).attr('title', accounting.formatMoney(title, '\u17DB', 0))
+                if ($(n).attr('data-currency') == 'KHR') {
+                    $(n).text(accounting.formatMoney(text, '\u17DB', 0))
+                } else {
+                    var text = $(n).text()
+                    var title = $(n).attr('title')
+                    $(n).text(accounting.formatMoney(text, currency, decimal))
+                    if (isAttribute) {
+                        $(n).attr('title', accounting.formatMoney(title, '\u17DB', 0))
+                    }
                 }
+                
             })
         }
 

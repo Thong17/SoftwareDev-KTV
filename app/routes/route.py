@@ -1378,15 +1378,19 @@ def checkout(id):
         jsonObj = json.loads(request.form['data'])
         amounts = jsonObj['amounts']
         amount = 0
+        amountUSD = 0
+        amountKHR = 0
 
         paidKHR = 0
         paidUSD = 0
 
         for a in amounts:
             if a['currency'] == 'KHR':
+                amountKHR += Decimal(a['amount'])
                 a['amount'] = Decimal(a['amount']) / 4000
                 paidKHR += Decimal(a['amount'])
             else:
+                amountUSD += Decimal(a['amount'])
                 paidUSD += Decimal(a['amount'])
             amount += Decimal(a['amount'])
 
@@ -1437,8 +1441,8 @@ def checkout(id):
                         transaction.profit -= quantity.soq.cost * quantity.quantity
 
             payment.isComplete = True
-            
-            payment.receive = amount
+
+            payment.receive = str(amountUSD) + ',' + str(amountKHR)
             payment.rate = drawer.rate
             payment.change = total_change
 

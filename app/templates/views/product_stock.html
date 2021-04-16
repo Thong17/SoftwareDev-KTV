@@ -426,8 +426,8 @@
             <td><input type="number" class="form-empty color-text input-color" id="input-cost" value="`+ cost + `"
                     placeholder="Cost"></td>
             <td><select id="select-currency" class="form-empty input-color color-text">
-                    <option value="dollar">$</option>
-                    <option disabled value="riel">&#x17DB;</option>
+                    <option value="USD">$</option>
+                    <option value="KHR">&#x17DB;</option>
                 </select></td>
             <td><input type="number" class="form-empty color-text input-color" id="input-rate"
                     placeholder="Rate" value="`+ rate + `"></td>
@@ -436,6 +436,7 @@
             <td><input type="date" class="form-empty color-text input-color" id="input-expire"
                     placeholder="Adjust" value="`+ expire + `"></td>
             <td class="flex-between">
+                
                 <span style="text-decoration: underline;" id="calculated-result" class="notranslate">`+ result + `</span>
                 `+ button + `
             </td>`
