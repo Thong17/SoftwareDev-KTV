@@ -67,20 +67,9 @@
                         <span>Cash:</span>
                         <div><span class="receive">{{ payment.receive }}</span></div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="total-container">
-            <span style="width: 50%;">Return</span>
-            <div class="total-details">
-                <div class="total-price">
-                    <div class="total-usd flex-between">
-                        <span>USD:</span>
-                        <span class="dollar-format">{{ payment.change }}</span>
-                    </div>
-                    <div class="total-khr flex-between">
-                        <span>KHR:</span>
-                        <span class="riel-format">{{ payment.change * 4000 }}</span>
+                    <div class="return-cash flex-between">
+                        <span>Return:</span>
+                        <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span><span class="riel-format">{{ payment.change * 4000 }}</span></div>
                     </div>
                 </div>
             </div>
@@ -113,9 +102,9 @@
                 $(n).text(accounting.formatMoney(text, {
                                     precision: 0,
                                     format: {
-                                        pos: "%v\u17DB",
-                                        neg: "%v\u17DB",
-                                        zero: '...'
+                                        pos: "(%v\u17DB)",
+                                        neg: "(%v\u17DB)",
+                                        zero: ''
                                     }
                                 }))
             })

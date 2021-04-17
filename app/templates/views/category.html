@@ -142,10 +142,10 @@
         var id = $(this).attr('id')
         var header = $(this).children()[0]
         $('#prop-header').html(
-            '<div class="flex-start"><h3 class="color-font">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="notranslate color-font">' +
+            '<div class="flex-start"><h3 class="color-font ln-category">Category</h3><h3 class="color-font mx-2">/</h3><h5 class="notranslate color-font">' +
             $(header).text() +
             '</h5></div><button disabled class="btn border color-font add-prop btn-slim" id="' +
-            id + '"><p class="plus">+</p></button>')
+            id + '"><p class="plus">+</p></button>').translator()
         $.ajax({
             url: '/category/' + id,
             method: 'POST',
@@ -181,7 +181,7 @@
                         element += addProperty(prop.id, prop.property, prop.type, prop.description)
                     });
                 } else {
-                    element += '<p class="no-result">Nothing created</p>'
+                    element += '<p class="no-result ln-result">Nothing created</p>'
                 }
                 element += `<tr class="property-form">
                             <td class="pl-0"><div class="form-group m-0 p-0" id="prp"><input type="text" name="property" class="form-control input-color" id="property"
@@ -193,7 +193,7 @@
                                     name="detail" class="form-control input-color" placeholder="Description" id="detail"><button
                                     class="btn border color-font ml-3" id="add-property">+</button></td>
                             </tr>`
-                $('#list-properties').html(element)
+                $('#list-properties').html(element).translator()
             }
         })
 

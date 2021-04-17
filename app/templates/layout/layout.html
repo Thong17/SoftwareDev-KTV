@@ -995,24 +995,24 @@
                             <div class="details-colors">` + color_element +
                 `</div>
                             <div class="details-appearance">
-                                <h5 class="color-font mt-3 mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i>Details</h5>
+                                <h5 class="color-font mt-3 mb-2"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-details"></span></h5>
                                 <div class="config-list flex-between pt-2">
-                                    <p class="property-name color-text" style="font-size: 13px">Width:</p><span class="color-font appearance-value">`+ width + `</span>
+                                    <p class="property-name color-text ln-width" style="font-size: 13px">Width:</p><span class="color-font appearance-value">`+ width + `</span>
                                 </div>
                                 <div class="config-list flex-between py-1">
-                                    <p class="property-name color-text" style="font-size: 13px">Height:</p><span class="color-font appearance-value">`+ height + `</span>
+                                    <p class="property-name color-text ln-height" style="font-size: 13px">Height:</p><span class="color-font appearance-value">`+ height + `</span>
                                 </div>
                                 <div class="config-list flex-between py-1">
-                                    <p class="property-name color-text" style="font-size: 13px">Weight:</p><span class="color-font appearance-value">`+ weight + `</span>
+                                    <p class="property-name color-text ln-weight" style="font-size: 13px">Weight:</p><span class="color-font appearance-value">`+ weight + `</span>
                                 </div>
                                 <div class="config-list flex-between py-1">
-                                    <p class="property-name color-text" style="font-size: 13px">Depth:</p><span class="color-font appearance-value">`+ depth + `</span>
+                                    <p class="property-name color-text ln-depth" style="font-size: 13px">Depth:</p><span class="color-font appearance-value">`+ depth + `</span>
                                 </div>
                                 <div class="config-list flex-between py-1">
-                                    <p class="property-name color-text" style="font-size: 13px">Material:</p><span class="color-font appearance-value">`+ material + `</span>
+                                    <p class="property-name color-text ln-material" style="font-size: 13px">Material:</p><span class="color-font appearance-value">`+ material + `</span>
                                 </div>
                                 <div class="config-list flex-between py-1">
-                                    <p class="property-name color-text" style="font-size: 13px">Brand:</p><span class="color-font appearance-value">`+ brand + `</span>
+                                    <p class="property-name color-text ln-brand" style="font-size: 13px">Brand:</p><span class="color-font appearance-value">`+ brand + `</span>
                                 </div>
                             </div>
                         </div>
@@ -1688,7 +1688,7 @@
                                     <img src="` + image + `" alt="" srcset="">
                                 </div>
                                 <h5 class="color-text mt-4" style="text-align: start;"><i class="fa fa-caret-right right" aria-hidden="true"></i>
-                                    Configuration</h5>
+                                    <span class="ln-configuration">Configuration</span></h5>
                                 <div class="details-appearance notranslate">
                                     `+ configuration_element + `
                                 </div>
@@ -1701,8 +1701,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn color-font close-modal" data-dismiss="modal">Cancel</button>
-                    <button class="btn border continue-btn color-font">Continue</button>
+                    <button type="button" class="btn color-font close-modal ln-cancel" data-dismiss="modal">Cancel</button>
+                    <button class="btn border continue-btn color-font ln-continue">Continue</button>
                 </div>`
         }
 

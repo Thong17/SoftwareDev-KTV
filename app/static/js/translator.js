@@ -129,7 +129,13 @@ $.fn.translator = function () {
             yearly: 'Yearly',
             alreadyPaid: 'Already Paid',
             expire: 'Expire',
-            noColor: 'No color added'
+            noColor: 'No color added',
+            totalCost: 'Total Cost',
+            totalPaid: 'Total Paid',
+            totalReturn: 'Total Return',
+            money: 'Money',
+            counter: 'Counter',
+            continue: 'Continue'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -264,7 +270,14 @@ $.fn.translator = function () {
             yearly: 'ប្រចាំឆ្នាំ',
             alreadyPaid: 'បានបង់ប្រាក់រួច',
             expire: 'ផុតកំណត់',
-            noColor: 'គ្មានពណ៍បានបង្កើតទេ'
+            noColor: 'គ្មានពណ៍បានបង្កើតទេ',
+            totalCost: 'សរុបតម្លៃ',
+            totalPaid: 'ប្រាក់ទទួល',
+            totalReturn: 'ប្រាក់អាប់',
+            money: 'សាច់ប្រាក់',
+            counter: 'បញ្ជរ',
+            continue: 'បន្ត'
+
         }
     }
     language = $('html').attr('data-lang')
@@ -275,6 +288,12 @@ $.fn.translator = function () {
         }
     })
 
+    $('.ln-continue').text(languages[language].continue)
+    $('.ln-counter').text(languages[language].counter)
+    $('.ln-money').text(languages[language].money)
+    $('.ln-total-cost').text(languages[language].totalCost)
+    $('.ln-total-paid').text(languages[language].totalPaid)
+    $('.ln-total-return').text(languages[language].totalReturn)
     $('.ln-no-color').text(languages[language].noColor)
     $('.ln-expire').text(languages[language].expire)
     $('.ln-advertise').text(languages[language].advertise)
@@ -397,6 +416,7 @@ $.fn.translator = function () {
     $('.ln-date').text(languages[language].date)
     $('.ln-invoice').text(languages[language].invoice)
     $('.ln-cashier').text(languages[language].cashier)
+    $('.ln-configuration').text(languages[language].configuration)
 
     // Side Nav
     $('#home').find('span').text(languages[language].home)

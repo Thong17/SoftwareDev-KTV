@@ -422,7 +422,7 @@
                             <td class="color-text notranslate" id="cus-lastname">{% if customer.phone != '' %}{{
                                 customer.phone }}{%
                                 else %}...{% endif %}</td>
-                            <td class="color-text notranslate" id="cus-phone">{% if customer.birthdate != '' %}{{ customer.birthdate
+                            <td class="color-text notranslate" id="cus-phone">{% if customer.birthdate != None %}{{ customer.birthdate
                                 }}{% else %}...{% endif %}</td>
                         </tr>
                         {% endfor %}

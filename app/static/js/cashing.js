@@ -83,9 +83,9 @@ $(document).on('click', '.order-btn', function() {
             
                                 $('#paymentModel').modal('show')
                                 $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
-                                                    <span class="color-font">Check Out: </span>
+                                                    <span class="color-font ln-checkout">Check Out: </span>
                                                     <span class="currency-format color-text" id="paymentAmount">`+accounting.formatMoney(data.data.amount)+`</span>
-                                                </div>`)
+                                                </div>`).translator()
                                 $('#receive-cash').val('').focus()
                                 $('.payment-add').attr('disabled', false)
                                 
@@ -157,9 +157,9 @@ $(document).on('click', '.order-btn', function() {
         
                             $('#paymentModel').modal('show')
                             $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
-                                                <span class="color-font">Check Out: </span>
+                                                <span class="color-font ln-checkout">Check Out: </span>
                                                 <span class="currency-format color-text" id="paymentAmount">`+accounting.formatMoney(data.data.amount)+`</span>
-                                            </div>`)
+                                            </div>`).translator()
                             $('#receive-cash').val('').focus()
                             $('.payment-add').attr('disabled', false)
                         }
@@ -358,7 +358,7 @@ $(document).on('click', '.checkout-btn', function() {
                                                         }
                                                     })
 
-                var element = '<div class="total-container"><div class="total-paid"><span class="color-font">Total Paid:</span><span>'+format_money+'</span></div><div class="total-change"><span class="color-font">Total Cost:</span><span>'+accounting.formatMoney(amount, {format:{pos:'%v%s'}})+'</span></div></div><div class="change-container"><div class="change-left color-font"><span>Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
+                var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">Total Paid:</span><span>'+format_money+'</span></div><div class="total-change"><span class="color-font ln-total-cost">Total Cost:</span><span>'+accounting.formatMoney(amount, {format:{pos:'%v%s'}})+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
                                                     
                 changeArr.forEach(m => {
                     if (m.money != 0) {
@@ -393,15 +393,15 @@ $(document).on('click', '.checkout-btn', function() {
 
                 
 
-                element += '</div></div><div class="invoice-btn"><button class="color-text close-payment">Continue</button><a href="/invoice/'+payment+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
-                $('.payment-total').html(element)
+                element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close">Continue</button><a href="/invoice/'+payment+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
+                $('.payment-total').html(element).translator()
 
                 // Bind click when checked out
                 $('.product-btn').attr('disabled', true)
                 $('.transaction-item').find('.remove-btn').addClass('hide')
                 
             } else {
-                $('.payment-total').html('<div class="checkout-btn"><span class="color-font">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+accounting.formatMoney(amount)+'</span></div>')
+                $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+accounting.formatMoney(amount)+'</span></div>').translator()
                 alert(data.result)
             }
         }
@@ -425,5 +425,8 @@ $(document).on('click', '.close-payment', function() {
     $('.product-btn').attr('disabled', false)
     $('.sum-order').text(0)
 })
+
+
+
 
 

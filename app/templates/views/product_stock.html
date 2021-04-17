@@ -18,6 +18,18 @@
         color: var(--color-hover) !important;
         text-align: center;
     }
+
+    .calculated-result {
+        position: relative;
+    }
+
+    .calculated-result::after {
+        content: '$';
+        position: absolute;
+        top: 6px;
+        right: 6px;
+    }
+
 </style>
 {% endblock %}
 
@@ -146,13 +158,13 @@
                         <table class="table stock-table">
                             <thead>
                                 <tr class="color-font">
-                                    <td style="width: 20%;" class="ln-color">Color</td>
-                                    <td style="width: 20%;" class="ln-cost">Cost</td>
+                                    <td style="width: 15%;" class="ln-color">Color</td>
+                                    <td style="width: 15%;" class="ln-cost">Cost</td>
                                     <td style="width: 10%;" class="ln-currency">Currency</td>
                                     <td style="width: 10%;" class="ln-rate">Rate</td>
                                     <td style="width: 10%;" class="ln-qty">Quantity</td>
-                                    <td style="width: 15%;" class="ln-expire">Expire</td>
-                                    <td style="width: 15%;" class="ln-total">Total</td>
+                                    <td style="width: 21%;" class="ln-expire">Expire</td>
+                                    <td style="width: 19%;" class="ln-total">Total</td>
                                 </tr>
                             </thead>
                             <tbody id="list-stocks">
@@ -172,16 +184,14 @@
                                     {% else %}
                                     <td id="">...</td>
                                     {% endif %}
-                                    <td class="notranslate">{{(stock.cost|round(2)|string).rstrip('0').rstrip('.')}}</td>
+                                    <td class="notranslate">{{(stock.costCurrency|round(2)|string).rstrip('0').rstrip('.')}}</td>
                                     <td>{{stock.currency}}</td>
                                     <td class="notranslate">{{(stock.rate|round(2)|string).rstrip('0').rstrip('.')}}</td>
                                     <td class="notranslate">{{stock.quantity}}</td>
-                                    <td class="notranslate">{{stock.expire}}</td>
+                                    <td class="notranslate">{% if stock.expire == None %}...{% else %}{{stock.expire}}{% endif %}</td>
                                     <td class="flex-between-center notranslate">
-                                        {% set total = stock.cost * stock.quantity %}
-
                                         <span style="text-decoration: underline;" class="total-cost currency-format"
-                                            title="{{ total * stock.rate }}">{{total}}</span>
+                                            title="{{ stock.total * 4000 }}">{{ stock.total }}</span>
                                         <div class="flex-between-center action-btn">
                                             <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
                                             <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
@@ -387,28 +397,52 @@
 
     var total = {
         cost: 0,
-        quantity: 0
+        quantity: 0,
+        currency: 'USD',
+        rate: 4000,
+        total: 0
     }
 
-    function stockForm(color, cost, currency, rate, quantity, expire, total, id) {
-        var button = ''
-        var result = ''
+    function stockForm(color, cost, currency, rate, quantity, expire, amount, id) {
+        button = ''
+
+        total.cost = cost
+        total.quantity = quantity
+        total.currency = currency
+        total.rate = rate
+        total.total = amount
+
+        edits = document.querySelectorAll('.stock-cancel')
+        add = document.querySelectorAll('.stock-close')
+        
+        Array.from(edits).forEach(a => {
+            $(a).click()
+        })
+
+        Array.from(add).forEach(a => {
+            $(a).click()
+        })
+
+        option = ''
+        if (currency == 'KHR') {
+            option = '<option value="USD">$</option><option selected value="KHR">&#x17DB;</option>'
+        } else {
+            option = '<option selected value="USD">$</option><option value="KHR">&#x17DB;</option>'
+        }
         if (cost == '') {
             button = `<div class="flex-between-center action-btn"><span class="stock-close pointer">
                     <ion-icon name="close-outline"></ion-icon>
                 </span>
-                <span class="pointer stock-add">
+                <span class="pointer stock-add ml-2">
                     <ion-icon name="checkmark-outline"></ion-icon>
                 </span></div>`
-            result = '$' + total
         } else {
             button = `<div class="flex-between-center action-btn"><span id="` + id + `" class="stock-cancel pointer">
                     <ion-icon name="close-outline"></ion-icon>
                 </span>
-                <span class="pointer stock-save" id="`+ id + `">
+                <span class="pointer stock-save ml-2" id="`+ id + `">
                     <ion-icon name="checkmark-outline"></ion-icon>
                 </span></div>`
-            result = total
         }
 
         return `<input type="hidden" id="input-product" value="{{product.id}}">
@@ -426,18 +460,16 @@
             <td><input type="number" class="form-empty color-text input-color" id="input-cost" value="`+ cost + `"
                     placeholder="Cost"></td>
             <td><select id="select-currency" class="form-empty input-color color-text">
-                    <option value="USD">$</option>
-                    <option value="KHR">&#x17DB;</option>
+                    `+option+`
                 </select></td>
             <td><input type="number" class="form-empty color-text input-color" id="input-rate"
                     placeholder="Rate" value="`+ rate + `"></td>
             <td><input type="number" class="form-empty color-text input-color" id="input-quantity"
                     placeholder="Quantity" value="`+ quantity + `"></td>
-            <td><input type="date" class="form-empty color-text input-color" id="input-expire"
+            <td><input type="date" class="form-empty color-text input-color" id="input-expire" style="width: 150px"
                     placeholder="Adjust" value="`+ expire + `"></td>
             <td class="flex-between">
-                
-                <span style="text-decoration: underline;" id="calculated-result" class="notranslate">`+ result + `</span>
+                <span class="calculated-result"><input type="number" class="form-empty color-text input-color pr-3" id="calculated-result" placeholder="Total" value="`+ amount + `"></span>
                 `+ button + `
             </td>`
     }
@@ -448,23 +480,63 @@
             $('.stock-form').empty()
         } else {
             $(this).find('p').addClass('clear')
-            $('.stock-form').html(stockForm('', '', '', '', '', '', '0.00', ''))
+            $('.stock-form').html(stockForm('', '', '', 4000, '', '', '0.00', ''))
             $('.stock-form').find('#input-cost').focus()
             total.cost = 0
             total.quantity = 0
         }
     })
 
-    $(document).on('input', '#input-cost, #input-quantity', function () {
+    $(document).on('change', '#select-currency', function() {
+        total.currency = $(this).val()
+        cost = total.total / total.quantity
+
+        if (total.currency == 'KHR') {
+            cost *= total.rate
+        }
+        console.log(cost)
+        total.cost = cost
+        $(this).closest('tr').find('#input-cost').val(cost)
+    })
+
+    $(document).on('input', '#input-cost, #input-quantity, #input-rate', function () {
+        value = $(this).val()
 
         if ($(this).attr('id') == 'input-cost') {
-            total.cost = $(this).val()
-        } else {
-            total.quantity = $(this).val()
+            total.cost = value
+        }
+        if ($(this).attr('id') == 'input-quantity') {
+            total.quantity = value
+        }
+        if ($(this).attr('id') == 'input-rate') {
+            if (value == '') {
+                value = 4000
+            }
+            total.rate = value
         }
 
-        var result = total.cost * total.quantity
-        $(this).parent().parent().find('#calculated-result').text(accounting.formatMoney(result))
+        result = total.cost * total.quantity
+        if (total.currency == 'KHR') {
+            result /= total.rate
+        } 
+        result = result.toFixed(2)
+        total.total = result
+
+        console.log(total)
+        $(this).closest('tr').find('#calculated-result').val(result)
+    })
+
+    $(document).on('input', '#calculated-result', function() {
+        value = $(this).val()
+        cost = value / total.quantity
+        total.cost = cost
+        if (total.currency == 'KHR') {
+            cost *= total.rate
+            cost = Math.round(cost / 100) * 100
+        }
+
+        total.total = value
+        $(this).closest('tr').find('#input-cost').val(cost)
     })
 
     $(document).on('click', '.stock-edit', function () {
@@ -476,7 +548,7 @@
 
         var color = $(tds[0]).attr('id')
 
-        $(tr).html(stockForm(color, $(tds[1]).text(), '', $(tds[3]).text(), $(tds[4]).text(), $(tds[5]).text(), $(tds[6]).find('span').text(), id))
+        $(tr).html(stockForm(color, $(tds[1]).text(), $(tds[2]).text(), $(tds[3]).text(), $(tds[4]).text(), $(tds[5]).text(), accounting.unformat($(tds[6]).find('span').text()), id))
 
         Array.from($(tr).find('#select-color').children()).forEach(option => {
             if ($(option).val() == color) {
@@ -547,16 +619,19 @@
                         $('#list-stocks').find('#' + id).addClass('text-danger')
                     } 
                     if (dateDifference(expire.val()) > 7) $('#list-stocks').find('#' + id).removeClass('text-danger text-warning')
-
+                    expireDate = expire.val()
                     if (data.data == 'success') {
+                        if (expireDate == '') {
+                            expireDate = '...'
+                        }
                         $('#list-stocks').find('#' + id).html(`<td id="` + color.val() + `" class="notranslate">` + color_name + `</td>
                                                             <td class="notranslate">`+ cost.val() + `</td>
                                                             <td>`+ currency.val() + `</td>
                                                             <td class="notranslate">`+ rate.val() + `</td>
                                                             <td class="notranslate">`+ quantity.val() + `</td>
-                                                            <td class="notranslate">`+ expire.val() + `</td>
+                                                            <td class="notranslate">`+ expireDate + `</td>
                                                             <td class="flex-between-center notranslate">
-                                                                <span style="text-decoration: underline;" title="`+ accounting.formatMoney(cost.val() * quantity.val() * rate.val(), 'R') + `">` + accounting.formatMoney(cost.val() * quantity.val()) + `</span>
+                                                                <span style="text-decoration: underline;" title="`+ accounting.formatMoney(data.total * 4000, '\u17DB', 0) + `">` + accounting.formatMoney(data.total) + `</span>
                                                                 <div class="flex-between-center action-btn">
                                                                     <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
                                                                     <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
@@ -644,6 +719,9 @@
                 data: { color: color.val(), cost: cost.val(), currency: currency.val(), rate: rate.val(), quantity: quantity.val(), expire: expire.val(), product: product.val() },
                 success: function (data) {
                     if (data.data == 'success') {
+                        if (data.expire == null) {
+                            data.expire = '...'
+                        }
                         $('#list-stocks').prepend(` <tr class="color-text" id="` + data.id + `">
                                                     <td id="`+ color.val() + `" class="notranslate">` + color_name + `</td>
                                                     <td class="notranslate">`+ data.cost + `</td>
@@ -652,7 +730,7 @@
                                                     <td class="notranslate">`+ data.quantity + `</td>
                                                     <td class="notranslate">`+ data.expire + `</td>
                                                     <td class="flex-between-center notranslate">
-                                                        <span style="text-decoration: underline;" title="`+ accounting.formatMoney(data.cost * data.quantity * data.rate, '\u17DB', 0) + `">` + accounting.formatMoney(data.cost * data.quantity) + `</span>
+                                                        <span style="text-decoration: underline;" title="`+ accounting.formatMoney(data.total * 4000, '\u17DB', 0) + `">` + accounting.formatMoney(data.total) + `</span>
                                                         <div class="flex-between-center action-btn">
                                                             <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
                                                             <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
@@ -694,7 +772,7 @@
                     rate.val('')
                     quantity.val('')
                     expire.val('')
-                    $('#calculated-result').text('$0.00')
+                    $('#calculated-result').val('')
                 }
             })
         }

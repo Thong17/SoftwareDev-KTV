@@ -344,9 +344,11 @@ class tblProduct(db.Model):
 class tblStock(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     cost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    costCurrency = db.Column(db.Numeric(16,2), nullable=True, default=0.00)
     currency = db.Column(db.String(20), nullable=False)
     rate = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
+    total = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     color = db.Column(db.String(36), nullable=True)
     expire = db.Column(db.Date, nullable=True)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
@@ -417,7 +419,7 @@ class tblDrawer(db.Model):
     key = db.Column(db.String(36), nullable=True, default='')
     rate = db.Column(db.Numeric(10,2), nullable=True, default=4000)
     counter = db.Column(db.String(50), nullable=True, default='')
-    startCost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
+    startCost = db.Column(db.Numeric(16,2), nullable=True, default=0.00)
     startedOn = db.Column(db.DateTime, default=datetime.utcnow)
     endedOn = db.Column(db.DateTime, nullable=True)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
@@ -426,9 +428,9 @@ class tblDrawer(db.Model):
 
 class tblMoney(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    money = db.Column(db.Numeric(10,0), nullable=True, default=0.00)
+    money = db.Column(db.Numeric(16,0), nullable=True, default=0.00)
     currency = db.Column(db.String(20), nullable=False)
-    value = db.Column(db.Numeric(10,5), nullable=True, default=0.00000)
+    value = db.Column(db.Numeric(16,5), nullable=True, default=0.00000)
     unit = db.Column(db.Numeric(10,0), nullable=True, default=0)
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
 

@@ -993,9 +993,10 @@ def add_stock():
     rate = request.form['rate']
     expire = request.form['expire']
     product = request.form['product']
+    costCurrency = cost
 
     Product = tblProduct.query.get(product)
-
+    
     if expire == '':
         expire = None
 
@@ -1004,16 +1005,21 @@ def add_stock():
 
     id = str(uuid4())
 
-    model = tblStock(id=id, cost=cost, quantity=quantity, currency=currency, rate=rate,
-                     expire=expire, productId=product, color=color, createdBy=current_user.id)
     amount = float(cost) * int(quantity)
+    if currency == 'KHR':
+        amount /= float(rate)
+        cost = float(cost) / 4000
+
+    model = tblStock(id=id, cost=cost, costCurrency=costCurrency, quantity=quantity, currency=currency, rate=rate, total=amount,
+                     expire=expire, productId=product, color=color, createdBy=current_user.id)
+    
     outcome = tblOutcome(id=id, description=Product.product +
                          ' x'+quantity, amount=amount, createdBy=current_user.id)
     try:
         db.session.add(model)
         db.session.add(outcome)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has added stock: '+str(cost)+'/'+currency+'/'+str(
-            quantity)+'/'+str(rate)+'/'+str(expire)+' in product '+Product.product, type='Add', createdBy=current_user.id)
+            quantity)+'/'+str(rate)+'/'+str(expire)+'/'+str(amount)+' in product '+Product.product, type='Add', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock = 0
@@ -1023,7 +1029,7 @@ def add_stock():
             total_stock += stock.quantity
             total_cost = stock.cost * stock.quantity
             total_costs += total_cost
-        return jsonify({'data': 'success', 'id': id, 'cost': cost, 'quantity': quantity, 'currency': currency, 'rate': rate, 'expire': expire, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S'), 'total_cost': total_costs})
+        return jsonify({'data': 'success', 'id': id, 'cost': costCurrency, 'quantity': quantity, 'currency': currency, 'rate': rate, 'expire': expire, 'color': color, 'total_stock': total_stock, 'createdOn': model.createdOn.strftime('%Y-%m-%d %H:%M:%S'), 'total_cost': total_costs, 'total': amount})
     except:
         return jsonify({'data': 'failed'})
 
@@ -1046,7 +1052,7 @@ def delete_stock(id):
         db.session.delete(outcome)
         db.session.delete(stock)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has deleted stock: '+str(stock.cost)+'/'+stock.currency+'/'+str(
-            stock.quantity)+'/'+str(stock.rate)+'/'+str(stock.expire)+' in product '+stock.stocksOfProduct.product, type='Delete', createdBy=current_user.id)
+            stock.quantity)+'/'+str(stock.rate)+'/'+str(stock.expire)+'/'+str(stock.total)+' in product '+stock.stocksOfProduct.product, type='Delete', createdBy=current_user.id)
         db.session.add(Activity)
         db.session.commit()
         total_stock -= delete_stock
@@ -1061,21 +1067,35 @@ def save_stock(id):
     stock = tblStock.query.get(id)
     outcome = tblOutcome.query.get(id)
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has modified stock from: '+str(stock.cost)+'/'+stock.currency+'/'+str(
-        stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.expire)+' in product '+stock.stocksOfProduct.product, type='Modify', createdBy=current_user.id)
+        stock.rate)+'/'+str(stock.quantity)+'/'+str(stock.expire)+'/'+str(stock.total)+' in product '+stock.stocksOfProduct.product, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
 
     expire =  request.form['expire']
     if expire == '':
         expire = None
 
+    color = request.form['color']
+    cost = request.form['cost']
+    currency = request.form['currency']
+    rate = request.form['rate']
+    quantity = request.form['quantity']
+    costCurrency = cost
 
-    stock.color = request.form['color']
-    stock.cost = request.form['cost']
-    stock.currency = request.form['currency']
-    stock.rate = request.form['rate']
-    stock.quantity = request.form['quantity']
+    amount = float(cost) * int(quantity)
+    if currency == 'KHR':
+        amount /= float(rate)
+        cost = float(cost) / 4000
+
+
+    stock.color = color
+    stock.cost = cost
+    stock.costCurrency = costCurrency
+    stock.currency = currency
+    stock.rate = rate
+    stock.quantity = quantity
+    stock.total = amount
     stock.expire = expire
-    outcome.amount = float(stock.cost) * int(stock.quantity)
+    outcome.amount = amount
     try:
         db.session.commit()
         total_stock = 0
@@ -1101,7 +1121,7 @@ def save_stock(id):
                 }
                 stocks.append(st)
 
-        return jsonify({'data': 'success', 'total_stock': total_stock, 'stocks': stocks, 'total_cost': total_costs})
+        return jsonify({'data': 'success', 'total_stock': total_stock, 'stocks': stocks, 'total_cost': total_costs, 'total': amount})
     except:
         return jsonify({'data': 'failed'})
 
@@ -1171,7 +1191,7 @@ def create_drawer():
 
     for money in data['moneys']:
         if money['currency'] == 'KHR':
-            value = float(money['money']) / float(data['rate'])
+            value = float(money['money']) / 4000
         else:
             value = money['money']
         mid = str(uuid4())

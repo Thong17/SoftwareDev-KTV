@@ -843,7 +843,7 @@
                                 <li class="flex-between-start"><span class="color-text ln-checkin">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
                                 <li class="mb-3 flex-between-center"><span class="color-text ln-duration">Duration </span><span id="calculate-time" class="text-danger notranslate"></span></li>
-                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-confirm">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
+                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
                             </ul>
                         </div>
                         <span class="check-in-out ln-checkout">End</span>
@@ -1241,7 +1241,7 @@
             url: '/drawer/' + id,
             type: 'POST',
             success: function (data) {
-                $('#drawerModal').find('.modal-body').html(drawerForm(data.counter, data.rate, data.data))
+                $('#drawerModal').find('.modal-body').html(drawerForm(data.counter, data.rate, data.data)).translator()
                 $('#drawerModal').modal('show')
             }
         })
@@ -1494,7 +1494,7 @@
                         values: data.values,
                         id: data.id,
                         stocks: data.stocks
-                    }))
+                    })).translator()
                     if (data.colors.length > 0 || data.values.length > 0) {
                         $('#productProperty').modal('show')
                     } else {
@@ -1771,7 +1771,7 @@
                                 <td style="width: 15%; text-align:center;">`+ m.currency + `</td>
                                 <td style="width: 20%; text-align:center;">`+ m.unit + `</td>
                                 <td style="width: 25%; text-align:center;">`+ m.money * m.unit + `</td>
-                                <td class="color-text flex-between-center"></td>
+                                <td class="color-text flex-between-center"><ion-icon name="remove-outline"></ion-icon><ion-icon name="add-outline"></ion-icon></td>
                             </tr>`
             })
         }
@@ -1781,7 +1781,7 @@
                         <div class="form-group">
                             <input class="form-control input-color" step="any" type="number" name="drawer-rate" id="drawer-rate" value="` +
             rate + `">
-                            <label class="label rate" for="drawer-rate">Rate</label>
+                            <label class="label rate ln-rate" for="drawer-rate">Rate</label>
                         </div>
                     </div>
                     <div class="col-md-8">
@@ -1789,7 +1789,7 @@
                             <input class="form-control input-color" type="text" name="drawer-counter" id="drawer-counter" value="` +
             counter +
             `">
-                            <label class="label counter" for="drawer-counter">Counter</label>
+                            <label class="label counter ln-counter" for="drawer-counter">Counter</label>
                         </div>
                     </div>
                 </div>
@@ -1797,14 +1797,14 @@
                     <table class="table money-table">
                         <thead>
                             <tr class="color-font">
-                                <td style="width: 35%;"><ion-icon name="add-outline" class="money-add mr-2" style="vertical-align: middle"></ion-icon>Money</td>
-                                <td style="width: 15%; text-align:center;">Currency</td>
-                                <td style="width: 20%; text-align:center;">Unit</td>
-                                <td style="width: 25%; text-align:center;">Total</td>
+                                <td style="width: 35%;"><ion-icon name="add-outline" class="money-add mr-2" style="vertical-align: middle"></ion-icon><span class="ln-money">Money</span></td>
+                                <td style="width: 15%; text-align:center;" class="ln-currency">Currency</td>
+                                <td style="width: 20%; text-align:center;" class="ln-unit">Unit</td>
+                                <td style="width: 25%; text-align:center;" class="ln-total">Total</td>
                                 <td style="width: 5%;"></td>
                             </tr>
                         </thead>
-                        <tbody id="list-money" class="color-text notranslate">
+                        <tbody id="list-money" class="color-text">
                             `+ element + `
                             <tr class="money-form color-text">
 
