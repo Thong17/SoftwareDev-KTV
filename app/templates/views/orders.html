@@ -335,10 +335,10 @@
                     <tbody id="order-list">
                         {% for order in orders %}
                         <tr class="order-item" id="{{ order.id }}" data-href="/order/{{ order.id }}">
-                            <td class="color-text">{% if order.customer.name != '' %}{{ order.customer.name }}{%
+                            <td class="color-text">{% if order.customerOrder.name != '' %}{{ order.customerOrder.name }}{%
                                 else %}...{% endif %}</td>
-                            <td class="color-text notranslate">{% if order.customer.phone != '' %}{{
-                                order.customer.phone }}{%
+                            <td class="color-text notranslate">{% if order.customerOrder.phone != '' %}{{
+                                order.customerOrder.phone }}{%
                                 else %}...{% endif %}</td>
                             <td class="color-text notranslate">{{ order.order.room }}</td>
                             <td class="color-text flex-between-center"><div class="flex-column-between"><div><span>{{ order.orderOn | datetimefilter }}-{{
@@ -375,7 +375,7 @@
                             <select class="selectpicker" id="select-customer" data-live-search="true">
                                 {% if customers %}
                                 {% for customer in customers %}
-                                <option class="notranslate" value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
+                                <option class="notranslate" value="{{ customer.id }}">{{ customer.name }}{% if customer.phone != '' %} - {{ customer.phone }}{% endif %}</option>
                                 {% endfor %}
                                 {% else %}
                                 <option value="" disabled>No customer</option>
@@ -469,15 +469,15 @@
                     })
                     element = ''
                     data.Orders.forEach(o => {
-                        if (o.customer.name == '') {
+                        if (o.customerOrder.name == '') {
                             _name = '...'
                         } else {
-                            _name = o.customer.name
+                            _name = o.customerOrder.name
                         }
-                        if (o.customer.phone == '') {
+                        if (o.customerOrder.phone == '') {
                             phone = '...'
                         } else {
-                            phone = o.customer.phone
+                            phone = o.customerOrder.phone
                         }
                         room = o.order
                         date = o.orderOn + '-' + o.orderTo
@@ -526,15 +526,15 @@
                         })
                         element = ''
                         data.Orders.forEach(o => {
-                            if (o.customer.name == '') {
+                            if (o.customerOrder.name == '') {
                                 _name = '...'
                             } else {
-                                _name = o.customer.name
+                                _name = o.customerOrder.name
                             }
-                            if (o.customer.phone == '') {
+                            if (o.customerOrder.phone == '') {
                                 phone = '...'
                             } else {
-                                phone = o.customer.phone
+                                phone = o.customerOrder.phone
                             }
                             room = o.order
                             date = o.orderOn + '-' + o.orderTo
@@ -579,15 +579,15 @@
                         })
                         element = ''
                         data.Orders.forEach(o => {
-                            if (o.customer.name == '') {
+                            if (o.customerOrder.name == '') {
                                 _name = '...'
                             } else {
-                                _name = o.customer.name
+                                _name = o.customerOrder.name
                             }
-                            if (o.customer.phone == '') {
+                            if (o.customerOrder.phone == '') {
                                 phone = '...'
                             } else {
-                                phone = o.customer.phone
+                                phone = o.customerOrder.phone
                             }
                             room = o.order
                             date = o.orderOn + '-' + o.orderTo
@@ -694,11 +694,12 @@
             fname = $('#name').val()
             phone = $('#phone').val()
             birthdate = $('#birthdate').val()
+            description = ''
             if (fname != '' || phone != '' || birthdate != '') {
                 $.ajax({
                     url: '/customer/add',
                     type: 'POST',
-                    data: { fname: fname, phone: phone, birthdate: birthdate },
+                    data: { fname: fname, phone: phone, birthdate: birthdate, description: description },
                     success: function (data) {
                         if (data.msg == 'Success') {
                             validation = [data.username, data.phone]
@@ -710,7 +711,10 @@
                                 <td class="color-text" id="cus-lastname">`+ data.phone + `</td>
                                 <td class="color-text" id="cus-phone">`+ data.birthdate + `</td>
                             </tr>`)
-                            $('#select-customer').append('<option value="'+data.id+'">'+data.username+' - '+data.phone+'</option>')
+                            if (phone != '') {
+                                phone =  ' - '+data.phone
+                            }
+                            $('#select-customer').append('<option value="'+data.id+'">'+data.username+phone+'</option>')
                             $('#select-customer').selectpicker('refresh')
                             $('#name').val('').focus()
                             $('#phone').val('')
@@ -750,10 +754,10 @@
                 type: 'POST',
                 success: function (data) {
                     eventsArr = []
-
+                    console.log(data)
                     data.orders.forEach(o => {
                         obj = {
-                            title: o.customer.name + ' ' + o.customer.phone,
+                            title: o.customerOrder.name + ' ' + o.customerOrder.phone,
                             start: o.orderOn,
                             end: o.orderTo,
                             backgroundColor: '#337ab799',

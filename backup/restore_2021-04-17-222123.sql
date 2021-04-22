@@ -64,7 +64,6 @@ CREATE TABLE `payment` (
 
 LOCK TABLES `payment` WRITE;
 /*!40000 ALTER TABLE `payment` DISABLE KEYS */;
-INSERT INTO `payment` VALUES ('260ce5fd-59e4-40d4-b0c8-c031efdb7b22','036ddab9-fcb9-44e7-9725-3045a46362d2'),('260ce5fd-59e4-40d4-b0c8-c031efdb7b22','9a65abcf-e798-44de-9d9e-526f8ba30d9c');
 /*!40000 ALTER TABLE `payment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -93,7 +92,7 @@ CREATE TABLE `tbl_activity` (
 
 LOCK TABLES `tbl_activity` WRITE;
 /*!40000 ALTER TABLE `tbl_activity` DISABLE KEYS */;
-INSERT INTO `tbl_activity` VALUES ('01d5e707-c54d-48f6-b728-34f6f2301493','Admin has upload photo for product: Burger','Upload','2021-04-08 14:11:54','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('06a06a95-8560-4b17-9b56-44fc6643ae82','Admin has added color Original Taste in product','Add','2021-04-08 14:11:13','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('0cd74fb1-75f2-43f1-850a-8f4b324043cc','Admin has added category: Food in category','Add','2021-04-08 14:09:18','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('0f691972-32b0-4788-85c7-74a81cee1f49','Admin has modified user: Test','Modify','2021-04-08 14:14:53','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('11a28aa4-4bc0-4f3b-81f8-f65786bddec2','Admin has added value Medium in product','Add','2021-04-08 14:12:15','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('14655446-185e-4845-93bf-2bc07a392ec2','Admin has added stock: 0.2/dollar/100/4000/2021-04-30 in product Coca Cola Original Taste','Add','2021-04-08 14:16:04','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('1f0cd498-4162-4735-b4d0-620ebbd3b9ea','Admin has modified theme from light','Modify','2021-04-08 14:03:51','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('1f1a1db0-1a8e-4dde-bceb-cfc8b023b422','Admin has added brand: ម្អូប in brand','Add','2021-04-08 14:11:32','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('2c89b88c-6724-463c-9e1d-bafe949127d2','Admin has added product Coca Cola Original Taste','Add','2021-04-08 14:10:44','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('32e423be-513b-42c8-83a9-7bf0821b9169','Admin has added value Large in product','Add','2021-04-08 14:12:21','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('3d846498-16d2-43b1-a8fb-79dde9439dc2','Admin has created user: Test','Created','2021-04-08 14:14:15','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('4c95e58b-dd1d-49ba-b304-2ed217c216c9','Admin has added product Burger','Add','2021-04-08 14:11:50','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('4e3803d5-ee7d-495a-8cf4-9bf30095bc88','Admin has added floor: 1F','Create','2021-04-08 14:12:55','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('5035fee7-77e7-47dc-83fb-edd8f57c295a','Admin has opened drawer','Open','2021-04-08 14:17:07','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('64241f3f-c987-430c-b892-867482e8a533','Admin has modified category from Food','Modify','2021-04-08 14:09:29','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('679f4b29-55f8-4beb-8b78-1123f652e85d','Admin has added room: Table 2','Create','2021-04-08 14:13:14','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('6e012cb1-bf75-4044-b6a6-9722acb23f8b','Admin has modified language from english','Modify','2021-04-08 14:03:56','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('6f6a425d-a96a-475e-959f-a3ef18f15d0a','Admin has added role: សាកល្បង','Add','2021-04-08 14:14:44','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('7ab45112-1dc4-4baa-815a-d25d016faf20','Admin has logged in','Login','2021-04-08 14:02:40','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('7e93dcd4-9f95-4d75-bf37-932ff68973c1','Admin has uploaded his profile picture ','Modify','2021-04-08 14:03:37','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('7fba0ba4-0cd2-46b0-bc01-7b4ed695b929','Admin has toggle room: Table 1 from Open','Toggle','2021-04-08 14:13:51','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('93038dc9-17aa-4b84-896b-85ad6eb2ebfc','Admin has upload photo for color: Original Taste','Upload','2021-04-08 14:11:19','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('9b98f28c-a97d-4634-b1c3-2e06eabb9f7f','Admin has added room: Table 1','Create','2021-04-08 14:13:08','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('ace6f1e5-27c7-4c83-bf33-ff9ac89ef857','Admin has added brand: Coca Cola in brand','Add','2021-04-08 14:10:07','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('b4a93d75-26ae-49e2-b1f0-fb980424dffd','Admin has checked out payment INV0000001','Payment','2021-04-08 14:17:57','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('b9a8cdf4-3e0e-4dae-9a87-b0a60d597b42','Admin has added category: Beverage in category','Add','2021-04-08 14:09:14','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('c6104d4b-c749-484f-b799-e499be922097','Admin has added property: Size in category មុខម្អូប','Add','2021-04-08 14:09:40','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('c680a633-248e-4473-83ab-a3622cd6e8d9','Admin has modified property from Size/text/','Modify','2021-04-08 14:09:52','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('c686666a-0d5f-4679-b0c1-53b12717b513','Admin has added Coca Cola Original Taste to favorite','Add','2021-04-08 14:16:42','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('d5e5c13e-b8bd-429f-852f-c072ca1c05b1','Admin has modified product from Burger//True/dollar/3.00//20/2021-04-10/មុខម្អូប','Modify','2021-04-08 14:16:23','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('d7b8afe2-51ee-4582-a7bc-f62fa37d0cb3','Admin has modified theme from dark','Modify','2021-04-08 14:09:01','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('d86f54b3-a3ab-4d88-a165-614ea9353516','Admin has modified product from Burger//True/dollar/3.00///None/មុខម្អូប','Modify','2021-04-08 14:12:05','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('d930f65d-504d-4a38-9caf-0330e75467c9','Admin has upload photo for product: Coca Cola Original Taste','Upload','2021-04-08 14:10:53','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('e5072f55-1280-4419-b378-ef3421e95f59','Admin has added transaction: Coca Cola Original Taste','Add','2021-04-08 14:17:24','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('ef9996d1-5388-468f-b8f0-572b0003334f','Admin has ordered invoice: INV0000001','Order','2021-04-08 14:17:41','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('f3d2b346-ed7a-45f6-aac9-6fd92fd9dee9','Admin has added room: Table 10','Create','2021-04-08 14:13:29','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('f45188dd-0b9a-445a-954d-12872911d117','Admin has added transaction: Burger-Large','Add','2021-04-08 14:17:39','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
+INSERT INTO `tbl_activity` VALUES ('18f3891b-f425-489d-90d5-f6a0ea0cd61e','Admin has modified theme from dark','Modify','2021-04-17 15:00:48','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('2711e695-dcf6-4b56-8743-89f49400888f','Admin has modified theme from blue','Modify','2021-04-17 15:00:51','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('31dae1cc-6adb-427d-abc8-e77023e0857f','Admin has modified theme from light','Modify','2021-04-17 15:00:45','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('36cc6064-a559-4481-90c8-2b94b36a15cf','Admin has logged in','Login','2021-04-17 15:03:40','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('40256cf0-bd99-46b3-8843-6400aa19f563','Admin has logged in','Login','2021-04-17 15:11:48','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('499e8de5-ddf8-47c8-bcbe-dd4384b241ec','Admin has logged in','Login','2021-04-17 14:58:32','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('5cc9ea9f-ae9c-429c-8823-9e59f7c1cf90','Admin has logged in','Login','2021-04-17 14:52:58','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('5df06bee-5974-4aaf-842a-9417a18160fb','Admin has logged in','Login','2021-04-17 15:00:32','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('6ad8148d-24ab-4de1-8921-4c2ae894d571','Admin has modified language from english','Modify','2021-04-17 15:00:58','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('710a92df-d46c-4c62-9f85-03c70091247f','Admin has modified theme from dark','Modify','2021-04-17 14:53:16','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('7b3459a0-87f5-4632-863c-b5f584acb632','Admin has logged in','Login','2021-04-17 15:02:26','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('863ffda5-8a9f-4552-9bcf-3ecb65b4b219','Admin has modified theme from blue','Modify','2021-04-17 14:53:19','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('87a27487-dccf-446c-84a2-91f052acf7b7','Admin has logged in','Login','2021-04-17 15:17:44','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('9eb2eb73-0000-4708-8d70-461a359cf5ce','Admin has uploaded his profile picture ','Modify','2021-04-17 15:19:05','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('a814b384-d280-4974-b4e3-1e426f6f5a21','Admin has uploaded his profile picture ','Modify','2021-04-17 15:05:01','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('ca8e2d51-acb7-40b5-af4d-0349cb0891c2','Admin has uploaded his profile picture ','Modify','2021-04-17 15:05:53','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('ca9ad88d-fce2-4f61-a74e-a04f75a90a6c','Admin has modified theme from light','Modify','2021-04-17 14:53:14','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('cbc2acf6-bec0-411e-a3aa-905acc3c2537','Admin has modified language from khmer','Modify','2021-04-17 14:58:36','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('cdf73465-92f6-44a4-b179-c5ea1ec632cc','Admin has logged in','Login','2021-04-17 15:13:39','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('d235a715-31e9-43f4-b19d-c653d8a8786a','Admin has logged in','Login','2021-04-17 15:01:39','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('d94a227c-e979-40a6-8872-c10792d78adb','Admin has logged in','Login','2021-04-17 15:08:00','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('db4c128b-83fb-4af1-a5e2-f882a1559f88','Admin has modified language from english','Modify','2021-04-17 14:53:22','465c4e3d-b81d-4086-aebd-fe0d27383db5'),('eaffc051-19fe-43b7-90b1-273b5f670828','Admin has logged in','Login','2021-04-17 15:06:56','465c4e3d-b81d-4086-aebd-fe0d27383db5');
 /*!40000 ALTER TABLE `tbl_activity` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -154,7 +153,6 @@ CREATE TABLE `tbl_appearance` (
 
 LOCK TABLES `tbl_appearance` WRITE;
 /*!40000 ALTER TABLE `tbl_appearance` DISABLE KEYS */;
-INSERT INTO `tbl_appearance` VALUES ('3e7c9b4f-883f-409a-8e22-197b88f2c719','','','','','','fca165aa-6c41-4dba-922b-2c5ce2a21110'),('f465ac4b-ac17-46e9-a7b9-f92dbbfd499b','','','','','','06738641-3c04-415c-ba23-7f14bbbbff33');
 /*!40000 ALTER TABLE `tbl_appearance` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -184,7 +182,6 @@ CREATE TABLE `tbl_brand` (
 
 LOCK TABLES `tbl_brand` WRITE;
 /*!40000 ALTER TABLE `tbl_brand` DISABLE KEYS */;
-INSERT INTO `tbl_brand` VALUES ('a3619c6b-6a37-4fa3-85a8-444eb5071da0','Coca Cola','','2021-04-08 14:10:07','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('c2cf63c0-ec80-40ac-94da-c09200c5ff43','ម្អូប','','2021-04-08 14:11:32','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_brand` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -215,7 +212,6 @@ CREATE TABLE `tbl_category` (
 
 LOCK TABLES `tbl_category` WRITE;
 /*!40000 ALTER TABLE `tbl_category` DISABLE KEYS */;
-INSERT INTO `tbl_category` VALUES ('5b0e5d2b-9b9c-4853-8e7c-ae19174d65fe','មុខម្អូប','default.png','','2021-04-08 14:09:18','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('f237a4eb-493f-4139-a825-39d9646d23f3','Beverage','default.png','','2021-04-08 14:09:14','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -312,7 +308,6 @@ CREATE TABLE `tbl_color` (
 
 LOCK TABLES `tbl_color` WRITE;
 /*!40000 ALTER TABLE `tbl_color` DISABLE KEYS */;
-INSERT INTO `tbl_color` VALUES ('96539509-0ef5-4ab8-9397-1e7e5a10d6ae','Original Taste','#C83434',0.00,'2021-04-08 14:11:13','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','06738641-3c04-415c-ba23-7f14bbbbff33');
 /*!40000 ALTER TABLE `tbl_color` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -357,7 +352,7 @@ CREATE TABLE `tbl_drawer` (
   `key` varchar(36) DEFAULT NULL,
   `rate` decimal(10,2) DEFAULT NULL,
   `counter` varchar(50) DEFAULT NULL,
-  `startCost` decimal(10,2) DEFAULT NULL,
+  `startCost` decimal(16,2) DEFAULT NULL,
   `startedOn` datetime DEFAULT NULL,
   `endedOn` datetime DEFAULT NULL,
   `createdBy` varchar(36) NOT NULL,
@@ -373,7 +368,6 @@ CREATE TABLE `tbl_drawer` (
 
 LOCK TABLES `tbl_drawer` WRITE;
 /*!40000 ALTER TABLE `tbl_drawer` DISABLE KEYS */;
-INSERT INTO `tbl_drawer` VALUES ('2779140f-813c-4651-9dd0-b3b40b6ce257','0caf3d47-9763-4764-940e-395dac4fa469',4000.00,'Default',1100.00,'2021-04-08 14:17:07',NULL,'9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_drawer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -401,7 +395,7 @@ CREATE TABLE `tbl_floor` (
 
 LOCK TABLES `tbl_floor` WRITE;
 /*!40000 ALTER TABLE `tbl_floor` DISABLE KEYS */;
-INSERT INTO `tbl_floor` VALUES ('4981b50a-a104-4f1a-b091-af099d67bdaf','Ground Floor','2021-04-08 14:00:03','bf4c4791-3a77-4b4e-8d4c-daa67edb4514'),('6de29285-296e-4dee-9066-b228fc520de4','1F','2021-04-08 14:12:55','bf4c4791-3a77-4b4e-8d4c-daa67edb4514');
+INSERT INTO `tbl_floor` VALUES ('076061d9-f1b5-4dde-8443-7e0092788af1','Ground Floor','2021-04-17 14:50:12','b43e7e5f-7f87-487c-aed1-6136c1e5f646');
 /*!40000 ALTER TABLE `tbl_floor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -414,9 +408,9 @@ DROP TABLE IF EXISTS `tbl_money`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tbl_money` (
   `id` varchar(36) NOT NULL,
-  `money` decimal(10,0) DEFAULT NULL,
+  `money` decimal(16,0) DEFAULT NULL,
   `currency` varchar(20) NOT NULL,
-  `value` decimal(10,5) DEFAULT NULL,
+  `value` decimal(16,5) DEFAULT NULL,
   `unit` decimal(10,0) DEFAULT NULL,
   `drawerId` varchar(36) NOT NULL,
   PRIMARY KEY (`id`),
@@ -431,7 +425,6 @@ CREATE TABLE `tbl_money` (
 
 LOCK TABLES `tbl_money` WRITE;
 /*!40000 ALTER TABLE `tbl_money` DISABLE KEYS */;
-INSERT INTO `tbl_money` VALUES ('42653260-410e-44b4-885a-27fcd3bb9b07',10,'USD',10.00000,100,'2779140f-813c-4651-9dd0-b3b40b6ce257'),('8c48b8c6-5463-4b5c-8774-fd8a804654bf',1,'USD',1.00000,94,'2779140f-813c-4651-9dd0-b3b40b6ce257');
 /*!40000 ALTER TABLE `tbl_money` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -500,7 +493,6 @@ CREATE TABLE `tbl_outcome` (
 
 LOCK TABLES `tbl_outcome` WRITE;
 /*!40000 ALTER TABLE `tbl_outcome` DISABLE KEYS */;
-INSERT INTO `tbl_outcome` VALUES ('6706cd9b-9957-450b-af29-691407e27fe7',1,'Coca Cola Original Taste x100',20.00,'2021-04-08 14:16:04','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_outcome` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -515,10 +507,10 @@ CREATE TABLE `tbl_payment` (
   `id` varchar(36) NOT NULL,
   `isComplete` tinyint(1) DEFAULT NULL,
   `invoice` varchar(20) DEFAULT NULL,
-  `amount` decimal(10,2) DEFAULT NULL,
-  `receive` decimal(10,2) DEFAULT NULL,
-  `rate` decimal(10,2) DEFAULT NULL,
-  `change` decimal(10,2) DEFAULT NULL,
+  `amount` decimal(10,4) DEFAULT NULL,
+  `receive` varchar(20) DEFAULT NULL,
+  `rate` decimal(10,4) DEFAULT NULL,
+  `change` decimal(10,4) DEFAULT NULL,
   `createdOn` datetime DEFAULT NULL,
   `createdBy` varchar(36) NOT NULL,
   `drawerId` varchar(36) NOT NULL,
@@ -537,7 +529,6 @@ CREATE TABLE `tbl_payment` (
 
 LOCK TABLES `tbl_payment` WRITE;
 /*!40000 ALTER TABLE `tbl_payment` DISABLE KEYS */;
-INSERT INTO `tbl_payment` VALUES ('260ce5fd-59e4-40d4-b0c8-c031efdb7b22',1,'INV0000001',3.65,10.00,4000.00,6.35,'2021-04-08 14:17:41','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','2779140f-813c-4651-9dd0-b3b40b6ce257');
 /*!40000 ALTER TABLE `tbl_payment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -572,7 +563,6 @@ CREATE TABLE `tbl_photo` (
 
 LOCK TABLES `tbl_photo` WRITE;
 /*!40000 ALTER TABLE `tbl_photo` DISABLE KEYS */;
-INSERT INTO `tbl_photo` VALUES ('b85ae2e0-c743-42e0-b839-667727ed7751','8ce04312-9178-452b-9391-2eef9994bb21.jpeg','Coca Cola Original Taste','2021-04-08 14:11:19','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','06738641-3c04-415c-ba23-7f14bbbbff33','96539509-0ef5-4ab8-9397-1e7e5a10d6ae');
 /*!40000 ALTER TABLE `tbl_photo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -590,6 +580,7 @@ CREATE TABLE `tbl_product` (
   `isStock` tinyint(1) DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL,
   `currency` varchar(20) NOT NULL,
+  `priceCurrency` decimal(10,2) DEFAULT NULL,
   `discount` varchar(3) DEFAULT NULL,
   `period` date DEFAULT NULL,
   `photo` varchar(255) DEFAULT NULL,
@@ -616,7 +607,6 @@ CREATE TABLE `tbl_product` (
 
 LOCK TABLES `tbl_product` WRITE;
 /*!40000 ALTER TABLE `tbl_product` DISABLE KEYS */;
-INSERT INTO `tbl_product` VALUES ('06738641-3c04-415c-ba23-7f14bbbbff33','Coca Cola Original Taste','',1,0.50,'dollar','',NULL,'4cb8f919-9b50-41a4-9714-b09b0443bf96.jpeg','','[\"9fcdf3a4-7f0a-447d-aa72-d9c6322b5577\"]','2021-04-08 14:10:44','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','a3619c6b-6a37-4fa3-85a8-444eb5071da0','f237a4eb-493f-4139-a825-39d9646d23f3'),('fca165aa-6c41-4dba-922b-2c5ce2a21110','Burger','',0,3.00,'dollar','20','2021-04-10','42cf3073-820a-47f8-a95b-e2ba9a1cf3f9.png','','[]','2021-04-08 14:11:50','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','c2cf63c0-ec80-40ac-94da-c09200c5ff43','5b0e5d2b-9b9c-4853-8e7c-ae19174d65fe');
 /*!40000 ALTER TABLE `tbl_product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -650,7 +640,7 @@ CREATE TABLE `tbl_profile` (
 
 LOCK TABLES `tbl_profile` WRITE;
 /*!40000 ALTER TABLE `tbl_profile` DISABLE KEYS */;
-INSERT INTO `tbl_profile` VALUES ('003c0417-7ac0-4e2a-905a-bb5d23ce85b1','default.png','','','','','','','2021-04-08 14:14:15','dac4ff74-8be0-4f2e-ab37-b87d8919db19'),('2724d5a9-1ba7-4796-a692-12e1233c1229','ab44ae3d-ec58-4b35-9521-2149bba5a393.jpg','Single','','','','','','2021-04-08 14:00:03','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
+INSERT INTO `tbl_profile` VALUES ('6c918d9b-c456-4138-a0f7-17a965c6db42','beb7f76f-cebc-4da1-ae0b-5d8140114d2a.jpg','Single','','','','','','2021-04-17 14:50:12','465c4e3d-b81d-4086-aebd-fe0d27383db5');
 /*!40000 ALTER TABLE `tbl_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -683,7 +673,6 @@ CREATE TABLE `tbl_property` (
 
 LOCK TABLES `tbl_property` WRITE;
 /*!40000 ALTER TABLE `tbl_property` DISABLE KEYS */;
-INSERT INTO `tbl_property` VALUES ('20d42ba6-71f9-4af6-a6ad-d3024862c3cd','ទំហំ','text','','2021-04-08 14:09:40','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','5b0e5d2b-9b9c-4853-8e7c-ae19174d65fe');
 /*!40000 ALTER TABLE `tbl_property` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -714,7 +703,6 @@ CREATE TABLE `tbl_quantity` (
 
 LOCK TABLES `tbl_quantity` WRITE;
 /*!40000 ALTER TABLE `tbl_quantity` DISABLE KEYS */;
-INSERT INTO `tbl_quantity` VALUES ('6a55839e-3039-4043-906d-4c90c687fe2f',1,1,'6706cd9b-9957-450b-af29-691407e27fe7','036ddab9-fcb9-44e7-9725-3045a46362d2');
 /*!40000 ALTER TABLE `tbl_quantity` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -746,7 +734,7 @@ CREATE TABLE `tbl_role` (
 
 LOCK TABLES `tbl_role` WRITE;
 /*!40000 ALTER TABLE `tbl_role` DISABLE KEYS */;
-INSERT INTO `tbl_role` VALUES ('94ebafc7-ee9c-411f-bec3-58775fb14f21','Administration','Admin, Cashier, Stock, Editor, Report',1,'2021-04-08 14:00:03','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('e88daa4f-8ef1-4553-8320-ac0d7fea9982','សាកល្បង','Report',0,'2021-04-08 14:14:44','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
+INSERT INTO `tbl_role` VALUES ('0c010b74-788e-43f9-bd28-c6b5624506e8','Administration','Admin, Cashier, Stock, Editor, Report',1,'2021-04-17 14:50:12','465c4e3d-b81d-4086-aebd-fe0d27383db5');
 /*!40000 ALTER TABLE `tbl_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -781,7 +769,6 @@ CREATE TABLE `tbl_room` (
 
 LOCK TABLES `tbl_room` WRITE;
 /*!40000 ALTER TABLE `tbl_room` DISABLE KEYS */;
-INSERT INTO `tbl_room` VALUES ('5ebf2e5f-d14a-4711-ac2d-1334a73ad47a','Table 2',5.00,'1h','Open','2021-04-08 14:13:14','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','4981b50a-a104-4f1a-b091-af099d67bdaf'),('6fc71b01-0ee6-46fb-b46c-f612afd77288','Table 10',5.00,'1h','Open','2021-04-08 14:13:29','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','6de29285-296e-4dee-9066-b228fc520de4'),('bb42a94c-981e-46cf-832f-95d781ef50eb','Table 1',0.00,'1h','Close','2021-04-08 14:13:08','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','4981b50a-a104-4f1a-b091-af099d67bdaf');
 /*!40000 ALTER TABLE `tbl_room` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -795,9 +782,11 @@ DROP TABLE IF EXISTS `tbl_stock`;
 CREATE TABLE `tbl_stock` (
   `id` varchar(36) NOT NULL,
   `cost` decimal(10,2) DEFAULT NULL,
+  `costCurrency` decimal(16,2) DEFAULT NULL,
   `currency` varchar(20) NOT NULL,
   `rate` decimal(10,2) DEFAULT NULL,
   `quantity` decimal(10,0) DEFAULT NULL,
+  `total` decimal(10,2) DEFAULT NULL,
   `color` varchar(36) DEFAULT NULL,
   `expire` date DEFAULT NULL,
   `createdOn` datetime DEFAULT NULL,
@@ -817,7 +806,6 @@ CREATE TABLE `tbl_stock` (
 
 LOCK TABLES `tbl_stock` WRITE;
 /*!40000 ALTER TABLE `tbl_stock` DISABLE KEYS */;
-INSERT INTO `tbl_stock` VALUES ('6706cd9b-9957-450b-af29-691407e27fe7',0.20,'dollar',4000.00,99,'96539509-0ef5-4ab8-9397-1e7e5a10d6ae','2021-04-30','2021-04-08 14:16:04','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','06738641-3c04-415c-ba23-7f14bbbbff33');
 /*!40000 ALTER TABLE `tbl_stock` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -844,7 +832,7 @@ CREATE TABLE `tbl_store` (
 
 LOCK TABLES `tbl_store` WRITE;
 /*!40000 ALTER TABLE `tbl_store` DISABLE KEYS */;
-INSERT INTO `tbl_store` VALUES ('bf4c4791-3a77-4b4e-8d4c-daa67edb4514','Store Name','','','2021-04-08 14:00:03');
+INSERT INTO `tbl_store` VALUES ('b43e7e5f-7f87-487c-aed1-6136c1e5f646','Store Name','','','2021-04-17 14:50:12');
 /*!40000 ALTER TABLE `tbl_store` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -882,7 +870,6 @@ CREATE TABLE `tbl_transaction` (
 
 LOCK TABLES `tbl_transaction` WRITE;
 /*!40000 ALTER TABLE `tbl_transaction` DISABLE KEYS */;
-INSERT INTO `tbl_transaction` VALUES ('036ddab9-fcb9-44e7-9725-3045a46362d2',1,1,'10',0.50,0.45,1,0.25,'Coca Cola Original Taste-Original Taste','06738641-3c04-415c-ba23-7f14bbbbff33','2021-04-08 14:17:24','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('9a65abcf-e798-44de-9d9e-526f8ba30d9c',1,1,'20',4.00,3.20,1,3.20,'Burger-Large','fca165aa-6c41-4dba-922b-2c5ce2a21110','2021-04-08 14:17:39','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_transaction` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -923,7 +910,7 @@ CREATE TABLE `tbl_user` (
 
 LOCK TABLES `tbl_user` WRITE;
 /*!40000 ALTER TABLE `tbl_user` DISABLE KEYS */;
-INSERT INTO `tbl_user` VALUES ('9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','','','Admin','',NULL,'','$2b$12$j1KQOIem47gzgpS7Du07yuQj9jooPoIySgprSnYpfUixXnlkf4Qz.','light','khmer','8c6131d5-f8af-41a1-bfa8-9625f289e493','0caf3d47-9763-4764-940e-395dac4fa469','2779140f-813c-4651-9dd0-b3b40b6ce257',1,1,'2021-04-08 14:00:03'),('dac4ff74-8be0-4f2e-ab37-b87d8919db19','','','Test','M',NULL,'','$2b$12$TDylkuaQJRX.ZvZMNH4AUu7BinwmutKQpgkQwEUk3gBiletugcBQ.','light','english','515fee72-8e03-45a8-86d6-562db7993a8d','','',1,0,'2021-04-08 14:14:15');
+INSERT INTO `tbl_user` VALUES ('465c4e3d-b81d-4086-aebd-fe0d27383db5','','','Admin','',NULL,'','$2b$12$UD8psrC1yjbdAwI4RYHj6OBTKB/nY0OwbO/DLn/.gc/Kadh5dJImC','light','khmer','1c7e5462-16da-4104-888d-cada9f3fc173','','',1,1,'2021-04-17 14:50:12');
 /*!40000 ALTER TABLE `tbl_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -939,6 +926,7 @@ CREATE TABLE `tbl_value` (
   `value` varchar(50) NOT NULL,
   `price` decimal(10,2) DEFAULT NULL,
   `currency` varchar(20) NOT NULL,
+  `priceCurrency` decimal(10,2) DEFAULT NULL,
   `description` text,
   `productId` varchar(36) NOT NULL,
   `propertyId` varchar(36) NOT NULL,
@@ -960,7 +948,6 @@ CREATE TABLE `tbl_value` (
 
 LOCK TABLES `tbl_value` WRITE;
 /*!40000 ALTER TABLE `tbl_value` DISABLE KEYS */;
-INSERT INTO `tbl_value` VALUES ('317d9d68-9a47-4e75-94b4-1fd74b846e08','Large',1.00,'dollar','','fca165aa-6c41-4dba-922b-2c5ce2a21110','20d42ba6-71f9-4af6-a6ad-d3024862c3cd','2021-04-08 14:12:21','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577'),('3c652ddc-dd4d-4bac-a067-f34c1c53e7a9','Medium',0.00,'dollar','','fca165aa-6c41-4dba-922b-2c5ce2a21110','20d42ba6-71f9-4af6-a6ad-d3024862c3cd','2021-04-08 14:12:15','9fcdf3a4-7f0a-447d-aa72-d9c6322b5577');
 /*!40000 ALTER TABLE `tbl_value` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -987,7 +974,7 @@ CREATE TABLE `user_role` (
 
 LOCK TABLES `user_role` WRITE;
 /*!40000 ALTER TABLE `user_role` DISABLE KEYS */;
-INSERT INTO `user_role` VALUES ('9fcdf3a4-7f0a-447d-aa72-d9c6322b5577','94ebafc7-ee9c-411f-bec3-58775fb14f21'),('dac4ff74-8be0-4f2e-ab37-b87d8919db19','e88daa4f-8ef1-4553-8320-ac0d7fea9982');
+INSERT INTO `user_role` VALUES ('465c4e3d-b81d-4086-aebd-fe0d27383db5','0c010b74-788e-43f9-bd28-c6b5624506e8');
 /*!40000 ALTER TABLE `user_role` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -1000,4 +987,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-08 21:19:36
+-- Dump completed on 2021-04-17 22:21:23

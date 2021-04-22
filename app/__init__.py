@@ -62,15 +62,20 @@ def create_app(config_class=Config):
 
             User = tblUser(id=uid, username='Admin', password=hashed_password, isAdmin=True, isConfirm=True, publicId=str(uuid4()))
             db.session.add(User)
-    
+            
+            db.session.commit()
+
             Profile = tblProfile(id=str(uuid4()), createdBy=uid)
             db.session.add(Profile)
 
             Role = tblRole(id=str(uuid4()), role='Administration', description='Admin, Cashier, Stock, Editor, Report', isDefault=True, createdBy=uid)
             db.session.add(Role)
-            
             User.roles.append(Role)
+
+            Customer = tblCustomer(id=str(uuid4()), name='Customer', createdBy=uid)
+            db.session.add(Customer)
             db.session.commit()
+
 
     bcrypt.init_app(app)
     ma.init_app(app)
@@ -240,10 +245,13 @@ class tblPayment(db.Model):
     isComplete = db.Column(db.Boolean, default=False)
     invoice = db.Column(db.String(20), nullable=True)
     amount = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
-    receive = db.Column(db.String(20), nullable=True, default='')
-    rate = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    paid = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    remain = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    receive = db.Column(db.String(20), nullable=True, default='0,0')
+    rate = db.Column(db.Numeric(10,4), nullable=True)
     change = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    orderedBy = db.Column(db.String(36), db.ForeignKey('tbl_customer.id'), nullable=False)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
     orderPayment = db.relationship('tblCheckin', backref='orderPayment', lazy=True, cascade='save-update, merge, delete', single_parent=True)
@@ -443,12 +451,14 @@ class tblQuantity(db.Model):
 
 class tblCustomer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    name = db.Column(db.String(20), nullable=True, default='')
+    name = db.Column(db.String(20), nullable=True, default='', unique=True)
     birthdate = db.Column(db.Date, nullable=True)
     phone = db.Column(db.String(20), nullable=True, default='')
+    description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
-    customer = db.relationship('tblOrder', backref='customer', lazy=True)
+    customerOrder = db.relationship('tblOrder', backref='customerOrder', lazy=True)
+    customerPayment = db.relationship('tblPayment', backref='customerPayment', lazy=True)
 
 class tblActivity(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -565,7 +575,7 @@ class CustomerSchema(ModelSchema):
         model = tblCustomer
 
 class OrderSchema(ModelSchema):
-    customer = fields.Nested(CustomerSchema)
+    customerOrder = fields.Nested(CustomerSchema)
     class Meta:
         model = tblOrder
 

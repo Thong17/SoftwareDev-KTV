@@ -83,17 +83,17 @@
         </span>
     </ul>
     {% else %}
-    <div class="social-nav">
+    <!-- <div class="social-nav">
         <div class="facebook">
-            <a href="https://www.facebook.com/Camping-Cave-112554470671175" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
+            <a href="#" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
         </div>
         <div class="instagram">
-            <a href="https://www.instagram.com/camping__cave/" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-instagram"></ion-icon></a>
+            <a href="#" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-instagram"></ion-icon></a>
         </div>
         <div class="youtube">
-            <a href="https://www.youtube.com/channel/UCCFSJpD2T30UFGrcs3yD_yA" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-youtube"></ion-icon></a>
+            <a href="#" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-youtube"></ion-icon></a>
         </div>
-    </div>
+    </div> -->
     {% endif %}
     
     <header class="{% if current_user.is_authenticated and current_user.isConfirm %}isAuthenticated{% endif %}">
@@ -146,8 +146,8 @@
             {% endwith %}
             {% block content %}{% endblock %}
             <div class="loading-container">
-            {% if Store %}
-                {% for c in Store.store %}
+            {% if loading %}
+                {% for c in loading %}
                     {% if c == ' ' %}
                     <span>-</span>
                     {% else %}
@@ -326,6 +326,22 @@
             })
         }
 
+        function currencyUSD(precision) {
+            var numbers = document.querySelectorAll('.currency-usd')
+            Array.from(numbers).forEach(n => {
+                var text = $(n).text()
+                $(n).text(accounting.formatMoney(text, {
+                                                    precision: precision,
+                                                    format: {
+                                                        pos: "%v%s",
+                                                        neg: "-%v%s",
+                                                        zero: '...'
+                                                    }
+                                                }))
+                
+            })
+        }
+
         function _Chart(div, canvas, type, data, prefix, suffix) {
             this.div = div
             this.canvas = canvas
@@ -449,7 +465,7 @@
             },
             {
                 route: 'financial',
-                sub: ['cashing', 'order', 'stock', 'expense', 'transaction', 'financial']
+                sub: ['cashing', 'order', 'stock', 'expense', 'transaction', 'financial', 'payment']
             },
             {
                 route: 'customize',

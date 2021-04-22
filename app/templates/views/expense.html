@@ -126,13 +126,14 @@
                 </span></div>
             </td>`
     }
+    currencyFormat()
+    $('#list-expenses').DataTable({
+        "pageLength": 25,
+        "drawCallback": function( settings ) {
+            
+        }
+    })
     $(document).ready(function () {
-        currencyFormat()
-        $('#list-expenses').DataTable({
-            "drawCallback": function( settings ) {
-                
-            }
-        })
         $(document).on('click', '.fa-trash-o', function() {
             id = $(this).closest('tr').attr('id')
             if (confirm('Deleting an expense may cause an unaccurate data. Are you sure you want to delete it? ')) {

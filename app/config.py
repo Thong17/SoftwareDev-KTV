@@ -4,7 +4,7 @@ mysqlObj = {
     'user': 'root',
     'password': 'myroot',
     'host': 'localhost',
-    'database': 'mart_shop'
+    'database': 'restaurant'
 }
 
 class Config():

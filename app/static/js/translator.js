@@ -135,7 +135,9 @@ $.fn.translator = function () {
             totalReturn: 'Total Return',
             money: 'Money',
             counter: 'Counter',
-            continue: 'Continue'
+            continue: 'Continue',
+            remain: 'Remain',
+            totalRemain: 'Total Remain'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -276,8 +278,9 @@ $.fn.translator = function () {
             totalReturn: 'ប្រាក់អាប់',
             money: 'សាច់ប្រាក់',
             counter: 'បញ្ជរ',
-            continue: 'បន្ត'
-
+            continue: 'បន្ត',
+            remain: 'នៅសល់',
+            totalRemain: 'សរុបជំពាក់'
         }
     }
     language = $('html').attr('data-lang')
@@ -288,6 +291,8 @@ $.fn.translator = function () {
         }
     })
 
+    $('.ln-total-remain').text(languages[language].totalRemain)
+    $('.ln-remain').text(languages[language].remain)
     $('.ln-continue').text(languages[language].continue)
     $('.ln-counter').text(languages[language].counter)
     $('.ln-money').text(languages[language].money)

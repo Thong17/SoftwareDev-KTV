@@ -16,13 +16,15 @@ $(document).on('click', '.order-btn', function() {
                 Array.from(transactions).forEach(t => {
                     transactionArr.push($(t).attr('id'))
                 })
+                var customer = $('#select-customer').val()
                 var json = JSON.stringify(transactionArr)
                 if (id == '') {
                     $.ajax({
                         url: '/payment',
                         type: 'POST',
                         data: {
-                            data: json
+                            data: json,
+                            customer: customer
                         },
                         dataType: 'json',
                         success: function(data) {
@@ -76,6 +78,15 @@ $(document).on('click', '.order-btn', function() {
                                                             })+`</td>
                                                         </tr>`
                                 })
+
+                                checkout = accounting.formatMoney(data.data.remain, {
+                                    precision: 2,
+                                    format: {
+                                        pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
+                                        neg: "%v%s",
+                                        zero: '...'
+                                    }
+                                })
                                 
                                 $('#item-invoice').html(invoice_item)
                                 $('#totalCash').text('...')
@@ -84,7 +95,7 @@ $(document).on('click', '.order-btn', function() {
                                 $('#paymentModel').modal('show')
                                 $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
                                                     <span class="color-font ln-checkout">Check Out: </span>
-                                                    <span class="currency-format color-text" id="paymentAmount">`+accounting.formatMoney(data.data.amount)+`</span>
+                                                    <span class="currency-format color-text" id="paymentAmount">`+checkout+`</span>
                                                 </div>`).translator()
                                 $('#receive-cash').val('').focus()
                                 $('.payment-add').attr('disabled', false)
@@ -150,6 +161,15 @@ $(document).on('click', '.order-btn', function() {
                                                         })+`</td>
                                                     </tr>`
                             })
+
+                            checkout = accounting.formatMoney(data.data.remain, {
+                                precision: 2,
+                                format: {
+                                    pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
+                                    neg: "%v%s",
+                                    zero: '...'
+                                }
+                            })
                             
                             $('#item-invoice').html(invoice_item)
                             $('#totalCash').text('...')
@@ -158,7 +178,7 @@ $(document).on('click', '.order-btn', function() {
                             $('#paymentModel').modal('show')
                             $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
                                                 <span class="color-font ln-checkout">Check Out: </span>
-                                                <span class="currency-format color-text" id="paymentAmount">`+accounting.formatMoney(data.data.amount)+`</span>
+                                                <span class="currency-format color-text" id="paymentAmount">`+checkout+`</span>
                                             </div>`).translator()
                             $('#receive-cash').val('').focus()
                             $('.payment-add').attr('disabled', false)
@@ -358,8 +378,17 @@ $(document).on('click', '.checkout-btn', function() {
                                                         }
                                                     })
 
-                var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">Total Paid:</span><span>'+format_money+'</span></div><div class="total-change"><span class="color-font ln-total-cost">Total Cost:</span><span>'+accounting.formatMoney(amount, {format:{pos:'%v%s'}})+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
-                                                    
+                total_remain = accounting.formatMoney(data.total_remain, {
+                    precision: 2,
+                    format: {
+                        pos: "%v%s",
+                        neg: "%v%s",
+                        zero: '...'
+                    }
+                })
+
+                var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">Total Paid:</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">Total Remain:</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
+                                                      
                 changeArr.forEach(m => {
                     if (m.money != 0) {
                         var money_currency = ''
@@ -401,7 +430,15 @@ $(document).on('click', '.checkout-btn', function() {
                 $('.transaction-item').find('.remove-btn').addClass('hide')
                 
             } else {
-                $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+accounting.formatMoney(amount)+'</span></div>').translator()
+                checkout = accounting.formatMoney(amount, {
+                    precision: 2,
+                    format: {
+                        pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
+                        neg: "%v%s",
+                        zero: '...'
+                    }
+                })
+                $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
                 alert(data.result)
             }
         }
@@ -421,6 +458,15 @@ $(document).on('click', '.close-payment', function() {
         'id': '',
         'data-change': true
     })
+    output = ''
+    Array.from($('#select-customer').children()).forEach(o => {
+        if ($(o).text() == 'Customer') {
+            output += '<option value="'+$(o).attr('value')+'" selected>'+$(o).text()+'</option>'
+        } else {
+            output += '<option value="'+$(o).attr('value')+'">'+$(o).text()+'</option>'
+        }
+    })
+    $('.selectpicker').selectpicker('refresh').empty().append(output).selectpicker('refresh').trigger('change')
     // Unbind Click event when close payment
     $('.product-btn').attr('disabled', false)
     $('.sum-order').text(0)

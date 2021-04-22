@@ -122,7 +122,7 @@
         </div>
     </div>
     <div class="grid-products product-container">
-        <div class="empty-result hide color-text">No product found...</div>
+        <div class="empty-result hide color-text ln-result">No product found...</div>
         {% if products %}
             {% for product in products %}
                 {% if current_user.id in product.listFavorite|tojson|safe %}
@@ -274,7 +274,7 @@
                 {% endif %}
             {% endfor %}
         {% else %}
-        <div class="empty-result color-text">No product found...</div>
+        <div class="empty-result color-text ln-result">No product found...</div>
         {% endif %}
     </div>
 </div>

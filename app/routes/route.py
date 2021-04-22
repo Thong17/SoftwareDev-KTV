@@ -255,7 +255,7 @@ def save_photo(id):
 @route.route('/setting')
 @login_required
 def setting():
-    return render_template('views/setting.html')
+    return render_template('views/setting.html', loading='Loading')
 
 
 @route.route('/custome', methods=['POST', 'GET'])
@@ -1175,7 +1175,8 @@ def cashing(token):
         brands = tblBrand.query.all()
         categories = tblCategory.query.all()
         store = tblStore.query.first()
-        return render_template('views/cashing.html', products=products, brands=brands, categories=categories, store=store)
+        customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
+        return render_template('views/cashing.html', products=products, brands=brands, categories=categories, store=store, customers=customers)
     else:
         return redirect('/financial/authentication')
 
@@ -1395,14 +1396,18 @@ def checkout(id):
         return jsonify({'result': 'Order has paid already!'})
     else:
         drawer = tblDrawer.query.get(current_user.drawer)
+        if payment.rate is None:
+            payment.rate = drawer.rate
         jsonObj = json.loads(request.form['data'])
         amounts = jsonObj['amounts']
         amount = 0
-        amountUSD = 0
-        amountKHR = 0
+        amountUSD = Decimal(payment.receive.split(',')[0])
+        amountKHR = Decimal(payment.receive.split(',')[1])
 
         paidKHR = 0
         paidUSD = 0
+
+        remainKHR = payment.remain
 
         for a in amounts:
             if a['currency'] == 'KHR':
@@ -1414,9 +1419,16 @@ def checkout(id):
                 paidUSD += Decimal(a['amount'])
             amount += Decimal(a['amount'])
 
-
-        if amount >= payment.amount:
-            moneys = []
+        remainKHR -= paidUSD
+        if remainKHR > 0:
+            remainKHR *= drawer.rate / 4000
+            remain = paidUSD + remainKHR
+        else:
+            remain = paidUSD
+        moneys = []
+        
+        if round(amount, 2) >= round(remain, 2):
+            payment.paid += payment.remain
             change = 0
             
             moneyObj = {
@@ -1424,14 +1436,16 @@ def checkout(id):
                 'currency': 'USD'
             }
 
-            paymentAmount = payment.amount
+            paymentAmount = payment.remain
+            
             paymentAmount -= paidUSD
             if paymentAmount > 0:
                 paymentAmount *= drawer.rate / 4000
-                change = paidKHR - paymentAmount
+                change = round(paidKHR, 4) - round(paymentAmount, 4)
             else:
-                change = paidUSD - payment.amount
+                change = paidUSD - payment.remain
             total_change = change
+            payment.remain = 0
 
             for money in (sorted(drawer.moneys, key=operator.attrgetter('value'), reverse=True)):
                 convertMoney = 0
@@ -1461,31 +1475,39 @@ def checkout(id):
                         transaction.profit -= quantity.soq.cost * quantity.quantity
 
             payment.isComplete = True
-
-            payment.receive = str(amountUSD) + ',' + str(amountKHR)
-            payment.rate = drawer.rate
             payment.change = total_change
-
-            if payment.orderPayment:
-                payment.orderPayment[0].checkin.order.status = 'Open'
-                payment.orderPayment[0].checkin.isCompleted = True
-            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                                ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
-            db.session.add(Activity)
-            db.session.commit()
-            return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate, 'total_change': total_change})
         else:
-            return jsonify({'result': 'Not enough money'})
+            payment.paid += amount
+            payment.remain = (remain - amount) * 4000 / drawer.rate
+            total_change = 0
 
+        payment.receive = str(amountUSD) + ',' + str(amountKHR)
+        
+        if payment.orderPayment:
+            payment.orderPayment[0].checkin.order.status = 'Open'
+            payment.orderPayment[0].checkin.isCompleted = True
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                            ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
+        db.session.add(Activity)
+        db.session.commit()
+        return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate, 'total_change': total_change, 'isComplete': payment.isComplete, 'total_receive': payment.receive, 'total_remain': payment.remain, 'total_paid': payment.paid})
+        
+@route.route('/payments')
+@is_authorized('Cashier')
+@login_required
+@is_confirmed()
+def payments():
+    store = tblStore.query.first()
+    payments = tblPayment.query.filter(tblPayment.isComplete == False).all()
+    return render_template('views/payment.html', payments=payments, store=store)
 
 @route.route('/transaction')
 @is_authorized('Cashier')
 @login_required
 @is_confirmed()
 def transaction():
-    Transactions = tblTransaction.query.order_by(
-        tblTransaction.createdOn).all()
-    Payments = tblPayment.query.order_by(tblPayment.invoice).all()
+    Transactions = tblTransaction.query.order_by(tblTransaction.createdOn.desc()).all()
+    Payments = tblPayment.query.order_by(tblPayment.invoice.desc()).all()
     return render_template('views/transaction.html', transactions=Transactions, payments=Payments)
 
 
@@ -2123,7 +2145,7 @@ def index():
     products = tblProduct.query.all()
     advertises = tblAdvertise.query.all()
     store = tblStore.query.first()
-    return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises, Store=store)
+    return render_template('views/home.html', categories=categories, brands=brands, products=products, advertises=advertises, loading=store.store)
 
 
 @route.route('/about')
@@ -2630,11 +2652,12 @@ def add_customer():
     username = request.form['fname']
     phone = request.form['phone']
     birthdate = request.form['birthdate']
+    description = request.form['description']
     if birthdate == '':
         birthdate = None
     id = str(uuid4())
     Customer = tblCustomer(id=id, name=username, phone=phone,
-                           birthdate=birthdate, createdBy=current_user.id)
+                           birthdate=birthdate, description=description, createdBy=current_user.id)
 
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                            ' has added customer: '+Customer.name, type='Add', createdBy=current_user.id)
@@ -2644,7 +2667,7 @@ def add_customer():
         db.session.commit()
         return jsonify({'msg': 'Success', 'username': username, 'phone': phone, 'birthdate': birthdate, 'id': id})
     except:
-        return jsonify({'msg': 'Failed to create new user'})
+        return jsonify({'msg': 'Failed to create new user! Make sure that the name is unique.'})
 
 
 @route.route('/order', methods=['POST', 'GET'])
@@ -2772,11 +2795,12 @@ def payment():
     Payments = tblPayment.query.with_entities(tblPayment.id).all()
     Drawer = tblDrawer.query.get(current_user.drawer)
     transactions = json.loads(request.form['data'])
+    customer = request.form['customer']
     if transactions:
         id = str(uuid4())
         invoice = 'INV' + str(len(Payments) + 1).zfill(7)
         Payment = tblPayment(
-            id=id, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
+            id=id, invoice=invoice, createdBy=current_user.id, orderedBy=customer, drawerId=current_user.drawer)
         db.session.add(Payment)
         totalPayment = 0
         for transaction in transactions:
@@ -2784,6 +2808,7 @@ def payment():
             totalPayment += Transaction.amount
             Payment.transactions.append(Transaction)
         Payment.amount = totalPayment
+        Payment.remain = totalPayment
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                                ' has ordered invoice: '+invoice, type='Order', createdBy=current_user.id)
         db.session.add(Activity)
@@ -2807,7 +2832,7 @@ def checkin(order_id):
         pid = str(uuid4())
         invoice = 'INV' + str(len(Payments) + 1).zfill(7)
         Payment = tblPayment(
-            id=pid, invoice=invoice, createdBy=current_user.id, drawerId=current_user.drawer)
+            id=pid, invoice=invoice, createdBy=current_user.id, orderedBy=Order.orderedBy, drawerId=current_user.drawer)
         CheckIn = tblCheckin(id=id, createdBy=current_user.id,
                              orderId=order_id, paymentId=pid)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
@@ -2942,6 +2967,16 @@ def order_transaction(product_id):
         return jsonify(resultObj)
 
 
+@route.route('/payments/<id>', methods=['POST'])
+def get_payments(id):
+    Drawer = tblDrawer.query.get(current_user.drawer)
+    Payment = tblPayment.query.get(id)
+
+    p = PaymentSchema()
+    payment = p.dump(Payment)
+    return jsonify({'data': payment, 'rate': Drawer.rate})
+
+
 @route.route('/payment/<id>', methods=['POST'])
 def get_payment(id):
     Drawer = tblDrawer.query.get(current_user.drawer)
@@ -2960,6 +2995,7 @@ def get_payment(id):
             if Transaction not in Payment.transactions:
                 Payment.transactions.append(Transaction)
         Payment.amount = total
+        Payment.remain = total
         db.session.commit()
 
     p = PaymentSchema()
