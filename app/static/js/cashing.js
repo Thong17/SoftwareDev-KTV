@@ -17,6 +17,9 @@ $(document).on('click', '.order-btn', function() {
                     transactionArr.push($(t).attr('id'))
                 })
                 var customer = $('#select-customer').val()
+                if (customer == undefined) {
+                    customer = ''
+                }
                 var json = JSON.stringify(transactionArr)
                 if (id == '') {
                     $.ajax({
@@ -110,7 +113,8 @@ $(document).on('click', '.order-btn', function() {
                         url: '/payment/'+id,
                         type: 'POST',
                         data: {
-                            data: json
+                            data: json,
+                            customer: customer
                         },
                         success: function(data) {
                             $('.order-btn').attr('data-change', false)
@@ -191,20 +195,8 @@ $(document).on('click', '.order-btn', function() {
         } else {
             $('#input-quantity').focus()
         }
-    }
-    
-    
+    }    
 })
-
-function amountList(id, money, currency, unit) {
-    return `<tr id="`+id+`">
-                <td class="pre-money">`+money+`</td>
-                <td class="pre-currency" style="text-align:center;">`+currency+`</td>
-                <td class="pre-unit" style="text-align:center;">`+unit+`</td>
-                <td class="pre-total" style="text-align:center;">`+money * unit+`</td>
-                <td class="color-text flex-between-center clear-btn"><ion-icon name="close-outline"></ion-icon></td>
-            </tr>`
-}
 
 $(document).on('click', '.clear-btn', function() {
     var id = $(this).closest('tr').attr('id')
@@ -244,11 +236,16 @@ $(document).on('click', '.checkout-btn', function() {
     var payment = $('.payment-total').attr('id')
     var amount = accounting.unformat($(this).find('#paymentAmount').text())
     var json = JSON.stringify(paymentObj)
+    var customer = $('#select-customer').val()
+    if (customer == undefined) {
+        customer = ''
+    }
     $.ajax({
         url: '/checkout/'+payment,
         type: 'POST',
         data: {
-            data: json
+            data: json,
+            customer: customer
         },
         dataType: 'json',
         beforeSend: function() {
@@ -256,6 +253,7 @@ $(document).on('click', '.checkout-btn', function() {
         },
         success: function(data) {
             if (data.result == 'Success') {
+                
                 $('.payment-add').attr('disabled', true)
                 $('.clear-btn ion-icon').addClass('hide')
                 var changeObj = {
@@ -435,7 +433,7 @@ $(document).on('click', '.checkout-btn', function() {
                     format: {
                         pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
                         neg: "%v%s",
-                        zero: '...'
+                        zero: '%v%s'
                     }
                 })
                 $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
@@ -445,32 +443,6 @@ $(document).on('click', '.checkout-btn', function() {
     })
 })
 
-$(document).on('click', '.close-payment', function() {
-    var transactions = document.querySelectorAll('.transaction-item')
-    Array.from(transactions).forEach(t => {
-        $(t).remove()
-    })
-    paymentObj.amounts = []
-    $('#paymentModel').modal('hide')
-    $('#list-payment').empty()
-    $('#sumTotal').text(accounting.formatMoney(0))
-    $('.order-btn').attr({
-        'id': '',
-        'data-change': true
-    })
-    output = ''
-    Array.from($('#select-customer').children()).forEach(o => {
-        if ($(o).text() == 'Customer') {
-            output += '<option value="'+$(o).attr('value')+'" selected>'+$(o).text()+'</option>'
-        } else {
-            output += '<option value="'+$(o).attr('value')+'">'+$(o).text()+'</option>'
-        }
-    })
-    $('.selectpicker').selectpicker('refresh').empty().append(output).selectpicker('refresh').trigger('change')
-    // Unbind Click event when close payment
-    $('.product-btn').attr('disabled', false)
-    $('.sum-order').text(0)
-})
 
 
 

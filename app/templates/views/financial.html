@@ -17,13 +17,8 @@
             
         </a>
     </li>
-    <li class="menu-stock">
-        <a href="/stock" class="stock">
-            
-        </a>
-    </li>
-    <li class="menu-expense">
-        <a href="/expense" class="expense">
+    <li class="menu-owe">
+        <a href="/owe" class="owe ln-owe">
             
         </a>
     </li>
@@ -37,11 +32,29 @@
             
         </a>
     </li>
+    <li class="menu-stock">
+        <a href="/stock" class="stock">
+            
+        </a>
+    </li>
+    <li class="menu-expense">
+        <a href="/expense" class="expense">
+            
+        </a>
+    </li>
 </ul>
 {% endblock %}
 
 {% block content %}
 <div class="wrap-container grid-container">
+    <div class="grid-item">
+        <div class="item-header stock">
+            
+        </div>
+        <div class="item-body" id="pieStock">
+            <canvas id="chartStock"></canvas>
+        </div>
+    </div>
     <div class="grid-item">
         <div class="item-header cashing">
             
@@ -72,14 +85,6 @@
         </div>
         <div class="item-body" id="pieExpense">
             <canvas id="chartExpense"></canvas>
-        </div>
-    </div>
-    <div class="grid-item">
-        <div class="item-header stock">
-            
-        </div>
-        <div class="item-body" id="pieStock">
-            <canvas id="chartStock"></canvas>
         </div>
     </div>
 </div>

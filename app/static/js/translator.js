@@ -137,7 +137,10 @@ $.fn.translator = function () {
             counter: 'Counter',
             continue: 'Continue',
             remain: 'Remain',
-            totalRemain: 'Total Remain'
+            totalRemain: 'Total Remain',
+            owe: 'Owe',
+            totalInvoice: 'Total Invoice',
+            orderSchedule: 'Order Schedule'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -148,7 +151,7 @@ $.fn.translator = function () {
             reports: 'របាយការណ៍',
             configuration: 'កំណត់',
             cashing: 'គិតលុយ',
-            order: 'កក់',
+            order: 'កម្មង់',
             stock: 'ស្តុក',
             expense: 'ចំណាយ',
             transaction: 'ប្រតិបត្តិការ',
@@ -280,7 +283,10 @@ $.fn.translator = function () {
             counter: 'បញ្ជរ',
             continue: 'បន្ត',
             remain: 'នៅសល់',
-            totalRemain: 'សរុបជំពាក់'
+            totalRemain: 'សរុបជំពាក់',
+            owe: 'ជំពាក់',
+            totalInvoice: 'វិក្កយបត្រសរុប',
+            orderSchedule: 'កាលវិភាគកម្មង់'
         }
     }
     language = $('html').attr('data-lang')
@@ -291,7 +297,10 @@ $.fn.translator = function () {
         }
     })
 
+    $('.ln-order-schedule').text(languages[language].orderSchedule)
+    $('.ln-total-invoice').text(languages[language].totalInvoice)
     $('.ln-total-remain').text(languages[language].totalRemain)
+    $('.ln-owe').text(languages[language].owe)
     $('.ln-remain').text(languages[language].remain)
     $('.ln-continue').text(languages[language].continue)
     $('.ln-counter').text(languages[language].counter)

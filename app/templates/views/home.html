@@ -209,7 +209,8 @@
 <!-- <div class="landing-container">
 
 </div> -->
-<div class="advertise-container">
+{% if advertises %}
+<div class="advertise-container mb-5">
     <div id="advertise" class="carousel slide" data-ride="carousel">
         <ul class="carousel-indicators">
             {% for advertise in advertises %}
@@ -236,7 +237,7 @@
         </div>
     </div>
 </div>
-<br>
+{% endif %}
 <div class="wrap-container flex-between-start">
     <div class="side-container">
         <h3>Filter</h3>
@@ -360,12 +361,6 @@
 <script>
 
     $(document).ready(function () {
-        gsap.from('.social-nav', {
-            opacity: 0,
-            x: 70,
-            delay: 1,
-            duration: 0.7
-        })
         $('.loading-container').addClass('hide')
         currencyFormat()
         var products = Array.from(document.querySelectorAll('.product-item'))

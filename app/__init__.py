@@ -218,7 +218,6 @@ class tblCheckout(db.Model):
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     orderId = db.Column(db.String(36), db.ForeignKey('tbl_order.id'), nullable=False)
 
-# Endwork
 
 payment = db.Table('payment',
     db.Column('payment_id', db.String(36), db.ForeignKey('tbl_payment.id')),
@@ -240,6 +239,11 @@ class tblTransaction(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     quantities = db.relationship('tblQuantity', backref='quantities', lazy=True, cascade='save-update, merge, delete', single_parent=True)
 
+owe = db.Table('owe',
+    db.Column('payment_id', db.String(36), db.ForeignKey('tbl_payment.id')),
+    db.Column('owe_id', db.String(36), db.ForeignKey('tbl_owe.id'))
+)
+
 class tblPayment(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     isComplete = db.Column(db.Boolean, default=False)
@@ -248,7 +252,7 @@ class tblPayment(db.Model):
     paid = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     remain = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     receive = db.Column(db.String(20), nullable=True, default='0,0')
-    rate = db.Column(db.Numeric(10,4), nullable=True)
+    rate = db.Column(db.Numeric(10,4), nullable=True, default=4000)
     change = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     orderedBy = db.Column(db.String(36), db.ForeignKey('tbl_customer.id'), nullable=False)
@@ -256,6 +260,19 @@ class tblPayment(db.Model):
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
     orderPayment = db.relationship('tblCheckin', backref='orderPayment', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     transactions = db.relationship('tblTransaction', secondary=payment, backref='transactions', lazy='dynamic')
+    owePayments = db.relationship('tblOwe', secondary=owe, backref='owePayments', lazy='dynamic')
+
+class tblOwe(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    invoice = db.Column(db.String(20), nullable=True)
+    amount = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    rate = db.Column(db.Numeric(10,4), nullable=True)
+    paid = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    remain = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    receive = db.Column(db.String(20), nullable=True, default='0,0')
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    owedBy = db.Column(db.String(36), db.ForeignKey('tbl_customer.id'), nullable=False)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
@@ -459,6 +476,8 @@ class tblCustomer(db.Model):
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     customerOrder = db.relationship('tblOrder', backref='customerOrder', lazy=True)
     customerPayment = db.relationship('tblPayment', backref='customerPayment', lazy=True)
+    customerOwe = db.relationship('tblOwe', backref='customerOwe', lazy=True)
+
 
 class tblActivity(db.Model):
     id = db.Column(db.String(36), primary_key=True)
@@ -570,7 +589,14 @@ class RoleSchema(ModelSchema):
     class Meta:
         model = tblRole
 
+class OweSchema(ModelSchema):
+    owePayments = fields.Nested(PaymentSchema, many=True)
+    class Meta:
+        model = tblOwe
+
 class CustomerSchema(ModelSchema):
+    customerPayment = fields.Nested(PaymentSchema, many=True)
+    customerOwe = fields.Nested(OweSchema, many=True)
     class Meta:
         model = tblCustomer
 

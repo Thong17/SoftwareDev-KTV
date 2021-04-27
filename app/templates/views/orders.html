@@ -304,7 +304,7 @@
         <div class="border-right"></div>
         <div class="column-wrapper" id="list-orders">
             <div class="column-title flex-center-center mb-3" style="text-align: center;">
-                <h4 class="notranslate color-font m-0 order">Order</h4>
+                <h4 class="notranslate color-font m-0 ln-order-schedule"></h4>
             </div>
             <!-- <div id='external-events'>
                 <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
@@ -488,7 +488,7 @@
                             <td class="color-text flex-between-center"><span>`+ date + `</span><span class="remove-order"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
                             </tr>`
                     })
-                    $('.column-title').html('<h4 class="notranslate color-font m-0">Order</h4>')
+                    $('.column-title').html('<h4 class="notranslate color-font m-0 ln-order-schedule"></h4>')
                     $('.calendar-container').html(`<div class="date-header">
                         <div class="select-list">
                             <select id="select-order" class="input-color m-0" name="select-order">
@@ -545,7 +545,7 @@
                                 <td class="color-text flex-between-center"><span>`+ date + `</span></td>
                                 </tr>`
                         })
-                        $('.column-title').html('<h4 class="notranslate color-font m-0">Order</h4>')
+                        $('.column-title').html('<h4 class="notranslate color-font m-0 ln-order-schedule"></h4>')
                         $('.calendar-container').html(`<div class="date-header">
                             <div class="select-list">
                                 <select id="select-order" class="input-color m-0" name="select-order">
@@ -598,7 +598,7 @@
                                 <td class="color-text flex-between-center"><span>`+ date + `</span><span class="remove-order"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
                                 </tr>`
                         })
-                        $('.column-title').html('<h4 class="notranslate color-font m-0">Order</h4>')
+                        $('.column-title').html('<h4 class="notranslate color-font m-0 ln-order-schedule"></h4>')
                         $('.calendar-container').html(`<div class="date-header">
                             <div class="select-list">
                                 <select id="select-order" class="input-color m-0" name="select-order">
@@ -651,6 +651,16 @@
             room = $('#input-room')
             from = $('#order-from')
             to = $('#order-to')
+
+            d = new Date()
+            h = (d.getHours()<10?'0':'') + d.getHours()
+            m = (d.getMinutes()<10?'0':'') + d.getMinutes()
+            
+            if (from.val() == '' || to.val() == '') {
+                from.val(h+':'+m)
+                to.val(h+':'+m)
+            }
+
             date = $('.fc-toolbar-title').text()
             if (customer.val() == '' || room.val() == '' || from.val() == '' || to.val() == '') {
                 msg = 'Please fill the requirement to submit order.'
@@ -754,7 +764,6 @@
                 type: 'POST',
                 success: function (data) {
                     eventsArr = []
-                    console.log(data)
                     data.orders.forEach(o => {
                         obj = {
                             title: o.customerOrder.name + ' ' + o.customerOrder.phone,

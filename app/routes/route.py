@@ -1,7 +1,7 @@
 from app import bcrypt, db, login_manager, upload, delete_photo, utc2local, datetimefilter
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout, tblCheckin
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout, tblCheckin, tblOwe
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm, ExpenseForm, StoreForm, FloorForm
-from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema, FloorSchema, StoreSchema, RoomSchema, OrderSchema, CheckoutSchema, OutcomeSchema
+from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema, FloorSchema, StoreSchema, RoomSchema, OrderSchema, CheckoutSchema, OutcomeSchema, CustomerSchema, OweSchema
 from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from uuid import uuid4
@@ -1392,17 +1392,23 @@ def delete_transaction(id):
 @route.route('/checkout/<id>', methods=['POST'])
 def checkout(id):
     payment = tblPayment.query.get(id)
+    customer = request.form['customer']
+    
     if payment.isComplete:
         return jsonify({'result': 'Order has paid already!'})
     else:
+        if customer != '':
+            payment.orderedBy = customer
+            db.session.commit()
         drawer = tblDrawer.query.get(current_user.drawer)
         if payment.rate is None:
             payment.rate = drawer.rate
         jsonObj = json.loads(request.form['data'])
         amounts = jsonObj['amounts']
         amount = 0
-        amountUSD = Decimal(payment.receive.split(',')[0])
-        amountKHR = Decimal(payment.receive.split(',')[1])
+
+        amountUSD = 0
+        amountKHR = 0
 
         paidKHR = 0
         paidUSD = 0
@@ -1421,7 +1427,7 @@ def checkout(id):
 
         remainKHR -= paidUSD
         if remainKHR > 0:
-            remainKHR *= drawer.rate / 4000
+            remainKHR *= payment.rate / 4000
             remain = paidUSD + remainKHR
         else:
             remain = paidUSD
@@ -1437,10 +1443,11 @@ def checkout(id):
             }
 
             paymentAmount = payment.remain
+            oweRemain = paymentAmount
             
             paymentAmount -= paidUSD
             if paymentAmount > 0:
-                paymentAmount *= drawer.rate / 4000
+                paymentAmount *= payment.rate / 4000
                 change = round(paidKHR, 4) - round(paymentAmount, 4)
             else:
                 change = paidUSD - payment.remain
@@ -1476,21 +1483,67 @@ def checkout(id):
 
             payment.isComplete = True
             payment.change = total_change
-        else:
-            payment.paid += amount
-            payment.remain = (remain - amount) * 4000 / drawer.rate
-            total_change = 0
+            msg = ''
+            payment.receive = str(amountUSD + Decimal(payment.receive.split(',')[0])) + ',' + str(amountKHR + Decimal(payment.receive.split(',')[1]))
 
-        payment.receive = str(amountUSD) + ',' + str(amountKHR)
+            if payment.customerPayment.customerOwe:
+                cashUSD = amountUSD + Decimal(payment.customerPayment.customerOwe[0].receive.split(',')[0]) - Decimal(payment.receive.split(',')[0])
+                cashKHR = amountKHR + Decimal(payment.customerPayment.customerOwe[0].receive.split(',')[1]) - Decimal(payment.receive.split(',')[1])
+            else:
+                cashUSD = amountUSD
+                cashKHR = amountKHR
+            receive = str(cashUSD) + ',' + str(cashKHR)
+            if payment.customerPayment.customerOwe:
+                if payment in payment.customerPayment.customerOwe[0].owePayments:
+                    payment.customerPayment.customerOwe[0].remain -= oweRemain
+                    payment.customerPayment.customerOwe[0].amount -= payment.amount
+                    payment.customerPayment.customerOwe[0].paid += oweRemain
+                    payment.customerPayment.customerOwe[0].receive = receive
+
+            if payment.orderPayment:
+                payment.orderPayment[0].checkin.order.status = 'Open'
+                payment.orderPayment[0].checkin.isCompleted = True
+            Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
+            db.session.add(Activity)
+            db.session.commit()
+            return jsonify({'result': 'Success', 'msg': '', 'change': moneys, 'rate': payment.rate, 'total_change': total_change, 'isComplete': payment.isComplete, 'total_receive': payment.receive, 'total_remain': payment.remain, 'total_paid': payment.paid})
+        else:
+            if payment.customerPayment.customerOwe:
+                payment.paid += paidUSD + (paidKHR * 4000 / payment.rate)
+                payment.remain = (remain - amount) * 4000 / payment.rate
+
+                payment.receive = str(amountUSD + Decimal(payment.receive.split(',')[0])) + ',' + str(amountKHR + Decimal(payment.receive.split(',')[1]))
+                total_change = 0
+
+                receive = str(amountUSD + Decimal(payment.customerPayment.customerOwe[0].receive.split(',')[0])) + ',' + str(amountKHR + Decimal(payment.customerPayment.customerOwe[0].receive.split(',')[1]))
+
+                if payment in payment.customerPayment.customerOwe[0].owePayments:
+                    payment.customerPayment.customerOwe[0].remain -= paidUSD + (paidKHR * 4000 / payment.rate)
+                    payment.customerPayment.customerOwe[0].paid += paidUSD + (paidKHR * 4000 / payment.rate)
+                    payment.customerPayment.customerOwe[0].receive = receive
+                else:
+                    payment.customerPayment.customerOwe[0].owePayments.append(payment)
+                    payment.customerPayment.customerOwe[0].amount += payment.amount
+                    payment.customerPayment.customerOwe[0].remain += payment.remain
+                    payment.customerPayment.customerOwe[0].paid += payment.paid
+                    payment.customerPayment.customerOwe[0].receive = receive
+    
+                msg = 'Payment still remain '+ str(round(payment.remain, 2))+'$ for customer name: '+payment.customerPayment.name
+                if payment.orderPayment:
+                    payment.orderPayment[0].checkin.order.status = 'Open'
+                    payment.orderPayment[0].checkin.isCompleted = True
+                
+                Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                                    ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
+                db.session.add(Activity)
+                db.session.commit()
+                return jsonify({'result': 'Success', 'msg': msg, 'change': moneys, 'rate': payment.rate, 'total_change': total_change, 'isComplete': payment.isComplete, 'total_receive': payment.receive, 'total_remain': payment.remain, 'total_paid': payment.paid})
+            else:
+                msg = 'Please select a customer to proceed the remaining payment!'
+                return jsonify({'result': msg, 'rate': payment.rate})
+
         
-        if payment.orderPayment:
-            payment.orderPayment[0].checkin.order.status = 'Open'
-            payment.orderPayment[0].checkin.isCompleted = True
-        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                            ' has checked out payment '+payment.invoice, type='Payment', createdBy=current_user.id)
-        db.session.add(Activity)
-        db.session.commit()
-        return jsonify({'result': 'Success', 'change': moneys, 'rate': drawer.rate, 'total_change': total_change, 'isComplete': payment.isComplete, 'total_receive': payment.receive, 'total_remain': payment.remain, 'total_paid': payment.paid})
         
 @route.route('/payments')
 @is_authorized('Cashier')
@@ -1498,11 +1551,24 @@ def checkout(id):
 @is_confirmed()
 def payments():
     store = tblStore.query.first()
-    payments = tblPayment.query.filter(tblPayment.isComplete == False).all()
-    return render_template('views/payment.html', payments=payments, store=store)
+    payments = tblPayment.query.all()
+    current = datetime.utcnow()
+    return render_template('views/payment.html', payments=payments, store=store, current=current)
+
+
+@route.route('/owe')
+@is_authorized('Cashier')
+@login_required
+@is_confirmed()
+def owe():
+    store = tblStore.query.first()
+    customers = tblCustomer.query.all()
+    current = datetime.utcnow()
+    return render_template('views/owe.html', customers=customers, store=store, current=current)
+
 
 @route.route('/transaction')
-@is_authorized('Cashier')
+@is_authorized('Admin')
 @login_required
 @is_confirmed()
 def transaction():
@@ -2659,9 +2725,12 @@ def add_customer():
     Customer = tblCustomer(id=id, name=username, phone=phone,
                            birthdate=birthdate, description=description, createdBy=current_user.id)
 
+    Owe = tblOwe(id=str(uuid4()), invoice='OWE_'+username, owedBy=id, createdBy=current_user.id)
+
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                            ' has added customer: '+Customer.name, type='Add', createdBy=current_user.id)
     try:
+        db.session.add(Owe)
         db.session.add(Activity)
         db.session.add(Customer)
         db.session.commit()
@@ -2800,7 +2869,7 @@ def payment():
         id = str(uuid4())
         invoice = 'INV' + str(len(Payments) + 1).zfill(7)
         Payment = tblPayment(
-            id=id, invoice=invoice, createdBy=current_user.id, orderedBy=customer, drawerId=current_user.drawer)
+            id=id, invoice=invoice, createdBy=current_user.id, orderedBy=customer, rate=Drawer.rate, drawerId=current_user.drawer)
         db.session.add(Payment)
         totalPayment = 0
         for transaction in transactions:
@@ -2974,14 +3043,17 @@ def get_payments(id):
 
     p = PaymentSchema()
     payment = p.dump(Payment)
-    return jsonify({'data': payment, 'rate': Drawer.rate})
+    return jsonify({'data': payment})
 
 
 @route.route('/payment/<id>', methods=['POST'])
 def get_payment(id):
     Drawer = tblDrawer.query.get(current_user.drawer)
     Payment = tblPayment.query.get(id)
-
+    customer = request.form['customer']
+    if customer != '':
+        Payment.orderedBy = customer
+        db.session.commit()
     if Payment.transactions:
         total = 0
         for Transaction in Payment.transactions:
@@ -2996,7 +3068,7 @@ def get_payment(id):
                 Payment.transactions.append(Transaction)
         Payment.amount = total
         Payment.remain = total
-        db.session.commit()
+    db.session.commit()
 
     p = PaymentSchema()
     payment = p.dump(Payment)
@@ -3068,6 +3140,14 @@ def print_invoice(id):
     Store = tblStore.query.first()
     return render_template('views/invoice.html', payment=Payment, store=Store)
 
+
+@route.route('/invoice_owe/<id>')
+def print_invoice_owe(id):
+    Owe = tblOwe.query.get(id)
+    Store = tblStore.query.first()
+    return render_template('views/invoice_owe.html', payment=Owe, store=Store)
+
+
 @route.route('/backup', methods=['POST'])
 def backup():
     try:
@@ -3111,5 +3191,191 @@ def change_lang():
     user.language = lang
     db.session.commit()
     return jsonify({'lang': lang})
+
+
+@route.route('/customer/owe/<id>', methods=['POST'])
+def get_owe(id):
+    Customer = tblCustomer.query.get(id)
+    json = CustomerSchema()
+    customer = json.dump(Customer)
+    return jsonify(customer)
+
+
+@route.route('/checkout/owe/<id>', methods=['POST'])
+def checkout_owe(id):
+    customer = tblCustomer.query.get(id)
+    drawer = tblDrawer.query.get(current_user.drawer)
+
+    moneys = []
+    listMoney = []
+    if drawer:
+        rate = drawer.rate
+        listMoney = sorted(drawer.moneys, key=operator.attrgetter('value'), reverse=True)
+    else:
+        rate = 4000
+    jsonObj = json.loads(request.form['data'])
+    amounts = jsonObj['amounts']
+
+    amount = 0
+    total = 0
+    remain = 0
+
+    receiveKHR = 0
+    receiveUSD = 0
+
+    amountUSD = 0
+    amountKHR = 0
+
+    paidKHR = 0
+    paidUSD = 0
+
+    total_change = 0
+
+    for a in amounts:
+        if a['currency'] == 'KHR':
+            amountKHR += Decimal(a['amount'])
+            a['amount'] = Decimal(a['amount']) / 4000
+            paidKHR += Decimal(a['amount'])
+        else:
+            amountUSD += Decimal(a['amount'])
+            paidUSD += Decimal(a['amount'])
+        amount += Decimal(a['amount'])
+    
+    receiveOweUSD = amountUSD
+    receiveOweKHR = amountKHR
+
+    paidKHR = round(paidKHR, 3)
+
+    total_receive = str(amountUSD)+','+str(amountKHR)
+    totalUSD = 0
+    totalKHR = 0
+
+    if customer:
+        customer.customerOwe[0].rate = rate
+        customer.customerOwe[0].amount = 0
+        customer.customerOwe[0].remain = 0
+        customer.customerOwe[0].paid = 0
+
+        oweUSD = customer.customerOwe[0].receive.split(',')[0]
+        oweKHR = customer.customerOwe[0].receive.split(',')[1]
+
+        for payment in sorted(customer.customerOwe[0].owePayments, key=operator.attrgetter('remain'), reverse=False):
+            if not payment.isComplete:
+                total += payment.amount
+
+                receiveUSD = Decimal(payment.receive.split(',')[0])
+                receiveKHR = Decimal(payment.receive.split(',')[1])
+
+                totalUSD += receiveUSD
+                totalKHR += receiveKHR
+                
+                if round(paidUSD, 2) >= round(payment.remain, 2):
+                    payment.receive = str(payment.remain + receiveUSD) +','+str(round(receiveKHR, 0))
+                    paidUSD -= payment.remain
+                    amountUSD -= payment.remain
+                    receiveOweUSD = amountUSD
+                    payment.paid += payment.remain
+                    customer.customerOwe[0].remain = 0
+                    customer.customerOwe[0].paid = 0
+                    customer.customerOwe[0].receive = '0,0'
+                                        
+                    oweUSD = 0
+                    oweKHR = 0
+                    payment.remain = 0
+                    payment.isComplete = True
+                    for transaction in payment.transactions:
+                        transaction.isComplete = True
+                        transaction.profit = transaction.amount
+                        if transaction.quantities:
+                            for quantity in transaction.quantities:
+                                transaction.profit -= quantity.soq.cost * quantity.quantity
+                else:
+                    remainKHR = payment.remain
+                    remainKHR -= round(paidUSD, 2)
+                    
+                    payment.paid += paidUSD
+                    payment.remain = remainKHR
+
+                    remainUSD = paidUSD
+
+                    paidUSD = 0
+
+                    remainKHR = round(remainKHR * rate / 4000, 2)
+                    if paidKHR >= remainKHR:
+                        payment.receive = str(receiveUSD + remainUSD)+','+str(round(receiveKHR + (remainKHR * rate), 0))                        
+                        
+                        amountKHR -= remainKHR * 4000
+                        receiveOweKHR = amountKHR
+                        paidKHR -= remainKHR
+                        customer.customerOwe[0].remain = 0
+                        customer.customerOwe[0].paid = 0
+                        customer.customerOwe[0].receive = '0,0'
+
+                        oweKHR = 0
+                        oweUSD = 0
+                        payment.paid += payment.remain
+                        payment.remain = 0
+                        payment.isComplete = True
+                        for transaction in payment.transactions:
+                            transaction.isComplete = True
+                            transaction.profit = transaction.amount
+                            if transaction.quantities:
+                                for quantity in transaction.quantities:
+                                    transaction.profit -= quantity.soq.cost * quantity.quantity
+                    else:
+                        receiveKHR = amountKHR
+                        payment.paid += (paidKHR * 4000 / rate)
+                        payment.remain -= paidKHR * 4000 / rate
+
+                        customer.customerOwe[0].amount += payment.amount
+                        customer.customerOwe[0].remain += payment.amount - payment.paid
+                        customer.customerOwe[0].paid += payment.paid
+                        
+                        receive = str(amountUSD + Decimal(payment.receive.split(',')[0]))+','+str(round(receiveKHR, 0) + Decimal(payment.receive.split(',')[1]))
+                        payment.receive = receive
+
+                        oweReceive = str(receiveOweUSD + Decimal(oweUSD)) + ',' + str(receiveOweKHR + Decimal(oweKHR))
+                        customer.customerOwe[0].receive = oweReceive
+
+                        amountUSD = 0
+                        amountKHR = 0
+                        paidKHR = 0
+                        remain += payment.remain
+
+
+        total_receive = str(Decimal(total_receive.split(',')[0]) + totalUSD) +','+ str(Decimal(total_receive.split(',')[1]) + totalKHR)
+
+        if paidKHR > 0 or paidUSD > 0:
+            change = paidKHR + paidUSD
+            total_change = change
+            moneyObj = {
+                'money': change,
+                'currency': 'USD'
+            }
+            for money in listMoney:
+                convertMoney = 0
+                if money.currency == 'KHR':
+                        convertMoney = money.money / 4000
+                else:
+                    convertMoney = money.money
+                if money.unit > 0 and convertMoney <= change:
+                    for unit in range(int(money.unit)):
+                        if convertMoney <= change:
+                            moneys.append({
+                                'money': money.money,
+                                'currency': money.currency
+                            })
+                            money.unit -= 1
+                            change -= convertMoney
+                            moneyObj['money'] = change
+
+            moneys.append(moneyObj)
+
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                           ' has checkout owe total: '+str(amount), type='Checkout', createdBy=current_user.id)
+    db.session.add(Activity)
+    db.session.commit()
+        
+    return jsonify({'result': 'Success', 'change': moneys, 'rate': rate, 'total_change': total_change, 'total_receive': total_receive, 'total_remain': remain, 'total_paid': amount, 'id': customer.customerOwe[0].id})
 
    

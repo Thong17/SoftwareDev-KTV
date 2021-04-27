@@ -635,7 +635,7 @@
             {% if products %}
             {% for product in products %}
             {% if current_user.id in product.listFavorite|tojson|safe %}
-            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}" data-barcode="{{product.barcode}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
                 <div class="item-wrapper">
@@ -693,7 +693,7 @@
                 </div>
             </div>
             {% else %}
-            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}" data-barcode="{{product.barcode}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
                 <div class="item-wrapper">
@@ -1041,11 +1041,29 @@
 
 {% block script %}
 <script src="{{url_for('static', filename='js/printThis.js')}}"></script>
+<script src="{{url_for('static', filename='js/jquery.barcode.js')}}"></script>
 <script src="{{url_for('static', filename='js/cashing.js')}}"></script>
 <script src="{{url_for('static', filename='js/attrchange.js')}}"></script>
 
 <!-- <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script> -->
 <script>
+
+    onScan.attachTo(document, {
+        suffixKeyCodes: [13], // enter-key expected at the end of a scan
+        reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+        onScan: function(barcode, iQty) { // Alternative to document.addEventListener('scan')
+            console.log(barcode)
+
+            products = document.querySelectorAll('.product-item')
+            Array.from(products).forEach(p => {
+                console.log($(p).attr('data-barcode'))
+                if ($(p).attr('data-barcode') == barcode) {
+                    $(p).find('.product-btn').click()
+                }
+            })
+        },
+    })
+
     $(document).on('click', '.dropdown-menu', function(event) {
         event.stopPropagation()
     })

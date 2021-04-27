@@ -335,7 +335,7 @@
                                                     format: {
                                                         pos: "%v%s",
                                                         neg: "-%v%s",
-                                                        zero: '...'
+                                                        zero: '%v%s'
                                                     }
                                                 }))
                 
@@ -465,7 +465,7 @@
             },
             {
                 route: 'financial',
-                sub: ['cashing', 'order', 'stock', 'expense', 'transaction', 'financial', 'payment']
+                sub: ['cashing', 'order', 'stock', 'expense', 'transaction', 'financial', 'payments', 'owe']
             },
             {
                 route: 'customize',
@@ -664,6 +664,39 @@
                 })
             }
             return temp
+        }
+
+        function accountMoney(amount) {
+            precision = 0
+            if (amount % 1 != 0) {
+                precision = 2
+            }
+            return accounting.formatMoney(amount, {precision: precision, format: {pos: "%v", neg: "%v", zero: '%v'}})
+        }
+
+        function amountList(id, money, currency, unit) {
+            return `<tr id="`+id+`">
+                        <td class="pre-money">`+accountMoney(money)+`</td>
+                        <td class="pre-currency" style="text-align:center;">`+currency+`</td>
+                        <td class="pre-unit" style="text-align:center;">`+unit+`</td>
+                        <td class="pre-total" style="text-align:center;">`+accountMoney(money * unit)+`</td>
+                        <td class="color-text flex-between-center clear-btn"><ion-icon name="close-outline"></ion-icon></td>
+                    </tr>`
+        }
+
+        function accountUSD(amount) {
+            return accounting.formatMoney(amount, {precision: 2, format: {pos: "%v%s", neg: "%v%s", zero: '%v%s'}})
+        }
+
+        function accountKHR(amount) {
+            return accounting.formatMoney(Math.round(amount / 100) * 100, {
+                        precision: 0,
+                        format: {
+                            pos: "%v\u17DB",
+                            neg: "%v\u17DB",
+                            zero: '%v\u17DB'
+                        }
+                    })
         }
 
         function valueForm(name, price, details, currency) {

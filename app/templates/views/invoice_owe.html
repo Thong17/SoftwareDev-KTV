@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ store.store }} - {{ payment.invoice }}</title>
+    <link rel="icon" href="{{url_for('static', filename='svg/icon.png')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/print.css')}}">
+</head>
+
+<body>
+    <div id="print" class="invoice-container">
+        <div class="store-name">{{ store.store }}</div>
+        <div class="location">{{ store.location }}</div>
+        <div class="contact-number mb-5">{{ store.phone }}</div>
+        <div class="date-time">
+            <span class="date">Date: {{ payment.createdOn | datetimefilter('%a, %b %d %Y') }}</span>
+            <span class="time">{{ payment.createdOn | datetimefilter }}</span>
+        </div>
+        <div class="invoice-cashier mb-3">
+            <span class="invoice">Invoice: {{ payment.invoice }}</span>
+            <span class="invoice">Cashier: {{ current_user.username }}</span>
+        </div>
+        <div class="transaction-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td style="width: 50%;">Description</td>
+                        <td style="width: 15%;">Price</td>
+                        <td style="width: 10%;">Disc</td>
+                        <td style="width: 10%;">Qty</td>
+                        <td style="width: 15%;">Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in payment.transactions %}
+                    <tr>
+                        <td>{{ transaction.description }}</td>
+                        <td class="dollar-format">{{ transaction.price }}</td>
+                        <td>{{ transaction.discount }}%</td>
+                        <td>{{ transaction.quantity }}</td>
+                        <td class="dollar-format">{{ transaction.amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="bottom-spacing"></div>
+        </div>
+        <div class="total-container pt-3">
+            <span style="width: 50%;">Total</span>
+            <div class="total-details">
+                <div class="total-price pb-2">
+                    <div class="total-usd flex-between">
+                        <span>USD:</span>
+                        <span class="dollar-format">{{ payment.amount }}</span>
+                    </div>
+                    <div class="total-khr flex-between">
+                        <span>KHR:</span>
+                        <span class="riel-format">{{ payment.amount * payment.rate }}</span>
+                    </div>
+                </div>
+                <div class="total-return">
+                    <div class="receive-cash flex-between">
+                        <span>Paid:</span>
+                        <div><span class="receive">{{ payment.receive }}</span></div>
+                    </div>
+                    <div class="return-cash flex-between">
+                        <span>Remain:</span>
+                        <div class="flex-column-start"><span class="dollar-format">{{ payment.remain }}</span><span class="riel-format">{{ payment.remain * payment.rate }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-container">Thank you for comming</div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='js/printThis.js')}}"></script>
+    <script src="{{url_for('static', filename='js/accounting.js')}}"></script>
+
+    <script>
+        function dollarFormat(currency, decimal, isAttribute) {
+            var numbers = document.querySelectorAll('.dollar-format')
+            Array.from(numbers).forEach(n => {
+                var text = $(n).text()
+                $(n).text(accounting.formatMoney(text, {
+                                    precision: 2,
+                                    format: {
+                                        pos: "%v%s",
+                                        neg: "%v%s",
+                                        zero: '...'
+                                    }
+                                }))
+            })
+        }
+        function rielFormat(currency, decimal, isAttribute) {
+            var numbers = document.querySelectorAll('.riel-format')
+            Array.from(numbers).forEach(n => {
+                var text = $(n).text()
+                $(n).text(accounting.formatMoney(text, {
+                                    precision: 0,
+                                    format: {
+                                        pos: "(%v\u17DB)",
+                                        neg: "(%v\u17DB)",
+                                        zero: ''
+                                    }
+                                }))
+            })
+        }
+        $(document).ready(function() {
+            dollarFormat()
+            rielFormat()
+            $('#print').printThis()
+            receive = $('.receive').text()
+            usd = receive.split(',')[0]
+            khr = receive.split(',')[1]
+            formatUSD = accounting.formatMoney(usd, {
+                precision: 2,
+                format: {
+                            pos: "%v%s",
+                            neg: "-%v%s",
+                            zero: ''
+                        }
+            })
+            formatKHR = accounting.formatMoney(khr, {
+                precision: 0,
+                format: {
+                            pos: "%v\u17DB",
+                            neg: "-%v\u17DB",
+                            zero: ''
+                        }
+            })
+            if (usd > 0 && khr > 0) {
+                receive = $('.receive').text(formatUSD + '+' +formatKHR)
+            } else {
+                if (usd > 0) {
+                    receive = $('.receive').text(formatUSD)
+                }
+                if (khr > 0) {
+                    receive = $('.receive').text(formatKHR)
+                }
+            }
+            
+        })
+    </script>
+</body>
+</html>

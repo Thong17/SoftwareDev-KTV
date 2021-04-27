@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{{url_for('static', filename='css/buttons.dataTables.min.css')}}">
 <style>
     #payment-add:hover {
-        color: var(--color-font) !important;
+        color: #0686f0 !important;
     }
 
     thead tr {
@@ -33,7 +33,7 @@
     .dataTables_info {
         display: none;
     }
-    select, input {
+    .dataTables_length select, input {
         border-radius: 10px !important;
         border: 1px solid var(--color-hr) !important;
     }
@@ -84,10 +84,10 @@
                     <td class="color-text transaction-inv">{{ payment.invoice }}</td>
                     <td class="color-text currency-usd">{{ payment.amount }}</td>
                     <td class="color-text currency-usd" id="paymentPaid">{{ payment.paid }}</td>
-                    <td class="color-text currency-usd" id="paymentRemain">{{ payment.remain }}</td>
+                    <td class="color-text currency-usd underline" id="paymentRemain">{{ payment.remain }}</td>
                     <td class="color-text">{% if payment.customerPayment.name == '' %}...{% else %}{{ payment.customerPayment.name }}{% endif %}</td>
                     <td class="color-text">{% if payment.customerPayment.phone == '' %}...{% else %}{{ payment.customerPayment.phone }}{% endif %}</td>
-                    <td class="color-text">{{ payment.createdOn | datetimefilter('%Y/%m/%d %H:%M:%S') }}</td>
+                    <td class="color-text">{{ (current - payment.createdOn).days }} days</td>
                     <td class="color-text" id="paymentStatus">
                         {% if payment.isComplete %}
                             Completed
@@ -300,7 +300,7 @@
                             zero: '...'
                         }
                     }))
-                    $('#totalKHR').text(accounting.formatMoney(Math.round(data.data.amount * data.rate / 100) * 100, {
+                    $('#totalKHR').text(accounting.formatMoney(Math.round(data.data.amount * data.data.rate / 100) * 100, {
                         precision: 0,
                         format: {
                             pos: "%v\u17DB",
@@ -342,7 +342,15 @@
                     })
                     
                     $('#item-invoice').html(invoice_item)
-                    $('#totalChange').text('...')
+                    total_change = accounting.formatMoney(data.data.change, {
+                                                                precision: 2,
+                                                                format: {
+                                                                    pos: "%v%s("+Math.round(data.data.change * 4000 / 100) * 100+"\u17DB)",
+                                                                    neg: "%v%s",
+                                                                    zero: '...'
+                                                                }
+                                                            })
+                    $('#totalChange').text(total_change)
 
                     dlr = data.data.receive.split(',')[0]
                     khr = data.data.receive.split(',')[1]
@@ -394,9 +402,9 @@
                     checkout = accounting.formatMoney(data.data.remain, {
                         precision: 2,
                         format: {
-                            pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
+                            pos: "%v%s("+Math.round(data.data.remain * data.data.rate / 100) * 100+"\u17DB)",
                             neg: "%v%s",
-                            zero: '...'
+                            zero: '%v%s'
                         }
                     })
 
@@ -420,7 +428,8 @@
                 url: '/checkout/'+payment,
                 type: 'POST',
                 data: {
-                    data: json
+                    data: json,
+                    customer: ''
                 },
                 dataType: 'json',
                 beforeSend: function() {
@@ -546,7 +555,7 @@
                                                                 format: {
                                                                     pos: "%v%s",
                                                                     neg: "%v%s",
-                                                                    zero: '...'
+                                                                    zero: '%v%s'
                                                                 }
                                                             })
 
@@ -555,7 +564,7 @@
                             format: {
                                 pos: "%v%s",
                                 neg: "%v%s",
-                                zero: '...'
+                                zero: '%v%s'
                             }
                         })
 

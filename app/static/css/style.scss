@@ -113,6 +113,19 @@ tbody tr td i {
     height: 100vh;
 }
 
+.flex-between-center .bootstrap-select .dropdown-toggle:focus, .form-group .bootstrap-select .dropdown-toggle:focus {
+    outline: none !important;
+    outline: none !important;
+    outline-offset: 0 !important;
+}
+
+.btn-light.focus, .btn-light:focus, .btn-light:hover {
+    color: var(--color-text) !important;
+    background-color: var(--color-bg) !important;
+    border-color: var(--color-hover) !important;
+    box-shadow: none !important;
+}
+
 .form-control {
     border-radius: 7px;
     z-index: 10;
@@ -217,6 +230,10 @@ input[type=date] {
     &::-webkit-datetime-edit-date-field {
         pointer-events: none;
     }
+}
+
+.underline {
+    text-decoration: underline !important;
 }
 
 

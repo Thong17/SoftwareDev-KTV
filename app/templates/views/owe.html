@@ -1,0 +1,625 @@
+{% extends 'views/financial.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/dataTables.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/buttons.dataTables.min.css')}}">
+<style>
+    .btn-checkout:hover {
+        color: #0686f0 !important;
+    }
+
+    .checkout-owe {
+        cursor: pointer;
+    }
+
+    thead tr {
+        background-color: var(--color-menu) !important;
+    }
+
+    .invoice-table td, .money-table td {
+        padding: 5px !important;
+        font-size: 13px !important;
+    }
+
+    .invoice-table tbody tr td, .money-table tbody tr td {
+        font-size: 11px !important;
+    }
+
+    .dataTables_wrapper {
+        width: 100%;
+    }
+
+    .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_empty, select, input, .dataTables_paginate a {
+        color: var(--color-text) !important;
+        font-weight: 300;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
+    }
+    .dataTables_info {
+        display: none;
+    }
+    .dataTables_length select, input {
+        border-radius: 10px !important;
+        border: 1px solid var(--color-hr) !important;
+    }
+    select:focus, input:focus {
+        outline: none;
+    }
+    tbody tr td {
+        background-color: var(--color-bg) !important;
+        height: 30px;
+    }
+    table {
+        border-bottom: none !important;
+    }
+    .paginate_button, .paginate_button.current {
+        background-color: var(--color-menu) !important;
+        background: var(--color-menu) !important;
+        border: var(--color-menu) !important;
+        color: var(--color-font) !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: var(--color-text) !important;
+    }
+    span .paginate_button, span .paginate_button.current {
+        color: var(--color-font) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+    <table class="table" id="list-payments">
+        <thead>
+            <tr class="color-font">
+                <td class="color-text ln-customer">Customer</td>
+                <td class="color-text ln-contact">Contact</td>
+                <td class="color-text ln-owe">Remain</td>
+                <td class="color-text"></td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+                {% if customer.customerOwe %}
+                <tr class="customer-item notranslate" style="font-size: 13px;" id="{{ customer.id }}">
+                    <td class="color-text" id="customerName">{% if customer.name == '' %}...{% else %}{{ customer.name }}{% endif %}</td>
+                    <td class="color-text">{% if customer.phone == '' %}...{% else %}{{ customer.phone }}{% endif %}</td>
+                    <td class="color-text currency-usd underline" id="paymentRemain">{{ customer.customerOwe[0].remain }}</td>
+                    <td class="color-text flex-end">
+                        <span id="{{ customer.id }}" class="p-2 btn-checkout"><i class="fa fa-usd" aria-hidden="true"></i></span>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="paymentModel" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body" style="padding: 0; height: 80vh;">
+                <div class="payment-container">
+                    <div class="payment-bill">
+                        <div class="payment-header">
+                            <div class="payment-type">
+                                <div class="type-btn type-cash color-text active ln-cash"></div>
+                                <div class="type-btn type-card color-text ln-card"></div>
+                            </div>
+                        </div>
+                        <div class="payment-body">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <input type="number" step="any" class="form-control input-color"
+                                            name="receive-cash" id="receive-cash" required>
+                                        <label for="receive-cash" class="label receive-cash ln-amount"></label>
+                                        <select name="receive-currency" id="receive-currency"
+                                            class="form-control input-color">
+                                            <option value="USD"><span>&#36;</span></option>
+                                            <option value="KHR"><span>&#6107;</span></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 pl-0">
+                                    <div class="form-group">
+                                        <button class="btn border color-text payment-add">
+                                            <ion-icon name="add-outline" style="vertical-align: middle"></ion-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="money-container mt-3" style="height: 100%; overflow: auto">
+                                <table class="table money-table">
+                                    <thead>
+                                        <tr class="color-font notranslate">
+                                            <td style="width: 40%;" class="ln-paid"></td>
+                                            <td style="width: 15%; text-align:center;" class="ln-currency"></td>
+                                            <td style="width: 10%; text-align:center;" class="ln-unit"></td>
+                                            <td style="width: 25%; text-align:center;" class="ln-total"></td>
+                                            <td style="width: 10%;"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="list-payment" class="color-text notranslate"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="payment-total color-text notranslate">
+
+                        </div>
+                    </div>
+                    <div class="payment-invoice">
+                        <div class="invoice-header">
+                            <h5 class="color-text notranslate" style="text-align: center; font-size: 23px; font-weight: 700;">{{ store.store }}</h5>
+                        </div>
+                        <div class="invoice-body">
+                            <div class="shop-details flex-column-start-center mb-1">
+                                <p class="color-text invoice-text "><span class="ln-contact"></span>: {{ store.phone }}</p>
+                                <p class="color-text notranslate invoice-text">{{ store.location }}</p>
+                            </div>
+                            <div class="flex-between-center pb-1">
+                                <p class="color-text invoice-text"><span class="ln-date"></span>: <span id="invoiceDate" class="notranslate"></span></p>
+                                <p class="color-text notranslate invoice-text"><span id="invoiceTime"></span></p>
+                            </div>
+                            <div class="flex-between-center border-dashed py-1">
+                                <p class="color-text invoice-text"><span class="ln-total-invoice"></span>: <span class="notranslate" id="invoiceNo"></span></p>
+                                <p class="color-text invoice-text"><span class="ln-cashier"></span>: <span
+                                        class="notranslate invoice-text">{{ current_user.username }}</span></p>
+                            </div>
+                            <div class="item-payment">
+                                <table class="table invoice-table">
+                                    <thead>
+                                        <tr class="color-font">
+                                            <td style="width: 40%;" class="notranslate invoice-text ln-description"></td>
+                                            <td style="width: 15%; text-align:center;" class="invoice-text ln-price"></td>
+                                            <td style="width: 10%; text-align:center;" class="notranslate ln-disc invoice-text"></td>
+                                            <td style="width: 15%; text-align:center;" class="notranslate ln-qty invoice-text"></td>
+                                            <td style="width: 20%; text-align:center;" class="invoice-text ln-total"></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="item-invoice" class="color-text notranslate"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="invoice-total border-dashed">
+                            <div class="flex-between-start" style="width: 100%;">
+                                <p class="color-text invoice-text ln-total" style="width: 50%;">Total</p>
+                                <div class="flex-between-center notranslate" style="width: 50%;">
+                                    <p class="color-text invoice-text">USD:</p>
+                                    <p class="color-text invoice-text" id="totalUSD"><span>&#36;</span></p>
+                                </div>
+                            </div>
+                            <div class="flex-between-center notranslate">
+                                <p class="color-text invoice-text">KHR:</p>
+                                <p class="color-text invoice-text" id="totalKHR"><span>&#6107;</span></p>
+                            </div>
+                            <div class="flex-between-center border-dashed my-1 pt-1 notranslate">
+                                <p class="color-text invoice-text ln-paid">Cash:</p>
+                                <p class="color-text invoice-text" id="totalCash">...</p>
+                            </div>
+                            <div class="flex-between-center notranslate">
+                                <p class="color-text invoice-text ln-return">Return:</p>
+                                <p class="color-text invoice-text" id="totalChange">...</p>
+                            </div>
+                        </div>
+                        <div class="invoice-footer">
+                            <p class="color-text ln-greet">Thank you for purchasing</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="customerOwe" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title color-font flex-between-center" style="width: 100%;"><div><span class="ln-total-owe">Total owe: </span><span class="title"></span></div><div class="total-owe"></div></h4>
+            </div>
+            <div class="modal-body" style="height: 500px; overflow-y: scroll;">
+                <table class="table">
+                    <thead>
+                        <tr class="color-font">
+                            <td class="color-text ln-invoice">Invoice</td>
+                            <td class="color-text ln-amount">Amount</td>
+                            <td class="color-text ln-paid">Paid</td>
+                            <td class="color-text ln-remain">Remain</td>
+                            <td class="color-text ln-since">Since</td>
+                        </tr>
+                    </thead>
+                    <tbody id="list-owes">
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn color-font close-modal ln-close" data-dismiss="modal"></button>
+                <button type="button" class="btn color-font border ln-checkout btn-checkout"></button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{{url_for('static', filename='js/dataTables.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
+<script>
+    currencyUSD(2)
+    $('#list-payments').DataTable({
+        "pageLength": 25,
+        "drawCallback": function( settings ) {
+            
+        }
+    })
+
+    function sortArrayKey(array, key) {
+        return array.sort(function(a, b) {
+            var x = a[key]; var y = b[key]
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0))
+        })
+    }
+
+    $(document).ready(function() {
+        $(document).on('click', '.customer-item', function() {
+            id = $(this).attr('id')
+            $.ajax({
+                url: '/customer/owe/'+id,
+                type: 'POST',
+                success: function(data) {
+                    console.log(data)
+                    $('#customerOwe').find('.title').text($('.customer-item#'+id).find('#customerName').text())
+                    element = ''
+                    totalOwe = 0
+                    customerPayment = sortArrayKey(data.customerOwe[0].owePayments, 'invoice')
+                    customerPayment.forEach(p => {
+                        if (p.isComplete == false) {
+                            date = new Date(convertUTCDateToLocalDate(new Date(p.createdOn))).toDateString()
+                            totalOwe += p.remain
+                            element += `<tr class="color-text">
+                                            <td>`+p.invoice+`</td>
+                                            <td>`+accountUSD(p.amount)+`</td>
+                                            <td>`+accountUSD(p.paid)+`</td>
+                                            <td>`+accountUSD(p.remain)+`</td>
+                                            <td>`+date+`</td>
+                                        </tr>`
+                        }
+                    })
+                    $('.total-owe').text(accountUSD(totalOwe))
+                    $('#list-owes').html(element)
+                    $('#customerOwe').find('.btn-checkout').attr('id', id)
+                    $('#customerOwe').modal('show')
+                }
+            })
+        })
+    })
+
+    $(document).on('click', '.btn-checkout', function(e) {
+        e.stopPropagation()
+        $('#customerOwe').modal('hide')
+        id = $(this).attr('id')
+        console.log(id)
+        $.ajax({
+            url: '/customer/owe/'+id,
+            type: 'POST',
+            success: function(data) {
+                console.log(data)
+                time = new Date().toLocaleTimeString()
+                date = new Date().toDateString()
+                $('#invoiceTime').text(time)
+                $('#invoiceDate').text(date)
+
+                payments = []
+                totalUSD = 0
+                totalKHR = 0
+
+                remainUSD = 0
+                remainKHR = 0
+
+                receiveUSD = 0
+                receiveKHR = 0
+
+                data.customerOwe[0].owePayments.forEach(p => {
+                    if (p.isComplete == false) {
+                        payments.push(p)
+                        totalUSD += p.amount
+                        totalKHR += p.amount * p.rate
+
+                        remainUSD += p.remain
+                        remainKHR += p.remain * p.rate
+                    }
+                })
+
+                receive = '...'
+
+                receiveUSD += parseFloat(data.customerOwe[0].receive.split(',')[0])
+                receiveKHR = parseFloat(data.customerOwe[0].receive.split(',')[1])
+
+
+                if (receiveUSD > 0 && receiveKHR > 0) {
+                    receive = accountUSD(receiveUSD) +' + '+accountKHR(receiveKHR)
+                } else {
+                    if (receiveUSD > 0) {
+                        receive = accountUSD(receiveUSD)
+                    } 
+                    if (receiveKHR > 0) {
+                        receive = accountKHR(receiveKHR)
+                    }
+                }
+
+                transactions = []
+
+                payments.forEach(p => {
+                    p.transactions.forEach(t => {
+                        obj = {
+                            id: t.id,
+                            description: t.description,
+                            discount: t.discount,
+                            quantity: t.quantity,
+                            price: t.price
+                        }
+                        if (transactions.some(a => a.description == t.description) && transactions.some(a => a.discount == t.discount) && transactions.some(a => a.price == t.price)) {
+                            transactions.forEach(i => {
+                                if (i.description == t.description && i.discount == t.discount && i.price == t.price) {
+                                    i.quantity += t.quantity
+                                }
+                            })
+                        } else {
+                            transactions.push(obj)
+                        }
+                    })
+                })
+
+                element = ''
+                transactions.forEach(t => {
+                    amount = t.price * t.quantity - (t.price * parseFloat(t.discount) / 100)
+                    element += '<tr><td>'+t.description+'</td><td>'+accountUSD(t.price)+'</td><td>'+t.discount+'%</td><td>'+t.quantity+'</td><td>'+accountUSD(amount)+'</td></tr>'
+                })
+
+                $('#item-invoice').html(element)
+
+                $('#invoiceNo').text(payments.length)
+
+                $('#totalUSD').text(accountUSD(totalUSD))
+                $('#totalKHR').text(accountKHR(totalKHR))
+                $('.payment-total').attr('id', id).html(`<div class="checkout-owe">
+                                                <span class="color-font ln-checkout">Check Out: </span>
+                                                <span class="currency-format color-text" id="paymentAmount">`+accountUSD(remainUSD)+`(`+accountKHR(remainKHR)+`)</span>
+                                            </div>`).translator()
+                $('#receive-cash').val('').focus()
+                $('#totalCash').text(receive)
+                $('#paymentModel').modal('show')
+            }
+        })
+    })
+
+    paymentObj = {
+        'amounts': []
+    }
+
+    $(document).on('click', '.clear-btn', function() {
+        var id = $(this).closest('tr').attr('id')
+        paymentObj.amounts.forEach((a, i) => {
+            if (a.id == id) {
+                paymentObj.amounts.splice(i, 1)
+                $('#'+id).remove()
+            }
+        })
+    })
+
+    $(document).on('click', '.payment-add', function() {
+        var amount = $('#receive-cash').val()
+        var currency = $('#receive-currency').val()
+        if (amount > 0) {
+            var id = generateString(8)
+            $('#list-payment').append(amountList(id, amount, currency, 1))
+            paymentObj.amounts.push({
+                'id': id,
+                'amount': amount,
+                'currency': $('#receive-currency').val()
+            })
+        } else {
+            $('#receive-cash').focus()
+        }
+    })
+
+    $(document).on('click', '.checkout-owe', function() {
+        id = $(this).closest('.payment-total').attr('id')
+        json = JSON.stringify(paymentObj)
+        $.ajax({
+            url: '/checkout/owe/'+id,
+            type: 'POST',
+            data: {
+                data: json
+            },
+            beforeSend: function() {
+                $('.payment-total').html('<span class="loading-gif"><img src="/static/icons/loading.gif" alt="" srcset=""></span>')
+            },
+            success: function(data) {
+                if (data.result == 'Success') {
+                    var changeObj = {
+                        'moneys': [],
+                        'currencies': []
+                    }
+
+                    var moneyArr = []
+                    var changeArr = []
+
+                    data.change.forEach(c => {
+                        if (moneyArr.includes(c.money+c.currency)) {
+                            changeArr.forEach(a => {
+                                if (a.money == c.money && a.currency == c.currency) {
+                                    a.unit += 1
+                                }
+                            })
+                        } else {
+
+                            moneyArr.push(c.money+c.currency)
+                            changeArr.push({
+                                'money': c.money,
+                                'currency': c.currency,
+                                'unit': 1
+                            })
+                        }
+                        
+                        changeObj.moneys.push(c.money)
+                        changeObj.currencies.push(c.currency)
+                        
+                    })
+
+                    var change = 0
+
+                    for (let i = 0; i < changeObj.moneys.length; i++) {
+                        var money = changeObj.moneys[i];
+                        var currency = changeObj.currencies[i];
+                        if (currency == 'KHR') {
+                            money /= data.rate
+                        }
+                        change += money
+                    }
+
+                    var paid = 0
+                    var khr = data.total_receive.split(',')[1]
+                    var dlr = data.total_receive.split(',')[0]
+
+                    var format_money = ''
+
+                    if (khr == 0) {
+
+                        format_money = accounting.formatMoney(dlr, {
+                                                                precision: 2,
+                                                                format: {
+                                                                    pos: "%v%s",
+                                                                    neg: "%v%s",
+                                                                    zero: '...'
+                                                                }
+                                                            })
+                    } else if (dlr == 0) {
+
+                        format_money = accounting.formatMoney(khr, {
+                            precision: 0,
+                            format: {
+                                pos: "%v\u17DB",
+                                neg: "%v\u17DB",
+                                zero: '...'
+                            }
+                        })
+                    } else {
+
+                        dlr = accounting.formatMoney(dlr, {
+                            precision: 2,
+                            format: {
+                                pos: "%v%s",
+                                neg: "%v%s",
+                                zero: '...'
+                            }
+                        })
+
+                        khr = accounting.formatMoney(khr, {
+                            precision: 0,
+                            format: {
+                                pos: "%v\u17DB",
+                                neg: "%v\u17DB",
+                                zero: '...'
+                            }
+                        })
+
+                        format_money = dlr +' + '+khr
+                    }
+
+                    $('#totalCash').text(format_money)
+
+                    $('#totalChange').text(accounting.formatMoney(data.total_change, {
+                        precision: 2,
+                        format: {
+                            pos: "%v%s("+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
+                            neg: "%v%s",
+                            zero: '...'
+                        }
+                    }))
+
+                    total_change = accounting.formatMoney(data.total_change, {
+                                                            precision: 2,
+                                                            format: {
+                                                                pos: "%v%s",
+                                                                neg: "%v%s",
+                                                                zero: '...'
+                                                            }
+                                                        })
+
+                    total_remain = accounting.formatMoney(data.total_remain, {
+                        precision: 2,
+                        format: {
+                            pos: "%v%s",
+                            neg: "%v%s",
+                            zero: '%v%s'
+                        }
+                    })
+
+                    $('.customer-item#'+id).find('#paymentRemain').text(total_remain)
+
+                    var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">Total Paid:</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">Total Remain:</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
+                                                        
+                    changeArr.forEach(m => {
+                        if (m.money != 0) {
+                            var money_currency = ''
+                            var money = 0
+                            if (m.currency == 'USD') {
+                                money_currency = 'x'+m.unit
+
+                                money = accounting.formatMoney(m.money, {
+                                    precision: 2,
+                                    format: {
+                                        pos: "%v%s("+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
+                                        neg: "%v",
+                                        zero: '...'
+                                    }
+                                })
+                            } else {
+                                money_currency = 'x'+m.unit
+
+                                money = accounting.formatMoney(m.money, {
+                                    precision: 0,
+                                    format: {
+                                        pos: "%v\u17DB",
+                                        neg: "%v",
+                                        zero: '...'
+                                    }
+                                })
+                            }
+                            element += '<div class="change-row"><span>'+m.currency+' '+money+'</span><span>'+money_currency+'</span></div>'
+                        }
+                    })
+
+                    element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close">Continue</button><a href="/invoice_owe/'+data.id+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
+                    $('.payment-total').html(element).translator()
+                    $('#list-payment').empty()
+                    $('#receive-cash').val('')
+                    paymentObj.amounts = []
+                    
+                } else {
+                    checkout = accounting.formatMoney(amount, {
+                        precision: 2,
+                        format: {
+                            pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
+                            neg: "%v%s",
+                            zero: '...'
+                        }
+                    })
+                    $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
+                    alert(data.result)
+                }
+            }
+        })
+    })
+
+    $(document).on('click', '.close-payment', function() {
+        $('#paymentModel').modal('hide')
+        $('#totalChange').text('...')
+    })
+</script>
+{% endblock %}

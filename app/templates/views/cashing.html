@@ -571,7 +571,7 @@
             {% if products %}
             {% for product in products %}
             {% if current_user.id in product.listFavorite|tojson|safe %}
-            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}" data-barcode="{{product.barcode}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
                 <div class="item-wrapper">
@@ -628,7 +628,7 @@
                 </div>
             </div>
             {% else %}
-            <div class="product-item" id="{{product.id}}" order="{{loop.index}}">
+            <div class="product-item" id="{{product.id}}" order="{{loop.index}}" data-barcode="{{product.barcode}}">
                 <input type="hidden" id="details-brand" value="{{product.brandId}}">
                 <input type="hidden" id="details-categ" value="{{product.categoryId}}">
                 <div class="item-wrapper">
@@ -954,6 +954,7 @@
 
 {% block script %}
 <script src="{{url_for('static', filename='js/printThis.js')}}"></script>
+<script src="{{url_for('static', filename='js/jquery.barcode.js')}}"></script>
 <script src="{{url_for('static', filename='js/cashing.js')}}"></script>
 <script src="{{url_for('static', filename='js/attrchange.js')}}"></script>
 <script src="{{url_for('static', filename='js/bootstrap-select.min.js')}}"></script>
@@ -962,6 +963,51 @@
     $(document).on('click', '#add-customer', function() {
         $('#addCustomer').modal('show')
     })
+
+    onScan.attachTo(document, {
+        suffixKeyCodes: [13], // enter-key expected at the end of a scan
+        reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+        onScan: function(barcode, iQty) { // Alternative to document.addEventListener('scan')
+            console.log(barcode)
+
+            products = document.querySelectorAll('.product-item')
+            Array.from(products).forEach(p => {
+                console.log($(p).attr('data-barcode'))
+                if ($(p).attr('data-barcode') == barcode) {
+                    $(p).find('.product-btn').click()
+                }
+            })
+        },
+    })
+
+
+    $(document).on('click', '.close-payment', function() {
+        var transactions = document.querySelectorAll('.transaction-item')
+        Array.from(transactions).forEach(t => {
+            $(t).remove()
+        })
+        paymentObj.amounts = []
+        $('#paymentModel').modal('hide')
+        $('#list-payment').empty()
+        $('#sumTotal').text(accounting.formatMoney(0))
+        $('.order-btn').attr({
+            'id': '',
+            'data-change': true
+        })
+        output = ''
+        Array.from($('#select-customer').children()).forEach(o => {
+            if ($(o).text() == 'Customer') {
+                output += '<option value="'+$(o).attr('value')+'" selected>'+$(o).text()+'</option>'
+            } else {
+                output += '<option value="'+$(o).attr('value')+'">'+$(o).text()+'</option>'
+            }
+        })
+        $('.selectpicker').selectpicker('refresh').empty().append(output).selectpicker('refresh').trigger('change')
+        // Unbind Click event when close payment
+        $('.product-btn').attr('disabled', false)
+        $('.sum-order').text(0)
+    })
+
 
     $(document).on('click', '.customer-save', function() {
         fname = $('#customer-name').val()

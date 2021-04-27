@@ -1,7 +1,46 @@
 {% extends 'views/index.html' %}
-
+{% block style %}
+<style>
+    .content {
+        width: 100%;
+        height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 0 200px;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
 {% block content %}
+<div class="social-nav">
+    <div class="facebook">
+        <a href="https://www.facebook.com/Software-Dev-116227830285629" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
+    </div>
+    <div class="instagram">
+        <a href="https://www.instagram.com/software_devtr/" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-instagram"></ion-icon></a>
+    </div>
+    <div class="youtube">
+        <a href="https://www.youtube.com/channel/UCVmabo4MSxCJjtRDvGcPL5g" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-youtube"></ion-icon></a>
+    </div>
+</div>
 <div class="wrap-container">
-    
+    <div class="content">
+        <h4 class="main-content color-font">
+            softwaredev.tr@gmail.com
+        </h4>
+        <div class="flex-column">
+            <p class="sub-content color-text flex-between-center mt-2">
+                <i class="fa fa-phone mr-2" aria-hidden="true"></i>017 467 617
+            </p>
+            <p class="sub-content color-text flex-between-center mt-2">
+                <i class="fa fa-phone mr-2" aria-hidden="true"></i>093 620 726
+            </p>
+            <p class="sub-content color-text flex-between-center mt-2">
+                <i class="fa fa-phone mr-2" aria-hidden="true"></i>097 798 2014
+            </p>
+        </div>
+    </div>
 </div>
 {% endblock %}

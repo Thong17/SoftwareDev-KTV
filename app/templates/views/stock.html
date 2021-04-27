@@ -127,7 +127,7 @@
             {% for product in products %}
                 {% if current_user.id in product.listFavorite|tojson|safe %}
                 <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}"
-                    {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %}>
+                    {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %} data-barcode="{{product.barcode}}">
                     <input type="hidden" id="details-brand" value="{{product.brandId}}">
                     <input type="hidden" id="details-categ" value="{{product.categoryId}}">
                     <div class="item-wrapper">
@@ -200,7 +200,7 @@
                 </a>
                 {% else %}
                 <a class="product-item" href="/stock/product/{{product.id}}" id="{{product.id}}" order="{{loop.index}}"
-                    {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %}>
+                    {% if product.isStock == False %}onclick="return false" style="cursor: default" {% endif %} data-barcode="{{product.barcode}}">
                     <input type="hidden" id="details-brand" value="{{product.brandId}}">
                     <input type="hidden" id="details-categ" value="{{product.categoryId}}">
                     <div class="item-wrapper">
@@ -282,9 +282,21 @@
 
 {% block script %}
 <script src="{{url_for('static', filename='js/attrchange.js')}}"></script>
-
+<script src="{{url_for('static', filename='js/jquery.barcode.js')}}"></script>
 <!-- <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script> -->
 <script>
+    onScan.attachTo(document, {
+        suffixKeyCodes: [13], // enter-key expected at the end of a scan
+        reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+        onScan: function(barcode, iQty) {
+            products = document.querySelectorAll('.product-item')
+            Array.from(products).forEach(p => {
+                if ($(p).attr('data-barcode') == barcode) {
+                    window.location.href = $(p).attr('href')
+                }
+            })
+        },
+    })
 
     $(document).ready(function () {
         currencyFormat()
