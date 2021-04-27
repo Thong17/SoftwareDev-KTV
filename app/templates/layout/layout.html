@@ -7,16 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management System {% block title %}{% endblock %}</title>
     <link rel="icon" href="{{url_for('static', filename='svg/icon.png')}}">
-
     <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/font-awesome.min.css')}}">
-    
-    <!-- <link rel="stylesheet" href="{{url_for('static', filename='css/all.min.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', filename='css/fontawesome.min.css')}}"> -->
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"> -->
-    <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
-        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"> -->
-
     <link href="https://fonts.googleapis.com/css2?family=Hanuman&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{url_for('static', filename='css/dist/modal.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/dist/style.css')}}">
@@ -83,24 +75,12 @@
         </span>
     </ul>
     {% else %}
-    <!-- <div class="social-nav">
-        <div class="facebook">
-            <a href="#" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
-        </div>
-        <div class="instagram">
-            <a href="#" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-instagram"></ion-icon></a>
-        </div>
-        <div class="youtube">
-            <a href="#" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-youtube"></ion-icon></a>
-        </div>
-    </div> -->
     {% endif %}
     
     <header class="{% if current_user.is_authenticated and current_user.isConfirm %}isAuthenticated{% endif %}">
         <nav class="menu-nav {% if current_user.is_authenticated and current_user.isConfirm %}isAuthenticated{% endif %}">
             <div class="nav-logo">
                 <i class="fa fa-terminal logo-btn" aria-hidden="true"></i>
-                <!-- <img class="logo-btn" src="/static/icons/favicon-{% if current_user.is_authenticated %}{{ current_user.theme }}{% else %}light{% endif %}.svg" alt="" srcset=""> -->
                 <ion-icon name="menu-outline" class="sidenav-btn hide"></ion-icon>
             </div>
             {% block navbar %}{% endblock %}
@@ -199,29 +179,13 @@
     </div>
 
     <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
-
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@next"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@next"></script> -->
-
     <script src="{{url_for('static', filename='js/popper.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/mdb.min.js')}}"></script>
     <script type="module" src="{{url_for('static', filename='ionicons/ionicons.esm.js')}}"></script>
     <script nomodule src="{{url_for('static', filename='ionicons/ionicons.js')}}"></script>
-
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script> -->
-
-    </script>
     <script src="{{url_for('static', filename='js/gsap-latest-beta.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/CSSRulePlugin3.min.js')}}"></script>
-    <!-- <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
-    <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script> -->
-
-    <!-- <script type="module" src="https://unpkg.com/ionicons@5.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule="" src="https://unpkg.com/ionicons@5.1.0/dist/ionicons/ionicons.js"></script> -->
     <script src="{{url_for('static', filename='js/translate.js')}}"></script>
     <script src="{{url_for('static', filename='js/accounting.js')}}"></script>
     <script src="{{url_for('static', filename='js/script.js')}}"></script>

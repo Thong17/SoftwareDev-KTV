@@ -1,9 +1,6 @@
 {% extends 'views/financial.html' %}
 
 {% block style %}
-<!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css"> -->
-
 <link rel="stylesheet" href="{{url_for('static', filename='css/dataTables.min.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='css/buttons.dataTables.min.css')}}">
 <style>
@@ -103,9 +100,6 @@
 {% endblock %}
 
 {% block script %}
-<!-- <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script> -->
-
 <script src="{{url_for('static', filename='js/dataTables.min.js')}}"></script>
 <script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
 <script>
