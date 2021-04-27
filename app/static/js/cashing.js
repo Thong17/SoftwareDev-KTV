@@ -97,7 +97,7 @@ $(document).on('click', '.order-btn', function() {
             
                                 $('#paymentModel').modal('show')
                                 $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
-                                                    <span class="color-font ln-checkout">Check Out: </span>
+                                                    <span class="color-font ln-checkout mr-1">Check Out: </span>
                                                     <span class="currency-format color-text" id="paymentAmount">`+checkout+`</span>
                                                 </div>`).translator()
                                 $('#receive-cash').val('').focus()
@@ -181,7 +181,7 @@ $(document).on('click', '.order-btn', function() {
         
                             $('#paymentModel').modal('show')
                             $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
-                                                <span class="color-font ln-checkout">Check Out: </span>
+                                                <span class="color-font ln-checkout mr-1">Check Out: </span>
                                                 <span class="currency-format color-text" id="paymentAmount">`+checkout+`</span>
                                             </div>`).translator()
                             $('#receive-cash').val('').focus()
@@ -436,7 +436,7 @@ $(document).on('click', '.checkout-btn', function() {
                         zero: '%v%s'
                     }
                 })
-                $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
+                $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
                 alert(data.result)
             }
         }

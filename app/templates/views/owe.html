@@ -387,7 +387,7 @@
                 $('#totalUSD').text(accountUSD(totalUSD))
                 $('#totalKHR').text(accountKHR(totalKHR))
                 $('.payment-total').attr('id', id).html(`<div class="checkout-owe">
-                                                <span class="color-font ln-checkout">Check Out: </span>
+                                                <span class="color-font ln-checkout mr-1">Check Out: </span>
                                                 <span class="currency-format color-text" id="paymentAmount">`+accountUSD(remainUSD)+`(`+accountKHR(remainKHR)+`)</span>
                                             </div>`).translator()
                 $('#receive-cash').val('').focus()
@@ -610,7 +610,7 @@
                             zero: '...'
                         }
                     })
-                    $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
+                    $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
                     alert(data.result)
                 }
             }
