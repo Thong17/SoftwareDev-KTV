@@ -1219,12 +1219,12 @@ main {
   box-sizing: border-box;
 }
 
-.item-container::-webkit-scrollbar {
-  display: none;
+.item-container::-webkit-scrollbar, .row-wrapper::-webkit-scrollbar, .money-container::-webkit-scrollbar, .order-container::-webkit-scrollbar, .content-body::-webkit-scrollbar {
+  display: none !important;
 }
 
-.money-container::-webkit-scrollbar {
-  display: none;
+.dataTables_wrapper.no-footer .dataTables_scrollBody {
+  border-bottom: 1px solid var(--color-hr) !important;
 }
 
 .flex-start {

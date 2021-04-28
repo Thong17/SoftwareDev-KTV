@@ -12,6 +12,10 @@
         cursor: pointer;
     }
 
+    .ln-checkout {
+        font-size: 16px;
+    }
+
     thead tr {
         background-color: var(--color-menu) !important;
     }
@@ -79,7 +83,8 @@
         </thead>
         <tbody>
             {% for customer in customers %}
-                {% if customer.customerOwe %}
+            {% if customer.customerOwe %}
+                {% if customer.customerOwe[0].remain > 0 %}
                 <tr class="customer-item notranslate" style="font-size: 13px;" id="{{ customer.id }}">
                     <td class="color-text" id="customerName">{% if customer.name == '' %}...{% else %}{{ customer.name }}{% endif %}</td>
                     <td class="color-text">{% if customer.phone == '' %}...{% else %}{{ customer.phone }}{% endif %}</td>
@@ -89,6 +94,7 @@
                     </td>
                 </tr>
                 {% endif %}
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
@@ -246,12 +252,17 @@
 {% endblock %}
 
 {% block script %}
+<script src="{{url_for('static', filename='js/printThis.js')}}"></script>
 <script src="{{url_for('static', filename='js/dataTables.min.js')}}"></script>
 <script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
 <script>
+    language = $('html').attr('data-lang')
     currencyUSD(2)
     $('#list-payments').DataTable({
-        "pageLength": 25,
+        "scrollCollapse": true,
+        "searching": false,
+        "scrollY": "70vh",
+        "paging": false,
         "drawCallback": function( settings ) {
             
         }
@@ -271,7 +282,6 @@
                 url: '/customer/owe/'+id,
                 type: 'POST',
                 success: function(data) {
-                    console.log(data)
                     $('#customerOwe').find('.title').text($('.customer-item#'+id).find('#customerName').text())
                     element = ''
                     totalOwe = 0
@@ -302,12 +312,10 @@
         e.stopPropagation()
         $('#customerOwe').modal('hide')
         id = $(this).attr('id')
-        console.log(id)
         $.ajax({
             url: '/customer/owe/'+id,
             type: 'POST',
             success: function(data) {
-                console.log(data)
                 time = new Date().toLocaleTimeString()
                 date = new Date().toDateString()
                 $('#invoiceTime').text(time)
@@ -386,10 +394,11 @@
 
                 $('#totalUSD').text(accountUSD(totalUSD))
                 $('#totalKHR').text(accountKHR(totalKHR))
+
                 $('.payment-total').attr('id', id).html(`<div class="checkout-owe">
-                                                <span class="color-font ln-checkout mr-1">Check Out: </span>
+                                                <span class="color-font ln-checkout mr-1">`+languagesObj[language].checkOut+`</span>
                                                 <span class="currency-format color-text" id="paymentAmount">`+accountUSD(remainUSD)+`(`+accountKHR(remainKHR)+`)</span>
-                                            </div>`).translator()
+                                            </div>`)
                 $('#receive-cash').val('').focus()
                 $('#totalCash').text(receive)
                 $('#paymentModel').modal('show')
@@ -556,13 +565,13 @@
                         format: {
                             pos: "%v%s",
                             neg: "%v%s",
-                            zero: '%v%s'
+                            zero: '...'
                         }
                     })
 
                     $('.customer-item#'+id).find('#paymentRemain').text(total_remain)
 
-                    var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">Total Paid:</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">Total Remain:</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
+                    var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">'+languagesObj[language].totalPaid+'</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">'+languagesObj[language].totalRemain+'</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">'+languagesObj[language].totalReturn+'</span><span>'+total_change+'</span></div><div class="list-changes">'
                                                         
                     changeArr.forEach(m => {
                         if (m.money != 0) {
@@ -595,8 +604,8 @@
                         }
                     })
 
-                    element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close">Continue</button><a href="/invoice_owe/'+data.id+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
-                    $('.payment-total').html(element).translator()
+                    element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close">'+languagesObj[language].close+'</button><button class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></button></div>'
+                    $('.payment-total').html(element)
                     $('#list-payment').empty()
                     $('#receive-cash').val('')
                     paymentObj.amounts = []
@@ -610,11 +619,15 @@
                             zero: '...'
                         }
                     })
-                    $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
+                    $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">'+languagesObj[language].checkOut+'</span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>')
                     alert(data.result)
                 }
             }
         })
+    })
+
+    $(document).on('click', '.print-inv', function() {
+        $(".payment-invoice").printThis()
     })
 
     $(document).on('click', '.close-payment', function() {

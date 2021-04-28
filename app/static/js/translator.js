@@ -1,3 +1,5 @@
+languagesObj = {}
+
 $.fn.translator = function () {
     languages = {
         english: {
@@ -289,6 +291,9 @@ $.fn.translator = function () {
             orderSchedule: 'កាលវិភាគកម្មង់'
         }
     }
+
+    languagesObj = languages
+
     language = $('html').attr('data-lang')
 
     $.each($('#select-lang option'), function () {

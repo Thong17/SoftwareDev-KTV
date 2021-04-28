@@ -241,9 +241,14 @@
                 </tr>`
     }
 
+    language = $('html').attr('data-lang')
+
     currencyUSD(2)
     $('#list-payments').DataTable({
-        "pageLength": 25,
+        "scrollCollapse": true,
+        "searching": false,
+        "scrollY": "70vh",
+        "paging": false,
         "drawCallback": function( settings ) {
             
         }
@@ -404,7 +409,7 @@
                         format: {
                             pos: "%v%s("+Math.round(data.data.remain * data.data.rate / 100) * 100+"\u17DB)",
                             neg: "%v%s",
-                            zero: '%v%s'
+                            zero: '...'
                         }
                     })
 
@@ -412,9 +417,9 @@
 
                     $('#paymentModel').modal('show')
                     $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
-                                        <span class="color-font ln-checkout mr-1">Check Out: </span>
+                                        <span class="color-font ln-checkout mr-1">`+languagesObj[language].checkOut+`</span>
                                         <span class="currency-format color-text" id="paymentAmount">`+checkout+`</span>
-                                    </div>`).translator()
+                                    </div>`)
                     $('#receive-cash').val('').focus()
                 }
             })
@@ -555,7 +560,7 @@
                                                                 format: {
                                                                     pos: "%v%s",
                                                                     neg: "%v%s",
-                                                                    zero: '%v%s'
+                                                                    zero: '...'
                                                                 }
                                                             })
 
@@ -564,11 +569,11 @@
                             format: {
                                 pos: "%v%s",
                                 neg: "%v%s",
-                                zero: '%v%s'
+                                zero: '...'
                             }
                         })
 
-                        var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">Total Paid:</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">Total Remain:</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
+                        var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">'+languagesObj[language].totalPaid+'</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">'+languagesObj[language].totalRemain+'</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">'+languagesObj[language].totalReturn+'</span><span>'+total_change+'</span></div><div class="list-changes">'
                         
                         $('.payment-item#'+payment).find('#paymentPaid').text(total_paid)
                         $('.payment-item#'+payment).find('#paymentRemain').text(total_remain)
@@ -609,8 +614,8 @@
                             }
                         })
 
-                        element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close"></button><a href="/invoice/'+payment+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
-                        $('.payment-total').html(element).translator()
+                        element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close">'+languagesObj[language].close+'</button><a href="/invoice/'+payment+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
+                        $('.payment-total').html(element)
                         $('#list-payment').empty()
                         $('#receive-cash').val('')
                         paymentObj.amounts = []
@@ -623,7 +628,7 @@
                                 zero: '...'
                             }
                         })
-                        $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">Check Out </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
+                        $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">'+languagesObj[language].checkOut+'</span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>')
                         alert(data.result)
                     }
                 }

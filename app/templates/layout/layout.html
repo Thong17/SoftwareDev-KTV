@@ -299,7 +299,7 @@
                                                     format: {
                                                         pos: "%v%s",
                                                         neg: "-%v%s",
-                                                        zero: '%v%s'
+                                                        zero: '...'
                                                     }
                                                 }))
                 
@@ -649,7 +649,7 @@
         }
 
         function accountUSD(amount) {
-            return accounting.formatMoney(amount, {precision: 2, format: {pos: "%v%s", neg: "%v%s", zero: '%v%s'}})
+            return accounting.formatMoney(amount, {precision: 2, format: {pos: "%v%s", neg: "%v%s", zero: '...'}})
         }
 
         function accountKHR(amount) {
@@ -658,7 +658,7 @@
                         format: {
                             pos: "%v\u17DB",
                             neg: "%v\u17DB",
-                            zero: '%v\u17DB'
+                            zero: '...'
                         }
                     })
         }

@@ -122,7 +122,9 @@
     }
     currencyFormat()
     $('#list-expenses').DataTable({
-        "pageLength": 25,
+        "scrollCollapse": true,
+        "scrollY": "67vh",
+        "paging": false,
         "drawCallback": function( settings ) {
             
         }
