@@ -1021,7 +1021,6 @@
                 type: 'post',
                 data: { fname: fname, phone: phone, birthdate: dob, description: details },
                 success: function(data) {
-                    console.log(data)
                     if (data.msg == 'Success') {
                         if (phone != '') {
                             phone = ' - '+phone
@@ -1034,7 +1033,7 @@
                         fname = $('#customer-name').focus()
                         $('#select-customer').selectpicker('refresh')
                     } else {
-                        alert(data.msg)
+                        alert(languagesAlert[language].customerError)
                     }
                 }
             })
@@ -1130,7 +1129,7 @@
 
         if (quantity < 1) {
             $('#input-quantity').focus()
-            alert('Value must be atleast 1')
+            alert(languagesAlert[language].valueError)
         } else {
             var orderList = {}
 
@@ -1175,7 +1174,15 @@
                         order += data.data.quantity
                         $('.sum-order').text(order)
                     } else {
-                        alert(data.data.message)
+                        if (data.result == 'not enough') {
+                            alert(languagesAlert[language].qtyNotEnough + data.data.message)
+                        }
+                        if (data.result == 'out of stock') {
+                            alert(languagesAlert[language].qtyOutOfStock)
+                        }
+                        if (data.result == 'error') {
+                            alert(languagesAlert[language].error)
+                        }
                     }
                 }
             })
@@ -1249,7 +1256,7 @@
             $('#productProperty').modal('hide')
 
         } else {
-            alert('Color must be selected')
+            alert(languagesAlert[language].colorConfirm)
         }
     })
 
@@ -1816,7 +1823,7 @@
                                     <td style="width: 5%;"></td>
                                     </tr>`)
                     } else {
-                        alert(data.data)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })
@@ -1931,7 +1938,7 @@
                         $(this).remove()
                     })
                 } else {
-                    alert(data.result)
+                    alert(languagesAlert[language].error)
                 }
             }
         })

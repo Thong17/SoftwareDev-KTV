@@ -54,7 +54,7 @@ def create_app(config_class=Config):
             id = str(uuid4())
             store = tblStore(id=id)
             db.session.add(store)
-            floor = tblFloor(id=str(uuid4()), floor='Ground Floor', storeId=id)
+            floor = tblFloor(id=str(uuid4()), floor='GF', storeId=id)
             db.session.add(floor)
 
             uid = str(uuid4())
@@ -164,7 +164,7 @@ user_role = db.Table('user_role',
 
 class tblStore(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    store = db.Column(db.String(20), nullable=True, default='Store Name')
+    store = db.Column(db.String(100), nullable=True, default='Store Name')
     phone = db.Column(db.String(50), nullable=True, default='')
     location = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
@@ -172,17 +172,17 @@ class tblStore(db.Model):
 
 class tblFloor(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    floor = db.Column(db.String(20), nullable=False)
+    floor = db.Column(db.String(100), nullable=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     storeId = db.Column(db.String(36), db.ForeignKey('tbl_store.id'), nullable=False)
     rooms = db.relationship('tblRoom', backref='rooms', lazy=True)
 
 class tblRoom(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    room = db.Column(db.String(20), nullable=False, unique=True)
+    room = db.Column(db.String(100), nullable=False, unique=True)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    hour = db.Column(db.String(20), nullable=True, default='1h')
-    status = db.Column(db.String(20), nullable=True, default='Open')
+    hour = db.Column(db.String(100), nullable=True, default='1h')
+    status = db.Column(db.String(100), nullable=True, default='Open')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     floorId = db.Column(db.String(36), db.ForeignKey('tbl_floor.id'), nullable=False)
@@ -244,14 +244,19 @@ owe = db.Table('owe',
     db.Column('owe_id', db.String(36), db.ForeignKey('tbl_owe.id'))
 )
 
+owe_inv = db.Table('owe_inv',
+    db.Column('payment_id', db.String(36), db.ForeignKey('tbl_payment.id')),
+    db.Column('invoice_id', db.String(36), db.ForeignKey('tbl_invoice.id'))
+)
+
 class tblPayment(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     isComplete = db.Column(db.Boolean, default=False)
-    invoice = db.Column(db.String(20), nullable=True)
+    invoice = db.Column(db.String(100), nullable=True)
     amount = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     paid = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     remain = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
-    receive = db.Column(db.String(20), nullable=True, default='0,0')
+    receive = db.Column(db.String(100), nullable=True, default='0,0')
     rate = db.Column(db.Numeric(10,4), nullable=True, default=4000)
     change = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
@@ -261,30 +266,44 @@ class tblPayment(db.Model):
     orderPayment = db.relationship('tblCheckin', backref='orderPayment', lazy=True, cascade='save-update, merge, delete', single_parent=True)
     transactions = db.relationship('tblTransaction', secondary=payment, backref='transactions', lazy='dynamic')
     owePayments = db.relationship('tblOwe', secondary=owe, backref='owePayments', lazy='dynamic')
+    invoicePayments = db.relationship('tblInvoice', secondary=owe_inv, backref='invoicePayments', lazy='dynamic')
+
+class tblInvoice(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    amount = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    paid = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    remain = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    receive = db.Column(db.String(100), nullable=True, default='0,0')
+    rate = db.Column(db.Numeric(10,4), nullable=True, default=4000)
+    change = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
+    createdOn = db.Column(db.DateTime, default=datetime.utcnow)
+    createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
+    orderedBy = db.Column(db.String(36), db.ForeignKey('tbl_customer.id'), nullable=False)
+
 
 class tblOwe(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    invoice = db.Column(db.String(20), nullable=True)
+    invoice = db.Column(db.String(100), nullable=True)
     amount = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     rate = db.Column(db.Numeric(10,4), nullable=True)
     paid = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     remain = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
-    receive = db.Column(db.String(20), nullable=True, default='0,0')
+    receive = db.Column(db.String(100), nullable=True, default='0,0')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     owedBy = db.Column(db.String(36), db.ForeignKey('tbl_customer.id'), nullable=False)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
 
 class tblUser(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True)
-    firstname = db.Column(db.String(20), nullable=True, default='')
-    lastname = db.Column(db.String(20), nullable=True, default='')
-    username = db.Column(db.String(20), nullable=False, unique=True)
+    firstname = db.Column(db.String(100), nullable=True, default='')
+    lastname = db.Column(db.String(100), nullable=True, default='')
+    username = db.Column(db.String(100), nullable=False, unique=True)
     gender = db.Column(db.String(1), nullable=True, default='')
     birthdate = db.Column(db.Date, nullable=True)
     email = db.Column(db.String(100), nullable=True, default='')
     password = db.Column(db.String(60), nullable=False)
-    theme = db.Column(db.String(20), nullable=True, default='light')
-    language = db.Column(db.String(20), nullable=True, default='english')
+    theme = db.Column(db.String(100), nullable=True, default='light')
+    language = db.Column(db.String(100), nullable=True, default='english')
     publicId = db.Column(db.String(50), nullable=False)
     token = db.Column(db.String(36), nullable=True, default='')
     drawer = db.Column(db.String(36), nullable=True, default='')
@@ -297,7 +316,7 @@ class tblUser(db.Model, UserMixin):
 
 class tblRole(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    role = db.Column(db.String(20), nullable=False, unique=True)
+    role = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text(), nullable=True, default='')
     isDefault = db.Column(db.Boolean, default=False)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
@@ -307,9 +326,9 @@ class tblRole(db.Model):
 class tblProfile(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     photo = db.Column(db.String(255), nullable=True, default='default.png')
-    status = db.Column(db.String(20), nullable=True, default='Single')
+    status = db.Column(db.String(100), nullable=True, default='Single')
     phone = db.Column(db.String(13), nullable=True, default='')
-    company = db.Column(db.String(20), nullable=True, default='')
+    company = db.Column(db.String(100), nullable=True, default='')
     hometown = db.Column(db.String(255), nullable=True, default='')
     location = db.Column(db.String(255), nullable=True, default='')
     bio = db.Column(db.Text(), nullable=True, default='')
@@ -348,7 +367,7 @@ class tblProduct(db.Model):
     barcode = db.Column(db.String(30), nullable=True)
     isStock = db.Column(db.Boolean, default=True)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    currency = db.Column(db.String(20), nullable=False)
+    currency = db.Column(db.String(100), nullable=False)
     priceCurrency = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     discount = db.Column(db.String(3), nullable=True, default='')
     period = db.Column(db.Date, nullable=True)
@@ -370,7 +389,7 @@ class tblStock(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     cost = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     costCurrency = db.Column(db.Numeric(16,2), nullable=True, default=0.00)
-    currency = db.Column(db.String(20), nullable=False)
+    currency = db.Column(db.String(100), nullable=False)
     rate = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     quantity = db.Column(db.Numeric(10,0), nullable=True, default=0)
     total = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
@@ -395,7 +414,7 @@ class tblValue(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     value = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
-    currency = db.Column(db.String(20), nullable=False)
+    currency = db.Column(db.String(100), nullable=False)
     priceCurrency = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     description = db.Column(db.Text(), nullable=True, default='')
     productId = db.Column(db.String(36), db.ForeignKey('tbl_product.id'), nullable=False)
@@ -405,7 +424,7 @@ class tblValue(db.Model):
 
 class tblBrand(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    brand = db.Column(db.String(20), nullable=False, unique=True)
+    brand = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
@@ -414,7 +433,7 @@ class tblBrand(db.Model):
 
 class tblColor(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    color = db.Column(db.String(20), nullable=False)
+    color = db.Column(db.String(100), nullable=False)
     hex = db.Column(db.String(100), nullable=True, default= '')
     price = db.Column(db.Numeric(10,2), nullable=True, default=0.00)
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
@@ -454,7 +473,7 @@ class tblDrawer(db.Model):
 class tblMoney(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     money = db.Column(db.Numeric(16,0), nullable=True, default=0.00)
-    currency = db.Column(db.String(20), nullable=False)
+    currency = db.Column(db.String(100), nullable=False)
     value = db.Column(db.Numeric(16,5), nullable=True, default=0.00000)
     unit = db.Column(db.Numeric(10,0), nullable=True, default=0)
     drawerId = db.Column(db.String(36), db.ForeignKey('tbl_drawer.id'), nullable=False)
@@ -468,15 +487,16 @@ class tblQuantity(db.Model):
 
 class tblCustomer(db.Model):
     id = db.Column(db.String(36), primary_key=True)
-    name = db.Column(db.String(20), nullable=True, default='', unique=True)
+    name = db.Column(db.String(100), nullable=True, default='', unique=True)
     birthdate = db.Column(db.Date, nullable=True)
-    phone = db.Column(db.String(20), nullable=True, default='')
+    phone = db.Column(db.String(100), nullable=True, default='')
     description = db.Column(db.Text(), nullable=True, default='')
     createdOn = db.Column(db.DateTime, default=datetime.utcnow)
     createdBy = db.Column(db.String(36), db.ForeignKey('tbl_user.id'), nullable=False)
     customerOrder = db.relationship('tblOrder', backref='customerOrder', lazy=True)
     customerPayment = db.relationship('tblPayment', backref='customerPayment', lazy=True)
     customerOwe = db.relationship('tblOwe', backref='customerOwe', lazy=True)
+    invoiceOwe = db.relationship('tblInvoice', backref='invoiceOwe', lazy=True)
 
 
 class tblActivity(db.Model):

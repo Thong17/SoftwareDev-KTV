@@ -326,7 +326,7 @@
                     if (data.data == 'Success') {
                         window.location.reload()
                     } else {
-                        alert(data.data)
+                        alert(languagesAlert[language].advertiseDeleteError)
                     }
                 }
             })
@@ -342,7 +342,7 @@
                     toggleLoader(data)
                     if (result != '') {
                         $(data).addClass('hide')
-                        alert(result)
+                        alert(languagesAlert[language].advertiseUploadError)
                     }
                 }
             })
@@ -358,7 +358,7 @@
                     toggleLoader(data)
                     if (result != '') {
                         $(data).addClass('hide')
-                        alert(result)
+                        alert(languagesAlert[language].advertiseUploadError)
                     }
                 }
             })

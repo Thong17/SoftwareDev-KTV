@@ -1105,7 +1105,7 @@
                         // _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
                         // _this.find('.check-in-out').text('Check Out')
                     } else {
-                        alert(data.msg)
+                        alert(languagesAlert[language].alreadyCheckin)
                     }
                 }
             })
@@ -1136,13 +1136,13 @@
                             $('.btn-transaction').attr({'data-change': true, 'data-check': true})
                         }
                     } else {
-                        alert(data.msg)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })
         } else {
             $('#duration-btn').addClass('flash')
-            alert('Confirm duration first!')
+            alert(languagesAlert[language].confirmDuration)
         }
     })
 
@@ -1160,7 +1160,7 @@
 
         if (quantity < 0 || quantity == 0) {
             $('#input-quantity').focus()
-            alert('Value must be atleast 1')
+            alert(languagesAlert[language].valueError)
         } else {
             $.ajax({
                 url: '/transaction/update/'+id,
@@ -1180,7 +1180,7 @@
                         order += 1
                         $('.sum-order').text(order)
                     } else {
-                        alert(data.result)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })
@@ -1276,7 +1276,7 @@
 
         if (quantity < 1) {
             $('#input-quantity').focus()
-            alert('Value must be atleast 1')
+            alert(languagesAlert[language].valueError)
         } else {
             var orderList = {}
 
@@ -1321,7 +1321,21 @@
                         order += 1
                         $('.sum-order').text(order)
                     } else {
-                        alert(data.data.message)
+                        if (data.result == 'not enough') {
+                            alert(languagesAlert[language].qtyNotEnough + data.data.message)
+                        }
+                        if (data.result == 'out of stock') {
+                            alert(languagesAlert[language].qtyOutOfStock)
+                        }
+                        if (data.result == 'error') {
+                            alert(languagesAlert[language].error)
+                        }
+                        if (data.result == 'paid') {
+                            alert(languagesAlert[language].orderPaid)
+                        }
+                        if (data.result == 'checkin') {
+                            alert(languagesAlert[language].checkinFirst)
+                        }
                     }
                 }
             })
@@ -1396,7 +1410,7 @@
             $('#productProperty').modal('hide')
 
         } else {
-            alert('Color must be selected')
+            alert(languagesAlert[language].colorConfirm)
         }
     })
 
@@ -1519,7 +1533,7 @@
                 }
             })
         } else {
-            alert('Order has already checked out!')
+            alert(languagesAlert[language].orderPaid)
         }
     })
 
@@ -1976,7 +1990,7 @@
                                     <td style="width: 5%;"></td>
                                     </tr>`)
                     } else {
-                        alert(data.data)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })
@@ -2066,7 +2080,6 @@
             type: 'POST',
             success: function (data) {
                 if (data.result == 'Success') {
-
                     $('.btn-transaction').attr('data-change', true)
                     var quantity = $('#' + pid).find('.stock-tag').text()
                     if (quantity == 'Out of stock') {
@@ -2089,7 +2102,7 @@
                         $(this).remove()
                     })
                 } else {
-                    alert(data.result)
+                    alert(languagesAlert[language].error)
                 }
             }
         })

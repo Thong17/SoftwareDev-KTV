@@ -655,7 +655,7 @@
         var id = $(this).parent().parent().parent().attr('id')
         var color_name = $(this).parent().parent().parent().children().eq(0).text()
         var quantity = $(this).parent().parent().parent().children().eq(4).text()
-        if (confirm('Are you sure you want to delete this stock?')) {
+        if (confirm(languagesAlert[language].confirmProcess)) {
             $.ajax({
                 url: '/stock/delete/' + id,
                 type: 'POST',
@@ -766,7 +766,7 @@
                             $('#stocks').find(e).text(t)
                         }
                     } else {
-                        alert(data.data)
+                        alert(languagesAlert[language].error)
                     }
                     cost.val('').focus()
                     rate.val('')

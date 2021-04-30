@@ -95,7 +95,7 @@
 
     $(document).on('click', '.pcr-delete', function () {
         var id = $(this).attr('id')
-        if (confirm('Are you sure you want to delete this color?')) {
+        if (confirm(languagesAlert[language].confirmProcess)) {
             $.ajax({
                 url: 'color/remove/' + id,
                 type: 'POST',
@@ -204,7 +204,7 @@
     })
 
     $('.grid-products').on('click', '.delete-value', function () {
-        if (confirm('Are you sure you want to delete this value?')) {
+        if (confirm(languagesAlert[language].confirmProcess)) {
             var id = $(this).parent().parent().attr('id')
             $.ajax({
                 url: '/value/remove/' + id,
@@ -255,7 +255,11 @@
                     type: 'POST',
                     data: { product: product, barcode: barcode, price: price, discount: discount, period: period, currency: currency, description: description, category: category, isStock: isStock, brand: brand, width: width, height: height, weight: weight, depth: depth, material: material },
                     success: function (data) {
-                        alert(data.data)
+                        if (data.data == 'Success') {
+                            alert(languagesAlert[language].userSaveSuccess)
+                        } else {
+                            alert(languagesAlert[language].error)
+                        }
                     }
                 })
             }
@@ -265,7 +269,7 @@
     $('.grid-products').on('click', '.delete-product', function () {
         event.preventDefault()
         var id = $(this).closest('.product-item').attr('id')
-        if (confirm('Are you sure you want to delete this product?')) {
+        if (confirm(languagesAlert[language].confirmProcess)) {
             $.ajax({
                 url: '/product/remove/' + id,
                 type: 'POST',
@@ -556,7 +560,7 @@
                 })
             }
         } else {
-            alert('No category selected')
+            alert(languagesAlert[language].selectCategory)
         }
     })
 
@@ -924,7 +928,7 @@
                     }
                 })
             } else {
-                alert('Please fill the text')
+                alert(languagesAlert[language].fillTheText)
                 $('#' + id).find('.edit-content').text(old_content)
             }
         })
@@ -949,7 +953,7 @@
                 if (data['msg'] == 'Success') {
                     window.location.reload()
                 } else {
-                    alert(data.msg)
+                    alert(languagesAlert[language].floorError)
                 }
             }
         })

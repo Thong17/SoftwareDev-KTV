@@ -261,7 +261,7 @@
                     if (data.msg == 'Success') {
                         window.location.reload()
                     } else {
-                        alert(data.msg)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })
@@ -277,7 +277,7 @@
                 if (data.msg == 'Success') {
                     window.location.reload()
                 } else {
-                    alert(data.msg)
+                    alert(languagesAlert[language].error)
                 }
             }
         })
@@ -324,7 +324,7 @@
                                 </div>
                             </div>`).translator()
                         } else {
-                            alert(data.msg)
+                            alert(languagesAlert[language].error)
                         }
                     }
                 })
@@ -361,19 +361,19 @@
     function removeFloor(attr) {
         event.stopPropagation()
         id = $(attr).closest('.dropdown-item').attr('id')
-        if(confirm('This floor may contain alot of properties. Are you sure you want to delete it?')) {
+        if(confirm(languagesAlert[language].confirmProcess)) {
             $.ajax({
-            url: '/floor/delete/'+id,
-            type: 'POST',
-            success: function(data) {
-                if (data.msg == 'Success') {
-                    window.location.reload()
-                    // $('#list-floors').find('#'+id).fadeOut('slow', function() {
-                    //     $(this).remove()
-                    // })
-                } else {
-                    alert(data.msg)
-                }
+                url: '/floor/delete/'+id,
+                type: 'POST',
+                success: function(data) {
+                    if (data.msg == 'Success') {
+                        window.location.reload()
+                        // $('#list-floors').find('#'+id).fadeOut('slow', function() {
+                        //     $(this).remove()
+                        // })
+                    } else {
+                        alert(languagesAlert[language].floorError)
+                    }
                 }
             })
         }
@@ -387,7 +387,11 @@
             type: 'POST',
             data: {store: store, phone: phone, place: place},
             success: function(data) {
-                alert(data.msg)
+                if (data.msg == 'Success') {
+                    alert(languagesAlert[language].userSaveSuccess)
+                } else {
+                    alert(languagesAlert[language].error)
+                }
             }
         })
     })
@@ -424,7 +428,7 @@
                         $(this).remove()
                     })
                 } else {
-                    alert(data.data)
+                    alert(languagesAlert[language].error)
                 }
             }
         })
@@ -452,7 +456,7 @@
                         //     <div class="grid-products" id="grid-`+data.id+`"></div>`)
                     } else {
                         $('#floor').focus()
-                        alert(data.msg)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })

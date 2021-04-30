@@ -296,6 +296,11 @@
                 }
             })
 
+            if ($('#password').val().length < 8) {
+                $('#password').focus()
+                invalid.push($('#password'))
+            }
+
             if (invalid.length == 0) {
                 username = $('#username').val().trim()
                 fullname = $('#fullname').val()
@@ -330,7 +335,7 @@
                         if (data.data == 'Success') {
                             window.location.reload()
                         } else {
-                            alert(data.data)
+                            alert(languagesAlert[language].userCreateError)
                         }
                     }
                 })
@@ -348,6 +353,11 @@
                     invalid.push(v)
                 }
             })
+
+            if ($('#password').val() != '' && $('#password').val().length < 8) {
+                $('#password').focus()
+                invalid.push($('#password'))
+            }
 
             if (invalid.length == 0) {
                 username = $('#username').val().trim()
@@ -381,9 +391,9 @@
                     },
                     success: function(data) {
                         if (data.data == 'Success') {
-                            alert(data.data)
+                            alert(languagesAlert[language].userSaveSuccess)
                         } else {
-                            alert(data.data)
+                            alert(languagesAlert[language].userSaveError)
                         }
                     }
                 })
@@ -437,7 +447,7 @@
                         $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-primary" id="enable-user">Enable</button>')
                     }
                 } else {
-                    alert(data.data)
+                    alert(languagesAlert[language].userToggle)
                 }
             }
         })

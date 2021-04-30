@@ -616,7 +616,7 @@
         $(document).on('click', '.remove-order', function (event) {
             event.stopPropagation()
             id = $(this).closest('.order-item').attr('id')
-            if (confirm('Are you sure you want to remove this order?')) {
+            if (confirm(languagesAlert[language].confirmProcess)) {
                 $.ajax({
                     url: '/order/remove/' + id,
                     type: 'POST',
@@ -626,7 +626,7 @@
                                 $(this).remove()
                             })
                         } else {
-                            alert(data.msg)
+                            alert(languagesAlert[language].error)
                         }
                         return false
                     }
@@ -651,8 +651,7 @@
 
             date = $('.fc-toolbar-title').text()
             if (customer.val() == '' || room.val() == '' || from.val() == '' || to.val() == '') {
-                msg = 'Please fill the requirement to submit order.'
-                alert(msg)
+                alert(languagesAlert[language].customerSelect)
             } else {
                 $.ajax({
                     url: '/order/add',
@@ -667,7 +666,7 @@
                                 }
                             })
                         } else {
-                            alert(data.msg)
+                            alert(languagesAlert[language].error)
                         }
                     }
                 })
@@ -717,7 +716,7 @@
                             $('#name').val('').focus()
                             $('#phone').val('')
                         } else {
-                            alert(data.msg)
+                            alert(languagesAlert[language].error)
                         }
                     }
                 })

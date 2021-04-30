@@ -1,5 +1,75 @@
 languagesObj = {}
 
+languagesAlert = {
+    english: {
+        invalidFile: 'Invalide file!',
+        invalidSize: 'Image size too big!',
+        noFile: 'No file selected!',
+        userCreateError: 'Failed! User has failed to create',
+        userSaveSuccess: 'Success! User has been saved successfully',
+        userSaveError: 'Failed! User cannot be saved. Please make sure the user is not default',
+        userToggle: 'Failed! User cannot be disable. Please make sure the user is not default',
+        advertiseUploadError: 'Failed! Advertise cannot be uploaded',
+        advertiseDeleteError: 'Failed! Advertise has not been deleted',
+        valueError: 'Failed! Qty must be atleast 1',
+        qtyNotEnough: 'Failed! Qty available only ',
+        qtyOutOfStock: 'Failed! Qty is already out of stock',
+        error: 'Failed! Please try again later',
+        colorConfirm: 'Failed! Color must be selected',
+        customerError: 'Failed! Please try another name',
+        proceedRemainError: 'Failed! Please select customer to proceed the remaining payment',
+        fillTheText: 'Please fill the text',
+        orderPaid: 'Payment has already paid',
+        confirmDuration: 'Please confirm the duration',
+        checkinFirst: 'Please checkin before you order',
+        customerSelect: 'Please select type of customer',
+        selectCategory: 'Please select category for product',
+        passwordChanged: 'Success! Password has been changed',
+        validatePassoword: 'Failed! Password must be 8 characters up',
+        validateAge: 'Failed! You must be born before today',
+        restoreSuccess: 'Success! Data has been restored',
+        confirmProcess: 'Are you sure you want to continue?',
+        alreadyCheckin: 'Failed! An order has been processing',
+        inProcess: 'Failed! Status is in process',
+        floorError: 'Failed! Unable to delete the existed data in the floor'
+    },
+    khmer: {
+        invalidFile: 'File ដែលបានជ្រើសរើសមិនត្រឹមត្រូវទេ',
+        invalidSize: 'រូបភាពមានទំហំធំ! សូមធ្វើការជ្រើសរើសរូបភាពផ្សេង',
+        noFile: 'មិនមាន File បានជ្រើសរើសទេ!',
+        userCreateError: 'បរាជ័យ! អ្នកប្រើប្រាស់មិនបានបង្កើតទេ',
+        userSaveSuccess: 'ជោគជ័យ! បានរក្សាទុកដោយជោគជ័យ',
+        userSaveError: 'បរាជ័យ! សូមត្រួតពនិត្យអ្នកប្រើប្រាស់ម្តងទៀត',
+        userToggle: 'បរាជ័យ! សូមត្រួតពនិត្យម្តងទៀត',
+        advertiseUploadError: 'បរាជ័យ! សូមពិនិត្យមើលរូបភាពម្តងទៀត',
+        advertiseDeleteError: 'បរាជ័យ! សូមពិនិត្យមើលរូបភាពម្តងទៀត',
+        valueError: 'បរាជ័យ! ចំនួនត្រូវចាប់ពី១ឡើងទៅ',
+        qtyNotEnough: 'បរាជ័យ! ចំនួនមិនគ្រប់គ្រាន់។ ចំនួននៅសល់ ',
+        qtyOutOfStock: 'បរាជ័យ! ចំនួនមិនមាននៅក្នុងស្តុក',
+        error: 'បរាជ័យ! សូមព្យាយាមម្តងទៀត',
+        colorConfirm: 'សូមជ្រើសរើសពណ៍មុនបន្ត',
+        customerError: 'បរាជ័យ! សូមព្យាយាមបំពេញឈ្មោះផ្សេង',
+        proceedRemainError: 'បរាជ័យ! សូមជ្រើសរើសអតិថិជនដើម្បីជំពាក់',
+        fillTheText: 'សូមបំពេញនូវព័ត៌មាន',
+        orderPaid: 'បានទទួលប្រាក់រួច',
+        confirmDuration: 'សូមផ្ទៀងផ្ទាត់រយះពេល',
+        checkinFirst: 'សូមចាប់ផ្តើមមុននឹងធ្វើប្រតិបត្តិការ',
+        customerSelect: 'សូមជ្រើសរើសអតិថិជន',
+        selectCategory: 'សូមជ្រើសរើសប្រភេទសំរាប់ផលិតផល',
+        passwordChanged: 'ជោគជ័យ! ពាក្យសម្ងាត់ត្រូវបានរក្សាទុក',
+        validatePassoword: 'បរាជ័យ! លេខសម្ងាត់ត្រូវតែមាន ៨ តួអក្សរឡើងទៅ',
+        validateAge: 'បរាជ័យ! អ្នកត្រូវកើតមុនថ្ងៃនេះ',
+        restoreSuccess: 'ជោគជ័យ! បានត្រលប់ទិន្នន័យដោយជោគជ័យ',
+        confirmProcess: 'តើអ្នកប្រាកដជាចង់បន្ត?',
+        alreadyCheckin: 'បរាជ័យ! មិនអាចចាប់ផ្តើមបានទេព្រោះកំពុងដំណើរការ',
+        inProcess: 'បរាជ័យ! ស្ថានភាពកំពុងដំណើរការ',
+        floorError: 'បរាជ័យ! មិនអាចលុបបានទេព្រោះមានទិន្នន័យ'
+    }
+}
+
+language = $('html').attr('data-lang')
+
+
 $.fn.translator = function () {
     languages = {
         english: {
@@ -11,7 +81,7 @@ $.fn.translator = function () {
             reports: 'Reports',
             configuration: 'Setting',
             cashing: 'Cashing',
-            order: 'Book',
+            order: 'Order',
             stock: 'Stock',
             expense: 'Expense',
             transaction: 'Transaction',
@@ -142,7 +212,8 @@ $.fn.translator = function () {
             totalRemain: 'Total Remain',
             owe: 'Owe',
             totalInvoice: 'Total Invoice',
-            orderSchedule: 'Order Schedule'
+            orderSchedule: 'Order Schedule',
+            delete: 'Delete'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -288,7 +359,8 @@ $.fn.translator = function () {
             totalRemain: 'សរុបជំពាក់',
             owe: 'ជំពាក់',
             totalInvoice: 'វិក្កយបត្រសរុប',
-            orderSchedule: 'កាលវិភាគកម្មង់'
+            orderSchedule: 'កាលវិភាគកម្មង់',
+            delete: 'លុប'
         }
     }
 
@@ -394,6 +466,7 @@ $.fn.translator = function () {
     $('.ln-category').text(languages[language].category)
     $('.ln-role').text(languages[language].role)
     $('.ln-store').text(languages[language].store)
+    $('.ln-delete').text(languages[language].delete)
 
 
     $('.ln-since').text(languages[language].since)

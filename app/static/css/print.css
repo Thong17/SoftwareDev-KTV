@@ -1,3 +1,9 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
 body {
     color: black;
 }
@@ -18,12 +24,12 @@ body {
 
 .contact-number {
     font-size: 48px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .location {
     font-size: 43px;
-    font-weight: 500;
+    font-weight: 400;
     color: #333;
 }
 
@@ -35,7 +41,7 @@ body {
 .date-time,
 .invoice-cashier {
     font-size: 43px;
-    font-weight: 600;
+    font-weight: 500;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -60,18 +66,18 @@ thead {
 thead tr {
     background-color: rgba(0, 0, 0, 0.1) !important;
     font-size: 43px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 tbody tr {
     font-size: 33px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .total-container {
     -webkit-print-color-adjust: exact;
     font-size: 43px;
-    font-weight: 600;
+    font-weight: 500;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -119,5 +125,5 @@ tbody tr {
 .footer-container {
     margin-top: 50px;
     font-size: 43px;
-    font-weight: 700;
+    font-weight: 600;
 }

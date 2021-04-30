@@ -1,5 +1,5 @@
 from app import bcrypt, db, login_manager, upload, delete_photo, utc2local, datetimefilter
-from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout, tblCheckin, tblOwe
+from app import tblUser, tblBrand, tblCategory, tblProperty, tblProduct, tblColor, tblPhoto, tblValue, tblStock, tblProfile, tblDrawer, tblTransaction, tblQuantity, tblMoney, tblCustomer, tblPayment, tblAdvertise, tblOutcome, tblActivity, tblRole, tblAppearance, tblFloor, tblStore, tblRoom, tblOrder, tblCheckout, tblCheckin, tblOwe, tblInvoice
 from app import LoginForm, RegisterForm, CategoryForm, BrandForm, ProfileForm, RoleForm, ExpenseForm, StoreForm, FloorForm
 from app import CategorySchema, ProductSchema, ColorSchema, BrandSchema, StockSchema, MoneySchema, DrawerSchema, TransactionSchema, PaymentSchema, ActivitySchema, RoleSchema, UserSchema, FloorSchema, StoreSchema, RoomSchema, OrderSchema, CheckoutSchema, OutcomeSchema, CustomerSchema, OweSchema
 from flask import render_template, redirect, request, jsonify, Blueprint, url_for, flash
@@ -773,8 +773,6 @@ def add_value():
 def save_product(id):
     Product = tblProduct.query.get(id)
 
-    
-
     category = request.form['category']
     brand = request.form['brand']
     product = request.form['product']
@@ -824,13 +822,16 @@ def save_product(id):
     Product.discount = discount
     Product.period = period
 
-    Product.appearance[0].width = width
-    Product.appearance[0].height = height
-    Product.appearance[0].weight = weight
-    Product.appearance[0].depth = depth
-    Product.appearance[0].material = material
-    db.session.commit()
-    return jsonify({'data': 'Success'})
+    try:
+        Product.appearance[0].width = width
+        Product.appearance[0].height = height
+        Product.appearance[0].weight = weight
+        Product.appearance[0].depth = depth
+        Product.appearance[0].material = material
+        db.session.commit()
+        return jsonify({'data': 'Success'})
+    except:
+        return jsonify({'data': 'Failed'})
 
 
 @route.route('/product/remove/<id>', methods=['POST'])
@@ -1345,13 +1346,11 @@ def order_product(id):
                     resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
                                         'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
                 else:
-                    resultObj['result'] = 'failed'
+                    resultObj['result'] = 'not enough'
                     resultObj['data'] = {
-                        'message': 'The selected product has only '+str(sum_stocks)+' left'}
+                        'message': str(sum_stocks)}
             else:
-                resultObj['result'] = 'failed'
-                resultObj['data'] = {
-                    'message': 'The selected product is not available'}
+                resultObj['result'] = 'out of stock'
         else:
             transaction.quantity = quantity
             amount *= quantity
@@ -1364,9 +1363,7 @@ def order_product(id):
                                 'price': price, 'isStock': False, 'discount': discount}
         return jsonify(resultObj)
     except:
-        resultObj['result'] = 'failed'
-        resultObj['data'] = {
-                    'message': 'Something went wrong! Please reload and try again.'}
+        resultObj['result'] = 'error'
         return jsonify(resultObj)
 
 @route.route('/transaction/delete/<id>', methods=['POST'])
@@ -1395,7 +1392,7 @@ def checkout(id):
     customer = request.form['customer']
     
     if payment.isComplete:
-        return jsonify({'result': 'Order has paid already!'})
+        return jsonify({'result': 'Failed', msg: 'paid'})
     else:
         if customer != '':
             payment.orderedBy = customer
@@ -1529,7 +1526,7 @@ def checkout(id):
                     payment.customerPayment.customerOwe[0].paid += payment.paid
                     payment.customerPayment.customerOwe[0].receive = receive
     
-                msg = 'Payment still remain '+ str(round(payment.remain, 2))+'$ for customer name: '+payment.customerPayment.name
+                msg = str(round(payment.remain, 2))
                 if payment.orderPayment:
                     payment.orderPayment[0].checkin.order.status = 'Open'
                     payment.orderPayment[0].checkin.isCompleted = True
@@ -1540,8 +1537,8 @@ def checkout(id):
                 db.session.commit()
                 return jsonify({'result': 'Success', 'msg': msg, 'change': moneys, 'rate': payment.rate, 'total_change': total_change, 'isComplete': payment.isComplete, 'total_receive': payment.receive, 'total_remain': payment.remain, 'total_paid': payment.paid})
             else:
-                msg = 'Please select a customer to proceed the remaining payment!'
-                return jsonify({'result': msg, 'rate': payment.rate})
+                msg = 'owe'
+                return jsonify({'result': 'Failed', 'msg': msg, 'rate': payment.rate})
 
         
         
@@ -2466,7 +2463,7 @@ def create_admin():
         if len(fullname) > 1:
             lastname = fullname[1]
     if request.form['birthdate'] != '':
-        birthdate = datetime.strptime(request.form['birthdate'], '%m/%d/%y')
+        birthdate = datetime.strptime(request.form['birthdate'], '%Y-%m-%d')
     else:
         birthdate = None
     user_id = str(uuid4())
@@ -2687,15 +2684,18 @@ def lock_room(id):
 @route.route('/room/delete/<id>', methods=['POST'])
 def delete_room(id):
     Room = tblRoom.query.get(id)
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has delete room: '+Room.room, type='Delete', createdBy=current_user.id)
-    try:
-        db.session.delete(Room)
-        db.session.add(Activity)
-        db.session.commit()
-        return jsonify({'data': 'Success'})
-    except:
-        return jsonify({'data': 'Failed to delete '+Room.room})
+    if Room.status == 'In Process':
+        return jsonify({'data': 'In process'})
+    else:
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                            ' has delete room: '+Room.room, type='Delete', createdBy=current_user.id)
+        try:
+            db.session.delete(Room)
+            db.session.add(Activity)
+            db.session.commit()
+            return jsonify({'data': 'Success'})
+        except:
+            return jsonify({'data': 'Failed to delete '+Room.room})
 
 
 @route.route('/room/edit/<id>', methods=['POST'])
@@ -2936,9 +2936,7 @@ def order_transaction(product_id):
 
         if Order.checkin:
             if Order.checkin.orderPayment.isComplete:
-                resultObj['result'] = 'failed'
-                resultObj['data'] = {
-                    'message': 'Order has paid already!'}
+                resultObj['result'] = 'paid'
                 return jsonify(resultObj)
             else:
                 if data['colorId'] == '':
@@ -3008,13 +3006,12 @@ def order_transaction(product_id):
                             resultObj['data'] = {'id': tid, 'amount': amount, 'stock': total_stocks,
                                                 'quantity': quantity, 'price': price, 'isStock': True, 'discount': discount}
                         else:
-                            resultObj['result'] = 'failed'
+                            resultObj['result'] = 'not enough'
                             resultObj['data'] = {
-                                'message': 'The selected product has only '+str(sum_stocks)+' left'}
+                                'message': str(sum_stocks)
+                            }
                     else:
-                        resultObj['result'] = 'failed'
-                        resultObj['data'] = {
-                            'message': 'The selected product is not available'}
+                        resultObj['result'] = 'out of stock'
                 else:
                     transaction.quantity = quantity
                     amount *= quantity
@@ -3025,14 +3022,10 @@ def order_transaction(product_id):
                                         'price': price, 'isStock': False, 'discount': discount}
                 return jsonify(resultObj)
         else:
-            resultObj['result'] = 'failed'
-            resultObj['data'] = {
-                'message': 'Please check in before you select the order'}
+            resultObj['result'] = 'checkin'
             return jsonify(resultObj)
     except:
-        resultObj['result'] = 'failed'
-        resultObj['data'] = {
-            'message': 'Something went wrong! Please reload and try again.'}
+        resultObj['result'] = 'error'
         return jsonify(resultObj)
 
 
@@ -3141,11 +3134,11 @@ def print_invoice(id):
     return render_template('views/invoice.html', payment=Payment, store=Store)
 
 
-@route.route('/invoice_owe/<id>')
+@route.route('/invoice/owe/<id>')
 def print_invoice_owe(id):
-    Owe = tblOwe.query.get(id)
+    Invoice = tblInvoice.query.get(id)
     Store = tblStore.query.first()
-    return render_template('views/invoice_owe.html', payment=Owe, store=Store)
+    return render_template('views/invoice_owe.html', payment=Invoice, store=Store)
 
 
 @route.route('/backup', methods=['POST'])
@@ -3157,9 +3150,9 @@ def backup():
             os.makedirs(dirs)
         cmd = "mysqldump -u"+mysqlObj['user']+" -p"+mysqlObj['password']+" "+mysqlObj['database']+" > backup/backup_"+strtime+".sql"
         os.system(cmd)
-        return jsonify({'msg': 'Backup completed successfully'})
+        return jsonify({'result': 'Success'})
     except: 
-        return jsonify({'msg': 'Failed to backup!'})
+        return jsonify({'result': 'Failed'})
 
 @route.route('/restore', methods=['POST'])
 def restore():
@@ -3250,6 +3243,10 @@ def checkout_owe(id):
     totalUSD = 0
     totalKHR = 0
 
+    iid = str(uuid4())
+
+    Invoice = tblInvoice(id=iid, amount=customer.customerOwe[0].amount, paid=customer.customerOwe[0].paid, remain=customer.customerOwe[0].remain, receive=customer.customerOwe[0].receive, rate=rate, createdBy=current_user.id, orderedBy=customer.id)
+
     if customer:
         customer.customerOwe[0].rate = rate
         customer.customerOwe[0].amount = 0
@@ -3261,6 +3258,7 @@ def checkout_owe(id):
 
         for payment in sorted(customer.customerOwe[0].owePayments, key=operator.attrgetter('remain'), reverse=False):
             if not payment.isComplete:
+                Invoice.invoicePayments.append(payment)
                 total += payment.amount
 
                 receiveUSD = Decimal(payment.receive.split(',')[0])
@@ -3373,9 +3371,17 @@ def checkout_owe(id):
 
     Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
                            ' has checkout owe total: '+str(amount), type='Checkout', createdBy=current_user.id)
-    db.session.add(Activity)
-    db.session.commit()
-        
-    return jsonify({'result': 'Success', 'change': moneys, 'rate': rate, 'total_change': total_change, 'total_receive': total_receive, 'total_remain': remain, 'total_paid': amount, 'id': customer.customerOwe[0].id})
 
+    Invoice.paid = Invoice.amount - remain
+    Invoice.receive = total_receive
+    Invoice.remain = remain
+    Invoice.change = total_change
+    try:
+        db.session.add(Activity)
+        db.session.add(Invoice)
+        db.session.commit()
+            
+        return jsonify({'result': 'Success', 'change': moneys, 'rate': rate, 'total_change': total_change, 'total_receive': total_receive, 'total_remain': remain, 'total_paid': amount, 'id': iid})
+    except:
+        return jsonify({'result': 'Failed'})
    

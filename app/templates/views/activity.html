@@ -1,13 +1,60 @@
 {% extends 'views/report.html' %}
 
 {% block style %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/dataTables.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/buttons.dataTables.min.css')}}">
 <style>
-    thead {
-        background-color: var(--color-menu);
-    }
+    
     .row-wrapper {
         overflow: scroll;
     }
+
+    thead tr {
+        background-color: var(--color-menu) !important;
+    }
+    form {
+        width: 250px;
+        border-right: 1px solid var(--color-hr);
+    }
+    .dataTables_wrapper {
+        width: 100%;
+    }
+    .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_empty, select, input, .dataTables_paginate a {
+        color: var(--color-text) !important;
+        font-weight: 300;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", 'Hanuman', serif;
+    }
+    .dataTables_info {
+        display: none;
+    }
+    select, input {
+        border-radius: 10px !important;
+        border: 1px solid var(--color-hr) !important;
+    }
+    select:focus, input:focus {
+        outline: none;
+    }
+    tbody tr td {
+        background-color: var(--color-bg) !important;
+        height: 30px;
+        cursor: default;
+    }
+    table {
+        border-bottom: none !important;
+    }
+    .paginate_button, .paginate_button.current {
+        background-color: var(--color-menu) !important;
+        background: var(--color-menu) !important;
+        border: var(--color-menu) !important;
+        color: var(--color-font) !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: var(--color-text) !important;
+    }
+    span .paginate_button, span .paginate_button.current {
+        color: var(--color-font) !important;
+    }
+
 </style>
 {% endblock %}
 
@@ -16,7 +63,7 @@
 
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 100%;">
-            <table class="table">
+            <table class="table" id="list-activity">
                 <thead>
                     <tr class="color-font">
                         <td class="color-text ln-activity" style="width: 10%;">Activity</td>
@@ -44,7 +91,14 @@
 {% endblock %}
 
 {% block script %}
+<script src="{{url_for('static', filename='js/dataTables.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
 <script>
-    
+    $('#list-activity').DataTable({
+        "scrollCollapse": true,
+        "scrollY": "70vh",
+        "paging": false,
+        "searching": false
+    })
 </script>
 {% endblock %}

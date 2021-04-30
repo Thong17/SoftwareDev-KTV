@@ -304,7 +304,7 @@
         return false;
     })
     $('#list-properties').on('click', '.action-btn .fa-trash-o', function () {
-        if (confirm('Are you sure you want to delete?')) {
+        if (confirm(languagesAlert[language].confirmProcess)) {
             var id = $(this).attr('id')
             $.ajax({
                 url: '/property/remove/' + id,
@@ -315,7 +315,7 @@
                             $(this).remove()
                         })
                     } else {
-                        alert(data.data)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })
@@ -457,7 +457,7 @@
                     $('.today .box-result p').text(data['today'])
                     $('.total .box-result p').text(data['total'])
                 } else {
-                    alert(data['msg'])
+                    alert(languagesAlert[language].floorError)
                 }
             }
         })
@@ -488,7 +488,7 @@
                     }
                 })
             } else {
-                alert('Please fill the text')
+                alert(languagesAlert[language].fillTheText)
                 $('#' + id).find('.edit-content').text(old_content)
             }
         })

@@ -34,6 +34,7 @@
     tbody tr td {
         background-color: var(--color-bg) !important;
         height: 30px;
+        cursor: default;
     }
     table {
         border-bottom: none !important;
@@ -249,7 +250,7 @@
                         $(this).remove()
                     })
                 } else {
-                    alert(data.data)
+                    alert(languagesAlert[language].error)
                 }
             }
         })

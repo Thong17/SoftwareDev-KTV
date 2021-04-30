@@ -12,6 +12,10 @@
         justify-content: start;
     }
 
+    tbody tr td {
+        cursor: default;
+    }
+
     .role {
         padding: 3px 15px;
         border-radius: 7px;
@@ -288,7 +292,7 @@
 
         $('.action-btn').on('click', '.fa-trash-o', function() {
             var id = $(this).closest('tr').attr('id')
-            if (confirm('Are you sure you want to remove role from this user?')) {
+            if (confirm(languagesAlert[language].confirmProcess)) {
                 $.ajax({
                     url: '/role/clear/'+id,
                     type: 'POST',
@@ -298,7 +302,7 @@
                                 $(this).remove()
                             })
                         } else {
-                            alert(data.data)
+                            alert(languagesAlert[language].userToggle)
                         }
                     }
                 })
@@ -381,12 +385,12 @@
                                 $('#' + id).find('.edit-content').text(new_content)
                                 toggleEdit($(clear), $(check))
                             } else {
-                                alert(data.msg)
+                                alert(languagesAlert[language].error)
                             }
                         }
                     })
                 } else {
-                    alert('Please fill the text')
+                    alert(languagesAlert[language].fillTheText)
                     $('#' + id).find('.edit-content').text(old_content)
                 }
             })
@@ -446,7 +450,7 @@
                     $(arg).closest('tr').find('.tags-td').text(data.tags)
                     $(arg).closest('tr').find('.action-btn').html('<i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i>')
                 } else {
-                    alert(data.data)
+                    alert(languagesAlert[language].error)
                 }
             }
         })
@@ -455,7 +459,7 @@
     function removeRole(arg) {
         event.stopPropagation()
         var id = $(arg).parent().attr('id')
-        if (confirm('Are you sure you want to delete this role?')) {
+        if (confirm(languagesAlert[language].confirmProcess)) {
             $.ajax({
                 url: '/role/remove/' + id,
                 method: 'POST',
@@ -465,7 +469,7 @@
                             $(this).remove()
                         })
                     } else {
-                        alert(data.msg)
+                        alert(languagesAlert[language].userToggle)
                     }
                 }
             })

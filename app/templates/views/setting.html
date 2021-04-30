@@ -139,7 +139,11 @@
                         $('.loading-container').removeClass('hide')
                     },
                     success: function(data) {
-                        alert(data.msg)
+                        if (data.result == 'Success') {
+                            alert(languagesAlert[language].userSaveSuccess)
+                        } else {
+                            alert(languagesAlert[language].error)
+                        }
                         $('.loading-container').addClass('hide')
                     }
                 })
@@ -176,10 +180,10 @@
                 },
                 success: function(data) {
                     if (data.data == 'Success') {
-                        alert(data.msg)
+                        alert(languagesAlert[language].restoreSuccess)
                         window.location.reload()
                     } else {
-                        alert(data.msg)
+                        alert(languagesAlert[language].error)
                         $('.loading-container').addClass('hide')
                     }
                 }

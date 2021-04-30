@@ -123,6 +123,11 @@
     thead {
         background-color: var(--color-hr);
     }
+
+    tbody tr td {
+        cursor: default;
+    }
+    
     @media only screen and (max-width: 450px) {
         .dash-board {
             flex-wrap: wrap;
@@ -177,9 +182,8 @@
                 <table class="table">
                     <thead>
                         <tr class="color-font">
-                            <td class="color-text ln-activity" style="width: 50%;">Activity</td>
-                            <td class="color-text ln-category">Type</td>
-                            <td class="color-text ln-date-create">Date Created</td>
+                            <td class="color-text ln-activity" style="width: 70%;">Activity</td>
+                            <td class="color-text ln-category" style="width: 30%;">Type</td>
                         </tr>
                     </thead>
                     <tbody id="list-activities" class="notranslate">
@@ -217,9 +221,8 @@
                 Array.from(users).forEach(u => {
                     if ($(u).hasClass('active') && a.createdBy == $(u).attr('id')) {
                         element += `<tr class="activity-item" style="font-size: 13px;" id="` + a.id + `">
-                            <td class="color-text">`+ a.activity + `</td>
-                            <td class="color-text">`+ a.type + `</td>
-                            <td class="color-text">`+ a.createdOn + `</td>
+                            <td class="color-text" style="width: 70%;">`+ a.activity + `</td>
+                            <td class="color-text" style="width: 30%;">`+ a.type + `</td>
                         </tr>`
                     }
                 })
@@ -249,9 +252,8 @@
                     Array.from(users).forEach(u => {
                         if ($(u).hasClass('active') && a.createdBy == $(u).attr('id')) {
                             $('#list-activities').append(`<tr class="activity-item" style="font-size: 13px;" id="` + a.id + `">
-                                <td class="color-text">`+ a.activity + `</td>
-                                <td class="color-text">`+ a.type + `</td>
-                                <td class="color-text">`+ a.createdOn + `</td>
+                                <td class="color-text" style="width: 70%;">`+ a.activity + `</td>
+                                <td class="color-text" style="width: 30%;">`+ a.type + `</td>
                             </tr>`)
                         }
                     })

@@ -6,6 +6,7 @@
 <style>
     #payment-add:hover {
         color: #0686f0 !important;
+        cursor: pointer;
     }
 
     thead tr {
@@ -43,6 +44,7 @@
     tbody tr td {
         background-color: var(--color-bg) !important;
         height: 30px;
+        cursor: default;
     }
     table {
         border-bottom: none !important;
@@ -240,8 +242,6 @@
                     <td class="color-text flex-between-center clear-btn"><ion-icon name="close-outline"></ion-icon></td>
                 </tr>`
     }
-
-    language = $('html').attr('data-lang')
 
     currencyUSD(2)
     $('#list-payments').DataTable({
@@ -629,7 +629,7 @@
                             }
                         })
                         $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">'+languagesObj[language].checkOut+'</span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>')
-                        alert(data.result)
+                        alert(languagesAlert[language].error)
                     }
                 }
             })

@@ -1387,10 +1387,10 @@
             if (this.files.length > 0) {
                 this.files.forEach((file, index) => {
                     if (jQuery.inArray(file.type, validtypes) == -1) {
-                        alert('Invalide file!')
+                        alert(languagesAlert[language].invalidFile)
                     } else {
                         if (file.size > 2000000) {
-                            alert('Image size too big ')
+                            alert(languagesAlert[language].invalidSize)
                         } else {
                             form.append(index, file)
                             len.push(index)
@@ -1432,7 +1432,7 @@
                     toggleLoader(loader)
                 }
             } else {
-                alert('No file selected')
+                alert(languagesAlert[language].noFile)
                 toggleLoader(loader)
             }
 

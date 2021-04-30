@@ -32,6 +32,7 @@
     tbody tr td {
         background-color: var(--color-bg) !important;
         height: 30px;
+        cursor: default;
     }
     table {
         border-bottom: none !important;
@@ -132,7 +133,7 @@
     $(document).ready(function () {
         $(document).on('click', '.fa-trash-o', function() {
             id = $(this).closest('tr').attr('id')
-            if (confirm('Deleting an expense may cause an unaccurate data. Are you sure you want to delete it? ')) {
+            if (confirm(languagesAlert[language].confirmProcess)) {
                 $.ajax({
                     url: '/expense/delete/'+id,
                     type: 'POST',
@@ -140,7 +141,7 @@
                         if (data.data == 'Success') {
                             window.location.reload()
                         } else {
-                            alert(data.data)
+                            alert(languagesAlert[language].error)
                         }
                     }
                 })
@@ -187,7 +188,7 @@
                                 <td class="color-text currency-format" id="amount">`+accounting.formatMoney(data.amount)+`</td>
                                 <td class="color-text flex-between-center notranslate"><span class="notranslate color-text" id="createdOn">`+date+`</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>`)
                         } else {
-                            alert('We are unable to submit your request. Please try again')
+                            alert(languagesAlert[language].error)
                         }
                     }
                 })

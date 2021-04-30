@@ -256,7 +256,6 @@
 <script src="{{url_for('static', filename='js/dataTables.min.js')}}"></script>
 <script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
 <script>
-    language = $('html').attr('data-lang')
     currencyUSD(2)
     $('#list-payments').DataTable({
         "scrollCollapse": true,
@@ -604,7 +603,7 @@
                         }
                     })
 
-                    element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close">'+languagesObj[language].close+'</button><button class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></button></div>'
+                    element += '</div></div><div class="invoice-btn"><button class="color-text-contrast close-payment ln-close">'+languagesObj[language].close+'</button><a href="/invoice/owe/'+data.id+'" target="_blank" class="btn border color-font print-inv"><ion-icon name="print-outline"></ion-icon></a></div>'
                     $('.payment-total').html(element)
                     $('#list-payment').empty()
                     $('#receive-cash').val('')
@@ -620,14 +619,10 @@
                         }
                     })
                     $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">'+languagesObj[language].checkOut+'</span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>')
-                    alert(data.result)
+                    alert(languagesAlert[language].error)
                 }
             }
         })
-    })
-
-    $(document).on('click', '.print-inv', function() {
-        $(".payment-invoice").printThis()
     })
 
     $(document).on('click', '.close-payment', function() {

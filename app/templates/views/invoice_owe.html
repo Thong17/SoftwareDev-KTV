@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ store.store }} - {{ payment.invoice }}</title>
+    <title>{{ store.store }} - {{ payment.invoiceOwe.name }}</title>
     <link rel="icon" href="{{url_for('static', filename='svg/icon.png')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/print.css')}}">
@@ -21,28 +21,26 @@
             <span class="time">{{ payment.createdOn | datetimefilter }}</span>
         </div>
         <div class="invoice-cashier mb-3">
-            <span class="invoice">Invoice: {{ payment.invoice }}</span>
+            <span class="invoice">Customer: {{ payment.invoiceOwe.name }}</span>
             <span class="invoice">Cashier: {{ current_user.username }}</span>
         </div>
         <div class="transaction-container">
             <table class="table">
                 <thead>
                     <tr>
-                        <td style="width: 50%;">Description</td>
-                        <td style="width: 15%;">Price</td>
-                        <td style="width: 10%;">Disc</td>
-                        <td style="width: 10%;">Qty</td>
-                        <td style="width: 15%;">Total</td>
+                        <td style="width: 30%;">Invoice</td>
+                        <td style="width: 25%;">Amount</td>
+                        <td style="width: 20%;">Paid</td>
+                        <td style="width: 25%;">Remain</td>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for transaction in payment.transactions %}
+                    {% for transaction in payment.invoicePayments %}
                     <tr>
-                        <td>{{ transaction.description }}</td>
-                        <td class="dollar-format">{{ transaction.price }}</td>
-                        <td>{{ transaction.discount }}%</td>
-                        <td>{{ transaction.quantity }}</td>
+                        <td>{{ transaction.invoice }}</td>
                         <td class="dollar-format">{{ transaction.amount }}</td>
+                        <td class="dollar-format">{{ transaction.paid }}</td>
+                        <td class="dollar-format">{{ transaction.remain }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -67,10 +65,17 @@
                         <span>Paid:</span>
                         <div><span class="receive">{{ payment.receive }}</span></div>
                     </div>
+                    {% if payment.remain > 0 %}
                     <div class="return-cash flex-between">
                         <span>Remain:</span>
                         <div class="flex-column-start"><span class="dollar-format">{{ payment.remain }}</span><span class="riel-format">{{ payment.remain * payment.rate }}</span></div>
                     </div>
+                    {% else %}
+                    <div class="return-cash flex-between">
+                        <span>Return:</span>
+                        <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span></div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

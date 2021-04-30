@@ -104,7 +104,7 @@ $(document).on('click', '.order-btn', function() {
                                 $('.payment-add').attr('disabled', false)
                                 
                             } else {
-                                alert(data.result)
+                                alert(languagesAlert[language].error)
                             }
                         }
                     })
@@ -437,7 +437,7 @@ $(document).on('click', '.checkout-btn', function() {
                     }
                 })
                 $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
-                alert(data.result)
+                alert(languagesAlert[language].proceedRemainError)
             }
         }
     })
