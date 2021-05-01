@@ -55,7 +55,7 @@ languagesAlert = {
         confirmDuration: 'សូមផ្ទៀងផ្ទាត់រយះពេល',
         checkinFirst: 'សូមចាប់ផ្តើមមុននឹងធ្វើប្រតិបត្តិការ',
         customerSelect: 'សូមជ្រើសរើសអតិថិជន',
-        selectCategory: 'សូមជ្រើសរើសប្រភេទសំរាប់ផលិតផល',
+        selectCategory: 'សូមជ្រើសរើសប្រភេទនិងម៉ាកសំរាប់ផលិតផល',
         passwordChanged: 'ជោគជ័យ! ពាក្យសម្ងាត់ត្រូវបានរក្សាទុក',
         validatePassoword: 'បរាជ័យ! លេខសម្ងាត់ត្រូវតែមាន ៨ តួអក្សរឡើងទៅ',
         validateAge: 'បរាជ័យ! អ្នកត្រូវកើតមុនថ្ងៃនេះ',

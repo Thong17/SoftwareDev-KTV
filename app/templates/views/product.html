@@ -47,7 +47,11 @@
         </div>
         <div class="border-right"></div>
         <div class="column-wrapper" style="width: 100%; box-sizing: border-box; overflow: hidden;">
-            <div class="content-header"></div>
+            <div class="content-header"><div class="flex-between">
+                <h5 class="notranslate color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="ln-product brand-name"></span></h5>
+                <button class="btn border color-font add-product btn-slim"><p class="plus">+</p></button>
+            </div>
+        </div>
             <div class="content-body">
                 <div class="inset-shadow hide"></div>
                 <div class="grid-products">
@@ -91,6 +95,22 @@
         if ($(this).val() == '') {
             $('.percentage').addClass('hide')
         }
+    })
+
+    $(document).on('change', '#select-brands', function() {
+        id = $(this).val()
+        $('.add-product').attr('id', id)
+
+        var containers = $('.item-container').children()
+
+        Array.from(containers).forEach(item => {
+            if ($(item).attr('id') == id) {
+                $(item).addClass('is-selected')
+                $('.brand-name').text($(item).find('.edit-content').text())
+            } else {
+                $(item).removeClass('is-selected')
+            }
+        });
     })
 
     $(document).on('click', '.pcr-delete', function () {
@@ -534,7 +554,7 @@
             isStock = false
         }
 
-        if (category != null) {
+        if (category != null && brand != "") {
             if (product == '') {
                 $('#product').focus()
             } else if (price == '') {
@@ -697,6 +717,10 @@
         var list = $('.grid-products')
         var details = $('.details')
         var icon = $('#add-product')
+
+        if (id == undefined) {
+            id = null
+        }
 
         if (product.hasClass('hide')) {
             $('.add-product p').addClass('clear')
@@ -967,8 +991,8 @@
         toggleLoader($('.loader'))
         $('.grid-products').empty()
         $('.content-header').html(
-            '<div class="flex-between"><h5 class="notranslate color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i>' +
-            head + '</h5><button class="btn border color-font add-product btn-slim" id="' +
+            '<div class="flex-between"><h5 class="notranslate color-font"><i class="fa fa-caret-right right" aria-hidden="true"></i><span class="brand-name">' +
+            head + '</span></h5><button class="btn border color-font add-product btn-slim" id="' +
             id + '"><p class="plus">+</p></button></div>')
 
         $.ajax({
