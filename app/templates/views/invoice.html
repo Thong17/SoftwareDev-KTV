@@ -67,10 +67,17 @@
                         <span>Paid:</span>
                         <div><span class="receive">{{ payment.receive }}</span></div>
                     </div>
+                    {% if payment.remain > 0 %}
+                    <div class="return-cash flex-between">
+                        <span>Remain:</span>
+                        <div class="flex-column-start"><span class="dollar-format">{{ payment.remain }}</span><span class="riel-format">{{ payment.remain * payment.rate }}</span></div>
+                    </div>
+                    {% else %}
                     <div class="return-cash flex-between">
                         <span>Return:</span>
                         <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span><span class="riel-format">{{ payment.change * 4000 }}</span></div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

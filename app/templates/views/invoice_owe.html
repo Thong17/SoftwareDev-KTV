@@ -73,7 +73,7 @@
                     {% else %}
                     <div class="return-cash flex-between">
                         <span>Return:</span>
-                        <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span></div>
+                        <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span><span class="riel-format">{{ payment.change * 4000 }}</span></div>
                     </div>
                     {% endif %}
                 </div>

@@ -1045,16 +1045,14 @@
 <script src="{{url_for('static', filename='js/cashing.js')}}"></script>
 <script src="{{url_for('static', filename='js/attrchange.js')}}"></script>
 <script>
+    start = new Date($('#checkin-date').text() +' '+ $('#checkin-time').text())
 
     onScan.attachTo(document, {
         suffixKeyCodes: [13], // enter-key expected at the end of a scan
         reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
         onScan: function(barcode, iQty) { // Alternative to document.addEventListener('scan')
-            console.log(barcode)
-
             products = document.querySelectorAll('.product-item')
             Array.from(products).forEach(p => {
-                console.log($(p).attr('data-barcode'))
                 if ($(p).attr('data-barcode') == barcode) {
                     $(p).find('.product-btn').click()
                 }
@@ -1101,9 +1099,18 @@
                 type: 'POST',
                 success: function (data) {
                     if (data.msg == 'Success') {
-                        window.location.reload()
-                        // _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
-                        // _this.find('.check-in-out').text('Check Out')
+                        start = new Date(data.startDate +' '+ data.startTime)
+                        _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
+                        _this.html(`<div class="dropup">
+                            <span class="mr-2 order-icon notranslate" id="duration-btn" data-toggle="dropdown" style="color: var(--color-text);">0</span>
+                            <ul class="dropdown-menu m-0 p-2">
+                                <li class="flex-between-start"><span class="color-text ln-checkin">`+languagesObj[language].checkIn+`</span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">`+data.startTime+`</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">`+data.startDate+`</span></div></li>
+                                <hr>
+                                <li class="mb-3 flex-between-center"><span class="color-text ln-duration">`+languagesObj[language].duration+` </span><span id="calculate-time" class="text-danger notranslate"></span></li>
+                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end">`+languagesObj[language].end+`</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
+                            </ul>
+                        </div>
+                        <span class="check-in-out ln-checkout">`+languagesObj[language].checkOut+`</span>`)
                     } else {
                         alert(languagesAlert[language].alreadyCheckin)
                     }
@@ -2108,7 +2115,6 @@
         })
     })
     
-    start = new Date($('#checkin-date').text() +' '+ $('#checkin-time').text())
     setInterval(function() {
         
         current = new Date()

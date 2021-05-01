@@ -253,7 +253,6 @@ $(document).on('click', '.checkout-btn', function() {
         },
         success: function(data) {
             if (data.result == 'Success') {
-                
                 $('.payment-add').attr('disabled', true)
                 $('.clear-btn ion-icon').addClass('hide')
                 var changeObj = {

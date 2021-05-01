@@ -629,7 +629,11 @@
                             }
                         })
                         $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">'+languagesObj[language].checkOut+'</span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>')
-                        alert(languagesAlert[language].error)
+                        if (data.msg == 'paid') {
+                            alert(languagesAlert[language].orderPaid)
+                        } else {
+                            alert(languagesAlert[language].error)
+                        }
                     }
                 }
             })

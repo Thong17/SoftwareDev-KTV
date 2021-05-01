@@ -494,7 +494,6 @@
         if (total.currency == 'KHR') {
             cost *= total.rate
         }
-        console.log(cost)
         total.cost = cost
         $(this).closest('tr').find('#input-cost').val(cost)
     })
@@ -522,7 +521,6 @@
         result = result.toFixed(2)
         total.total = result
 
-        console.log(total)
         $(this).closest('tr').find('#calculated-result').val(result)
     })
 

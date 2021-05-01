@@ -1392,7 +1392,7 @@ def checkout(id):
     customer = request.form['customer']
     
     if payment.isComplete:
-        return jsonify({'result': 'Failed', msg: 'paid'})
+        return jsonify({'result': 'Failed', 'msg': 'paid'})
     else:
         if customer != '':
             payment.orderedBy = customer
@@ -2912,7 +2912,7 @@ def checkin(order_id):
             db.session.add(Payment)
             db.session.add(CheckIn)
             db.session.commit()
-            return jsonify({'msg': 'Success'})
+            return jsonify({'msg': 'Success', 'startTime': datetimefilter(CheckIn.startedOn, '%I:%M %p'), 'startDate': datetimefilter(CheckIn.startedOn, '%B %d, %Y')})
         except:
             return jsonify({'msg': 'Failed'})
     else:
@@ -3233,85 +3233,53 @@ def checkout_owe(id):
             amountUSD += Decimal(a['amount'])
             paidUSD += Decimal(a['amount'])
         amount += Decimal(a['amount'])
-    
-    receiveOweUSD = amountUSD
-    receiveOweKHR = amountKHR
 
-    paidKHR = round(paidKHR, 3)
+    if amount > 0:
+        receiveOweUSD = amountUSD
+        receiveOweKHR = amountKHR
 
-    total_receive = str(amountUSD)+','+str(amountKHR)
-    totalUSD = 0
-    totalKHR = 0
+        paidKHR = round(paidKHR, 3)
 
-    iid = str(uuid4())
+        total_receive = str(amountUSD)+','+str(amountKHR)
+        totalUSD = 0
+        totalKHR = 0
 
-    Invoice = tblInvoice(id=iid, amount=customer.customerOwe[0].amount, paid=customer.customerOwe[0].paid, remain=customer.customerOwe[0].remain, receive=customer.customerOwe[0].receive, rate=rate, createdBy=current_user.id, orderedBy=customer.id)
+        iid = str(uuid4())
 
-    if customer:
-        customer.customerOwe[0].rate = rate
-        customer.customerOwe[0].amount = 0
-        customer.customerOwe[0].remain = 0
-        customer.customerOwe[0].paid = 0
+        Invoice = tblInvoice(id=iid, amount=customer.customerOwe[0].amount, paid=customer.customerOwe[0].paid, remain=customer.customerOwe[0].remain, receive=customer.customerOwe[0].receive, rate=rate, createdBy=current_user.id, orderedBy=customer.id)
 
-        oweUSD = customer.customerOwe[0].receive.split(',')[0]
-        oweKHR = customer.customerOwe[0].receive.split(',')[1]
+        if customer:
+            customer.customerOwe[0].rate = rate
+            customer.customerOwe[0].amount = 0
+            customer.customerOwe[0].remain = 0
+            customer.customerOwe[0].paid = 0
 
-        for payment in sorted(customer.customerOwe[0].owePayments, key=operator.attrgetter('remain'), reverse=False):
-            if not payment.isComplete:
-                Invoice.invoicePayments.append(payment)
-                total += payment.amount
+            oweUSD = customer.customerOwe[0].receive.split(',')[0]
+            oweKHR = customer.customerOwe[0].receive.split(',')[1]
 
-                receiveUSD = Decimal(payment.receive.split(',')[0])
-                receiveKHR = Decimal(payment.receive.split(',')[1])
+            for payment in sorted(customer.customerOwe[0].owePayments, key=operator.attrgetter('remain'), reverse=False):
+                if not payment.isComplete:
+                    Invoice.invoicePayments.append(payment)
+                    total += payment.amount
 
-                totalUSD += receiveUSD
-                totalKHR += receiveKHR
-                
-                if round(paidUSD, 2) >= round(payment.remain, 2):
-                    payment.receive = str(payment.remain + receiveUSD) +','+str(round(receiveKHR, 0))
-                    paidUSD -= payment.remain
-                    amountUSD -= payment.remain
-                    receiveOweUSD = amountUSD
-                    payment.paid += payment.remain
-                    customer.customerOwe[0].remain = 0
-                    customer.customerOwe[0].paid = 0
-                    customer.customerOwe[0].receive = '0,0'
-                                        
-                    oweUSD = 0
-                    oweKHR = 0
-                    payment.remain = 0
-                    payment.isComplete = True
-                    for transaction in payment.transactions:
-                        transaction.isComplete = True
-                        transaction.profit = transaction.amount
-                        if transaction.quantities:
-                            for quantity in transaction.quantities:
-                                transaction.profit -= quantity.soq.cost * quantity.quantity
-                else:
-                    remainKHR = payment.remain
-                    remainKHR -= round(paidUSD, 2)
+                    receiveUSD = Decimal(payment.receive.split(',')[0])
+                    receiveKHR = Decimal(payment.receive.split(',')[1])
+
+                    totalUSD += receiveUSD
+                    totalKHR += receiveKHR
                     
-                    payment.paid += paidUSD
-                    payment.remain = remainKHR
-
-                    remainUSD = paidUSD
-
-                    paidUSD = 0
-
-                    remainKHR = round(remainKHR * rate / 4000, 2)
-                    if paidKHR >= remainKHR:
-                        payment.receive = str(receiveUSD + remainUSD)+','+str(round(receiveKHR + (remainKHR * rate), 0))                        
-                        
-                        amountKHR -= remainKHR * 4000
-                        receiveOweKHR = amountKHR
-                        paidKHR -= remainKHR
+                    if round(paidUSD, 2) >= round(payment.remain, 2):
+                        payment.receive = str(payment.remain + receiveUSD) +','+str(round(receiveKHR, 0))
+                        paidUSD -= payment.remain
+                        amountUSD -= payment.remain
+                        receiveOweUSD = amountUSD
+                        payment.paid += payment.remain
                         customer.customerOwe[0].remain = 0
                         customer.customerOwe[0].paid = 0
                         customer.customerOwe[0].receive = '0,0'
-
-                        oweKHR = 0
+                                            
                         oweUSD = 0
-                        payment.paid += payment.remain
+                        oweKHR = 0
                         payment.remain = 0
                         payment.isComplete = True
                         for transaction in payment.transactions:
@@ -3321,67 +3289,102 @@ def checkout_owe(id):
                                 for quantity in transaction.quantities:
                                     transaction.profit -= quantity.soq.cost * quantity.quantity
                     else:
-                        receiveKHR = amountKHR
-                        payment.paid += (paidKHR * 4000 / rate)
-                        payment.remain -= paidKHR * 4000 / rate
-
-                        customer.customerOwe[0].amount += payment.amount
-                        customer.customerOwe[0].remain += payment.amount - payment.paid
-                        customer.customerOwe[0].paid += payment.paid
+                        remainKHR = payment.remain
+                        remainKHR -= round(paidUSD, 2)
                         
-                        receive = str(amountUSD + Decimal(payment.receive.split(',')[0]))+','+str(round(receiveKHR, 0) + Decimal(payment.receive.split(',')[1]))
-                        payment.receive = receive
+                        payment.paid += paidUSD
+                        payment.remain = remainKHR
 
-                        oweReceive = str(receiveOweUSD + Decimal(oweUSD)) + ',' + str(receiveOweKHR + Decimal(oweKHR))
-                        customer.customerOwe[0].receive = oweReceive
+                        remainUSD = paidUSD
 
-                        amountUSD = 0
-                        amountKHR = 0
-                        paidKHR = 0
-                        remain += payment.remain
+                        paidUSD = 0
+
+                        remainKHR = round(remainKHR * rate / 4000, 2)
+                        if paidKHR >= remainKHR:
+                            payment.receive = str(receiveUSD + remainUSD)+','+str(round(receiveKHR + (remainKHR * rate), 0))                        
+                            
+                            amountKHR -= remainKHR * 4000
+                            receiveOweKHR = amountKHR
+                            paidKHR -= remainKHR
+                            customer.customerOwe[0].remain = 0
+                            customer.customerOwe[0].paid = 0
+                            customer.customerOwe[0].receive = '0,0'
+
+                            oweKHR = 0
+                            oweUSD = 0
+                            payment.paid += payment.remain
+                            payment.remain = 0
+                            payment.isComplete = True
+                            for transaction in payment.transactions:
+                                transaction.isComplete = True
+                                transaction.profit = transaction.amount
+                                if transaction.quantities:
+                                    for quantity in transaction.quantities:
+                                        transaction.profit -= quantity.soq.cost * quantity.quantity
+                        else:
+                            receiveKHR = amountKHR
+                            payment.paid += (paidKHR * 4000 / rate)
+                            payment.remain -= paidKHR * 4000 / rate
+
+                            customer.customerOwe[0].amount += payment.amount
+                            customer.customerOwe[0].remain += payment.amount - payment.paid
+                            customer.customerOwe[0].paid += payment.paid
+                            
+                            receive = str(amountUSD + Decimal(payment.receive.split(',')[0]))+','+str(round(receiveKHR, 0) + Decimal(payment.receive.split(',')[1]))
+                            payment.receive = receive
+
+                            oweReceive = str(receiveOweUSD + Decimal(oweUSD)) + ',' + str(receiveOweKHR + Decimal(oweKHR))
+                            customer.customerOwe[0].receive = oweReceive
+
+                            amountUSD = 0
+                            amountKHR = 0
+                            paidKHR = 0
+                            remain += payment.remain
 
 
-        total_receive = str(Decimal(total_receive.split(',')[0]) + totalUSD) +','+ str(Decimal(total_receive.split(',')[1]) + totalKHR)
+            total_receive = str(Decimal(total_receive.split(',')[0]) + totalUSD) +','+ str(Decimal(total_receive.split(',')[1]) + totalKHR)
 
-        if paidKHR > 0 or paidUSD > 0:
-            change = paidKHR + paidUSD
-            total_change = change
-            moneyObj = {
-                'money': change,
-                'currency': 'USD'
-            }
-            for money in listMoney:
-                convertMoney = 0
-                if money.currency == 'KHR':
-                        convertMoney = money.money / 4000
-                else:
-                    convertMoney = money.money
-                if money.unit > 0 and convertMoney <= change:
-                    for unit in range(int(money.unit)):
-                        if convertMoney <= change:
-                            moneys.append({
-                                'money': money.money,
-                                'currency': money.currency
-                            })
-                            money.unit -= 1
-                            change -= convertMoney
-                            moneyObj['money'] = change
+            if paidKHR > 0 or paidUSD > 0:
+                change = paidKHR + paidUSD
+                total_change = change
+                moneyObj = {
+                    'money': change,
+                    'currency': 'USD'
+                }
+                for money in listMoney:
+                    convertMoney = 0
+                    if money.currency == 'KHR':
+                            convertMoney = money.money / 4000
+                    else:
+                        convertMoney = money.money
+                    if money.unit > 0 and convertMoney <= change:
+                        for unit in range(int(money.unit)):
+                            if convertMoney <= change:
+                                moneys.append({
+                                    'money': money.money,
+                                    'currency': money.currency
+                                })
+                                money.unit -= 1
+                                change -= convertMoney
+                                moneyObj['money'] = change
 
-            moneys.append(moneyObj)
+                moneys.append(moneyObj)
 
-    Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
-                           ' has checkout owe total: '+str(amount), type='Checkout', createdBy=current_user.id)
+        Activity = tblActivity(id=str(uuid4()), activity=current_user.username +
+                            ' has checkout owe total: '+str(amount), type='Checkout', createdBy=current_user.id)
 
-    Invoice.paid = Invoice.amount - remain
-    Invoice.receive = total_receive
-    Invoice.remain = remain
-    Invoice.change = total_change
-    try:
-        db.session.add(Activity)
-        db.session.add(Invoice)
-        db.session.commit()
-            
-        return jsonify({'result': 'Success', 'change': moneys, 'rate': rate, 'total_change': total_change, 'total_receive': total_receive, 'total_remain': remain, 'total_paid': amount, 'id': iid})
-    except:
-        return jsonify({'result': 'Failed'})
+        Invoice.paid = Invoice.amount - remain
+        Invoice.receive = total_receive
+        Invoice.remain = remain
+        Invoice.change = total_change
+        try:
+            db.session.add(Activity)
+            db.session.add(Invoice)
+            db.session.commit()
+                
+            return jsonify({'result': 'Success', 'change': moneys, 'rate': rate, 'total_change': total_change, 'total_receive': total_receive, 'total_remain': remain, 'total_paid': amount, 'id': iid})
+        except:
+            return jsonify({'result': 'Failed', 'rate': rate})
+    else:
+        return jsonify({'result': 'Failed', 'rate': rate})
    

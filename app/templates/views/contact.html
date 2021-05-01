@@ -11,35 +11,37 @@
         padding: 0 200px;
         letter-spacing: 1px;
     }
+
+    .link-container {
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: flex-start;
+    }
 </style>
 {% endblock %}
 {% block content %}
-<div class="social-nav">
-    <div class="facebook">
-        <a href="https://www.facebook.com/Software-Dev-116227830285629" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
-    </div>
-    <div class="instagram">
-        <a href="https://www.instagram.com/software_devtr/" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-instagram"></ion-icon></a>
-    </div>
-    <div class="youtube">
-        <a href="https://www.youtube.com/channel/UCVmabo4MSxCJjtRDvGcPL5g" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-youtube"></ion-icon></a>
-    </div>
-</div>
 <div class="wrap-container">
     <div class="content">
         <h4 class="main-content color-font">
             softwaredev.tr@gmail.com
         </h4>
         <div class="flex-column">
-            <p class="sub-content color-text flex-between-center mt-2">
-                <i class="fa fa-phone mr-2" aria-hidden="true"></i>017 467 617
-            </p>
-            <p class="sub-content color-text flex-between-center mt-2">
-                <i class="fa fa-phone mr-2" aria-hidden="true"></i>093 620 726
-            </p>
-            <p class="sub-content color-text flex-between-center mt-2">
-                <i class="fa fa-phone mr-2" aria-hidden="true"></i>097 798 2014
-            </p>
+            <div class="link-container">
+                <div class="facebook flex-between-center">
+                    <a href="https://www.facebook.com/Software-Dev-116227830285629" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook-square" aria-hidden="true"></i></a>
+                    <p class="ml-2">Software Dev</p>
+                </div>
+                <div class="instagram flex-between-center">
+                    <a href="https://www.instagram.com/software_devtr/" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-instagram"></ion-icon></a>
+                    <p class="ml-2">software_devtr</p>
+                </div>
+                <div class="youtube flex-between-center">
+                    <a href="https://www.youtube.com/channel/UCVmabo4MSxCJjtRDvGcPL5g" target="_blank" rel="noopener noreferrer"><ion-icon name="logo-youtube"></ion-icon></a>
+                    <p class="ml-2">Software Dev</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

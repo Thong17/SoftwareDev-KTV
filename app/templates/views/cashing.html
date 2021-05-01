@@ -967,11 +967,9 @@
         suffixKeyCodes: [13], // enter-key expected at the end of a scan
         reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
         onScan: function(barcode, iQty) { // Alternative to document.addEventListener('scan')
-            console.log(barcode)
 
             products = document.querySelectorAll('.product-item')
             Array.from(products).forEach(p => {
-                console.log($(p).attr('data-barcode'))
                 if ($(p).attr('data-barcode') == barcode) {
                     $(p).find('.product-btn').click()
                 }
@@ -1917,7 +1915,6 @@
                 if (data.result == 'Success') {
                     $('.order-btn').attr('data-change', true)
                     var quantity = $('#' + pid).find('.stock-tag').text()
-                    console.log(quantity)
                     if (quantity == 'Out of stock') {
                         quantity = 0
                     }
