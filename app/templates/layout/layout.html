@@ -191,6 +191,9 @@
             var numbers = document.querySelectorAll('.currency-format')
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
+                if (parseFloat(text) % 1 == 0) {
+                    decimal = 2
+                }
                 if ($(n).attr('data-currency') == 'KHR') {
                     $(n).attr('title', accounting.formatMoney(text / 4000, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}}))
                     $(n).text(accounting.formatMoney(Math.round(text / 100) * 100, {
@@ -220,6 +223,9 @@
             var numbers = document.querySelectorAll('.currency-usd')
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
+                if (parseFloat(text) % 1 == 0) {
+                    precision = 2
+                }
                 $(n).text(accounting.formatMoney(text, {
                                                     precision: precision,
                                                     format: {
@@ -575,7 +581,12 @@
         }
 
         function accountUSD(amount) {
-            return accounting.formatMoney(amount, {precision: 3, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}})
+            if (parseFloat(amount) % 1 == 0) {
+                precision = 2
+            } else {
+                precision = 3
+            }
+            return accounting.formatMoney(amount, {precision: precision, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}})
         }
 
         function accountKHR(amount) {

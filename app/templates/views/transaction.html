@@ -160,7 +160,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="color-text">{{ transaction.description }}</td>
-                                <td class="color-text">{{ transaction.amount }}</td>
+                                <td class="color-text currency-format">{{ transaction.amount }}</td>
                                 <td class="color-text">{{ transaction.quantity }}</td>
                                 <td class="color-text">{{ transaction.discount }}%</td>
                                 <td class="color-text">{{ transaction.createdOn | datetimefilter('%Y/%m/%d %H:%M:%S') }}</td>
@@ -196,6 +196,8 @@
             
         }
     })
+
+    currencyFormat()
     $(document).ready(function() {
         var invoices = document.querySelectorAll('.item')
         $('.item-container').on('click', '.item', function() {
