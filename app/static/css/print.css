@@ -1,7 +1,12 @@
+@font-face {
+    font-family: 'Hanuman';
+    src: url('/static/fonts/Hanuman-Regular.ttf') format('truetype'), url('/static/fonts/Hanuman-Bold.ttf') format('truetype');
+} 
+
 * {
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    font-family: sans-serif, 'Hanuman';
 }
 
 body {

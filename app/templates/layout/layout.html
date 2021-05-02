@@ -144,40 +144,6 @@
         </p>
     </footer>
 
-    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog cascading-modal modal-avatar modal-sm" role="document">
-            {% if current_user.is_authenticated %}
-            <div class="modal-content">
-                <div class="modal-header">
-
-                    <img src="/static/uploads/{{ current_user.profile[0].photo }}" alt="avatar"
-                        class="rounded-circle img-responsive">
-                </div>
-                <div class="modal-body text-center mb-1">
-
-                    <h5 class="mb-2 color-font notranslate">{{ current_user.username }}</h5>
-
-                    <div class="form-group" id="pwd">
-                        <form id="authenticateForm" action="{{ url_for('route.authenticate') }}" style="width: 100%;">
-                            <input type="hidden" value="{{ current_user.id }}">
-                            <input type="password" id="userPassword" class="form-control input-color input-modal"
-                                required>
-                            <label for="userPassword" class="label userPassword">Password</label>
-                            <input type="submit" class="hide" onclick="$('#authenticateForm').submit();">
-                        </form>
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <button class="btn color-text btn-block btn-modal" id="loginUser">Continue</button>
-                    </div>
-                </div>
-
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
     <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/popper.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
@@ -199,53 +165,9 @@
             i = $(window).scrollTop()
         })
 
-        $('.menu-bar').on('click', 'a', function () {
-            if ($(this).attr('class').trim() == 'cashing') {
-                event.preventDefault()
-                $('#loginModal').modal('show')
-            }
-        })
-
         if ("onhashchange" in window) {
             var url = window.location.pathname.split('/')[1]
         }
-
-        $('#loginUser').on('click', function () {
-            $('#authenticateForm').submit()
-        })
-
-        $('#authenticateForm').on('submit', function () {
-            event.preventDefault()
-            var password = $('#userPassword').val()
-            $.ajax({
-                url: '/authenticate',
-                type: 'POST',
-                data: { password: password },
-                success: function (data) {
-                    if (data.redirect != '') {
-                        window.location.href = data.redirect
-                    } else {
-                        if (data.password != '') {
-                            const element = data.password;
-                            $('#userPassword').addClass('invalid')
-                            $('#userPassword').focus()
-                            $('#pwd').append('<div title="' + element + '" class="errors-msg" id="err-pwd"><i class="fa fa-exclamation" aria-hidden="true"></i></div>')
-
-                            gsap.from('#err-pwd', {
-                                opacity: 0,
-                                scale: 0.5,
-                                duration: 1,
-                                ease: 'elastic.out'
-                            })
-                        } else {
-                            $('.userPassword').removeClass('invalid')
-                            $('#err-pwd').remove()
-                        }
-                    }
-                }
-            })
-            return false
-        })
 
         $('.side-menu').hover(
             function () {
@@ -270,7 +192,7 @@
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
                 if ($(n).attr('data-currency') == 'KHR') {
-                    $(n).attr('title', accounting.formatMoney(text / 4000, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '%v%s'}}))
+                    $(n).attr('title', accounting.formatMoney(text / 4000, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}}))
                     $(n).text(accounting.formatMoney(Math.round(text / 100) * 100, {
                         precision: 0,
                         format: {
@@ -281,7 +203,7 @@
                     }))
                 }
                 else {
-                    $(n).text(accounting.formatMoney(text, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '%v%s'}}))
+                    $(n).text(accounting.formatMoney(text, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}}))
                     $(n).attr('title', accounting.formatMoney(Math.round(text * 4000 / 100) * 100, {
                         precision: 0,
                         format: {

@@ -860,7 +860,7 @@
                 {% endif %}
                 <div class="arrow arrow-left animate-left-to-right">
                     <div class="flex-between-center">
-                        <span class="mr-3 color-text ln-total">Total:</span>
+                        <span class="mr-1 color-text ln-total">Total:</span>
                         <span id="sumTotal" class="color-font currency-format notranslate">{{ total }}</span>
                     </div>
                 </div>
@@ -2061,8 +2061,12 @@
                 if (data.data == 'Success') {
                     $('.drawer-btn, .drawer-time').removeClass('active')
                     $('#drawerTime').empty()
+                    $('#drawer-rate').val('4000')
+                    $('#drawer-counter').val('Default')
                     $('#list-money').html(`<tr class="money-form color-text"></tr>`)
                     drawerObj.moneys = []
+                    drawerObj.rate = 4000
+                    drawerObj.counter = 'Default'
                     toggleEdit($('.drawer-save'), $('.drawer-end'))
                     $('.drawer-btn').attr('id', 'none')
                 }

@@ -1127,59 +1127,25 @@ def save_stock(id):
         return jsonify({'data': 'failed'})
 
 
-@route.route('/financial', defaults={'arg': None})
-@route.route('/financial/<arg>')
+@route.route('/financial')
 @login_required
 @is_confirmed()
-def financial(arg):
-    if arg is not None:
-        return render_template('views/financial.html', authentication='require')
-    else:
-        return render_template('views/financial.html', authentication='')
+def financial():
+    return render_template('views/financial.html')
 
 
-@route.route('/authenticate', methods=['POST'])
-@login_required
-def authenticate():
-    msg = {
-        'password': [],
-        'redirect': ''
-    }
-    password = request.form['password']
-    try:
-        if password == '':
-            msg['password'].append('Password cannot be empty')
-            return jsonify(msg)
-        else:
-            isMatch = bcrypt.check_password_hash(
-                current_user.password, password)
-            if isMatch is True:
-                token = str(uuid4())
-                current_user.token = token
-                msg['redirect'] = '/cashing/'+token
-                db.session.commit()
-                return jsonify(msg)
-            msg['password'].append('Password is not correct')
-            return jsonify(msg)
-    except:
-        msg['password'].append('Connection is not available')
-        return jsonify(msg)
-
-
-@route.route('/cashing/<token>')
+@route.route('/cashing')
 @is_authorized('Cashier')
 @login_required
 @is_confirmed()
-def cashing(token):
-    if token == current_user.token:
-        products = tblProduct.query.all()
-        brands = tblBrand.query.all()
-        categories = tblCategory.query.all()
-        store = tblStore.query.first()
-        customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
-        return render_template('views/cashing.html', products=products, brands=brands, categories=categories, store=store, customers=customers)
-    else:
-        return redirect('/financial/authentication')
+def cashing():
+    products = tblProduct.query.all()
+    brands = tblBrand.query.all()
+    categories = tblCategory.query.all()
+    store = tblStore.query.first()
+    customers = tblCustomer.query.order_by(tblCustomer.createdOn).all()
+    return render_template('views/cashing.html', products=products, brands=brands, categories=categories, store=store, customers=customers)
+
 
 
 @route.route('/drawer/create', methods=['POST'])
@@ -1430,7 +1396,7 @@ def checkout(id):
             remain = paidUSD
         moneys = []
         
-        if round(amount, 2) >= round(remain, 2):
+        if round(amount, 4) >= round(remain, 4):
             payment.paid += payment.remain
             change = 0
             
@@ -1526,7 +1492,7 @@ def checkout(id):
                     payment.customerPayment.customerOwe[0].paid += payment.paid
                     payment.customerPayment.customerOwe[0].receive = receive
     
-                msg = str(round(payment.remain, 2))
+                msg = str(round(payment.remain, 3))
                 if payment.orderPayment:
                     payment.orderPayment[0].checkin.order.status = 'Open'
                     payment.orderPayment[0].checkin.isCompleted = True
@@ -1602,7 +1568,7 @@ def update_transaction(id):
     if discount == '':
         discount = 0
     
-    transaction.amount = round(float(price) * (1 - float(discount) / 100), 2)
+    transaction.amount = round(float(price) * (1 - float(discount) / 100), 3)
 
     transaction.price = price
     transaction.discount = discount
@@ -3098,8 +3064,8 @@ def checkout_order(order_id):
         
         tid = str(uuid4())
 
-        transaction = tblTransaction(id=tid, price=round(Decimal(totalPrice), 2), quantity=1, discount=0, isEditable=False,
-                                    amount=round(Decimal(totalPrice), 2), description=description, createdBy=current_user.id, product=Order.order.id)
+        transaction = tblTransaction(id=tid, price=round(Decimal(totalPrice), 4), quantity=1, discount=0, isEditable=False,
+                                    amount=round(Decimal(totalPrice), 4), description=description, createdBy=current_user.id, product=Order.order.id)
         
         if totalPrice == 0:
             json = None
@@ -3268,7 +3234,7 @@ def checkout_owe(id):
                     totalUSD += receiveUSD
                     totalKHR += receiveKHR
                     
-                    if round(paidUSD, 2) >= round(payment.remain, 2):
+                    if round(paidUSD, 3) >= round(payment.remain, 3):
                         payment.receive = str(payment.remain + receiveUSD) +','+str(round(receiveKHR, 0))
                         paidUSD -= payment.remain
                         amountUSD -= payment.remain
@@ -3290,7 +3256,7 @@ def checkout_owe(id):
                                     transaction.profit -= quantity.soq.cost * quantity.quantity
                     else:
                         remainKHR = payment.remain
-                        remainKHR -= round(paidUSD, 2)
+                        remainKHR -= round(paidUSD, 3)
                         
                         payment.paid += paidUSD
                         payment.remain = remainKHR
@@ -3299,7 +3265,7 @@ def checkout_owe(id):
 
                         paidUSD = 0
 
-                        remainKHR = round(remainKHR * rate / 4000, 2)
+                        remainKHR = round(remainKHR * rate / 4000, 3)
                         if paidKHR >= remainKHR:
                             payment.receive = str(receiveUSD + remainUSD)+','+str(round(receiveKHR + (remainKHR * rate), 0))                        
                             

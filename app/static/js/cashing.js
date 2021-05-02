@@ -31,6 +31,7 @@ $(document).on('click', '.order-btn', function() {
                         },
                         dataType: 'json',
                         success: function(data) {
+                            console.log(data)
                             if (data.result == 'Success') {
                                 $('.order-btn').attr('data-change', false)
                                 $('.order-btn').attr('id', data.data.id)
@@ -196,6 +197,7 @@ $(document).on('click', '.checkout-btn', function() {
             $('.payment-total').html('<span class="loading-gif"><img src="/static/icons/loading.gif" alt="" srcset=""></span>')
         },
         success: function(data) {
+            console.log(data)
             if (data.result == 'Success') {
                 $('.payment-add').attr('disabled', true)
                 $('.clear-btn ion-icon').addClass('hide')
