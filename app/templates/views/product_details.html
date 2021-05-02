@@ -112,7 +112,7 @@ $(document).ready(function(){
 
         var details_price = accounting.unformat($('.details-price').text()) + accounting.unformat(price)
 
-        $('.details-price').text(accounting.formatMoney(details_price))
+        $('.details-price').text(accountUSD(details_price))
     })
 
     $(document).on('click', '.span-color', function () {

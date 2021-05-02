@@ -498,43 +498,15 @@
 
                     if (khr == 0) {
 
-                        format_money = accounting.formatMoney(dlr, {
-                                                                precision: 2,
-                                                                format: {
-                                                                    pos: "%v%s",
-                                                                    neg: "%v%s",
-                                                                    zero: '...'
-                                                                }
-                                                            })
+                        format_money = accountUSD(dlr)
                     } else if (dlr == 0) {
 
-                        format_money = accounting.formatMoney(khr, {
-                            precision: 0,
-                            format: {
-                                pos: "%v\u17DB",
-                                neg: "%v\u17DB",
-                                zero: '...'
-                            }
-                        })
+                        format_money = accountKHR(khr)
                     } else {
 
-                        dlr = accounting.formatMoney(dlr, {
-                            precision: 2,
-                            format: {
-                                pos: "%v%s",
-                                neg: "%v%s",
-                                zero: '...'
-                            }
-                        })
+                        dlr = accountUSD(dlr)
 
-                        khr = accounting.formatMoney(khr, {
-                            precision: 0,
-                            format: {
-                                pos: "%v\u17DB",
-                                neg: "%v\u17DB",
-                                zero: '...'
-                            }
-                        })
+                        khr = accountKHR(khr)
 
                         format_money = dlr +' + '+khr
                     }
@@ -542,31 +514,17 @@
                     $('#totalCash').text(format_money)
 
                     $('#totalChange').text(accounting.formatMoney(data.total_change, {
-                        precision: 2,
+                        precision: 3,
                         format: {
                             pos: "%v%s("+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
-                            neg: "%v%s",
+                            neg: "-%v%s(-"+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
                             zero: '...'
                         }
                     }))
 
-                    total_change = accounting.formatMoney(data.total_change, {
-                                                            precision: 2,
-                                                            format: {
-                                                                pos: "%v%s",
-                                                                neg: "%v%s",
-                                                                zero: '...'
-                                                            }
-                                                        })
+                    total_change = accountUSD(data.total_change)
 
-                    total_remain = accounting.formatMoney(data.total_remain, {
-                        precision: 2,
-                        format: {
-                            pos: "%v%s",
-                            neg: "%v%s",
-                            zero: '...'
-                        }
-                    })
+                    total_remain = accountUSD(data.total_remain)
 
                     $('.customer-item#'+id).find('#paymentRemain').text(total_remain)
 
@@ -583,21 +541,14 @@
                                     precision: 2,
                                     format: {
                                         pos: "%v%s("+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
-                                        neg: "%v",
+                                        neg: "-%v%s(-"+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
                                         zero: '...'
                                     }
                                 })
                             } else {
                                 money_currency = 'x'+m.unit
 
-                                money = accounting.formatMoney(m.money, {
-                                    precision: 0,
-                                    format: {
-                                        pos: "%v\u17DB",
-                                        neg: "%v",
-                                        zero: '...'
-                                    }
-                                })
+                                money = accountKHR(m.money)
                             }
                             element += '<div class="change-row"><span>'+m.currency+' '+money+'</span><span>'+money_currency+'</span></div>'
                         }
@@ -611,10 +562,10 @@
                     
                 } else {
                     checkout = accounting.formatMoney(amount, {
-                        precision: 2,
+                        precision: 3,
                         format: {
                             pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
-                            neg: "%v%s",
+                            neg: "-%v%s(-"+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
                             zero: '...'
                         }
                     })

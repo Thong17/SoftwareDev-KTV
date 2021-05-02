@@ -574,7 +574,7 @@
     <div class="col-filter" style="border-right: 1px solid var(--color-hr);">
         <!-- Begin -->
         <div class="content-menu flex-between">
-            <div class="flex-start-center">
+            <div class="flex-start-center" style="position: relative; width: 70%;">
                 <div class="fav-btn"><i class="fa fa-bookmark-o" aria-hidden="true"></i></div>
                 <div class="dropdown" id="list-cates">
                     <div class="menu-icon" data-toggle="dropdown">
@@ -1181,7 +1181,7 @@
                         
                         var total = accounting.unformat($('#sumTotal').text())
                         total += data.data.amount
-                        $('#sumTotal').text(accounting.formatMoney(total))
+                        $('#sumTotal').text(accountUSD(total))
 
                         var order = parseInt($('.sum-order').text())
                         order += 1
@@ -1322,7 +1322,7 @@
                         }
                         var total = accounting.unformat($('#sumTotal').text())
                         total += data.data.amount
-                        $('#sumTotal').text(accounting.formatMoney(total))
+                        $('#sumTotal').text(accountUSD(total))
 
                         var order = parseInt($('.sum-order').text())
                         order += 1
@@ -1412,7 +1412,7 @@
 
         if (validation.isSelected == true) {
             // Stockform
-            $('.order-form').html(orderForm(orderId, details, cost, '', '', accounting.formatMoney(0)))
+            $('.order-form').html(orderForm(orderId, details, cost, '', '', accountUSD(0)))
             $('.order-form').find('#input-discount').focus()
             $('#productProperty').modal('hide')
 
@@ -1445,7 +1445,7 @@
         var discount = $(this).closest('tr').find('#input-discount').val()
         var quantity = $(this).val()
         var total = (price - (price * discount / 100)) * quantity
-        $('#calculated-result').text(accounting.formatMoney(total))
+        $('#calculated-result').text(accountUSD(total))
     })
 
     $(document).on('input', '#input-discount', function () {
@@ -1460,7 +1460,7 @@
         var quantity = $(this).closest('tr').find('#input-quantity').val()
         var discount = $(this).val()
         var total = (price - (price * discount / 100)) * quantity
-        $('#calculated-result').text(accounting.formatMoney(total))
+        $('#calculated-result').text(accountUSD(total))
 
     })
 
@@ -1473,7 +1473,7 @@
         var quantity = $(this).closest('tr').find('#input-quantity').val()
         var price = $(this).val()
         var total = (price - (price * discount / 100)) * quantity
-        $('#calculated-result').text(accounting.formatMoney(total))
+        $('#calculated-result').text(accountUSD(total))
 
     })
 
@@ -1582,7 +1582,7 @@
                     placeholder="Disc"></td>
             <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
                     placeholder="Qty" value="`+ quantity + `" disabled></form></td>
-            <td id="calculated-result" style="text-align:center;">`+ accounting.formatMoney(total) + `</td>
+            <td id="calculated-result" style="text-align:center;">`+ accountUSD(total) + `</td>
             <td class="save-checkout">
                 <ion-icon name="checkmark-outline"></ion-icon>
             </td>`
@@ -1604,7 +1604,7 @@
                 var v_price = $(v).find('#value-price').text()
                 var c_price = accounting.unformat(v_price) - accounting.unformat(price)
                 if (c_price % 1 != 0) {
-                    precision = 2
+                    precision = 3
                 }
 
                 var n_price = accounting.formatMoney(c_price, {
@@ -1621,7 +1621,7 @@
 
             var details_price = accounting.unformat($('.details-price').text()) + accounting.unformat(price)
 
-            $('.details-price').text(accounting.formatMoney(details_price))
+            $('.details-price').text(accountUSD(details_price))
 
             var configList = document.querySelectorAll('.config-list')
             Array.from(configList).forEach(c => {
@@ -1781,14 +1781,14 @@
         }
         return `<tr class="color-text transaction-item" id="` + id + `" data-id="` + oid + `">
                     <td class="description" id="order-description" data-id="`+ pid + `">` + description + `</td>
-                    <td class="text-center" id="order-price">`+ accounting.formatMoney(price) +`</td>
+                    <td class="text-center" id="order-price">`+ accountUSD(price) +`</td>
                     <td>
                         <p class="color-text text-center" id="order-discount">`+ discount + `%</p>
                     </td>
                     <td>
                         <p class="color-text text-center" id="order-quantity">`+ quantity + `</p>
                     </td>
-                    <td class="text-center" id="order-amount">`+ accounting.formatMoney(amount) + `</td>
+                    <td class="text-center" id="order-amount">`+ accountUSD(amount) + `</td>
                     <td class="cancel-btn hide">
                         <ion-icon name="close-outline"></ion-icon>
                     </td>
@@ -2099,7 +2099,7 @@
                     if (quantity.trim() != 'Available') {
                         $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
                     }
-                    $('#sumTotal').text(accounting.formatMoney(total - amount))
+                    $('#sumTotal').text(accountUSD(total - amount))
                     orderLists.forEach((o, i) => {
                         if (o.orderId == id.attr('data-id')) {
                             orderLists.splice(i, 1)

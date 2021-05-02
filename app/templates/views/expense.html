@@ -156,7 +156,7 @@
 
             $(document).on('click', '.form-cancel', function() {
                 $(this).closest('tr').html(`<td class="color-text" id="description">`+details+`</td>
-                <td class="color-text currency-format" id="amount">`+accounting.formatMoney(amount)+`</td>
+                <td class="color-text currency-format" id="amount">`+accountUSD(amount)+`</td>
                 <td class="color-text flex-between-center notranslate" id="createdOn"><span>`+date+`</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>`)
             })
         })
@@ -185,7 +185,7 @@
                     success: function(data) {
                         if (data.data == 'Success') {
                             tr.html(`<td class="color-text" id="description">`+data.details+`</td>
-                                <td class="color-text currency-format" id="amount">`+accounting.formatMoney(data.amount)+`</td>
+                                <td class="color-text currency-format" id="amount">`+accountUSD(data.amount)+`</td>
                                 <td class="color-text flex-between-center notranslate"><span class="notranslate color-text" id="createdOn">`+date+`</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>`)
                         } else {
                             alert(languagesAlert[language].error)

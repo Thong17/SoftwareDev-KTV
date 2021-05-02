@@ -39,54 +39,26 @@ $(document).on('click', '.order-btn', function() {
                                 $('#invoiceTime').text(time)
                                 $('#invoiceDate').text(date)
                                 $('#invoiceNo').text(data.data.invoice)
-                                $('#totalUSD').text(accounting.formatMoney(data.data.amount, {
-                                    precision: 2,
-                                    format: {
-                                        pos: "%v%s",
-                                        neg: "%v%s",
-                                        zero: '...'
-                                    }
-                                }))
-                                $('#totalKHR').text(accounting.formatMoney(Math.round(data.data.amount * data.rate / 100) * 100, {
-                                    precision: 0,
-                                    format: {
-                                        pos: "%v\u17DB",
-                                        neg: "%v\u17DB",
-                                        zero: '...'
-                                    }
-                                }))
+                                $('#totalUSD').text(accountUSD(data.data.amount))
+                                $('#totalKHR').text(accountKHR(data.data.amount * data.rate))
             
                                 var invoice_item = ''
             
                                 data.data.transactions.forEach(t => {
                                     invoice_item += `<tr id="`+t.id+`">
                                                             <td>`+t.description+`</td>
-                                                            <td style="text-align: center">`+accounting.formatMoney(t.price, {
-                                                                precision: 2,
-                                                                format: {
-                                                                    pos: "%v%s",
-                                                                    neg: "%v%s",
-                                                                    zero: '...'
-                                                                }
-                                                            })+`</td>
+                                                            <td style="text-align: center">`+accountUSD(t.price)+`</td>
                                                             <td style="text-align: center">`+t.discount+`%</td>
                                                             <td style="text-align: center">`+t.quantity+`</td>
-                                                            <td style="text-align: center">`+accounting.formatMoney(t.amount, {
-                                                                precision: 2,
-                                                                format: {
-                                                                    pos: "%v%s",
-                                                                    neg: "%v%s",
-                                                                    zero: '...'
-                                                                }
-                                                            })+`</td>
+                                                            <td style="text-align: center">`+accountUSD(t.amount)+`</td>
                                                         </tr>`
                                 })
 
                                 checkout = accounting.formatMoney(data.data.remain, {
-                                    precision: 2,
+                                    precision: 3,
                                     format: {
                                         pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
-                                        neg: "%v%s",
+                                        neg: "-%v%s(-"+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
                                         zero: '...'
                                     }
                                 })
@@ -123,54 +95,26 @@ $(document).on('click', '.order-btn', function() {
                             $('#invoiceTime').text(time)
                             $('#invoiceDate').text(date)
                             $('#invoiceNo').text(data.data.invoice)
-                            $('#totalUSD').text(accounting.formatMoney(data.data.amount, {
-                                precision: 2,
-                                format: {
-                                    pos: "%v%s",
-                                    neg: "%v%s",
-                                    zero: '...'
-                                }
-                            }))
-                            $('#totalKHR').text(accounting.formatMoney(Math.round(data.data.amount * data.rate / 100) * 100, {
-                                precision: 0,
-                                format: {
-                                    pos: "%v\u17DB",
-                                    neg: "%v\u17DB",
-                                    zero: '...'
-                                }
-                            }))
+                            $('#totalUSD').text(accountUSD(data.data.amount))
+                            $('#totalKHR').text(accountKHR(data.data.amount * data.rate))
         
                             var invoice_item = ''
         
                             data.data.transactions.forEach(t => {
                                 invoice_item += `<tr id="`+t.id+`">
                                                         <td>`+t.description+`</td>
-                                                        <td style="text-align: center">`+accounting.formatMoney(t.price, {
-                                                            precision: 2,
-                                                            format: {
-                                                                pos: "%v%s",
-                                                                neg: "%v%s",
-                                                                zero: '...'
-                                                            }
-                                                        })+`</td>
+                                                        <td style="text-align: center">`+accountUSD(t.price)+`</td>
                                                         <td style="text-align: center">`+t.discount+`%</td>
                                                         <td style="text-align: center">`+t.quantity+`</td>
-                                                        <td style="text-align: center">`+accounting.formatMoney(t.amount, {
-                                                            precision: 2,
-                                                            format: {
-                                                                pos: "%v%s",
-                                                                neg: "%v%s",
-                                                                zero: '...'
-                                                            }
-                                                        })+`</td>
+                                                        <td style="text-align: center">`+accountUSD(t.amount)+`</td>
                                                     </tr>`
                             })
 
                             checkout = accounting.formatMoney(data.data.remain, {
-                                precision: 2,
+                                precision: 3,
                                 format: {
                                     pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
-                                    neg: "%v%s",
+                                    neg: "-%v%s(-"+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
                                     zero: '...'
                                 }
                             })
@@ -314,43 +258,15 @@ $(document).on('click', '.checkout-btn', function() {
 
                 if (khr == 0) {
 
-                    format_money = accounting.formatMoney(dlr, {
-                                                            precision: 2,
-                                                            format: {
-                                                                pos: "%v%s",
-                                                                neg: "%v%s",
-                                                                zero: '...'
-                                                            }
-                                                        })
+                    format_money = accountUSD(dlr)
                 } else if (dlr == 0) {
 
-                    format_money = accounting.formatMoney(khr, {
-                        precision: 0,
-                        format: {
-                            pos: "%v\u17DB",
-                            neg: "%v\u17DB",
-                            zero: '...'
-                        }
-                    })
+                    format_money = accountKHR(khr)
                 } else {
 
-                    dlr = accounting.formatMoney(dlr, {
-                        precision: 2,
-                        format: {
-                            pos: "%v%s",
-                            neg: "%v%s",
-                            zero: '...'
-                        }
-                    })
+                    dlr = accountUSD(dlr)
 
-                    khr = accounting.formatMoney(khr, {
-                        precision: 0,
-                        format: {
-                            pos: "%v\u17DB",
-                            neg: "%v\u17DB",
-                            zero: '...'
-                        }
-                    })
+                    khr = accountKHR(khr)
 
                     format_money = dlr +' + '+khr
                 }
@@ -358,31 +274,17 @@ $(document).on('click', '.checkout-btn', function() {
                 $('#totalCash').text(format_money)
 
                 $('#totalChange').text(accounting.formatMoney(data.total_change, {
-                    precision: 2,
+                    precision: 3,
                     format: {
                         pos: "%v%s("+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
-                        neg: "%v%s",
+                        neg: "-%v%s(-"+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
                         zero: '...'
                     }
                 }))
 
-                total_change = accounting.formatMoney(data.total_change, {
-                                                        precision: 2,
-                                                        format: {
-                                                            pos: "%v%s",
-                                                            neg: "%v%s",
-                                                            zero: '...'
-                                                        }
-                                                    })
+                total_change = accountUSD(data.total_change)
 
-                total_remain = accounting.formatMoney(data.total_remain, {
-                    precision: 2,
-                    format: {
-                        pos: "%v%s",
-                        neg: "%v%s",
-                        zero: '...'
-                    }
-                })
+                total_remain = accountUSD(data.total_remain)
 
                 var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">Total Paid:</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">Total Remain:</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">Total Return: </span><span>'+total_change+'</span></div><div class="list-changes">'
                                                       
@@ -394,24 +296,17 @@ $(document).on('click', '.checkout-btn', function() {
                             money_currency = 'x'+m.unit
 
                             money = accounting.formatMoney(m.money, {
-                                precision: 2,
+                                precision: 3,
                                 format: {
                                     pos: "%v%s("+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
-                                    neg: "%v",
+                                    neg: "-%v%s(-"+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
                                     zero: '...'
                                 }
                             })
                         } else {
                             money_currency = 'x'+m.unit
 
-                            money = accounting.formatMoney(m.money, {
-                                precision: 0,
-                                format: {
-                                    pos: "%v\u17DB",
-                                    neg: "%v",
-                                    zero: '...'
-                                }
-                            })
+                            money = accountKHR(m.money * 4000)
                         }
                         element += '<div class="change-row"><span>'+m.currency+' '+money+'</span><span>'+money_currency+'</span></div>'
                     }
@@ -428,10 +323,10 @@ $(document).on('click', '.checkout-btn', function() {
                 
             } else {
                 checkout = accounting.formatMoney(amount, {
-                    precision: 2,
+                    precision: 3,
                     format: {
                         pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
-                        neg: "%v%s",
+                        neg: "-%v%s(-"+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
                         zero: '%v%s'
                     }
                 })

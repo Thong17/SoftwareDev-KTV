@@ -262,31 +262,35 @@
             li.find('a')[0].click()
         })
 
-        function currencyFormat(currency, decimal, isAttribute) {
-            if (currency == '') {
-                currency = '$'
-            }
-            if (decimal == '') {
-                decimal = 2
-            }
-            if (isAttribute == '') {
-                isAttribute = false
+        function currencyFormat(decimal, isAttribute) {
+            if (decimal == undefined) {
+                decimal = 3
             }
             var numbers = document.querySelectorAll('.currency-format')
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
-                var title = $(n).attr('title')
                 if ($(n).attr('data-currency') == 'KHR') {
-                    $(n).text(accounting.formatMoney(text, '\u17DB', 0))
-                } else {
-                    var text = $(n).text()
-                    var title = $(n).attr('title')
-                    $(n).text(accounting.formatMoney(text, currency, decimal))
-                    if (isAttribute) {
-                        $(n).attr('title', accounting.formatMoney(title, '\u17DB', 0))
-                    }
+                    $(n).attr('title', accounting.formatMoney(text / 4000, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '%v%s'}}))
+                    $(n).text(accounting.formatMoney(Math.round(text / 100) * 100, {
+                        precision: 0,
+                        format: {
+                            pos: "%v\u17DB",
+                            neg: "-%v\u17DB",
+                            zero: '...'
+                        }
+                    }))
                 }
-                
+                else {
+                    $(n).text(accounting.formatMoney(text, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '%v%s'}}))
+                    $(n).attr('title', accounting.formatMoney(Math.round(text * 4000 / 100) * 100, {
+                        precision: 0,
+                        format: {
+                            pos: "%v\u17DB",
+                            neg: "-%v\u17DB",
+                            zero: '...'
+                        }
+                    }))
+                }
             })
         }
 
@@ -633,7 +637,7 @@
         function accountMoney(amount) {
             precision = 0
             if (amount % 1 != 0) {
-                precision = 2
+                precision = 3
             }
             return accounting.formatMoney(amount, {precision: precision, format: {pos: "%v", neg: "%v", zero: '%v'}})
         }
@@ -649,7 +653,7 @@
         }
 
         function accountUSD(amount) {
-            return accounting.formatMoney(amount, {precision: 2, format: {pos: "%v%s", neg: "%v%s", zero: '...'}})
+            return accounting.formatMoney(amount, {precision: 3, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}})
         }
 
         function accountKHR(amount) {
@@ -657,7 +661,7 @@
                         precision: 0,
                         format: {
                             pos: "%v\u17DB",
-                            neg: "%v\u17DB",
+                            neg: "-%v\u17DB",
                             zero: '...'
                         }
                     })
@@ -833,23 +837,9 @@
             var disc = ''
 
             if (this.currency == 'KHR') {
-                price = accounting.formatMoney(this.price, {
-                                                    precision: 0,
-                                                    format: {
-                                                        pos: "%v\u17DB",
-                                                        neg: "-%v\u17DB",
-                                                        zero: '...'
-                                                    }
-                                                })
+                price = accountKHR(this.price)
             } else {
-                price = accounting.formatMoney(this.price, {
-                                                    precision: 2,
-                                                    format: {
-                                                        pos: "%v$",
-                                                        neg: "-%v$",
-                                                        zero: '...'
-                                                    }
-                                                })
+                price = accountUSD(this.price)
             }
 
             if (this.arrival < 1) {
@@ -940,7 +930,7 @@
                 precisionProduct = 0
             } else {
                 currency = '$'
-                precisionProduct = 2
+                precisionProduct = 3
             }
 
             var property_element = ''
@@ -956,7 +946,7 @@
                                 precision = 0
                             } else {
                                 currencyValue = '$'
-                                precision = 2
+                                precision = 3
                             }
                             if (value.property == property.id) {
                                 value_element += `<label class="value container-input" id="` + value.id + `">
@@ -1478,7 +1468,7 @@
                             precision = 0
                         } else {
                             currencyValue = '$'
-                            precision = 2
+                            precision = 3
                         }
                         var element = `<label class="value container-input" id="` + data.id + `">
                                         <div class="product-btn color-text">
@@ -1614,7 +1604,7 @@
                         values.forEach(value => {
                             var precision = 0
                             if (value.price % 1 != 0) {
-                                precision = 2
+                                precision = 3
                             }
                             var selected = ''
                             var option = accounting.formatMoney(value.price, {
@@ -1688,7 +1678,7 @@
                             </div>
                         </div>
                         <div class="details-header" style="font-size: 23px">
-                            <span class="notranslate details-price color-font">` + accounting.formatMoney(price) + `</span>
+                            <span class="notranslate details-price color-font">` + accountUSD(price) + `</span>
                         </div>
                     </div>
                 </div>

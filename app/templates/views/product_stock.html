@@ -190,8 +190,7 @@
                                     <td class="notranslate">{{stock.quantity}}</td>
                                     <td class="notranslate">{% if stock.expire == None %}...{% else %}{{stock.expire}}{% endif %}</td>
                                     <td class="flex-between-center notranslate">
-                                        <span style="text-decoration: underline;" class="total-cost currency-format"
-                                            title="{{ stock.total * 4000 }}">{{ stock.total }}</span>
+                                        <span style="text-decoration: underline;" class="total-cost currency-format">{{ stock.total }}</span>
                                         <div class="flex-between-center action-btn">
                                             <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
                                             <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
@@ -335,7 +334,7 @@
             }
         )
 
-        currencyFormat('$', 0, true)
+        currencyFormat()
 
         $('#refresh-chart').on('click', function () {
             if ($('#add-stock').find('p').hasClass('clear')) {
@@ -565,7 +564,7 @@
                         <td class="notranslate">`+ $(tmp[4]).text() + `</td>
                         <td class="notranslate">`+ $(tmp[5]).text() + `</td>
                         <td class="flex-between-center notranslate">
-                            <span style="text-decoration: underline;" title="`+ accounting.formatMoney($(tmp[6]).find('span').attr('title'), '\u17DB', 0) + `">` + accounting.formatMoney($(tmp[6]).text()) + `</span>
+                            <span style="text-decoration: underline;" title="`+ accountKHR($(tmp[6]).find('span').attr('title')) + `">` + accountUSD($(tmp[6]).text()) + `</span>
                             <div class="flex-between-center action-btn">
                                 <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
                                 <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
@@ -629,14 +628,14 @@
                                                             <td class="notranslate">`+ quantity.val() + `</td>
                                                             <td class="notranslate">`+ expireDate + `</td>
                                                             <td class="flex-between-center notranslate">
-                                                                <span style="text-decoration: underline;" title="`+ accounting.formatMoney(data.total * 4000, '\u17DB', 0) + `">` + accounting.formatMoney(data.total) + `</span>
+                                                                <span style="text-decoration: underline;" title="`+ accountKHR(data.total * 4000) + `">` + accountUSD(data.total) + `</span>
                                                                 <div class="flex-between-center action-btn">
                                                                     <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
                                                                     <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
                                                                 </div> 
                                                             </td>`)
                         $('#total_stock').text(data.total_stock)
-                        $('#total_cost').text(accounting.formatMoney(data.total_cost))
+                        $('#total_cost').text(accountUSD(data.total_cost))
 
                         data.stocks.forEach(s => {
                             $('#stocks').find('#' + s.color.split(' ').join('_') + '-quantity').text(s.quantity)
@@ -663,7 +662,7 @@
                             $(this).remove()
                         })
                         $('#total_stock').text(data.total_stock)
-                        $('#total_cost').text(accounting.formatMoney(data.total_cost))
+                        $('#total_cost').text(accountUSD(data.total_cost))
                         if (color_name != '...') {
                             var t = data.total_stock
                             var e = '#'
@@ -728,7 +727,7 @@
                                                     <td class="notranslate">`+ data.quantity + `</td>
                                                     <td class="notranslate">`+ data.expire + `</td>
                                                     <td class="flex-between-center notranslate">
-                                                        <span style="text-decoration: underline;" title="`+ accounting.formatMoney(data.total * 4000, '\u17DB', 0) + `">` + accounting.formatMoney(data.total) + `</span>
+                                                        <span style="text-decoration: underline;" title="`+ accountKHR(data.total * 4000) + `">` + accountUSD(data.total) + `</span>
                                                         <div class="flex-between-center action-btn">
                                                             <i class="fa fa-pencil-square-o stock-edit" aria-hidden="true"></i>
                                                             <i class="fa fa-trash-o stock-delete" aria-hidden="true"></i>
@@ -748,7 +747,7 @@
                         if (dateDifference(expire.val()) > 7) $('#list-stocks').find('#' + id).removeClass('text-danger text-warning')
 
                         $('#total_stock').text(data.total_stock)
-                        $('#total_cost').text(accounting.formatMoney(data.total_cost))
+                        $('#total_cost').text(accountUSD(data.total_cost))
                         var t = data.total_stock
                         var e = '#'
                         if (color_name != '...') {

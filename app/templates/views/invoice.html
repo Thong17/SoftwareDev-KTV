@@ -106,7 +106,7 @@
             var numbers = document.querySelectorAll('.riel-format')
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
-                $(n).text(accounting.formatMoney(text, {
+                $(n).text(accounting.formatMoney(Math.round(text / 100) * 100, {
                                     precision: 0,
                                     format: {
                                         pos: "(%v\u17DB)",
