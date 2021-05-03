@@ -31,7 +31,7 @@ languagesAlert = {
         confirmProcess: 'Are you sure you want to continue?',
         alreadyCheckin: 'Failed! An order has been processing',
         inProcess: 'Failed! Status is in process',
-        floorError: 'Failed! Unable to delete the existed data in the floor'
+        floorError: 'Failed! Unable to delete the existed data in the floor',
     },
     khmer: {
         invalidFile: 'File ដែលបានជ្រើសរើសមិនត្រឹមត្រូវទេ',
@@ -63,7 +63,7 @@ languagesAlert = {
         confirmProcess: 'តើអ្នកប្រាកដជាចង់បន្ត?',
         alreadyCheckin: 'បរាជ័យ! មិនអាចចាប់ផ្តើមបានទេព្រោះកំពុងដំណើរការ',
         inProcess: 'បរាជ័យ! ស្ថានភាពកំពុងដំណើរការ',
-        floorError: 'បរាជ័យ! មិនអាចលុបបានទេព្រោះមានទិន្នន័យ'
+        floorError: 'បរាជ័យ! មិនអាចលុបបានទេព្រោះមានទិន្នន័យ',
     }
 }
 
@@ -213,7 +213,12 @@ $.fn.translator = function () {
             owe: 'Owe',
             totalInvoice: 'Total Invoice',
             orderSchedule: 'Order Schedule',
-            delete: 'Delete'
+            delete: 'Delete',
+            enable: 'Enable',
+            disable: 'Disable',
+            resetPassword: 'Reset Password',
+            male: 'Male',
+            female: 'Female'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -360,7 +365,12 @@ $.fn.translator = function () {
             owe: 'ជំពាក់',
             totalInvoice: 'វិក្កយបត្រសរុប',
             orderSchedule: 'កាលវិភាគកម្មង់',
-            delete: 'លុប'
+            delete: 'លុប',
+            enable: 'បើក',
+            disable: 'បិទ',
+            resetPassword: 'ប្តូរពាក្យសម្ងាត់',
+            male: 'ប្រុស',
+            female: 'ស្រី'
         }
     }
 
@@ -374,6 +384,11 @@ $.fn.translator = function () {
         }
     })
 
+    $('.ln-male').text(languages[language].male)
+    $('.ln-female').text(languages[language].female)
+    $('.ln-enable').text(languages[language].resetPassword)
+    $('.ln-enable').text(languages[language].enable)
+    $('.ln-disable').text(languages[language].disable)
     $('.ln-order-schedule').text(languages[language].orderSchedule)
     $('.ln-total-invoice').text(languages[language].totalInvoice)
     $('.ln-total-remain').text(languages[language].totalRemain)

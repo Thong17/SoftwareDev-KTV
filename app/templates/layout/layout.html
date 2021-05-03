@@ -186,14 +186,22 @@
 
         function currencyFormat(decimal, isAttribute) {
             if (decimal == undefined) {
-                decimal = 3
+                decimal = 2
             }
             var numbers = document.querySelectorAll('.currency-format')
             Array.from(numbers).forEach(n => {
                 var text = $(n).text()
+
                 if (parseFloat(text) % 1 == 0) {
                     decimal = 2
+                } else {
+                    if ((parseFloat(text) * 1).toString().split('.')[1].length > 2) {
+                        decimal = 3
+                    } else {
+                        decimal = 2
+                    }
                 }
+                
                 if ($(n).attr('data-currency') == 'KHR') {
                     $(n).attr('title', accounting.formatMoney(text / 4000, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}}))
                     $(n).text(accounting.formatMoney(Math.round(text / 100) * 100, {
@@ -225,6 +233,12 @@
                 var text = $(n).text()
                 if (parseFloat(text) % 1 == 0) {
                     precision = 2
+                } else {
+                    if ((parseFloat(text) * 1).toString().split('.')[1].length > 2) {
+                        precision = 3
+                    } else {
+                        precision = 2
+                    }
                 }
                 $(n).text(accounting.formatMoney(text, {
                                                     precision: precision,
@@ -564,9 +578,17 @@
 
         function accountMoney(amount) {
             precision = 0
-            if (amount % 1 != 0) {
-                precision = 3
+
+            if (amount % 1 == 0) {
+                precision = 0
+            } else {
+                if ((amount * 1).toString().split('.')[1].length > 2) {
+                    precision = 3
+                } else {
+                    precision = 2
+                }
             }
+
             return accounting.formatMoney(amount, {precision: precision, format: {pos: "%v", neg: "%v", zero: '%v'}})
         }
 
@@ -581,11 +603,17 @@
         }
 
         function accountUSD(amount) {
+
             if (parseFloat(amount) % 1 == 0) {
                 precision = 2
             } else {
-                precision = 3
+                if ((parseFloat(amount) * 1).toString().split('.')[1].length > 2) {
+                    precision = 3
+                } else {
+                    precision = 2
+                }
             }
+
             return accounting.formatMoney(amount, {precision: precision, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}})
         }
 

@@ -31,7 +31,6 @@ $(document).on('click', '.order-btn', function() {
                         },
                         dataType: 'json',
                         success: function(data) {
-                            console.log(data)
                             if (data.result == 'Success') {
                                 $('.order-btn').attr('data-change', false)
                                 $('.order-btn').attr('id', data.data.id)
@@ -55,8 +54,18 @@ $(document).on('click', '.order-btn', function() {
                                                         </tr>`
                                 })
 
+                                if (data.data.remain % 1 == 0) {
+                                    precision = 2
+                                } else {
+                                    if ((data.data.remain * 1).toString().split('.')[1].length > 2) {
+                                        precision = 3
+                                    } else {
+                                        precision = 2
+                                    }
+                                }
+
                                 checkout = accounting.formatMoney(data.data.remain, {
-                                    precision: 3,
+                                    precision: precision,
                                     format: {
                                         pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
                                         neg: "-%v%s(-"+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
@@ -71,7 +80,7 @@ $(document).on('click', '.order-btn', function() {
                                 $('#paymentModel').modal('show')
                                 $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
                                                     <span class="color-font ln-checkout mr-1">Check Out: </span>
-                                                    <span class="currency-format color-text" id="paymentAmount">`+checkout+`</span>
+                                                    <span class="currency-format color-font" id="paymentAmount">`+checkout+`</span>
                                                 </div>`).translator()
                                 $('#receive-cash').val('').focus()
                                 $('.payment-add').attr('disabled', false)
@@ -111,8 +120,18 @@ $(document).on('click', '.order-btn', function() {
                                                     </tr>`
                             })
 
+                            if (data.data.remain % 1 == 0) {
+                                precision = 2
+                            } else {
+                                if ((data.data.remain * 1).toString().split('.')[1].length > 2) {
+                                    precision = 3
+                                } else {
+                                    precision = 2
+                                }
+                            }
+
                             checkout = accounting.formatMoney(data.data.remain, {
-                                precision: 3,
+                                precision: precision,
                                 format: {
                                     pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
                                     neg: "-%v%s(-"+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
@@ -127,7 +146,7 @@ $(document).on('click', '.order-btn', function() {
                             $('#paymentModel').modal('show')
                             $('.payment-total').attr('id', data.data.id).html(`<div class="checkout-btn">
                                                 <span class="color-font ln-checkout mr-1">Check Out: </span>
-                                                <span class="currency-format color-text" id="paymentAmount">`+checkout+`</span>
+                                                <span class="currency-format color-font" id="paymentAmount">`+checkout+`</span>
                                             </div>`).translator()
                             $('#receive-cash').val('').focus()
                             $('.payment-add').attr('disabled', false)
@@ -262,10 +281,8 @@ $(document).on('click', '.checkout-btn', function() {
 
                     format_money = accountUSD(dlr)
                 } else if (dlr == 0) {
-
                     format_money = accountKHR(khr)
                 } else {
-
                     dlr = accountUSD(dlr)
 
                     khr = accountKHR(khr)
@@ -275,8 +292,18 @@ $(document).on('click', '.checkout-btn', function() {
 
                 $('#totalCash').text(format_money)
 
+                if (data.total_change % 1 == 0) {
+                    precision = 2
+                } else {
+                    if ((data.total_change * 1).toString().split('.')[1].length > 2) {
+                        precision = 3
+                    } else {
+                        precision = 2
+                    }
+                }
+
                 $('#totalChange').text(accounting.formatMoney(data.total_change, {
-                    precision: 3,
+                    precision: precision,
                     format: {
                         pos: "%v%s("+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
                         neg: "-%v%s(-"+Math.round(data.total_change * 4000 / 100) * 100+"\u17DB)",
@@ -297,8 +324,18 @@ $(document).on('click', '.checkout-btn', function() {
                         if (m.currency == 'USD') {
                             money_currency = 'x'+m.unit
 
+                            if (m.money % 1 == 0) {
+                                money_precision = 2
+                            } else {
+                                if ((m.money * 1).toString().split('.')[1].length > 2) {
+                                    money_precision = 3
+                                } else {
+                                    money_precision = 2
+                                }
+                            }
+
                             money = accounting.formatMoney(m.money, {
-                                precision: 3,
+                                precision: money_precision,
                                 format: {
                                     pos: "%v%s("+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
                                     neg: "-%v%s(-"+Math.round(m.money * 4000 / 100) * 100+"\u17DB)",
@@ -308,7 +345,7 @@ $(document).on('click', '.checkout-btn', function() {
                         } else {
                             money_currency = 'x'+m.unit
 
-                            money = accountKHR(m.money * 4000)
+                            money = accountKHR(m.money)
                         }
                         element += '<div class="change-row"><span>'+m.currency+' '+money+'</span><span>'+money_currency+'</span></div>'
                     }
@@ -324,15 +361,25 @@ $(document).on('click', '.checkout-btn', function() {
                 $('.transaction-item').find('.remove-btn').addClass('hide')
                 
             } else {
+                if (amount % 1 == 0) {
+                    precision = 2
+                } else {
+                    if ((amount * 1).toString().split('.')[1].length > 2) {
+                        precision = 3
+                    } else {
+                        precision = 2
+                    }
+                }
+
                 checkout = accounting.formatMoney(amount, {
-                    precision: 3,
+                    precision: precision,
                     format: {
                         pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
                         neg: "-%v%s(-"+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
                         zero: '%v%s'
                     }
                 })
-                $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">Check Out: </span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>').translator()
+                $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">Check Out: </span><span class="currency-format color-font" id="paymentAmount">'+checkout+'</span></div>').translator()
                 alert(languagesAlert[language].proceedRemainError)
             }
         }

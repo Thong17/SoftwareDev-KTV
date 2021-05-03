@@ -1413,7 +1413,7 @@ def checkout(id):
                 paymentAmount *= payment.rate / 4000
                 change = round(paidKHR, 4) - round(paymentAmount, 4)
             else:
-                change = paidUSD - payment.remain
+                change = paidUSD - payment.remain + paidKHR
             total_change = change
             payment.remain = 0
 

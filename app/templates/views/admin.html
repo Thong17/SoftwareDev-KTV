@@ -173,8 +173,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <select name="gender" class="form-control input-color pl-2 pr-0" id="gender">
-                                <option value="M">Male</option>
-                                <option value="F">Female</option>
+                                <option class="ln-male" value="M">Male</option>
+                                <option class="ln-female" value="F">Female</option>
                             </select>
                             <label for="gender" class="lbl ln-gender">Gender</label>
                         </div>
@@ -299,6 +299,7 @@
             if ($('#password').val().length < 8) {
                 $('#password').focus()
                 invalid.push($('#password'))
+                alert(languagesAlert[language].validatePassoword)
             }
 
             if (invalid.length == 0) {
@@ -423,14 +424,14 @@
         }
         if (id != '') {
             if (enabled) {
-                $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-danger" id="disable-user">Disable</button>')
+                $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3 ln-save" id="save-user">Save</button><button class="btn btn-danger ln-disable" id="disable-user">Disable</button>').translator()
             } else {
-                $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-primary" id="enable-user">Enable</button>')
+                $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3 ln-save" id="save-user">Save</button><button class="btn btn-primary ln-enable" id="enable-user">Enable</button>').translator()
             }
-            $('.pw').text('Reset Password')
+            $('.pw').text(languagesObj[language].resetPassword)
         } else {
-            $('.btn-container').attr('id', '').html('<button class="btn btn-block btn-success" id="create-user">Create</button>')
-            $('.pw').text('Password')
+            $('.btn-container').attr('id', '').html('<button class="btn btn-block btn-success ln-create" id="create-user">Create</button>').translator()
+            $('.pw').text(languagesObj[language].password)
         }
     }
 
@@ -442,9 +443,9 @@
             success: function(data) {
                 if (data.data == 'Success') {
                     if (data.confirm) {
-                        $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-danger" id="disable-user">Disable</button>')
+                        $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3 ln-save" id="save-user">Save</button><button class="btn btn-danger ln-disable" id="disable-user">Disable</button>').translator()
                     } else {
-                        $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3" id="save-user">Save</button><button class="btn btn-primary" id="enable-user">Enable</button>')
+                        $('.btn-container').attr('id', id).html('<button class="btn btn-success mr-3 ln-save" id="save-user">Save</button><button class="btn btn-primary ln-enable" id="enable-user">Enable</button>').translator()
                     }
                 } else {
                     alert(languagesAlert[language].userToggle)
