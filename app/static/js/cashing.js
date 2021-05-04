@@ -216,7 +216,6 @@ $(document).on('click', '.checkout-btn', function() {
             $('.payment-total').html('<span class="loading-gif"><img src="/static/icons/loading.gif" alt="" srcset=""></span>')
         },
         success: function(data) {
-            console.log(data)
             if (data.result == 'Success') {
                 $('.payment-add').attr('disabled', true)
                 $('.clear-btn ion-icon').addClass('hide')
