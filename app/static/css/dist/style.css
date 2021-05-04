@@ -186,6 +186,10 @@ tbody tr td i {
   transition: 0.3s ease;
 }
 
+.bootstrap-select {
+  z-index: 99 !important;
+}
+
 .container-input:hover input ~ .checkbox {
   background-color: var(--color-menu);
 }
