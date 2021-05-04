@@ -98,18 +98,17 @@
                     <p class="dropdown-item profile-name hide notranslate">
                         {{current_user.username}}
                     </p>
-                    <a class="dropdown-item" href="/profile">Profile</a>
+                    <a class="dropdown-item ln-profile" href="/profile">Profile</a>
                     <div class="dropdown-divider"></div>
                     <form action="/logout" method="post" style="width: 100%;">
-                        <input type="submit" class="btn btn-block color-text" style="border: none; width: 100%;"
-                            value="Logout">
+                        <button type="submit" class="btn btn-block color-text ln-logout" style="border: none !important; width: 100%;">Login</button>
                     </form>
                 </div>
             </div>
             {% else %}
             <div class="user-btn">
-                <a href="/login" class="color-text mr-3">Login</a>
-                <a href="/register" class="color-text btn border">Register</a>
+                <a href="/login" class="color-text mr-3 ln-login">Login</a>
+                <a href="/register" class="color-text btn border ln-register">Register</a>
             </div>
             {% endif %}
         </nav>

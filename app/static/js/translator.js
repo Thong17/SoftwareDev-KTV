@@ -218,7 +218,11 @@ $.fn.translator = function () {
             disable: 'Disable',
             resetPassword: 'Reset Password',
             male: 'Male',
-            female: 'Female'
+            female: 'Female',
+            profile: 'Profile',
+            logout: 'Logout',
+            login: 'Login',
+            register: 'Register'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -370,7 +374,11 @@ $.fn.translator = function () {
             disable: 'បិទ',
             resetPassword: 'ប្តូរពាក្យសម្ងាត់',
             male: 'ប្រុស',
-            female: 'ស្រី'
+            female: 'ស្រី',
+            profile: 'ព័ត៌មាន',
+            logout: 'ចាកចេញ',
+            login: 'ចូល',
+            register: 'ចុះឈ្មោះ'
         }
     }
 
@@ -384,6 +392,10 @@ $.fn.translator = function () {
         }
     })
 
+    $('.ln-register').text(languages[language].register)
+    $('.ln-logout').text(languages[language].logout)
+    $('.ln-login').text(languages[language].login)
+    $('.ln-profile').text(languages[language].profile)
     $('.ln-male').text(languages[language].male)
     $('.ln-female').text(languages[language].female)
     $('.ln-enable').text(languages[language].resetPassword)
