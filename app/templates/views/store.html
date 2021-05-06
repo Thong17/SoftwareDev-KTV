@@ -318,7 +318,7 @@
                                 <h5 class="color-font room-no notranslate">`+ data.room +`</h5>
                                 <div class="color-text room-bottom flex-between-center">
                                     <div class="room-price notranslate">
-                                    <span id="room-price">`+ accountUSD(data.price) +`</span>/ `+ data.hour +`
+                                    <span id="room-price">`+ accountUSD(data.price, true) +`</span>/ `+ data.hour +`
                                     </div>
                                     <div class="room-status text-success ln-open">Open</div>
                                 </div>
@@ -341,7 +341,7 @@
         }
     })
     $(document).ready(function() {
-        currencyFormat()
+        currencyFormat(true)
 
         Array.from($('#list-floors').children()).forEach(item => {
             if ($(item).hasClass('active')) {

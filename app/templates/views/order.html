@@ -1067,13 +1067,19 @@
         duration_str = $('#calculate-time').text().split('min')[0]
         hour = 0
         min = 0
-        if (duration_str.includes('h')) {
+        day = 0
+        if (duration_str.includes('d')) {
+            min = duration_str.split('h')[1]
+            day_hour = duration_str.split('h')[0]
+            day = day_hour.split('d')[0]
+            hour = day_hour.split('d')[1]
+        } else if (duration_str.includes('h')) {
             hour = duration_str.split('h')[0]
             min = duration_str.split('h')[1]
         } else {
             min = duration_str
         }
-        duration_min = parseInt(hour) * 60 + parseInt(min)
+        duration_min = parseInt(day) * 1440 + parseInt(hour) * 60 + parseInt(min)
 
         $('.input-checkout').val(duration_min)
         $(this).addClass('hide')
@@ -1633,7 +1639,7 @@
         $('[data-toggle="tooltip"]').tooltip({
             trigger: 'hover'
         })
-        currencyFormat('$', '2', false)
+        currencyFormat(true)
 
         $('.arrow').addClass('active')
         var products = Array.from(document.querySelectorAll('.product-item'))
@@ -2122,26 +2128,50 @@
         
         current = new Date()
 
-        cal = current - start
+        delta =  Math.abs(current - start) / 1000
 
-        hour = Math.floor((cal % 86400000) / 3600000)
-        minute = Math.round(((cal % 86400000) % 3600000) / 60000)
-        $('#duration-btn').text(minute + hour * 60)
-        if (hour < 10 && hour > 0) {
-            hour = '0'+hour+'h '
-        } else if (hour < 1) {
-            hour = ''
+        cal = delta
+
+        days = Math.floor(delta / 86400)
+        delta -= days * 86400
+
+        // calculate (and subtract) whole hours
+        hours = Math.floor(delta / 3600) % 24
+        delta -= hours * 3600
+
+        // calculate (and subtract) whole minutes
+        minutes = Math.floor(delta / 60) % 60
+        delta -= minutes * 60
+
+        // what's left is seconds
+        seconds = delta % 60
+
+
+        if (days > 0 && days < 10) {
+            days = '0'+days+'d '
+        } else if (days < 1) {
+            days = ''
         } else {
-            hour = hour+'h '
+            days = days+'d '
         }
 
-        if (minute < 10) {
-            minute = '0'+minute+'min'
+        if (hours < 10 && hours > 0) {
+            hours = '0'+hours+'h '
+        } else if (hours < 1) {
+            hours = ''
         } else {
-            minute = minute+'min'
+            hours = hours+'h '
         }
-        result = hour  + minute
-        
+
+        if (minutes < 10) {
+            minutes = '0'+minutes+'min'
+        } else {
+            minutes = minutes+'min'
+        }
+
+        result = days + hours + minutes
+
+        $('#duration-btn').text(result)
         $('#calculate-time').text(result)
     }, 500)
 </script>

@@ -183,9 +183,11 @@
             li.find('a')[0].click()
         })
 
-        function currencyFormat(decimal, isAttribute) {
-            if (decimal == undefined) {
-                decimal = 2
+        function currencyFormat(zero) {
+            if (zero != undefined) {
+                zero = '%v%s'
+            } else {
+                zero = '...'
             }
             var numbers = document.querySelectorAll('.currency-format')
             Array.from(numbers).forEach(n => {
@@ -202,24 +204,24 @@
                 }
                 
                 if ($(n).attr('data-currency') == 'KHR') {
-                    $(n).attr('title', accounting.formatMoney(text / 4000, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}}))
+                    $(n).attr('title', accounting.formatMoney(text / 4000, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: zero}}))
                     $(n).text(accounting.formatMoney(Math.round(text / 100) * 100, {
                         precision: 0,
                         format: {
                             pos: "%v\u17DB",
                             neg: "-%v\u17DB",
-                            zero: '...'
+                            zero: zero
                         }
                     }))
                 }
                 else {
-                    $(n).text(accounting.formatMoney(text, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}}))
+                    $(n).text(accounting.formatMoney(text, {precision: decimal, format: {pos: "%v%s", neg: "-%v%s", zero: zero}}))
                     $(n).attr('title', accounting.formatMoney(Math.round(text * 4000 / 100) * 100, {
                         precision: 0,
                         format: {
                             pos: "%v\u17DB",
                             neg: "-%v\u17DB",
-                            zero: '...'
+                            zero: zero
                         }
                     }))
                 }
@@ -601,8 +603,12 @@
                     </tr>`
         }
 
-        function accountUSD(amount) {
-
+        function accountUSD(amount, zero) {
+            if (zero != undefined) {
+                zero = '%v%s'
+            } else {
+                zero = '...'
+            }
             if (parseFloat(amount) % 1 == 0) {
                 precision = 2
             } else {
@@ -613,7 +619,7 @@
                 }
             }
 
-            return accounting.formatMoney(amount, {precision: precision, format: {pos: "%v%s", neg: "-%v%s", zero: '...'}})
+            return accounting.formatMoney(amount, {precision: precision, format: {pos: "%v%s", neg: "-%v%s", zero: zero}})
         }
 
         function accountKHR(amount) {
