@@ -86,7 +86,7 @@ $(document).on('click', '.order-btn', function() {
                                 $('.payment-add').attr('disabled', false)
                                 
                             } else {
-                                alert(languagesAlert[language].error)
+                                alert(languagesAlert[language].noTransaction)
                             }
                         }
                     })
