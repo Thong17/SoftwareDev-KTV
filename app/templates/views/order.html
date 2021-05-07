@@ -2146,32 +2146,31 @@
         // what's left is seconds
         seconds = delta % 60
 
+        btn = ''
 
-        if (days > 0 && days < 10) {
-            days = '0'+days+'d '
-        } else if (days < 1) {
-            days = ''
-        } else {
+        if (days > 0) {
+            btn = days+'d'
             days = days+'d '
+        } else {
+            days = ''
+            if (hours > 0) {
+                btn = hours+'h'
+            } else {
+                btn = minutes+'min'
+            }
         }
 
-        if (hours < 10 && hours > 0) {
-            hours = '0'+hours+'h '
-        } else if (hours < 1) {
-            hours = ''
-        } else {
+        if (hours > 0) {
             hours = hours+'h '
+        } else {
+            hours = ''
         }
 
-        if (minutes < 10) {
-            minutes = '0'+minutes+'min'
-        } else {
-            minutes = minutes+'min'
-        }
+        minutes = minutes+'min'
 
         result = days + hours + minutes
 
-        $('#duration-btn').text(result)
+        $('#duration-btn').text(btn)
         $('#calculate-time').text(result)
     }, 500)
 </script>

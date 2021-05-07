@@ -985,7 +985,7 @@
         paymentObj.amounts = []
         $('#paymentModel').modal('hide')
         $('#list-payment').empty()
-        $('#sumTotal').text(accountUSD(0))
+        $('#sumTotal').text(accountUSD(0, true))
         $('.order-btn').attr({
             'id': '',
             'data-change': true
