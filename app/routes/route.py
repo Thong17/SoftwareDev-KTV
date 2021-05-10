@@ -2725,10 +2725,10 @@ def order():
                 Room = tblRoom.query.get(order['order'])
                 order['order'] = Room.room
                 order['orderOn'] = datetimefilter(
-                    datetime.strptime(order['orderOn'], '%Y-%m-%dT%H:%M:%S'))
+                    datetime.strptime(order['orderOn'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%d/%I:%M %p')
                 order['orderTo'] = datetimefilter(
-                    datetime.strptime(order['orderTo'], '%Y-%m-%dT%H:%M:%S'))
-            return jsonify({'Orders': Orders, 'date': datetimefilter(date, '%B %d, %Y')})
+                    datetime.strptime(order['orderTo'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%d/%I:%M %p')
+            return jsonify({'Orders': Orders})
     return render_template('views/orders.html', floors=floors, customers=customers, orders=orders, date=date)
 
 
@@ -2742,9 +2742,9 @@ def order_process():
         Room = tblRoom.query.get(order['order'])
         order['order'] = Room.room
         order['orderOn'] = datetimefilter(
-            datetime.strptime(order['orderOn'], '%Y-%m-%dT%H:%M:%S'))
+            datetime.strptime(order['orderOn'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%d/%I:%M %p')
         order['orderTo'] = datetimefilter(
-            datetime.strptime(order['orderTo'], '%Y-%m-%dT%H:%M:%S'))
+            datetime.strptime(order['orderTo'], '%Y-%m-%dT%H:%M:%S'), '%Y-%m-%d/%I:%M %p')
     return jsonify({'Orders': Orders, 'date': datetimefilter(date, '%B %d, %Y')})
 
 
@@ -2758,8 +2758,8 @@ def add_order():
 
     UTC_OFFSET_TIMEDELTA = datetime.utcnow() - datetime.now()
 
-    dateFrom = datetime.strptime(date + ' ' + _from, '%B %d, %Y %H:%M')
-    dateTo = datetime.strptime(date + ' ' + _to, '%B %d, %Y %H:%M')
+    dateFrom = datetime.strptime(_from, '%Y-%m-%dT%H:%M')
+    dateTo = datetime.strptime(_to, '%Y-%m-%dT%H:%M')
 
     utcFrom = dateFrom + UTC_OFFSET_TIMEDELTA
     utcTo = dateTo + UTC_OFFSET_TIMEDELTA
@@ -2859,6 +2859,7 @@ def payment():
 @route.route('/checkin/order/<order_id>', methods=['POST'])
 def checkin(order_id):
     Order = tblOrder.query.get(order_id)
+    Drawer = tblDrawer.query.get(current_user.drawer)
     if Order.order.status == 'Open':
         Order.order.status = 'In Process'
         Order.isProcessed = True
@@ -2867,7 +2868,7 @@ def checkin(order_id):
         pid = str(uuid4())
         invoice = 'INV' + str(len(Payments) + 1).zfill(7)
         Payment = tblPayment(
-            id=pid, invoice=invoice, createdBy=current_user.id, orderedBy=Order.orderedBy, drawerId=current_user.drawer)
+            id=pid, invoice=invoice, rate=Drawer.rate, createdBy=current_user.id, orderedBy=Order.orderedBy, drawerId=current_user.drawer)
         CheckIn = tblCheckin(id=id, createdBy=current_user.id,
                              orderId=order_id, paymentId=pid)
         Activity = tblActivity(id=str(uuid4()), activity=current_user.username +

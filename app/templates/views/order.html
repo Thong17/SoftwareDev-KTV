@@ -631,6 +631,9 @@
             </div>
         </div>
         <div class="grid-products product-container">
+            <div class="loader">
+                <div class="loading"></div>
+            </div>
             <div class="empty-result hide color-text ln-result">No product found...</div>
             {% if products %}
             {% for product in products %}
@@ -1417,7 +1420,7 @@
 
         if (validation.isSelected == true) {
             // Stockform
-            $('.order-form').html(orderForm(orderId, details, cost, '', '', accountUSD(0)))
+            $('.order-form').html(orderForm(orderId, details, cost, '', 1, accountUSD(cost)))
             $('.order-form').find('#input-discount').focus()
             $('#productProperty').modal('hide')
 
@@ -1438,6 +1441,10 @@
 
     $(document).on('click', '.close-payment', function() {
         window.location.href = '/order'
+    })
+
+    $(document).on('focus', '#input-quantity', function() {
+        this.select()
     })
 
     $(document).on('input', '#input-quantity', function () {
@@ -1594,6 +1601,14 @@
         }
 
     $(document).ready(function () {
+
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('.product-container', {
+                opacity: 0
+            })
+        }, 300)
+
         $(document).on('change', '.input-radio', function () {
             var pid = $(this).closest('.property-values').attr('id').split('_')[1]
             var name = $(this).closest('.value').find('#value-value').text()

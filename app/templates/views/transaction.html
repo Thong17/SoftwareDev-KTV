@@ -72,7 +72,7 @@
 
     .input-inv {
         width: 37px;
-        border-radius: 15px;
+        border-radius: 15px !important;
     }
 
     .input-inv::placeholder {
@@ -133,6 +133,9 @@
         </div>
         <div class="border-right"></div>
         <div class="column-wrapper" style="width: 100%;">
+            <div class="loader">
+                <div class="loading"></div>
+            </div>
             <div class="content-body">
                 <table class="table" id="transactionTable">
                     <thead>
@@ -199,6 +202,14 @@
 
     currencyFormat()
     $(document).ready(function() {
+
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('.content-body', {
+                opacity: 0
+            })
+        }, 300)
+
         var invoices = document.querySelectorAll('.item')
         $('.item-container').on('click', '.item', function() {
             text = $(this).text()

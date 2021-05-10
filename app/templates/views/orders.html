@@ -8,6 +8,16 @@
 
 
 <style>
+    .fc-button-primary {
+        background-color: var(--color-bg) !important;
+        border: 1px solid var(--color-hr) !important;
+    }
+
+    .fc .fc-button-primary:not(:disabled):active, .fc .fc-button-primary:not(:disabled).fc-button-active {
+        background-color: var(--color-menu) !important;
+        border: 1px solid var(--color-hover) !important;
+    }
+
     .room-container {
         position: relative;
         display: flex;
@@ -295,7 +305,10 @@
         </div>
         <div class="border-right"></div>
         <div class="column-wrapper" id="list-orders">
-            <div class="column-title flex-center-center mb-3" style="text-align: center;">
+            <div class="loader hide">
+                <div class="loading"></div>
+            </div>
+            <div class="column-title flex-center-center mb-4" style="text-align: center;">
                 <h4 class="notranslate color-font m-0 ln-order-schedule"></h4>
             </div>
             <!-- <div id='external-events'>
@@ -333,9 +346,33 @@
                                 order.customerOrder.phone }}{%
                                 else %}...{% endif %}</td>
                             <td class="color-text notranslate">{{ order.order.room }}</td>
-                            <td class="color-text flex-between-center"><div class="flex-column-between"><div><span>{{ order.orderOn | datetimefilter }}-{{
-                                order.orderTo | datetimefilter }}</span></div><span class="date-below">{{ order.orderOn | datetimefilter("%Y-%m-%d") }}</span></div><span class="remove-order"><i
-                                        class="fa fa-trash-o" aria-hidden="true"></i></span></td>
+                            <td class="color-text flex-between-center">
+
+                                <div class="flex-column-between">
+                                    <div>
+                                        <span>
+                                            {{ order.orderOn | datetimefilter }}
+                                        </span>
+                                    </div>
+                                    <span class="date-below">
+                                        {{ order.orderOn | datetimefilter("%Y-%m-%d") }}
+                                    </span>
+                                </div>
+                                <div class="flex-column-between">
+                                    <div>
+                                        <span>
+                                            {{ order.orderTo | datetimefilter }}
+                                        </span>
+                                    </div>
+                                    <span class="date-below">
+                                        {{ order.orderTo | datetimefilter("%Y-%m-%d") }}
+                                    </span>
+                                </div>
+
+                                <span class="remove-order">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </span>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -385,13 +422,13 @@
                     <span class="dash color-text">-</span>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <input type="time" class="form-control input-color" id="order-from">
+                            <input type="datetime-local" class="form-control input-color" id="order-from">
                             <label for="order-from" class="label ln-from">From</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <input type="time" class="form-control input-color" id="order-to">
+                            <input type="datetime-local" class="form-control input-color" id="order-to">
                             <label for="order-to" class="label ln-to">To</label>
                         </div>
                     </div>
@@ -442,6 +479,64 @@
 <script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
 <script src="{{url_for('static', filename='js/bootstrap-select.min.js')}}"></script>
 <script>
+
+    function showOrder(orders, remove) {
+        if (remove == undefined) {
+            remove = `<span class="remove-order">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </span>`
+        } else {
+            remove = `<span></span>`
+        }
+        element = ''
+        orders.forEach(o => {
+            if (o.customerOrder.name == '') {
+                _name = '...'
+            } else {
+                _name = o.customerOrder.name
+            }
+            if (o.customerOrder.phone == '') {
+                phone = '...'
+            } else {
+                phone = o.customerOrder.phone
+            }
+            room = o.order
+
+            element += `<tr class="order-item" id="` + o.id + `" data-href="/order/`+o.id+`">
+                <td class="color-text">`+ _name + `</td>
+                <td class="color-text notranslate">`+ phone + `</td>
+                <td class="color-text notranslate">`+ room + `</td>
+                <td class="color-text flex-between-center">
+
+
+                    <div class="flex-column-between">
+                        <div>
+                            <span>
+                                `+o.orderOn.split('/')[1]+`
+                            </span>
+                        </div>
+                        <span class="date-below">
+                            `+o.orderOn.split('/')[0]+`
+                        </span>
+                    </div>
+                    <div class="flex-column-between">
+                        <div>
+                            <span>
+                                `+o.orderTo.split('/')[1]+`
+                            </span>
+                        </div>
+                        <span class="date-below">
+                            `+o.orderTo.split('/')[0]+`
+                        </span>
+                    </div>
+
+                    `+remove+`
+                </td>
+            </tr>`
+        })
+        return element
+    }
+
     $(document).ready(function () {
         $(document).on('click', '.order-item', function() {
             window.location = $(this).data("href")
@@ -451,31 +546,22 @@
             $.ajax({
                 url: '/order',
                 type: 'POST',
+                beforeSend: function() {
+                    toggleLoader($('.loader'))
+                },
                 success: function (data) {
+                    setTimeout(function () {
+                        toggleLoader($('.loader'))
+                        gsap.from('#list-orders', {
+                            opacity: 0
+                        })
+                    }, 0)
+
                     Array.from($('.grid-products').children()).forEach(r => {
                         $(r).removeClass('active')
                     })
-                    element = ''
-                    data.Orders.forEach(o => {
-                        if (o.customerOrder.name == '') {
-                            _name = '...'
-                        } else {
-                            _name = o.customerOrder.name
-                        }
-                        if (o.customerOrder.phone == '') {
-                            phone = '...'
-                        } else {
-                            phone = o.customerOrder.phone
-                        }
-                        room = o.order
-                        date = o.orderOn + '-' + o.orderTo
-                        element += `<tr class="order-item" id="` + o.id + `" data-href="/order/`+o.id+`">
-                            <td class="color-text">`+ _name + `</td>
-                            <td class="color-text notranslate">`+ phone + `</td>
-                            <td class="color-text notranslate">`+ room + `</td>
-                            <td class="color-text flex-between-center"><span>`+ date + `</span><span class="remove-order"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
-                            </tr>`
-                    })
+                    element = showOrder(data.Orders)
+                    
                     $('.column-title').html('<h4 class="notranslate color-font m-0 ln-order-schedule"></h4>')
                     $('.calendar-container').html(`<div class="date-header">
                         <div class="select-list">
@@ -484,7 +570,6 @@
                                 <option class="ln-process" value="process">In Process</option>
                             </select>
                         </div>
-                        <h2 class="fc-toolbar-title m-0" id="date"><span class="ln-date">Date</span>: `+ data.date + `</h2>
                         
                     </div>
                     <table id="order-table" class="table">
@@ -512,27 +597,7 @@
                         Array.from($('.grid-products').children()).forEach(r => {
                             $(r).removeClass('active')
                         })
-                        element = ''
-                        data.Orders.forEach(o => {
-                            if (o.customerOrder.name == '') {
-                                _name = '...'
-                            } else {
-                                _name = o.customerOrder.name
-                            }
-                            if (o.customerOrder.phone == '') {
-                                phone = '...'
-                            } else {
-                                phone = o.customerOrder.phone
-                            }
-                            room = o.order
-                            date = o.orderOn + '-' + o.orderTo
-                            element += `<tr class="order-item" id="` + o.id + `" data-href="/order/`+o.id+`">
-                                <td class="color-text">`+ _name + `</td>
-                                <td class="color-text notranslate">`+ phone + `</td>
-                                <td class="color-text notranslate">`+ room + `</td>
-                                <td class="color-text flex-between-center"><span>`+ date + `</span></td>
-                                </tr>`
-                        })
+                        element = showOrder(data.Orders, false)
                         $('.column-title').html('<h4 class="notranslate color-font m-0 ln-order-schedule"></h4>')
                         $('.calendar-container').html(`<div class="date-header">
                             <div class="select-list">
@@ -541,7 +606,6 @@
                                     <option selected class="ln-process" value="process">In Process</option>
                                 </select>
                             </div>
-                            <h2 class="fc-toolbar-title m-0" id="date"><span class="ln-date">Date</span>: `+ data.date + `</h2>
                             
                         </div>
                         <table id="order-table" class="table">
@@ -565,27 +629,8 @@
                         Array.from($('.grid-products').children()).forEach(r => {
                             $(r).removeClass('active')
                         })
-                        element = ''
-                        data.Orders.forEach(o => {
-                            if (o.customerOrder.name == '') {
-                                _name = '...'
-                            } else {
-                                _name = o.customerOrder.name
-                            }
-                            if (o.customerOrder.phone == '') {
-                                phone = '...'
-                            } else {
-                                phone = o.customerOrder.phone
-                            }
-                            room = o.order
-                            date = o.orderOn + '-' + o.orderTo
-                            element += `<tr class="order-item" id="` + o.id + `" data-href="/order/`+o.id+`">
-                                <td class="color-text">`+ _name + `</td>
-                                <td class="color-text notranslate">`+ phone + `</td>
-                                <td class="color-text notranslate">`+ room + `</td>
-                                <td class="color-text flex-between-center"><span>`+ date + `</span><span class="remove-order"><i class="fa fa-trash-o" aria-hidden="true"></i></span></td>
-                                </tr>`
-                        })
+
+                        element = showOrder(data.Orders)
                         $('.column-title').html('<h4 class="notranslate color-font m-0 ln-order-schedule"></h4>')
                         $('.calendar-container').html(`<div class="date-header">
                             <div class="select-list">
@@ -594,7 +639,6 @@
                                     <option class="ln-process" value="process">In Process</option>
                                 </select>
                             </div>
-                            <h2 class="fc-toolbar-title m-0" id="date"><span class="ln-date">Date</span>: `+ data.date + `</h2>
                             
                         </div>
                         <table id="order-table" class="table">
@@ -640,13 +684,16 @@
             from = $('#order-from')
             to = $('#order-to')
 
-            d = new Date()
-            h = (d.getHours()<10?'0':'') + d.getHours()
-            m = (d.getMinutes()<10?'0':'') + d.getMinutes()
-            
+            Number.prototype.AddZero= function(b,c){
+                var  l= (String(b|| 10).length - String(this).length)+1;
+                return l> 0? new Array(l).join(c|| '0')+this : this;
+            }            
+
             if (from.val() == '' || to.val() == '') {
-                from.val(h+':'+m)
-                to.val(h+':'+m)
+                d = new Date()
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+                from.val(d.toISOString().slice(0,16))
+                to.val(d.toISOString().slice(0,16))
             }
 
             date = $('.fc-toolbar-title').text()
@@ -749,7 +796,17 @@
             $.ajax({
                 url: '/room/order/' + id,
                 type: 'POST',
+                beforeSend: function() {
+                    toggleLoader($('.loader'))
+                },
                 success: function (data) {
+                    setTimeout(function () {
+                        toggleLoader($('.loader'))
+                        gsap.from('#list-orders', {
+                            opacity: 0
+                        })
+                    }, 100)
+
                     eventsArr = []
                     data.orders.forEach(o => {
                         obj = {
@@ -779,7 +836,7 @@
                             }
                         },
                         headerToolbar: {
-                            left: 'today',
+                            left: 'timeGridDay dayGridWeek dayGridMonth',
                             center: 'prev title next',
                             right: 'add'
                         },

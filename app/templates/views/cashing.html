@@ -567,6 +567,9 @@
             </div>
         </div>
         <div class="grid-products product-container">
+            <div class="loader">
+                <div class="loading"></div>
+            </div>
             <div class="empty-result ln-result hide color-text"></div>
             {% if products %}
             {% for product in products %}
@@ -1248,7 +1251,7 @@
         orderLists.push(orderList)
 
         if (validation.isSelected == true) {
-            $('.order-form').html(orderForm(orderId, details, cost, '', '', accountUSD(0)))
+            $('.order-form').html(orderForm(orderId, details, cost, '', 1, accountUSD(cost)))
             $('.order-form').find('#input-discount').focus()
             $('#productProperty').modal('hide')
 
@@ -1265,6 +1268,10 @@
                 $(this).remove()
             })
         }
+    })
+
+    $(document).on('focus', '#input-quantity', function() {
+        this.select()
     })
 
     $(document).on('input', '#input-quantity', function () {
@@ -1404,6 +1411,14 @@
     }
 
     $(document).ready(function () {
+
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('.product-container', {
+                opacity: 0
+            })
+        }, 300)
+
         $(document).on('change', '.input-radio', function () {
             var pid = $(this).closest('.property-values').attr('id').split('_')[1]
             var name = $(this).closest('.value').find('#value-value').text()

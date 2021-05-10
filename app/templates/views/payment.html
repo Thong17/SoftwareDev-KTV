@@ -66,6 +66,9 @@
 
 {% block content %}
 <div class="wrap-container">
+    <div class="loader">
+        <div class="loading"></div>
+    </div>
     <table class="table" id="list-payments">
         <thead>
             <tr class="color-font">
@@ -255,6 +258,14 @@
     })
 
     $(document).ready(function() {
+
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('.wrap-container', {
+                opacity: 0
+            })
+        }, 300)
+
         paymentObj = {
             'amounts': []
         }
@@ -353,7 +364,7 @@
                         format: {
                             pos: "%v%s("+Math.round(data.data.remain * data.data.rate / 100) * 100+"\u17DB)",
                             neg: "-%v%s(-"+Math.round(data.data.remain * data.data.rate / 100) * 100+"\u17DB)",
-                            zero: '...'
+                            zero: '%v%s'
                         }
                     })
 
@@ -513,7 +524,7 @@
                             format: {
                                 pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
                                 neg: "-%v%s(-"+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
-                                zero: '...'
+                                zero: '%v%s'
                             }
                         })
                         $('.payment-total').html('<div class="checkout-btn"><span class="color-font ln-checkout mr-1">'+languagesObj[language].checkOut+'</span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>')

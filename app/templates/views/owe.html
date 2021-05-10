@@ -566,7 +566,7 @@
                         format: {
                             pos: "%v%s("+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
                             neg: "-%v%s(-"+Math.round(amount * data.rate / 100) * 100+"\u17DB)",
-                            zero: '...'
+                            zero: '%v%s'
                         }
                     })
                     $('.payment-total').html('<div class="checkout-owe"><span class="color-font ln-checkout mr-1">'+languagesObj[language].checkOut+'</span><span class="currency-format color-text" id="paymentAmount">'+checkout+'</span></div>')

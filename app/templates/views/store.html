@@ -178,7 +178,7 @@
                         {% elif room.status == 'Close' %}
                         <i class="fa fa-unlock-alt unlock-room" aria-hidden="true"></i>
                         {% else %}
-                        <i class="fa fa-lock" aria-hidden="true"></i>
+                        <i class="fa fa-lock process-room" aria-hidden="true"></i>
                         {% endif %}
                     </div>
                     <h5 class="color-font room-no notranslate">{{ room.room }}</h5>
@@ -238,6 +238,10 @@
         
         $('#edit-room').val(room)
         $('#edit-price').val(accounting.unformat(price))
+    })
+
+    $(document).on('click', '.process-room', function() {
+        alert(languagesAlert[language].roomProcess)
     })
 
     $(document).on('click', '.save-room', function() {

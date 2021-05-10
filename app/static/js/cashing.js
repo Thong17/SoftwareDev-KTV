@@ -69,7 +69,7 @@ $(document).on('click', '.order-btn', function() {
                                     format: {
                                         pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
                                         neg: "-%v%s(-"+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
-                                        zero: '...'
+                                        zero: '%v%s'
                                     }
                                 })
                                 
@@ -135,7 +135,7 @@ $(document).on('click', '.order-btn', function() {
                                 format: {
                                     pos: "%v%s("+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
                                     neg: "-%v%s(-"+Math.round(data.data.remain * data.rate / 100) * 100+"\u17DB)",
-                                    zero: '...'
+                                    zero: '%v%s'
                                 }
                             })
                             

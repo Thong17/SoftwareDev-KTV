@@ -32,7 +32,8 @@ languagesAlert = {
         alreadyCheckin: 'Failed! An order has been processing',
         inProcess: 'Failed! Status is in process',
         floorError: 'Failed! Unable to delete the existed data in the floor',
-        noTransaction: 'No transaction added!'
+        noTransaction: 'No transaction added!',
+        roomProcess: 'Room is in process'
     },
     khmer: {
         invalidFile: 'File ដែលបានជ្រើសរើសមិនត្រឹមត្រូវទេ',
@@ -65,7 +66,8 @@ languagesAlert = {
         alreadyCheckin: 'បរាជ័យ! មិនអាចចាប់ផ្តើមបានទេព្រោះកំពុងដំណើរការ',
         inProcess: 'បរាជ័យ! ស្ថានភាពកំពុងដំណើរការ',
         floorError: 'បរាជ័យ! មិនអាចលុបបានទេព្រោះមានទិន្នន័យ',
-        noTransaction: 'មិនមានប្រតិបត្តិការបង្កើតទេ'
+        noTransaction: 'មិនមានប្រតិបត្តិការបង្កើតទេ',
+        roomProcess: 'បន្ទប់កំពុងដំណើរការ'
     }
 }
 
