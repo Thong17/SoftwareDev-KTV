@@ -12,7 +12,7 @@
         border-right: 1px solid var(--color-hr);
     }
     .dataTables_wrapper {
-        width: calc(100% - 250px);
+        width: 100%;
     }
     .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_empty, select, input, .dataTables_paginate a {
         color: var(--color-text) !important;
@@ -79,24 +79,29 @@
             <button class="btn border btn-shadow color-font ln-save" id="submit" name="submit" type="submit">Save</button>
         </div>
     </form>
-    <table id="list-expenses" class="table">
-        <thead>
-            <tr class="color-font">
-                <td class="color-text ln-details">Details</td>
-                <td class="color-text ln-price">Price</td>
-                <td class="color-text ln-date-create">Created On</td>
-            </tr>
-        </thead>
-        <tbody>
-            {% for expense in expenses %}
-            <tr id="{{ expense.id }}">
-                <td class="color-text notranslate" id="description">{{ expense.description }}</td>
-                <td class="color-text currency-format notranslate" id="amount">{{ expense.amount }}</td>
-                <td class="color-text flex-between-center notranslate"><span class="notranslate color-text" id="createdOn">{{ expense.createdOn }}</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div style="width: calc(100% - 250px); height: 100%;" id="expense-container">
+        <div class="loader">
+            <div class="loading"></div>
+        </div>
+        <table id="list-expenses" class="table">
+            <thead>
+                <tr class="color-font">
+                    <td class="color-text ln-details">Details</td>
+                    <td class="color-text ln-price">Price</td>
+                    <td class="color-text ln-date-create">Created On</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr id="{{ expense.id }}">
+                    <td class="color-text notranslate" id="description">{{ expense.description }}</td>
+                    <td class="color-text currency-format notranslate" id="amount">{{ expense.amount }}</td>
+                    <td class="color-text flex-between-center notranslate"><span class="notranslate color-text" id="createdOn">{{ expense.createdOn }}</span><div class="flex-between-center action-btn"><i class="fa fa-pencil-square-o" aria-hidden="true"></i><i class="fa fa-trash-o" aria-hidden="true"></i></div></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 
@@ -131,6 +136,12 @@
         }
     })
     $(document).ready(function () {
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('#expense-container', {
+                opacity: 0
+            })
+        }, 300)
         $(document).on('click', '.fa-trash-o', function() {
             id = $(this).closest('tr').attr('id')
             if (confirm(languagesAlert[language].confirmProcess)) {

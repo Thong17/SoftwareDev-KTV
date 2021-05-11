@@ -60,7 +60,9 @@
 
 {% block content %}
 <div class="wrap-container">
-
+    <div class="loader">
+        <div class="loading"></div>
+    </div>
     <div class="row-wrapper">
         <div class="column-wrapper" style="width: 100%;">
             <table class="table" id="list-activity">
@@ -99,6 +101,15 @@
         "scrollY": "70vh",
         "paging": false,
         "searching": false
+    })
+
+    $(document).ready(function() {
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('.wrap-container', {
+                opacity: 0
+            })
+        }, 300)
     })
 </script>
 {% endblock %}

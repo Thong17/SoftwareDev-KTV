@@ -1669,7 +1669,6 @@ table tbody tr {
 
 .product-container {
     width: 100%;
-    height: calc(100vh - 230px);
     overflow-y: auto !important;
     scroll-behavior: smooth;
 }
@@ -2214,6 +2213,7 @@ select.goog-te-combo {
 .menu-items div.active {
     color: var(--color-font);
     border: 1px solid var(--color-hr);
+    background-color: var(--color-bg);
 }
 
 .menu-btn {

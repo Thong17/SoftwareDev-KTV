@@ -74,7 +74,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="wrap-container">
+<div class="wrap-container pb-5">
     <div class="content-menu flex-between">
         <div class="dropdown" id="list-cates">
             <div class="menu-icon" data-toggle="dropdown">
@@ -122,6 +122,9 @@
         </div>
     </div>
     <div class="grid-products product-container">
+        <div class="loader">
+            <div class="loading"></div>
+        </div>
         <div class="empty-result hide color-text ln-result">No product found...</div>
         {% if products %}
             {% for product in products %}
@@ -298,6 +301,12 @@
     })
 
     $(document).ready(function () {
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('.product-container', {
+                opacity: 0
+            })
+        }, 300)
         currencyFormat()
         var products = Array.from(document.querySelectorAll('.product-item'))
 

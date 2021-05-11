@@ -106,6 +106,9 @@
             </div>
             <br>
             <div id="chart-container">
+                <div class="loader">
+                    <div class="loading"></div>
+                </div>
                 <canvas id="canvas"></canvas>
             </div>
             <table id="export-table"></table>
@@ -193,6 +196,13 @@
     }
 
     $(document).ready(function () {
+
+        setTimeout(function () {
+            toggleLoader($('.loader'))
+            gsap.from('#chart-container', {
+                opacity: 0
+            })
+        }, 300)
 
         var chart = document.getElementById('chart-container')
         var canvas = document.getElementById('canvas')

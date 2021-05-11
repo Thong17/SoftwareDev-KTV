@@ -120,7 +120,9 @@
 
     .col-order {
         width: 350px;
-        position: relative;
+        height: calc(100vh - 180px);
+        position: sticky;
+        top: 30px;
     }
 
     .drawer-btn {
@@ -507,7 +509,7 @@
 
 {% block content %}
 <div class="wrap-container">
-    <div class="col-filter" style="border-right: 1px solid var(--color-hr);">
+    <div class="col-filter">
         <!-- Begin -->
         <div class="content-menu flex-between">
             <div class="flex-start-center" style="position: relative; width: 70%;">
@@ -697,7 +699,7 @@
 
         <!-- Noted -->
     </div>
-    <div class="col-order pl-4">
+    <div class="col-order pl-4" style="border-left: 1px solid var(--color-hr);">
         <h4 class="color-font transaction mb-3" style="text-align: center;"></h4>
         <div class="flex-between-center">
             <select name="customer" id="select-customer" class="input-color ml-0 selectpicker" data-live-search="true">
