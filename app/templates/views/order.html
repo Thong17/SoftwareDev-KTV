@@ -2125,7 +2125,7 @@
                     if (quantity.trim() != 'Available') {
                         $('#' + pid).find('.stock-tag').text(sum_q + ' Available')
                     }
-                    $('#sumTotal').text(accountUSD(total - amount))
+                    $('#sumTotal').text(accountUSD(total - amount, true))
                     orderLists.forEach((o, i) => {
                         if (o.orderId == id.attr('data-id')) {
                             orderLists.splice(i, 1)

@@ -1779,6 +1779,7 @@ table tbody tr {
     overflow: hidden;
     cursor: pointer;
     transition: 0.3s ease;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
 }
 
 .grid-products .product-item .item-wrapper {
@@ -1853,8 +1854,8 @@ table tbody tr {
     cursor: default;
 }
 
-.product-item:hover .product-btn,
-.product-item.active .product-btn {
+.product-item .product-btn:hover,
+.product-item .product-btn.active {
     opacity: 1;
     transform: scale(0.9);
 }

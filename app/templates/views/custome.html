@@ -38,19 +38,19 @@
 {% block content %}
 <div class="wrap-container grid-container">
     <div class="grid-item">
-        <div class="item-header ln-category">
-            
-        </div>
-        <div class="item-body" id="pie">
-            <canvas id="pieChart"></canvas>
-        </div>
-    </div>
-    <div class="grid-item">
         <div class="item-header ln-brand">
             
         </div>
         <div class="item-body" id="doughnut">
             <canvas id="doughnutChart"></canvas>
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="item-header ln-category">
+            
+        </div>
+        <div class="item-body" id="pie">
+            <canvas id="pieChart"></canvas>
         </div>
     </div>
     <div class="grid-item">
@@ -91,7 +91,7 @@
 {% block script %}
 <script>
     $(document).ready(function () {
-        $('#pie').parent().css({
+        $('#doughnut').parent().css({
             'grid-column': '1/3'
         })
         $.ajax({
