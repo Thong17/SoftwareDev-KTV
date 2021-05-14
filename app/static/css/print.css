@@ -3,6 +3,12 @@
     src: url('/static/fonts/Hanuman-Regular.ttf') format('truetype'), url('/static/fonts/Hanuman-Bold.ttf') format('truetype');
 } 
 
+@media print {
+    #lang-container {
+       display: none;
+    }
+ }
+
 * {
     margin: 0;
     padding: 0;

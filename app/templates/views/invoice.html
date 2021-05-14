@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="english">
 
 <head>
     <meta charset="UTF-8">
@@ -13,27 +13,34 @@
 </head>
 
 <body>
+    <div id="lang-container">
+        <select class="form-control ml-5 mt-4" style="width: 150px;" name="lang" id="select-lang">
+            <option value="english">English</option>
+            <option value="khmer">Khmer</option>
+            <option value="vietnam">Vietnam</option>
+        </select>
+    </div>
     <div id="print" class="invoice-container">
         <div class="store-name">{{ store.store }}</div>
         <div class="location">{{ store.location }}</div>
         <div class="contact-number mb-5">{{ store.phone }}</div>
         <div class="date-time">
-            <span class="date">Date: {{ payment.createdOn | datetimefilter('%a, %b %d %Y') }}</span>
+            <span class="date"><span class="lni-date">Date:</span> {{ payment.createdOn | datetimefilter('%a, %b %d %Y') }}</span>
             <span class="time">{{ payment.createdOn | datetimefilter }}</span>
         </div>
         <div class="invoice-cashier mb-3">
-            <span class="invoice">Invoice: {{ payment.invoice }}</span>
-            <span class="invoice">Cashier: {{ current_user.username }}</span>
+            <span class="invoice"><span class="lni-invoice">Invoice:</span> {{ payment.invoice }}</span>
+            <span class="invoice"><span class="lni-cashier">Cashier:</span> {{ current_user.username }}</span>
         </div>
         <div class="transaction-container">
             <table class="table">
                 <thead>
                     <tr>
-                        <td style="width: 50%;">Description</td>
-                        <td style="width: 15%;">Price</td>
-                        <td style="width: 10%;">Disc</td>
-                        <td style="width: 10%;">Qty</td>
-                        <td style="width: 15%;">Total</td>
+                        <td style="width: 50%;" class="lni-description">Description</td>
+                        <td style="width: 15%;" class="lni-price">Price</td>
+                        <td style="width: 10%;" class="lni-disc">Disc</td>
+                        <td style="width: 10%;" class="lni-qty">Qty</td>
+                        <td style="width: 15%;" class="lni-total">Total</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,7 +58,7 @@
             <div class="bottom-spacing"></div>
         </div>
         <div class="total-container pt-3">
-            <span style="width: 50%;">Total</span>
+            <span style="width: 50%;" class="lni-total">Total</span>
             <div class="total-details">
                 <div class="total-price pb-2">
                     <div class="total-usd flex-between">
@@ -65,30 +72,47 @@
                 </div>
                 <div class="total-return">
                     <div class="receive-cash flex-between">
-                        <span>Paid:</span>
+                        <span class="lni-paid">Paid:</span>
                         <div><span class="receive">{{ payment.receive }}</span></div>
                     </div>
                     {% if payment.remain > 0 %}
                     <div class="return-cash flex-between">
-                        <span>Remain:</span>
+                        <span class="lni-remain">Remain:</span>
                         <div class="flex-column-start"><span class="dollar-format">{{ payment.remain }}</span><span class="riel-format">{{ payment.remain * payment.rate }}</span></div>
                     </div>
                     {% else %}
                     <div class="return-cash flex-between">
-                        <span>Return:</span>
+                        <span class="lni-return">Return:</span>
                         <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span><span class="riel-format">{{ payment.change * 4000 }}</span></div>
                     </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-        <div class="footer-container">Thank you for comming</div>
+        <div class="footer-container lni-greet">Thank you for comming</div>
     </div>
     <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/printThis.js')}}"></script>
     <script src="{{url_for('static', filename='js/accounting.js')}}"></script>
-
+    <script src="{{url_for('static', filename='js/translator.js')}}"></script>
     <script>
+        $('#select-lang').on('change', function() {
+            value = $(this).val()
+            $('.lni-invoice').text(languagesObj[value].invoice + ':')
+            $('.lni-date').text(languagesObj[value].date + ':')
+            $('.lni-cashier').text(languagesObj[value].cashier + ':')
+            $('.lni-total').text(languagesObj[value].total)
+            $('.lni-remain').text(languagesObj[value].remain + ':')
+            $('.lni-paid').text(languagesObj[value].paid + ':')
+            $('.lni-return').text(languagesObj[value].return + ':')
+            $('.lni-qty').text(languagesObj[value].qty)
+            $('.lni-description').text(languagesObj[value].description)
+            $('.lni-price').text(languagesObj[value].price)
+            $('.lni-disc').text(languagesObj[value].disc)
+            $('.lni-greet').text(languagesObj[value].greet)
+        })
+
+
         function dollarFormat(currency, decimal, isAttribute) {
             var numbers = document.querySelectorAll('.dollar-format')
             Array.from(numbers).forEach(n => {
@@ -120,6 +144,8 @@
         $(document).ready(function() {
             dollarFormat()
             rielFormat()
+            $(document).translator()
+
             $('#print').printThis()
             receive = $('.receive').text()
             usd = receive.split(',')[0]
