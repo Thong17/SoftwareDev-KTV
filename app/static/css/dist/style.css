@@ -1683,7 +1683,7 @@ table tbody tr {
   grid-row-gap: 50px;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   grid-template-rows: repeat(auto-fill, minmax(200px, 200px));
-  padding: 15px 15px 0 15px;
+  padding: 15px;
   overflow-y: auto;
 }
 

@@ -170,6 +170,7 @@
                             <tbody id="list-stocks">
                                 {% if product %}
                                 {% for stock in product.stocks %}
+                                {% if stock.quantity > 0 %}
                                 <tr title="{{stock.createdOn}}" class="color-text {% if stock.expire %}{% if (stock.expire - today).days < 7 and (stock.expire - today).days > 0 %}text-warning{% elif (stock.expire - today).days < 0 %}text-danger{% endif %}{% endif %}" id="{{stock.id}}">
                                     {% if stock.color|length %}
                                     {% if product.colors %}
@@ -197,6 +198,7 @@
                                         </div>
                                     </td>
                                 </tr>
+                                {% endif %}
                                 {% endfor %}
                                 {% endif %}
                                 <tr class="stock-form color-text">

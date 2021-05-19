@@ -3,6 +3,12 @@
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('static', filename= 'css/classic.min.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename= 'css/lightbox.min.css') }}">
+<style>
+    .product-item:hover .product-btn {
+        opacity: 1 !important;
+        transform: scale(0.9) !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
