@@ -87,10 +87,10 @@
                     <tbody id="list-properties">
 
                     </tbody>
-                    <div class="loader hide">
-                        <div class="loading"></div>
-                    </div>
                 </table>
+                <div class="loader hide">
+                    <div class="loading"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -154,6 +154,7 @@
                 toggleEdit($('.loader'), $('#list-properties'))
             },
             success: function (data) {
+                $('.content-body').css('height', '72vh')
                 setTimeout(function () {
                     toggleEdit($('#list-properties'), $('.loader'))
                     tl.from('#list-properties tr', {
@@ -178,6 +179,8 @@
 
                         element += addProperty(prop.id, prop.property, prop.type, prop.description)
                     });
+
+                    $('.content-body').css('height', 'auto')
                 } else {
                     element += '<p class="no-result ln-result">Nothing created</p>'
                 }

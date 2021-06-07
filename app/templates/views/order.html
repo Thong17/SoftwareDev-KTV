@@ -112,7 +112,7 @@
         grid-row-gap: 20px;
         grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
         grid-template-rows: repeat(auto-fill, minmax(200px, 200px)) !important;
-        padding: 15px 15px 0 15px;
+        padding: 15px;
     }
 
     .grid-products .product-item {
@@ -1303,6 +1303,7 @@
                 }
             })
 
+            orderList.details = details
             orderList.discount = discount
             orderList.quantity = quantity
             orderList.price = price
@@ -1566,7 +1567,7 @@
 
         return `<input type="hidden" id="input-product" value="` + id + `">
             <td><input type="text" class="form-empty color-text input-color" title="`+ details + `" id="input-details" value="` + details + `"
-                    placeholder="Details" disabled></td>
+                    placeholder="Details"></td>
             <td><input type="number" class="form-empty color-text input-color" id="input-price" value="`+ cost + `"
                     placeholder="Price"></td>
             <td><input min="1" max="100" type="number" class="form-empty color-text input-color" id="input-discount" value="`+ discount + `"
@@ -1574,10 +1575,10 @@
             <td><form id="orderForm" style="width: auto"><input type="number" class="form-empty color-text input-color" id="input-quantity"
                     placeholder="Qty" value="`+ quantity + `"></form></td>
             <td id="calculated-result" style="text-align:center;">`+ total + `</td>
-            <td class="cancel-btn">
+            <td class="cancel-btn hide">
                 <ion-icon name="close-outline"></ion-icon>
             </td>
-            <td class="save-btn hide">
+            <td class="save-btn">
                 <ion-icon name="checkmark-outline"></ion-icon>
             </td>
             <td class="remove-btn hide">
@@ -1589,7 +1590,7 @@
 
         return `<input type="hidden" id="input-transaction" value="` + id + `">
             <td><input type="text" class="form-empty color-text input-color" title="`+ details + `" id="input-details" value="` + details + `"
-                    placeholder="Details" disabled></td>
+                    placeholder="Details"></td>
             <td><input type="number" class="form-empty color-text input-color" id="input-price" value="`+ cost + `"
                     placeholder="Price"></td>
             <td><input min="1" max="100" type="number" class="form-empty color-text input-color" id="input-discount" value="`+ discount + `"

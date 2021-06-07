@@ -135,8 +135,7 @@ def register():
                 db.session.commit()
                 login_user(requestedUser)
                 return redirect('/')
-            except SQLAlchemyError as error:
-                print(str(error))
+            except:
                 db.session.rollback()
                 return 'Register failed'
     return render_template('views/register.html', form=form)
@@ -1237,7 +1236,7 @@ def order_product(id):
     try:
         product = tblProduct.query.get(id)
         data = json.loads(request.form['data'])
-        description = product.product
+        description = data['details']
         oid = request.form['id']
 
         Payment = tblPayment.query.get(oid)
@@ -1254,10 +1253,6 @@ def order_product(id):
         quantity = Decimal(data['quantity'])
 
         amount = price * (1 - discount / 100)
-
-        for v in data['values']:
-            value = tblValue.query.get(v['valueId'])
-            description += '-'+value.value
 
         tid = str(uuid4())
         transaction = tblTransaction(id=tid, discount=discount, price=price,
@@ -1276,8 +1271,6 @@ def order_product(id):
                 sum_stocks = 0
                 for stock in product.stocks:
                     if stock.color == data['colorId']:
-                        Color = tblColor.query.get(data['colorId'])
-                        transaction.description += '-'+Color.color
                         sum_stocks += stock.quantity
                     elif stock.color == '':
                         sum_stocks += stock.quantity
@@ -1564,12 +1557,13 @@ def update_transaction(id):
     transaction = tblTransaction.query.get(id)
     price = request.form['price']
     discount = request.form['discount']
+    details = request.form['details']
 
     if discount == '':
         discount = 0
     
     transaction.amount = round(float(price) * (1 - float(discount) / 100), 3)
-
+    transaction.description = details
     transaction.price = price
     transaction.discount = discount
     
@@ -2304,9 +2298,7 @@ def add_role():
         msg['redirect'] = 'Success'
         return jsonify(msg)
     except:
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                msg[fieldName].append(err)
+        msg['redirect'] = 'Faild'
         return jsonify(msg)
 
 
@@ -2896,7 +2888,7 @@ def order_transaction(product_id):
     try:
         product = tblProduct.query.get(product_id)
         data = json.loads(request.form['data'])
-        description = product.product
+        description = data['details']
         oid = request.form['id']
 
         Order = tblOrder.query.get(oid)
@@ -2917,10 +2909,6 @@ def order_transaction(product_id):
                 quantity = Decimal(data['quantity'])
 
                 amount = price * (1 - discount / 100)
-
-                for v in data['values']:
-                    value = tblValue.query.get(v['valueId'])
-                    description += '-'+value.value
 
                 tid = str(uuid4())
                 transaction = tblTransaction(id=tid, discount=discount, price=price,
@@ -2998,7 +2986,6 @@ def order_transaction(product_id):
 
 @route.route('/payments/<id>', methods=['POST'])
 def get_payments(id):
-    Drawer = tblDrawer.query.get(current_user.drawer)
     Payment = tblPayment.query.get(id)
 
     p = PaymentSchema()
