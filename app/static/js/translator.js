@@ -294,7 +294,8 @@ $.fn.translator = function () {
             profile: 'Profil',
             logout: 'Keluar',
             login: 'Gabung',
-            register: 'Daftar'
+            register: 'Daftar',
+            totalOwe: 'Total Hutang'
         },
         english: {
             advertise: 'Advertise',
@@ -446,7 +447,8 @@ $.fn.translator = function () {
             profile: 'Profile',
             logout: 'Logout',
             login: 'Login',
-            register: 'Register'
+            register: 'Register',
+            totalOwe: 'Total Owe'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -602,7 +604,8 @@ $.fn.translator = function () {
             profile: 'ព័ត៌មាន',
             logout: 'ចាកចេញ',
             login: 'ចូល',
-            register: 'ចុះឈ្មោះ'
+            register: 'ចុះឈ្មោះ',
+            totalOwe: 'សរុបជំពាក់'
         },
         vietnam: {
             advertise: 'Quảng cáo',
@@ -754,7 +757,8 @@ $.fn.translator = function () {
             profile: 'Hồ sơ',
             logout: 'Đăng xuất',
             login: 'Đăng nhập',
-            register: 'Đăng ký'
+            register: 'Đăng ký',
+            totalOwe: 'Tổng nợ'
         }
     }
 
@@ -768,6 +772,7 @@ $.fn.translator = function () {
         }
     })
 
+    $('.ln-total-owe').text(languages[language].totalOwe+': ')
     $('.ln-register').text(languages[language].register)
     $('.ln-logout').text(languages[language].logout)
     $('.ln-login').text(languages[language].login)

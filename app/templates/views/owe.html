@@ -227,7 +227,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title color-font flex-between-center" style="width: 100%;"><div><span class="ln-total-owe">Total owe: </span><span class="title"></span></div><div class="total-owe"></div></h4>
+                <h4 class="modal-title color-font flex-between-center" style="width: 100%;"><div><span class="ln-total-owe"></span><span class="title"></span></div><div class="total-owe"></div></h4>
             </div>
             <div class="modal-body" style="height: 500px; overflow-y: scroll;">
                 <table class="table">
@@ -533,10 +533,15 @@
                     }))
 
                     total_change = accountUSD(data.total_change)
-
                     total_remain = accountUSD(data.total_remain)
-
-                    $('.customer-item#'+id).find('#paymentRemain').text(total_remain)
+                    
+                    if (data.total_remain > 0) {
+                        $('.customer-item#'+id).find('#paymentRemain').text(total_remain)
+                    } else {
+                        $('.customer-item#'+id).fadeOut('slow', function() {
+                            $(this).remove()
+                        })
+                    }
 
                     var element = '<div class="total-container"><div class="total-paid"><span class="color-font ln-total-paid">'+languagesObj[language].totalPaid+'</span><span>'+format_money+'</span></div><div class="total-remain"><span class="color-font ln-total-remain">'+languagesObj[language].totalRemain+'</span><span>'+total_remain+'</span></div></div><div class="change-container"><div class="change-left color-font"><span class="ln-total-return">'+languagesObj[language].totalReturn+'</span><span>'+total_change+'</span></div><div class="list-changes">'
                                                         
