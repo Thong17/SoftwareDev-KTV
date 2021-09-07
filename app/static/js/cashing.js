@@ -2,14 +2,19 @@ paymentObj = {
     'amounts': []
 }
 
+// When user click on Place Order button
 $(document).on('click', '.order-btn', function() {
     var id = $(this).attr('id')
     var isChange = $(this).attr('data-change')
     var drawer = $('.drawer-btn').attr('id')
+
+    // Check if the drawer is open
     if (drawer == 'none') {
         $('.drawer-btn').click()
     } else {
+        // Check if there is payment
         if ($(this).attr('data-check') == 'true') {
+            // Check if there is another payment add over an existing
             if (isChange == 'true') {
                 var transactions = document.querySelectorAll('.transaction-item')
                 var transactionArr = []
@@ -21,6 +26,7 @@ $(document).on('click', '.order-btn', function() {
                     customer = ''
                 }
                 var json = JSON.stringify(transactionArr)
+                // Check if the payment is in cashing or order
                 if (id == '') {
                     $.ajax({
                         url: '/payment',

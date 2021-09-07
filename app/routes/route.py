@@ -1006,6 +1006,7 @@ def add_stock():
     id = str(uuid4())
 
     amount = float(cost) * int(quantity)
+
     if currency == 'KHR':
         amount /= float(rate)
         cost = float(cost) / 4000

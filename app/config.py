@@ -4,7 +4,7 @@ mysqlObj = {
     'user': 'root',
     'password': 'myroot',
     'host': 'localhost',
-    'database': 'restaurant'
+    'database': 'camping_cave'
 }
 
 class Config():
