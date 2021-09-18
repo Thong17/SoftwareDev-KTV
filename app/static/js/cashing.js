@@ -12,8 +12,10 @@ $(document).on('click', '.order-btn', function() {
     if (drawer == 'none') {
         $('.drawer-btn').click()
     } else {
+
         // Check if there is payment
         if ($(this).attr('data-check') == 'true') {
+
             // Check if there is another payment add over an existing
             if (isChange == 'true') {
                 var transactions = document.querySelectorAll('.transaction-item')
@@ -26,6 +28,7 @@ $(document).on('click', '.order-btn', function() {
                     customer = ''
                 }
                 var json = JSON.stringify(transactionArr)
+                
                 // Check if the payment is in cashing or order
                 if (id == '') {
                     $.ajax({

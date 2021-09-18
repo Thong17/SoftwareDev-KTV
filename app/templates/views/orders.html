@@ -37,6 +37,7 @@
         border-radius: 7px;
         box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15) !important;
         height: 90px;
+        cursor: pointer;
     }
 
     .room-container.active {
@@ -274,6 +275,21 @@
         color: var(--color-hover);
         position: absolute;
     }
+
+    .select-list select, .select-list input, .select-list button {
+        height: 38px;
+        border-radius: 15px;
+    }
+
+    .search-btn {
+        width: 70%;
+        border-radius: 15px !important;
+    }
+
+    .search-input {
+        width: 100% !important;
+    }
+
 </style>
 <script src="{{url_for('static', filename='js/fullcalendar.js')}}"></script>
 {% endblock %}
@@ -333,6 +349,10 @@
                             <option class="ln-process" value="process">In Process</option>
                         </select>
                     </div>
+                    <div class="search-btn flex-between notranslate color-text">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <input type="text" class="search-input active input-color color-text pl-2" placeholder="Search">
+                    </div>
                     <!-- <span class="btn-date prev-date"><i class="fa fa-angle-left" aria-hidden="true"></i></span> -->
                     <!-- <h2 class="fc-toolbar-title m-0" id="date"><span class="ln-date">Date</span>: {{ date | datetimefilter('%B %d, %Y') }}</h2> -->
                     <!-- <span class="btn-date next-date"><i class="fa fa-angle-right" aria-hidden="true"></i></span> -->
@@ -348,7 +368,7 @@
                     </thead>
                     <tbody id="order-list">
                         {% for order in orders %}
-                        <tr class="order-item" id="{{ order.id }}" data-href="/order/{{ order.id }}">
+                        <tr class="order-item" id="{{ order.id }}" data-href="/order/{{ order.id }}" data-search="{{ order.customerOrder.name }}{{ order.customerOrder.phone }}{{ order.order.room }}">
                             <td class="color-text">{% if order.customerOrder.name != '' %}{{ order.customerOrder.name }}{%
                                 else %}...{% endif %}</td>
                             <td class="color-text notranslate">{% if order.customerOrder.phone != '' %}{{
@@ -511,7 +531,7 @@
             }
             room = o.order
 
-            element += `<tr class="order-item" id="` + o.id + `" data-href="/order/`+o.id+`">
+            element += `<tr class="order-item" id="` + o.id + `" data-href="/order/`+o.id+`" data-search="`+_name+phone+room+`">
                 <td class="color-text">`+ _name + `</td>
                 <td class="color-text notranslate">`+ phone + `</td>
                 <td class="color-text notranslate">`+ room + `</td>
@@ -547,6 +567,21 @@
     }
 
     $(document).ready(function () {
+
+        // Search order
+        $(document).on('input', '.search-input', function() {
+            var val = $(this).val()
+            var list = $('#order-list').children()
+            Array.from(list).forEach((l, i) => {
+                var value = $(l).attr('data-search').toUpperCase()
+                if (value.indexOf(val.toUpperCase()) > -1) {
+                    $(l).css('display', 'table-row')
+                } else {
+                    $(l).css('display', 'none')
+                }
+            })
+        })
+
         $(document).on('click', '.order-item', function() {
             window.location = $(this).data("href")
         })
@@ -579,7 +614,10 @@
                                 <option class="ln-process" value="process">In Process</option>
                             </select>
                         </div>
-                        
+                        <div class="search-btn flex-between notranslate color-text">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            <input type="text" class="search-input active input-color color-text pl-2" placeholder="Search">
+                        </div>
                     </div>
                     <table id="order-table" class="table">
                     <thead>
@@ -615,6 +653,10 @@
                                     <option selected class="ln-process" value="process">In Process</option>
                                 </select>
                             </div>
+                            <div class="search-btn flex-between notranslate color-text">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                <input type="text" class="search-input active input-color color-text pl-2" placeholder="Search">
+                            </div>
                             
                         </div>
                         <table id="order-table" class="table">
@@ -647,6 +689,10 @@
                                     <option selected class="order" value="order">Order</option>
                                     <option class="ln-process" value="process">In Process</option>
                                 </select>
+                            </div>
+                            <div class="search-btn flex-between notranslate color-text">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                <input type="text" class="search-input active input-color color-text pl-2" placeholder="Search">
                             </div>
                             
                         </div>

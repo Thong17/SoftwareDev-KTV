@@ -1,0 +1,164 @@
+{% extends 'views/custome.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/dataTables.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/buttons.dataTables.min.css')}}">
+<style>
+    thead {
+        background-color: var(--color-menu);
+    }
+
+    tbody tr td {
+        cursor: default !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap-container">
+    <table class="table" id="customerTable">
+        <thead>
+            <tr class="color-font">
+                <td class="color-text ln-customer" style="width: 10%;"></td>
+                <td class="color-text ln-phone"></td>
+                <td class="color-text ln-birthdate"></td>
+                <td class="color-text ln-since"></td>
+                <td class="color-text ln-owe"></td>
+                <td class="color-text"></td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+                {% if customer.name != 'Customer' %}
+                <tr class="customer-item notranslate" style="font-size: 13px;" id="{{ customer.id }}">
+                    <td class="color-text">
+                        {% if customer.name %}
+                            {{ customer.name }}
+                        {% else %}
+                            ...
+                        {% endif %}
+                    </td>
+                    <td class="color-text">
+                        {% if customer.phone %}
+                            {{ customer.phone }}
+                        {% else %}
+                            ...
+                        {% endif %}
+                    </td>
+                    <td class="color-text">
+                        {% if customer.birthdate %}
+                            {{ customer.birthdate }}
+                        {% else %}
+                            ...
+                        {% endif %}
+                    </td>
+                    <td class="color-text">{{ customer.createdOn | datetimefilter('%Y/%m/%d %H:%M:%S') }}</td>
+                    <td class="color-text underline">
+                        {% if customer.customerOwe and customer.customerOwe[0].remain %}
+                            <span class="currency-format">{{ customer.customerOwe[0].remain }}</span>
+                        {% else %}
+                            ...
+                        {% endif %}
+                    </td>
+                    <td class="color-text flex-end-center"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="editCustomer" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title color-font ln-edit-customer"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-7 pr-0">
+                        <div class="form-group">
+                            <input class="form-control input-color" type="text" name="customer-name" id="customer-name">
+                            <label class="label customer-name ln-name" for="customer-name">Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <input class="form-control input-color" type="text" name="customer-phone" id="customer-phone">
+                            <label class="label customer-phone ln-phone" for="customer-phone">Phone</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input class="form-control input-color" type="date" name="customer-dob" id="customer-dob">
+                    <label class="label customer-dob ln-birthdate" for="customer-dob">Date of Birth</label>
+                </div>
+                <div class="from-group" style="position: relative; padding-top: 23px; margin: 5px;">
+                    <textarea name="customer-details" id="customer-details" class="form-control input-color textarea"></textarea>
+                    <label for="customer-details" class="label customer-details ln-description">Description</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn color-font close-modal ln-cancel" data-dismiss="modal"></button>
+                <button class="btn border customer-save color-font ln-save"></button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{{url_for('static', filename='js/dataTables.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
+<script>
+    $('#transactionTable').DataTable({
+        "scrollCollapse": true,
+        "searching": false,
+        "scrollY": "70vh",
+        "paging": false,
+        "drawCallback": function( settings ) {
+            
+        }
+    })
+
+    currencyFormat()
+
+    $('.fa-pencil-square-o').on('click', function() {
+        id = $(this).closest('tr').attr('id')
+        $.ajax({
+            url: '/customer/edit/'+id,
+            type: 'POST',
+            success: function(data) {
+                $('#customer-name').val(data.name)
+                $('#customer-phone').val(data.phone)
+                $('#customer-dob').val(data.birthdate)
+                $('#customer-details').val(data.description)
+                $('.customer-save').attr('id', data.id)
+                $('#editCustomer').modal('show')
+            }
+        })
+    })
+
+    $('.customer-save').on('click', function() {
+        id = $(this).attr('id')
+        customer = $('#customer-name').val()
+        phone = $('#customer-phone').val()
+        birthdate = $('#customer-dob').val()
+        description = $('#customer-details').val()
+
+        $.ajax({
+            url: '/customer/save/'+id,
+            type: 'POST',
+            data: {customer: customer, phone: phone, birthdate: birthdate, description: description},
+            success: function(data) {
+                if (data.result == 'Success') {
+                    window.location.reload()
+                } else {
+                    alert(languagesAlert[language].customerError)
+                    $('#customer-name').focus()
+                }
+            }
+        })
+    })
+</script>
+{% endblock %}

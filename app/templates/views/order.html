@@ -1494,7 +1494,11 @@
 
     $(document).on('keypress', '#input-discount', function (e) {
         if (e.which == 13) {
-            $('#input-quantity').focus()
+            if ($('#input-quantity').prop('disabled')) {
+                $('.save-checkout').click()
+            } else {
+                $('#input-quantity').focus()
+            }
         }
     })
 

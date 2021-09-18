@@ -84,6 +84,23 @@ html[data-theme=blue] {
   --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
 }
 
+html[data-theme=red] {
+  --color-tooltip: rgb(80, 10, 10);
+  --color-bg: rgb(53, 8, 8);
+  --color-menu-bg: rgba(53, 8, 8, 0.9);
+  --color-menu: rgb(66, 13, 13);
+  --color-font: rgb(255, 255, 255);
+  --color-logo: rgb(223, 223, 223);
+  --color-text: rgb(201, 201, 201);
+  --color-hr: rgba(243, 243, 243, 0.1);
+  --color-hover: rgba(255, 255, 255, 0.3);
+  --color-btn-hover: rgba(255, 255, 255, 0.9);
+  --color-shadow: rgba(1, 1, 1, 0.1);
+  --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+  --color-label: #696969;
+  --color-inset: 0 0 0 3px hsla(0, 0%, 100%, 0), 0 0 0 4px hsla(0, 0%, 83.9%, 0), inset 0 2px 2px 0 rgba(0, 0, 0, .2);
+}
+
 html[data-theme=dark] {
   --color-tooltip: rgb(29, 29, 29);
   --color-bg: rgb(37, 37, 37);
@@ -1686,7 +1703,7 @@ table tbody tr {
   display: grid;
   grid-column-gap: 30px;
   grid-row-gap: 50px;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   grid-template-rows: repeat(auto-fill, minmax(200px, 200px));
   padding: 15px;
   overflow-y: auto;

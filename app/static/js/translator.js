@@ -192,6 +192,7 @@ $.fn.translator = function () {
             phone: 'Telepon',
             room: 'Kamar',
             newCustomer: 'Pelanggan baru',
+            editCustomer: 'Sunting Pelanggan',
             from: 'Dari',
             to: 'Untuk',
             birth: 'Tanggal lahir',
@@ -345,6 +346,7 @@ $.fn.translator = function () {
             phone: 'Phone',
             room: 'Room',
             newCustomer: 'New Customer',
+            editCustomer: 'Edit Customer',
             from: 'From',
             to: 'To',
             birth: 'Birthdate',
@@ -498,6 +500,7 @@ $.fn.translator = function () {
             phone: 'ទូរស័ព្ទ',
             room: 'បន្ទប់',
             newCustomer: 'អតិថិជនថ្មី',
+            editCustomer: 'កែប្រែអតិថិជន',
             from: 'ពី',
             to: 'ដល់',
             birth: 'ថ្ងៃកំណើត',
@@ -655,6 +658,7 @@ $.fn.translator = function () {
             phone: 'Điện thoại',
             room: 'Phòng',
             newCustomer: 'Khách hàng mới',
+            editCustomer: 'Chỉnh sửa khách hàng',
             from: 'Từ',
             to: 'Đến',
             birth: 'Ngày sinh',
@@ -900,6 +904,7 @@ $.fn.translator = function () {
     $('.ln-from').text(languages[language].from)
     $('.ln-to').text(languages[language].to)
     $('.ln-new-customer').text(languages[language].newCustomer)
+    $('.ln-edit-customer').text(languages[language].editCustomer)
     $('.ln-room').text(languages[language].room)
     $('.ln-phone').text(languages[language].phone)
     $('.ln-customer').text(languages[language].customer)

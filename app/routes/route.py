@@ -3342,4 +3342,32 @@ def checkout_owe(id):
             return jsonify({'result': 'Failed', 'rate': rate})
     else:
         return jsonify({'result': 'Failed', 'rate': rate})
+
+@route.route('/customer')
+def customer():
+    customers = tblCustomer.query.all()
+    return render_template('views/customer.html', customers=customers)
+
+@route.route('/customer/edit/<id>', methods=['POST'])
+def edit_customer(id):
+    Customer = tblCustomer.query.get(id)
+    json = CustomerSchema()
+    customer = json.dump(Customer)
+    return jsonify(customer)
+
+@route.route('/customer/save/<id>', methods=['POST'])
+def save_customer(id):
+    customer = tblCustomer.query.get(id)
+    if request.form['birthdate'] == '':
+        customer.birthdate = None
+    else:
+        customer.birthdate = request.form['birthdate']
+    customer.name = request.form['customer']
+    customer.phone = request.form['phone']
+    customer.description = request.form['description']
+    try:
+        db.session.commit()
+        return jsonify({'result': 'Success'})
+    except:
+        return jsonify({'result': 'Faild'})
    
