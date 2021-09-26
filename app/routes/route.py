@@ -858,12 +858,19 @@ def save_value(id):
         value.price)+'/'+value.currency+'/'+value.description+' in product: '+value.productId, type='Modify', createdBy=current_user.id)
     db.session.add(Activity)
     value.value = request.form['value']
-    value.price = request.form['price']
+    value.priceCurrency = request.form['price']
     value.currency = request.form['currency']
+
+    # Exchange price base on currency
+    if value.currency == 'KHR':
+        value.price = float(value.priceCurrency) / 4000
+    else:
+        value.price = value.priceCurrency
+
     value.description = request.form['description']
     try:
         db.session.commit()
-        return jsonify({'resutl': 'success', 'value': value.value, 'price': value.price, 'currency': value.currency, 'description': value.description})
+        return jsonify({'resutl': 'success', 'value': value.value, 'price': value.priceCurrency, 'currency': value.currency, 'description': value.description})
     except:
         return jsonify({'resutl': 'failed'})
 
@@ -878,6 +885,29 @@ def remove_value(id):
     db.session.commit()
     return jsonify({'result': 'Success'})
 
+# Update value to default
+@route.route('/value/default/<id>', methods=['POST'])
+def default_value(id):
+    propertyId = request.form['propertyId']
+    productId = request.form['productId']
+    value = tblValue.query.get(id)
+    Activity = tblActivity(id=str(uuid4()), activity=current_user.username+' has updated: ' +
+                           value.value+' to default value', type='Modify', createdBy=current_user.id)
+    db.session.add(Activity)
+
+    # remove the existing default value
+    values = tblValue.query.filter(tblValue.propertyId == propertyId, tblValue.productId == productId).all()
+    for v in values:
+        v.isDefault = False
+    
+    # set the current value to default
+    value.isDefault = True
+
+    try:
+        db.session.commit()
+        return jsonify({'result': 'Success'})
+    except: 
+        return jsonify({'result': 'Faild'})
 
 @route.route('/color/<id>', methods=['POST'])
 def get_color(id):

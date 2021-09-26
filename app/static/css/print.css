@@ -3,6 +3,8 @@
     src: url('/static/fonts/Hanuman-Regular.ttf') format('truetype'), url('/static/fonts/Hanuman-Bold.ttf') format('truetype');
 } 
 
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans+Narrow&display=swap');
+
 @media print {
     #lang-container {
        display: none;
@@ -12,7 +14,7 @@
 * {
     margin: 0;
     padding: 0;
-    font-family: sans-serif, 'Hanuman';
+    font-family: 'PT Sans Narrow', sans-serif, 'Hanuman';
 }
 
 body {
@@ -40,18 +42,13 @@ body {
 
 .location {
     font-size: 43px;
-    font-weight: 400;
+    font-weight: 500;
     color: #333;
-}
-
-.date-time {
-    border-bottom: 3px solid rgba(0, 0, 0, 0.8);
-    -webkit-print-color-adjust: exact;
 }
 
 .date-time,
 .invoice-cashier {
-    font-size: 43px;
+    font-size: 48px;
     font-weight: 500;
     width: 100%;
     display: flex;
@@ -66,22 +63,20 @@ body {
 
 .bottom-spacing {
     height: 300px;
-    border-bottom: 3px solid rgba(0, 0, 0, 0.8);
+    border-bottom: 5px dashed rgba(0, 0, 0, 0.8);
     border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-thead {
-    -webkit-print-color-adjust: exact;
-}
-
 thead tr {
-    background-color: rgba(0, 0, 0, 0.1) !important;
-    font-size: 43px;
-    font-weight: 600;
+    background-color: none !important;
+    font-size: 50px;
+    font-weight: 700;
+    border-top: 5px dashed rgba(0, 0, 0, 0.8);
+    border-bottom: 5px dashed rgba(0, 0, 0, 0.8);
 }
 
 tbody tr {
-    font-size: 33px;
+    font-size: 50px;
     font-weight: 500;
 }
 
@@ -115,7 +110,7 @@ tbody tr {
 }
 
 .total-return {
-    border-top: 3px solid rgba(0, 0, 0, 0.8);
+    border-top: 5px dashed rgba(0, 0, 0, 0.8);
     -webkit-print-color-adjust: exact;
 }
 
@@ -136,5 +131,10 @@ tbody tr {
 .footer-container {
     margin-top: 50px;
     font-size: 43px;
+    font-weight: 500;
+}
+
+.total-amount {
+    font-size: 50px;
     font-weight: 600;
 }

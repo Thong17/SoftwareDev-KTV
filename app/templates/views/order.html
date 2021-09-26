@@ -636,7 +636,7 @@
             <div class="loader">
                 <div class="loading"></div>
             </div>
-            <div class="empty-result hide color-text ln-result">No product found...</div>
+            <div class="empty-result hide color-text ln-result"></div>
             {% if products %}
             {% for product in products %}
             {% if current_user.id in product.listFavorite|tojson|safe %}
@@ -758,7 +758,7 @@
             {% endif %}
             {% endfor %}
             {% else %}
-            <div class="empty-result color-text ln-result">No product found...</div>
+            <div class="empty-result color-text ln-result"></div>
             {% endif %}
         </div>
 
@@ -775,11 +775,11 @@
             <table class="table order-table notranslate">
                 <thead>
                     <tr class="color-font">
-                        <td style="width: 50%;" class="ln-description">Description</td>
-                        <td class="text-center ln-price" style="width: 20%;">Price</td>
-                        <td class="text-center ln-disc" style="width: 15%;">Disc</td>
-                        <td class="text-center ln-qty" style="width: 15%;">Qty</td>
-                        <td class="text-center ln-amount" style="width: 20%;">Amount</td>
+                        <td style="width: 50%;" class="ln-description"></td>
+                        <td class="text-center ln-price" style="width: 20%;"></td>
+                        <td class="text-center ln-disc" style="width: 15%;"></td>
+                        <td class="text-center ln-qty" style="width: 15%;"></td>
+                        <td class="text-center ln-amount" style="width: 20%;"></td>
                         <td class="text-center cancel-btn"></td>
                     </tr>
                 </thead>
@@ -827,7 +827,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span class="ln-alreadyPaid">Already Paid</span>
+                                <span class="ln-alreadyPaid"></span>
                             </button>
                         {% else %}
                             <button class="btn color-text order-btn btn-primary btn-transaction" id="{{ Order.checkin.orderPayment.id }}" data-change="true" data-id="{{ Order.id }}" data-payment="{{ Order.checkin.paymentId }}" data-check='true'>
@@ -835,7 +835,7 @@
                                     <span class="sum-order notranslate">{{ Order.checkin.orderPayment.transactions.count() }}</span>
                                     <i class="fa fa-cart-arrow-down" aria-hidden="true" style="color: var(--color-font);"></i>
                                 </span>
-                                <span class="ln-order">Payment</span>
+                                <span class="ln-order"></span>
                             </button>
                         {% endif %}
                     {% else %}
@@ -843,29 +843,29 @@
                         data-change="true" data-payment="{{ Order.checkin.paymentId }}">
                         
                         <div class="dropup">
-                            <span class="mr-2 order-icon notranslate" id="duration-btn" data-toggle="dropdown" style="color: var(--color-text);">0</span>
+                            <span class="mr-2 order-icon notranslate" id="duration-btn" data-toggle="dropdown" style="color: var(--color-text);">0min</span>
                             <ul class="dropdown-menu m-0 p-2">
-                                <li class="flex-between-start"><span class="color-text ln-checkin">Checked In </span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
+                                <li class="flex-between-start"><span class="color-text ln-checkin"></span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
-                                <li class="mb-3 flex-between-center"><span class="color-text ln-duration">Duration </span><span id="calculate-time" class="text-danger notranslate"></span></li>
-                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end">Confirm</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
+                                <li class="mb-3 flex-between-center"><span class="color-text ln-duration"></span><span id="calculate-time" class="text-danger notranslate"></span></li>
+                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end"></span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
                             </ul>
                         </div>
-                        <span class="check-in-out ln-checkout">End</span>
+                        <span class="check-in-out ln-checkout"></span>
                     </button>
                     {% endif %}
                 {% else %}
                     <button class="btn color-text check-in btn-success btn-transaction" data-id="{{ Order.id }}"
                         data-change="true" data-payment="{{ Order.checkin.paymentId }}">
                         <span class="mr-2 order-icon" style="color: var(--color-text);">
-                            0
+                            0min
                         </span>
-                        <span class="check-in-out ln-checkin">Start</span>
+                        <span class="check-in-out ln-checkin"></span>
                     </button>
                 {% endif %}
                 <div class="arrow arrow-left animate-left-to-right">
                     <div class="flex-between-center">
-                        <span class="mr-1 color-text ln-total">Total:</span>
+                        <span class="mr-1 color-text ln-total"></span>
                         <span id="sumTotal" class="color-font currency-format notranslate">{{ total }}</span>
                     </div>
                 </div>
@@ -890,7 +890,7 @@
                     <div class="payment-bill">
                         <div class="payment-header">
                             <div class="payment-type">
-                                <div class="type-btn type-cash color-text active ln-cash">Cash</div>
+                                <div class="type-btn type-cash color-text active ln-cash"></div>
                             </div>
                         </div>
                         <div class="payment-body">
@@ -899,7 +899,7 @@
                                     <div class="form-group">
                                         <input type="number" step="any" class="form-control input-color"
                                             name="receive-cash" id="receive-cash" required>
-                                        <label for="receive-cash" class="label receive-cash ln-amount">Amount</label>
+                                        <label for="receive-cash" class="label receive-cash ln-amount"></label>
                                         <select name="receive-currency" id="receive-currency"
                                             class="form-control input-color">
                                             <option value="USD"><span>&#36;</span></option>
@@ -919,10 +919,10 @@
                                 <table class="table money-table">
                                     <thead>
                                         <tr class="color-font notranslate">
-                                            <td style="width: 40%;" class="ln-paid">Paid</td>
-                                            <td style="width: 15%; text-align:center;" class="ln-currency">Currency</td>
-                                            <td style="width: 10%; text-align:center;" class="ln-unit">Unit</td>
-                                            <td style="width: 25%; text-align:center;" class="ln-total">Total</td>
+                                            <td style="width: 40%;" class="ln-paid"></td>
+                                            <td style="width: 15%; text-align:center;" class="ln-currency"></td>
+                                            <td style="width: 10%; text-align:center;" class="ln-unit"></td>
+                                            <td style="width: 25%; text-align:center;" class="ln-total"></td>
                                             <td style="width: 10%;"></td>
                                         </tr>
                                     </thead>
@@ -941,27 +941,27 @@
                         </div>
                         <div class="invoice-body">
                             <div class="shop-details flex-column-start-center mb-1">
-                                <p class="color-text"><span class="ln-contact">Contact</span>: {{ store.phone }}</p>
+                                <p class="color-text"><span class="ln-contact"></span>: {{ store.phone }}</p>
                                 <p class="color-text notranslate">{{ store.location }}</p>
                             </div>
                             <div class="flex-between-center pb-1">
-                                <p class="color-text"><span class="ln-date">Date</span>: <span id="invoiceDate" class="notranslate"></span></p>
+                                <p class="color-text"><span class="ln-date"></span>: <span id="invoiceDate" class="notranslate"></span></p>
                                 <p class="color-text notranslate"><span id="invoiceTime"></span></p>
                             </div>
                             <div class="flex-between-center border-dashed py-1">
-                                <p class="color-text"><span class="ln-invoice">Invoice</span>: <span class="notranslate" id="invoiceNo"></span></p>
-                                <p class="color-text"><span class="ln-cashier">Cashier</span>: <span class="notranslate">{{ current_user.username
+                                <p class="color-text"><span class="ln-invoice"></span>: <span class="notranslate" id="invoiceNo"></span></p>
+                                <p class="color-text"><span class="ln-cashier"></span>: <span class="notranslate">{{ current_user.username
                                         }}</span></p>
                             </div>
                             <div class="item-payment">
                                 <table class="table invoice-table">
                                     <thead>
                                         <tr class="color-font">
-                                            <td style="width: 40%;" class="notranslate ln-description">Item Name</td>
-                                            <td style="width: 15%; text-align:center;" class="ln-price">Price</td>
-                                            <td style="width: 10%; text-align:center;" class="notranslate ln-disc">Disc</td>
-                                            <td style="width: 15%; text-align:center;" class="notranslate ln-qty">Qty</td>
-                                            <td style="width: 20%; text-align:center;" class="ln-total">Total</td>
+                                            <td style="width: 40%;" class="notranslate ln-description"></td>
+                                            <td style="width: 15%; text-align:center;" class="ln-price"></td>
+                                            <td style="width: 10%; text-align:center;" class="notranslate ln-disc"></td>
+                                            <td style="width: 15%; text-align:center;" class="notranslate ln-qty"></td>
+                                            <td style="width: 20%; text-align:center;" class="ln-total"></td>
                                         </tr>
                                     </thead>
                                     <tbody id="item-invoice" class="color-text notranslate"></tbody>
@@ -970,7 +970,7 @@
                         </div>
                         <div class="invoice-total border-dashed">
                             <div class="flex-between-start" style="width: 100%;">
-                                <p class="color-text ln-total" style="width: 50%;">Total</p>
+                                <p class="color-text ln-total" style="width: 50%;"></p>
                                 <div class="flex-between-center notranslate" style="width: 50%;">
                                     <p class="color-text">USD:</p>
                                     <p class="color-text" id="totalUSD"><span>&#36;</span></p>
@@ -981,16 +981,16 @@
                                 <p class="color-text" id="totalKHR"><span>&#6107;</span></p>
                             </div>
                             <div class="flex-between-center border-dashed my-1 pt-1 notranslate">
-                                <p class="color-text ln-paid">Cash:</p>
+                                <p class="color-text ln-paid"></p>
                                 <p class="color-text" id="totalCash">...</p>
                             </div>
                             <div class="flex-between-center notranslate">
-                                <p class="color-text ln-return">Return:</p>
+                                <p class="color-text ln-return"></p>
                                 <p class="color-text" id="totalChange">...</p>
                             </div>
                         </div>
                         <div class="invoice-footer">
-                            <p class="color-text ln-greet">Thank you for purchasing</p>
+                            <p class="color-text ln-greet"></p>
                         </div>
                     </div>
                     <button type="button" class="btn color-font close-modal invoice-close" data-dismiss="modal">
@@ -1006,7 +1006,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title color-font ln-drawer">Cash Drawer</h4>
+                <h4 class="modal-title color-font ln-drawer"></h4>
                 {% if current_user.drawer == '' %}
                 <div class="drawer-time" title="Drawer is off">
                     <span class="color-text" id="drawerTime"></span>
@@ -1029,13 +1029,13 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn color-font close-modal ln-close" data-dismiss="modal">Close</button>
+                <button type="button" class="btn color-font close-modal ln-close" data-dismiss="modal"></button>
                 {% if current_user.drawer == '' %}
-                <button class="btn border drawer-save color-font ln-create">Create</button>
-                <button class="btn border drawer-end color-font hide ln-end" id="{{ current_user.drawer }}">End</button>
+                <button class="btn border drawer-save color-font ln-create"></button>
+                <button class="btn border drawer-end color-font hide ln-end" id="{{ current_user.drawer }}"></button>
                 {% else %}
-                <button class="btn border drawer-save color-font hide ln-create">Create</button>
-                <button class="btn border drawer-end color-font ln-end" id="{{ current_user.drawer }}">End</button>
+                <button class="btn border drawer-save color-font hide ln-create"></button>
+                <button class="btn border drawer-end color-font ln-end" id="{{ current_user.drawer }}"></button>
                 {% endif %}
             </div>
         </div>
@@ -1112,7 +1112,7 @@
                         start = new Date(data.startDate +' '+ data.startTime)
                         _this.removeClass('check-in btn-success').addClass('check-out btn-danger')
                         _this.html(`<div class="dropup">
-                            <span class="mr-2 order-icon notranslate" id="duration-btn" data-toggle="dropdown" style="color: var(--color-text);">0</span>
+                            <span class="mr-2 order-icon notranslate" id="duration-btn" data-toggle="dropdown" style="color: var(--color-text);">0min</span>
                             <ul class="dropdown-menu m-0 p-2">
                                 <li class="flex-between-start"><span class="color-text ln-checkin">`+languagesObj[language].checkIn+`</span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">`+data.startTime+`</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">`+data.startDate+`</span></div></li>
                                 <hr>
@@ -1366,7 +1366,8 @@
         var orderId = generateString(23)
 
         var validation = {
-            isSelected: true
+            colorSelected: true,
+            propertySelected: true
         }
 
         var orderList = {
@@ -1388,19 +1389,20 @@
         orderList.productId = id
 
         if (colors.length > 0) {
-            validation.isSelected = false
+            validation.colorSelected = false
             Array.from(colors).forEach(c => {
                 var color = $(c).find('.span-color').attr('title')
 
                 if ($(c).hasClass('active')) {
                     details += '-' + color
-                    validation.isSelected = true
+                    validation.colorSelected = true
                     orderList.colorId = $(c).find('.span-color').attr('id')
                 }
             })
         }
 
         Array.from(properties).forEach(p => {
+            validation.propertySelected = false
             var valueObj = {}
             var pid = $(p).attr('id').split('_')[1]
             var pname = $(p).attr('id').split('_')[0].toLowerCase()
@@ -1408,6 +1410,7 @@
 
             var value = $('.value').find('input[name=' + pname + ']:checked').val()
             if (value != undefined) {
+                validation.propertySelected = true
                 valueObj['propertyName'] = pname
                 valueObj['propertyId'] = pid
                 valueObj['valueId'] = value
@@ -1421,14 +1424,19 @@
 
         orderLists.push(orderList)
 
-        if (validation.isSelected == true) {
+        if (validation.colorSelected == true && validation.propertySelected == true) {
             // Stockform
             $('.order-form').html(orderForm(orderId, details, cost, '', 1, accountUSD(cost)))
             $('.order-form').find('#input-discount').focus()
             $('#productProperty').modal('hide')
 
         } else {
-            alert(languagesAlert[language].colorConfirm)
+            if (validation.colorSelected == false) {
+                alert(languagesAlert[language].colorConfirm)
+            } 
+            if (validation.propertySelected == false) {
+                alert(languagesAlert[language].propertyConfirm)
+            }
         }
     })
 
@@ -1630,8 +1638,14 @@
                 var precision = 0
                 var v_price = $(v).find('#value-price').text()
                 var c_price = accounting.unformat(v_price) - accounting.unformat(price)
-                if (c_price % 1 != 0) {
-                    precision = 3
+                if (c_price % 1 == 0) {
+                    precision = 0
+                } else {
+                    if ((c_price * 1).toString().split('.')[1].length > 2) {
+                        precision = 3
+                    } else {
+                        precision = 2
+                    }
                 }
 
                 var n_price = accounting.formatMoney(c_price, {

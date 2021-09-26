@@ -33,7 +33,8 @@ languagesAlert = {
         inProcess: 'Gagal! Status sedang dalam proses',
         floorError: 'Gagal! Tidak dapat menghapus data yang ada di lantai',
         noTransaction: 'Tidak ada transaksi yang ditambahkan!',
-        roomProcess: 'Kamar sedang dalam proses'
+        roomProcess: 'Kamar sedang dalam proses',
+        propertyConfirm: 'Silakan pilih kolom input'
     },
     english: {
         invalidFile: 'Invalide file!',
@@ -67,7 +68,8 @@ languagesAlert = {
         inProcess: 'Failed! Status is in process',
         floorError: 'Failed! Unable to delete the existing data in the floor',
         noTransaction: 'No transaction added!',
-        roomProcess: 'Room is in process'
+        roomProcess: 'Room is in process',
+        propertyConfirm: 'Please choose the input field'
     },
     khmer: {
         invalidFile: 'File ដែលបានជ្រើសរើសមិនត្រឹមត្រូវទេ',
@@ -101,7 +103,8 @@ languagesAlert = {
         inProcess: 'បរាជ័យ! ស្ថានភាពកំពុងដំណើរការ',
         floorError: 'បរាជ័យ! មិនអាចលុបបានទេព្រោះមានទិន្នន័យ',
         noTransaction: 'មិនមានប្រតិបត្តិការបង្កើតទេ',
-        roomProcess: 'បន្ទប់កំពុងដំណើរការ'
+        roomProcess: 'បន្ទប់កំពុងដំណើរការ',
+        propertyConfirm: 'សូមជ្រើសរើសវាលបញ្ចូល'
     },
     vietnam: {
         invalidFile: 'Tập tin không hợp lệ!',
@@ -135,7 +138,8 @@ languagesAlert = {
         inProcess: 'Thất bại! Trạng thái đang trong quá trình',
         floorError: 'Thất bại! Không thể xóa dữ liệu hiện có trong sàn',
         noTransaction: 'Không có giao dịch nào được thêm vào!',
-        roomProcess: 'Phòng đang được xử lý'
+        roomProcess: 'Phòng đang được xử lý',
+        propertyConfirm: 'Vui lòng chọn trường đầu vào'
     }
 }
 
@@ -296,7 +300,8 @@ $.fn.translator = function () {
             logout: 'Keluar',
             login: 'Gabung',
             register: 'Daftar',
-            totalOwe: 'Total Hutang'
+            totalOwe: 'Total Hutang',
+            grandTotal: 'Total keseluruhan'
         },
         english: {
             advertise: 'Advertise',
@@ -305,7 +310,7 @@ $.fn.translator = function () {
             financial: 'Financial',
             customize: 'Modify',
             reports: 'Reports',
-            configuration: 'Setting',
+            configuration: 'Configuration',
             cashing: 'Cashing',
             order: 'Order',
             stock: 'Stock',
@@ -450,7 +455,8 @@ $.fn.translator = function () {
             logout: 'Logout',
             login: 'Login',
             register: 'Register',
-            totalOwe: 'Total Owe'
+            totalOwe: 'Total Owe',
+            grandTotal: 'Grand Total'
         },
         khmer: {
             advertise: 'ពាណិជ្ជកម្ម',
@@ -608,7 +614,8 @@ $.fn.translator = function () {
             logout: 'ចាកចេញ',
             login: 'ចូល',
             register: 'ចុះឈ្មោះ',
-            totalOwe: 'សរុបជំពាក់'
+            totalOwe: 'សរុបជំពាក់',
+            grandTotal: 'តំលៃ​បូក​សរុប'
         },
         vietnam: {
             advertise: 'Quảng cáo',
@@ -762,7 +769,8 @@ $.fn.translator = function () {
             logout: 'Đăng xuất',
             login: 'Đăng nhập',
             register: 'Đăng ký',
-            totalOwe: 'Tổng nợ'
+            totalOwe: 'Tổng nợ',
+            grandTotal: 'Tổng cộng'
         }
     }
 

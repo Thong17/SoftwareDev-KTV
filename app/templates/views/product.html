@@ -17,11 +17,12 @@
         <div class="column-wrapper" style="width: 350px; box-sizing: border-box; overflow: hidden;">
             <div id="brand-nav">
                 <div class="flex-between-end">
-                    <h5 class="color-font ln-brand">Brands</h5>
+                    <h5 class="color-font ln-brand"></h5>
                     <button class="btn border color-font btn-slim" id="add-brand">
                         <p class="plus">+</p>
                     </button>
                 </div>
+
                 <hr class="mt-2">
                 <div class="item-container" style="height: 70vh;">
                     {% if brands %}
@@ -80,9 +81,9 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn color-font" data-dismiss="modal">Cancel</button>
-                <button class="btn border save-btn color-font">Save</button>
-                <button class="hide btn border edit-btn color-font">Edit</button>
+                <button type="button" class="btn color-font ln-cancel" data-dismiss="modal">Cancel</button>
+                <button class="btn border save-btn color-font ln-save">Save</button>
+                <button class="hide btn border edit-btn color-font ln-edit">Edit</button>
             </div>
         </div>
     </div>
@@ -219,6 +220,7 @@
                                                     zero: '...'
                                                 }
                                             })
+                    
 
                     $('label#' + id).find('#value-value').text(data.value)
                     $('label#' + id).find('#value-price').text(price)
@@ -307,6 +309,23 @@
             })
         }
         return false
+    })
+
+    // Check if the select value input radio is changed
+    $(document).on('change', '#select-value', function() {
+        valueId = $(this).closest('.value').attr('id')
+        productId = $('.details-title').attr('id')
+        propertyId = $(this).closest('.property-values').attr('class').split(' property-')[1]
+        $.ajax({
+            url: '/value/default/'+valueId,
+            type: 'POST',
+            data: {productId: productId, propertyId: propertyId},
+            success: function(data) {
+                if (data.result != 'Success') {
+                    alert(languagesAlert[language].error)
+                }
+            }
+        })
     })
 
     $('.grid-products').on('click', '.edit-product', function () {

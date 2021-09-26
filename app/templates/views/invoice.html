@@ -38,19 +38,19 @@
                 <thead>
                     <tr>
                         <td style="width: 50%;" class="lni-description">Description</td>
+                        <td style="width: 10%;" class="lni-qty">QTY</td>
                         <td style="width: 15%;" class="lni-price">Price</td>
-                        <td style="width: 10%;" class="lni-disc">Disc</td>
-                        <td style="width: 10%;" class="lni-qty">Qty</td>
+                        <td style="width: 10%;" class="lni-disc">DISC</td>
                         <td style="width: 15%;" class="lni-total">Total</td>
                     </tr>
                 </thead>
                 <tbody>
                     {% for transaction in payment.transactions %}
                     <tr>
-                        <td>{{ transaction.description }}</td>
+                        <td>- {{ transaction.description }}</td>
+                        <td>{{ transaction.quantity }}</td>
                         <td class="dollar-format">{{ transaction.price }}</td>
                         <td>{{ transaction.discount }}%</td>
-                        <td>{{ transaction.quantity }}</td>
                         <td class="dollar-format">{{ transaction.amount }}</td>
                     </tr>
                     {% endfor %}
@@ -59,32 +59,32 @@
             <div class="bottom-spacing"></div>
         </div>
         <div class="total-container pt-3">
-            <span style="width: 50%;" class="lni-total">Total</span>
+            <span style="width: 50%;" class="lni-grand-total total-amount">Grand Total</span>
             <div class="total-details">
                 <div class="total-price pb-2">
                     <div class="total-usd flex-between">
-                        <span>USD:</span>
-                        <span class="dollar-format">{{ payment.amount }}</span>
+                        <span class="total-amount">USD:</span>
+                        <span class="dollar-format total-amount">{{ payment.amount }}</span>
                     </div>
                     <div class="total-khr flex-between">
-                        <span>KHR:</span>
-                        <span class="riel-format">{{ payment.amount * payment.rate }}</span>
+                        <span class="total-amount">KHR:</span>
+                        <span class="riel-format total-amount">{{ payment.amount * payment.rate }}</span>
                     </div>
                 </div>
                 <div class="total-return">
                     <div class="receive-cash flex-between">
-                        <span class="lni-paid">Paid:</span>
-                        <div><span class="receive">{{ payment.receive }}</span></div>
+                        <span class="lni-paid total-amount">Paid:</span>
+                        <div><span class="receive total-amount">{{ payment.receive }}</span></div>
                     </div>
                     {% if payment.remain > 0 %}
                     <div class="return-cash flex-between">
-                        <span class="lni-remain">Remain:</span>
-                        <div class="flex-column-start"><span class="dollar-format">{{ payment.remain }}</span><span class="riel-format">{{ payment.remain * payment.rate }}</span></div>
+                        <span class="lni-remain total-amount">Remain:</span>
+                        <div class="flex-column-start"><span class="dollar-format total-amount">{{ payment.remain }}</span></div>
                     </div>
                     {% else %}
                     <div class="return-cash flex-between">
-                        <span class="lni-return">Return:</span>
-                        <div class="flex-column-start"><span class="dollar-format">{{ payment.change }}</span><span class="riel-format">{{ payment.change * 4000 }}</span></div>
+                        <span class="lni-return total-amount">Return:</span>
+                        <div class="flex-column-start"><span class="dollar-format total-amount">{{ payment.change }}</span></div>
                     </div>
                     {% endif %}
                 </div>
@@ -111,6 +111,7 @@
             $('.lni-price').text(languagesObj[value].price)
             $('.lni-disc').text(languagesObj[value].disc)
             $('.lni-greet').text(languagesObj[value].greet)
+            $('.lni-grand-total').text(languagesObj[value].grandTotal)
         })
 
 
@@ -135,8 +136,8 @@
                 $(n).text(accounting.formatMoney(Math.round(text / 100) * 100, {
                                     precision: 0,
                                     format: {
-                                        pos: "(%v\u17DB)",
-                                        neg: "(%v\u17DB)",
+                                        pos: "%v\u17DB",
+                                        neg: "%v\u17DB",
                                         zero: ''
                                     }
                                 }))

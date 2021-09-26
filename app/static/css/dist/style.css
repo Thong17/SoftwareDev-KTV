@@ -1748,6 +1748,10 @@ table tbody tr {
   justify-content: space-between;
 }
 
+.list-products .product-item .item-wrapper .item-details div:nth-child(2) p:first-child {
+  font-size: 18px !important;
+}
+
 .list-products .product-item .item-wrapper .item-details .details .color-font {
   font-size: 18px !important;
 }
@@ -1765,7 +1769,7 @@ table tbody tr {
 
 .list-products .product-item .item-wrapper .item-details div:nth-child(2) p:first-child {
   text-align: end;
-  font-size: 13px !important;
+  font-size: 13px;
 }
 
 .list-products .product-item .item-wrapper .item-details .details #details-date {

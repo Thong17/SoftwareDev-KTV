@@ -1198,7 +1198,8 @@
         var orderId = generateString(23)
 
         var validation = {
-            isSelected: true
+            colorSelected: true,
+            propertySelected: true
         }
 
         var orderList = {
@@ -1220,19 +1221,20 @@
         orderList.productId = id
 
         if (colors.length > 0) {
-            validation.isSelected = false
+            validation.colorSelected = false
             Array.from(colors).forEach(c => {
                 var color = $(c).find('.span-color').attr('title')
 
                 if ($(c).hasClass('active')) {
                     details += '-' + color
-                    validation.isSelected = true
+                    validation.colorSelected = true
                     orderList.colorId = $(c).find('.span-color').attr('id')
                 }
             })
         }
 
         Array.from(properties).forEach(p => {
+            validation.propertySelected = false
             var valueObj = {}
             var pid = $(p).attr('id').split('_')[1]
             var pname = $(p).attr('id').split('_')[0].toLowerCase()
@@ -1240,11 +1242,11 @@
 
             var value = $('.value').find('input[name=' + pname + ']:checked').val()
             if (value != undefined) {
+                validation.propertySelected = true
                 valueObj['propertyName'] = pname
                 valueObj['propertyId'] = pid
                 valueObj['valueId'] = value
                 orderList.values.push(valueObj)
-
                 if ($(p).children().length > 1) {
                     details += '-' + vname
                 }
@@ -1253,13 +1255,18 @@
 
         orderLists.push(orderList)
 
-        if (validation.isSelected == true) {
+        if (validation.colorSelected == true && validation.propertySelected == true) {
             $('.order-form').html(orderForm(orderId, details, cost, '', 1, accountUSD(cost)))
             $('.order-form').find('#input-discount').focus()
             $('#productProperty').modal('hide')
 
         } else {
-            alert(languagesAlert[language].colorConfirm)
+            if (validation.colorSelected == false) {
+                alert(languagesAlert[language].colorConfirm)
+            } 
+            if (validation.propertySelected == false) {
+                alert(languagesAlert[language].propertyConfirm)
+            }
         }
     })
 
@@ -1436,8 +1443,15 @@
                 var precision = 0
                 var v_price = $(v).find('#value-price').text()
                 var c_price = accounting.unformat(v_price) - accounting.unformat(price)
-                if (c_price % 1 != 0) {
-                    precision = 3
+
+                if (c_price % 1 == 0) {
+                    precision = 0
+                } else {
+                    if ((c_price * 1).toString().split('.')[1].length > 2) {
+                        precision = 3
+                    } else {
+                        precision = 2
+                    }
                 }
 
                 var n_price = accounting.formatMoney(c_price, {

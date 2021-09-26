@@ -41,31 +41,31 @@
             {% endif %}
         </div>
         <li class="side-menu" id="home">
-            <span>Home</span>
+            <span></span>
             <a href="{{ url_for('route.index') }}">
                 <i class="fa fa-home" aria-hidden="true"></i>
             </a>
         </li>
         <li class="side-menu" id="financial">
-            <span>Financial</span>
+            <span></span>
             <a href="{{ url_for('route.financial') }}">
                 <i class="fa fa-usd" aria-hidden="true"></i>
             </a>
         </li>
         <li class="side-menu" id="customize">
-            <span>Modify</span>
+            <span></span>
             <a href="{{ url_for('route.custome') }}">
                 <i class="fa fa-sliders" aria-hidden="true"></i>
             </a>
         </li>
         <li class="side-menu" id="reports">
-            <span>Reports</span>
+            <span></span>
             <a href="{{ url_for('route.financial_report') }}">
                 <i class="fa fa-bar-chart" aria-hidden="true"></i>
             </a>
         </li>
         <li class="side-menu" id="configuration">
-            <span>Setting</span>
+            <span></span>
             <a href="/setting">
                 <i class="fa fa-cog" aria-hidden="true"></i>
             </a>
@@ -649,14 +649,14 @@
                     <input class="form-control input-color" type="text" name="property-name" id="property-name" value="` +
                 this.name +
                 `">
-                    <label class="label name" for="property-name">Name</label>
+                    <label class="label name" for="property-name">`+languagesObj[language].name+`</label>
                 </div>
                 <div class="row">
                     <div class="col-md-8 pr-0">
                         <div class="form-group">
                             <input class="form-control input-color" step="any" type="number" name="property-price" id="property-price" value="` +
                 accounting.unformat(this.price) + `">
-                            <label class="label price" for="property-price">Price</label>
+                            <label class="label price" for="property-price">`+languagesObj[language].price+`</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -670,7 +670,7 @@
                 <div class="form-group pb-3">
                     <textarea class="form-control input-color" type="text" id="property-description" name="property-description" style="min-height: 100px;">` +
                 this.details + `</textarea>
-                    <label class="label description" for="property-description">Description</label>
+                    <label class="label description" for="property-description">`+languagesObj[language].description+`</label>
                 </div>`
         }
 
@@ -777,14 +777,18 @@
             }
         }
 
-        function dynamicSort(property) {
+        function dynamicSort(property, desc) {
             var sortOrder = 1;
             if (property[0] === "-") {
                 sortOrder = -1;
                 property = property.substr(1);
             }
             return function (a, b) {
-                var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+                if (desc) {
+                    var result = (a[property] > b[property]) ? -1 : (a[property] < b[property]) ? 1 : 0;
+                } else {
+                    var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+                }
                 return result * sortOrder;
             }
         }
@@ -914,6 +918,14 @@
                                 currencyValue = '$'
                                 precision = 2
                             }
+
+                            // Check the input type radio if isDefault is true
+                            if (value.isDefault) {
+                                isChecked = 'checked'
+                            } else {
+                                isChecked = ''
+                            }
+
                             if (value.property == property.id) {
                                 value_element += `<label class="value container-input" id="` + value.id + `">
                                                     `+ product_btn + `
@@ -934,7 +946,7 @@
                                                                                                                                         }
                                                                                                                                     }) + `</p>
                                                     </div>
-                                                    <input type="radio" class="input-radio" name="` + property.id + `">
+                                                    <input type="radio" class="input-radio" id="select-value" name="` + property.id + `" `+isChecked+`>
                                                     <span class="checkbox"></span>
                                                 </label>`
                             }
@@ -1459,7 +1471,7 @@
                                                                                                             }
                                                                                                         }) + `</p>
                                         </div>
-                                        <input type="radio" name="` + data.property + `">
+                                        <input type="radio" name="` + data.property + `" id="select-value">
                                         <span class="checkbox"></span></label>`
 
                         var values = $('.property-' + data.property)
@@ -1535,8 +1547,6 @@
             var id = params.id
             var stocks = params.stocks
 
-            var configuration_element = ''
-
             var color_element = ''
 
             if (colors.length > 0) {
@@ -1559,19 +1569,30 @@
 
             var property_element = ''
 
+            var configuration_element = ''
+
             if (properties.length > 0) {
                 var propertyArr = []
                 properties.forEach(property => {
+                    var propertyString = ''
                     var value_element = ''
-
                     if (values.length > 0) {
                         var isSeleted = false
                         var propertyObj = {}
+                        configuration = ''
                         values.forEach(value => {
                             var precision = 0
-                            if (value.price % 1 != 0) {
-                                precision = 3
+
+                            if (value.price % 1 == 0) {
+                                precision = 0
+                            } else {
+                                if ((value.price * 1).toString().split('.')[1].length > 2) {
+                                    precision = 3
+                                } else {
+                                    precision = 2
+                                }
                             }
+
                             var selected = ''
                             var option = accounting.formatMoney(value.price, {
                                 precision: precision,
@@ -1581,9 +1602,10 @@
                                     zero: '<ion-icon class="value-active" name="checkmark-done-outline"></ion-icon>'
                                 }
                             })
-
+                            
                             if (value.property == property.id) {
-                                if (accounting.unformat(value.price) == 0 && isSeleted == false) {
+                                // Select value in product configuration if isDefault is true
+                                if (accounting.unformat(value.price) == 0 && value.isDefault == true) {
                                     isSeleted = true
                                     selected = 'checked'
                                     propertyObj['id'] = property.id
@@ -1591,12 +1613,26 @@
                                     propertyObj['value'] = value.value
                                     propertyObj['price'] = value.price
                                     propertyObj['description'] = value.description
-
-                                    configuration_element += `<div class="config-list flex-between" id="` + property.id + `">
+                                    configuration = `<div class="config-list flex-between" id="` + property.id + `">
+                                                                    <p class="property-name color-text" style="font-size: 13px">`+ property.property + `: <span class="color-font value-description">` + value.description.toLowerCase() + ' ' + value.value.toLowerCase() + `</span></p>
+                                                                </div>`
+                                } else if (accounting.unformat(value.price) == 0 && isSeleted == false) {
+                                    isSeleted = true
+                                    selected = 'checked'
+                                    propertyObj['id'] = property.id
+                                    propertyObj['name'] = property.property
+                                    propertyObj['value'] = value.value
+                                    propertyObj['price'] = value.price
+                                    propertyObj['description'] = value.description
+                                    configuration = `<div class="config-list flex-between" id="` + property.id + `">
                                                                 <p class="property-name color-text" style="font-size: 13px">`+ property.property + `: <span class="color-font value-description">` + value.description.toLowerCase() + ' ' + value.value.toLowerCase() + `</span></p>
                                                             </div>`
-                                }
-
+                                } else if (accounting.unformat(value.price) > 0 && isSeleted == false) {
+                                    configuration = `<div class="config-list flex-between" id="` + property.id + `">
+                                                                <p class="property-name color-text" style="font-size: 13px">`+ property.property + `: <span class="color-font value-description">...</span></p>
+                                                            </div>`
+                                } 
+                                
                                 value_element += `<label class="value container-input" id="` + value.id + `">
                                                     <div class="flex-between-start">
                                                         <div class="flex-column-start-start">
@@ -1610,20 +1646,19 @@
                                                     </div>
                                                     <span class="hide checkbox"></span>
                                                 </label>`
+                                propertyString = `<div class="flex-column-start-start mt-4">
+                                                        <h5 class="color-font mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>` +
+                                                    property.property + `</h5>
+                                                    </div>
+                                                    <div class="property-values" id="` + property.property.split(' ').join('-') + '_' + property.id + `">
+                                                        ` + value_element + `
+                                                    </div>`
                             }
                         })
+                        configuration_element += configuration
                         propertyArr.push(propertyObj)
-                    } else {
-                        value_element = '<button class="btn border btn-value color-font" disabled>...</button>'
                     }
-                    property_element +=
-                        `<div class="flex-column-start-start mt-4">
-                            <h5 class="color-font mb-3"><i class="fa fa-caret-right right" aria-hidden="true"></i>` +
-                        property.property + `</h5>
-                        </div>
-                        <div class="property-values" id="` + property.property.split(' ').join('-') + '_' + property.id + `">
-                            ` + value_element + `
-                        </div>`
+                    property_element += propertyString
                 });
             }
 

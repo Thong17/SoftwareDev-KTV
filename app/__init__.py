@@ -413,6 +413,10 @@ class tblAppearance(db.Model):
 class tblValue(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     value = db.Column(db.String(50), nullable=False)
+
+    # default field for product value
+    isDefault = db.Column(db.Boolean, default=False)
+
     price = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
     currency = db.Column(db.String(100), nullable=False)
     priceCurrency = db.Column(db.Numeric(10,4), nullable=True, default=0.00)
