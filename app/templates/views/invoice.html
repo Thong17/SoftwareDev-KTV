@@ -9,6 +9,9 @@
     <link rel="icon" href="{{url_for('static', filename='svg/icon.png')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
     <link href="https://fonts.googleapis.com/css2?family=Hanuman&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{url_for('static', filename='css/print.css')}}">
 </head>
 
@@ -148,7 +151,7 @@
             rielFormat()
             $(document).translator()
 
-            $('#print').printThis()
+            // $('#print').printThis()
             receive = $('.receive').text()
             usd = receive.split(',')[0]
             khr = receive.split(',')[1]

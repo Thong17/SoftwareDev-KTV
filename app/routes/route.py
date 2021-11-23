@@ -63,6 +63,42 @@ def load_user(id):
     return tblUser.query.get(id)
 
 
+# Flask API
+@route.route('/api/products')
+def api_products():
+    products = tblProduct.query.all()
+    schema = ProductSchema()
+    json = schema.dump(products, many=True)
+
+    for product in json:
+        category = tblCategory.query.get(product['productOfCategory'])
+        brand = tblBrand.query.get(product['productOfBrand'])
+        product['brand'] = brand.brand
+        product['category'] = category.category
+
+    return jsonify(json)
+
+@route.route('/api/product', methods=['POST'])
+def api_product():
+    products = tblProduct.query.all()
+    json_products = request.get_json()
+    results = []
+    for item in json_products:
+        product = tblProduct.query.get(item['id'])
+        schema = ProductSchema()
+        Product = schema.dump(product)
+        Product['qty'] = item['qty']
+        results.append(Product)
+    
+    return jsonify(results)
+
+
+
+
+
+
+
+
 @route.route('/login', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
@@ -3063,22 +3099,49 @@ def checkout_order(order_id):
         isCompleted = True
     
     if not isCompleted:
-        duration = request.form['duration']
+        duration = int(request.form['duration'])
+        actual_duration = duration
+        duration_type = request.form['type']
+
         if duration == '':
             duration = 0
 
-        minute = int(duration)
-        totalPrice = (float(Order.order.price) * minute) / 60
+        quantity = ''
 
-        if minute / 60 > 1:
-            quantity = str(int(minute / 60)) + 'h ' + str(round(minute % 60, 2)) + 'min'
+        # Latest updated
+        if duration_type != 'min':
+            if duration_type == 'h':
+                duration *= 60
+            if duration_type == 'd':
+                duration *= 1440
+            if duration_type == 'm':
+                duration *= 43800
+            if duration_type == 'y':
+                duration *= 525600
+            quantity = str(actual_duration) + duration_type
         else:
-            quantity = str(round(minute, 0)) + 'min'
+            if actual_duration / 525600 > 1:
+                quantity = str(int(actual_duration / 525600)) + 'y '
+                actual_duration %= 525600
+            if actual_duration / 43800 > 1:
+                actual_duration += str(int(actual_duration / 43800)) + 'm '
+                actual_duration %= 43800
+            if actual_duration / 1440 > 1:
+                quantity += str(int(actual_duration / 1440)) + 'd '
+                actual_duration %= 1440
+            if actual_duration / 60 > 1:
+                quantity += str(int(actual_duration / 60)) + 'h '
+                actual_duration %= 60
+            if actual_duration > 1:
+                quantity += str(actual_duration) + 'min'
+            
+
+        totalPrice = (float(Order.order.price) * duration) / 60
 
         description = Order.order.room  + ', ' + quantity
 
         cid = str(uuid4())
-        CheckOut = tblCheckout(id=cid, totalHour=minute, createdBy=current_user.id, orderId=order_id)
+        CheckOut = tblCheckout(id=cid, totalHour=duration, createdBy=current_user.id, orderId=order_id)
         
         
         tid = str(uuid4())

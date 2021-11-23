@@ -456,8 +456,13 @@
 
     .input-min {
         position: absolute;
-        top: 5px;
-        right: 97px;
+        top: 8px;
+        right: 65px;
+        width: 60px;
+        background-color: var(--color-menu);
+        border: 1px solid var(--color-hr);
+        border-radius: 5px;
+        outline: none !important;
     }
 
     .checkout-li {
@@ -848,7 +853,7 @@
                                 <li class="flex-between-start"><span class="color-text ln-checkin"></span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">{{ Order.checkin.startedOn | datetimefilter('%I:%M %p') }}</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">{{ Order.checkin.startedOn | datetimefilter('%B %d, %Y') }}</span></div></li>
                                 <hr>
                                 <li class="mb-3 flex-between-center"><span class="color-text ln-duration"></span><span id="calculate-time" class="text-danger notranslate"></span></li>
-                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end"></span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
+                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end"></span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><select class="color-text input-min"><option value="min">min</option><option value="h">hour</option><option value="d">day</option><option value="m">month</option><option value="y">year</option></select></div></div></li>
                             </ul>
                         </div>
                         <span class="check-in-out ln-checkout"></span>
@@ -1117,7 +1122,7 @@
                                 <li class="flex-between-start"><span class="color-text ln-checkin">`+languagesObj[language].checkIn+`</span><div class="flex-column-start-start"><span id="checkin-time" class="text-primary notranslate">`+data.startTime+`</span><span class="color-text notranslate" id="checkin-date" style="font-size: 10px;">`+data.startDate+`</span></div></li>
                                 <hr>
                                 <li class="mb-3 flex-between-center"><span class="color-text ln-duration">`+languagesObj[language].duration+` </span><span id="calculate-time" class="text-danger notranslate"></span></li>
-                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end">`+languagesObj[language].end+`</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><span class="color-text input-min">min</span></div></div></li>
+                                <li><div class="border checkout-li"><span class="color-text confirm-checkout ln-end">`+languagesObj[language].end+`</span><div class="color-text flex-between hide checkout-container" style="width: 100%;"><input type="number" class="input-checkout input-color"><span data-is="false" id="isConfirm"><ion-icon name="checkmark-outline"></ion-icon></span><select class="color-text input-min"><option value="min">min</option><option value="h">hour</option><option value="d">day</option><option value="m">month</option><option value="y">year</option></select></div></div></li>
                             </ul>
                         </div>
                         <span class="check-in-out ln-checkout">`+languagesObj[language].checkOut+`</span>`)
@@ -1129,14 +1134,20 @@
         }
     })
 
+    $(document).on('change', '.input-min', function() {
+        $('.input-checkout').val('').focus()
+    })
+
     $(document).on('click', '.check-out', function () {
         duration = $('.input-checkout').val()
+        duration_type = $('.input-min').val()
+
         id = $(this).attr('data-id')
         if ($('#isConfirm').attr('data-is') == 'true') {
             $.ajax({
                 url: '/checkout/order/' + id,
                 type: 'POST',
-                data: {duration: duration},
+                data: {duration: duration, type: duration_type},
                 success: function (data) {
                     if (data.msg == 'Success') {
                         $('.btn-transaction').removeClass('check-out btn-danger').addClass('order-btn  btn-primary').attr({'id': data.paymentId, 'data-check': false})
